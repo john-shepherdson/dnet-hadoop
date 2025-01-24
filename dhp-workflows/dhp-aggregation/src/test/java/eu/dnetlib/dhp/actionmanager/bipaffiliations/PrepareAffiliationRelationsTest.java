@@ -28,8 +28,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
+import eu.dnetlib.dhp.schema.oaf.utils.PidCleaner;
 
 public class PrepareAffiliationRelationsTest {
 
@@ -39,8 +39,7 @@ public class PrepareAffiliationRelationsTest {
 
 	private static Path workingDir;
 	private static final String ID_PREFIX = "50|doi_________::";
-	private static final Logger log = LoggerFactory
-		.getLogger(PrepareAffiliationRelationsTest.class);
+	private static final Logger log = LoggerFactory.getLogger(PrepareAffiliationRelationsTest.class);
 
 	@BeforeAll
 	public static void beforeAll() throws IOException {
@@ -74,8 +73,20 @@ public class PrepareAffiliationRelationsTest {
 	@Test
 	void testMatch() throws Exception {
 
-		String crossrefAffiliationRelationPath = getClass()
+		String crossrefAffiliationRelationPathNew = getClass()
 			.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/doi_to_ror.json")
+			.getPath();
+
+		String crossrefAffiliationRelationPath = getClass()
+			.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/doi_to_ror_old.json")
+			.getPath();
+
+		String publisherAffiliationRelationPath = getClass()
+			.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/publishers")
+			.getPath();
+
+		String publisherAffiliationRelationOldPath = getClass()
+			.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/publichers_old")
 			.getPath();
 
 		String outputPath = workingDir.toString() + "/actionSet";
@@ -84,10 +95,12 @@ public class PrepareAffiliationRelationsTest {
 			.main(
 				new String[] {
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
-					"-crossrefInputPath", crossrefAffiliationRelationPath,
+					"-crossrefInputPath", crossrefAffiliationRelationPathNew,
 					"-pubmedInputPath", crossrefAffiliationRelationPath,
-					"-openapcInputPath", crossrefAffiliationRelationPath,
-					"-dataciteInputPath", crossrefAffiliationRelationPath,
+					"-openapcInputPath", crossrefAffiliationRelationPathNew,
+					"-dataciteInputPath", crossrefAffiliationRelationPathNew,
+					"-webCrawlInputPath", crossrefAffiliationRelationPathNew,
+					"-publisherInputPath", publisherAffiliationRelationPath,
 					"-outputPath", outputPath
 				});
 
@@ -98,13 +111,8 @@ public class PrepareAffiliationRelationsTest {
 			.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
 			.map(aa -> ((Relation) aa.getPayload()));
 
-//        for (Relation r : tmp.collect()) {
-//            System.out.println(
-//                    r.getSource() + "\t" + r.getTarget() + "\t" + r.getRelType() + "\t" + r.getRelClass() + "\t" + r.getSubRelType() + "\t" + r.getValidationDate() + "\t" + r.getDataInfo().getTrust() + "\t" + r.getDataInfo().getInferred()
-//            );
-//        }
 		// count the number of relations
-		assertEquals(80, tmp.count());
+		assertEquals(162, tmp.count());// 18 + 24 + 30 * 4 =
 
 		Dataset<Relation> dataset = spark.createDataset(tmp.rdd(), Encoders.bean(Relation.class));
 		dataset.createOrReplaceTempView("result");
@@ -115,7 +123,7 @@ public class PrepareAffiliationRelationsTest {
 		// verify that we have equal number of bi-directional relations
 		Assertions
 			.assertEquals(
-				40, execVerification
+				81, execVerification
 					.filter(
 						"relClass='" + ModelConstants.HAS_AUTHOR_INSTITUTION + "'")
 					.collectAsList()
@@ -123,26 +131,56 @@ public class PrepareAffiliationRelationsTest {
 
 		Assertions
 			.assertEquals(
-				40, execVerification
+				81, execVerification
 					.filter(
 						"relClass='" + ModelConstants.IS_AUTHOR_INSTITUTION_OF + "'")
 					.collectAsList()
 					.size());
 
 		// check confidence value of a specific relation
-		String sourceDOI = "10.1061/(asce)0733-9399(2002)128:7(759)";
+		String sourceDOI = "10.1089/10872910260066679";
 
 		final String sourceOpenaireId = ID_PREFIX
-			+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", sourceDOI));
+			+ IdentifierFactory.md5(PidCleaner.normalizePidValue("doi", sourceDOI));
 
 		Assertions
 			.assertEquals(
-				"0.7071067812", execVerification
+				"1.0", execVerification
 					.filter(
 						"source='" + sourceOpenaireId + "'")
 					.collectAsList()
 					.get(0)
 					.getString(4));
+
+		final String publisherid = ID_PREFIX
+			+ IdentifierFactory.md5(PidCleaner.normalizePidValue("doi", "10.1089/10872910260066679"));
+		final String rorId = "20|ror_________::" + IdentifierFactory.md5("https://ror.org/05cf8a891");
+
+		Assertions
+			.assertEquals(
+				4, execVerification.filter("source = '" + publisherid + "' and target = '" + rorId + "'").count());
+
+		Assertions
+			.assertEquals(
+				1, execVerification
+					.filter(
+						"source = '" + ID_PREFIX
+							+ IdentifierFactory
+								.md5(PidCleaner.normalizePidValue("doi", "10.1007/s00217-010-1268-9"))
+							+ "' and target = '" + "20|ror_________::"
+							+ IdentifierFactory.md5("https://ror.org/03265fv13") + "'")
+					.count());
+
+		Assertions
+			.assertEquals(
+				1, execVerification
+					.filter(
+						"source = '" + ID_PREFIX
+							+ IdentifierFactory
+								.md5(PidCleaner.normalizePidValue("doi", "10.1007/3-540-47984-8_14"))
+							+ "' and target = '" + "20|ror_________::"
+							+ IdentifierFactory.md5("https://ror.org/00a0n9e72") + "'")
+					.count());
 
 	}
 }

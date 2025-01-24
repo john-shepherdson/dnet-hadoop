@@ -36,7 +36,7 @@ public class SolrRecordDumpJob extends AbstractSolrRecordTransformJob {
 
 	private final String inputPath;
 
-	private final String format;
+	private final String shadowFormat;
 
 	private final String outputPath;
 
@@ -61,8 +61,8 @@ public class SolrRecordDumpJob extends AbstractSolrRecordTransformJob {
 		final String inputPath = parser.get("inputPath");
 		log.info("inputPath: {}", inputPath);
 
-		final String format = parser.get("format");
-		log.info("format: {}", format);
+		final String shadowFormat = parser.get("shadowFormat");
+		log.info("shadowFormat: {}", shadowFormat);
 
 		final String outputPath = Optional
 			.ofNullable(parser.get("outputPath"))
@@ -95,27 +95,24 @@ public class SolrRecordDumpJob extends AbstractSolrRecordTransformJob {
 				final String isLookupUrl = parser.get("isLookupUrl");
 				log.info("isLookupUrl: {}", isLookupUrl);
 				final ISLookupClient isLookup = new ISLookupClient(ISLookupClientFactory.getLookUpService(isLookupUrl));
-				new SolrRecordDumpJob(spark, inputPath, format, outputPath).run(isLookup);
+				new SolrRecordDumpJob(spark, inputPath, shadowFormat, outputPath).run(isLookup);
 			});
 	}
 
-	public SolrRecordDumpJob(SparkSession spark, String inputPath, String format, String outputPath) {
+	public SolrRecordDumpJob(SparkSession spark, String inputPath, String shadowFormat, String outputPath) {
 		this.spark = spark;
 		this.inputPath = inputPath;
-		this.format = format;
+		this.shadowFormat = shadowFormat;
 		this.outputPath = outputPath;
 	}
 
 	public void run(ISLookupClient isLookup) throws ISLookUpException, TransformerException {
-		final String fields = isLookup.getLayoutSource(format);
+		final String fields = isLookup.getLayoutSource(shadowFormat);
 		log.info("fields: {}", fields);
 
 		final String xslt = isLookup.getLayoutTransformer();
 
-		final String dsId = isLookup.getDsId(format);
-		log.info("dsId: {}", dsId);
-
-		final String indexRecordXslt = getLayoutTransformer(format, fields, xslt);
+		final String indexRecordXslt = getLayoutTransformer(shadowFormat, fields, xslt);
 		log.info("indexRecordTransformer {}", indexRecordXslt);
 
 		final Encoder<TupleWrapper> encoder = Encoders.bean(TupleWrapper.class);

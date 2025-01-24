@@ -41,10 +41,7 @@ import com.google.common.collect.Sets;
 import com.mycila.xmltool.XMLDoc;
 import com.mycila.xmltool.XMLTag;
 
-import eu.dnetlib.dhp.oa.provision.model.JoinedEntity;
-import eu.dnetlib.dhp.oa.provision.model.RelatedEntity;
-import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
-import eu.dnetlib.dhp.oa.provision.model.XmlInstance;
+import eu.dnetlib.dhp.oa.provision.model.*;
 import eu.dnetlib.dhp.schema.common.*;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.Result;
@@ -219,6 +216,13 @@ public class XmlRecordFactory implements Serializable {
 		if (entity.getMeasures() != null) {
 			metadata.addAll(measuresAsXml(entity.getMeasures()));
 		}
+		if (entity.getContext() != null) {
+			contexts.addAll(entity.getContext().stream().map(Context::getId).collect(Collectors.toList()));
+			/* FIXME: Workaround for CLARIN mining issue: #3670#note-29 */
+			if (contexts.contains("dh-ch::subcommunity::2")) {
+				contexts.add("clarin");
+			}
+		}
 
 		if (ModelSupport.isResult(type)) {
 			final Result r = (Result) entity;
@@ -243,14 +247,6 @@ public class XmlRecordFactory implements Serializable {
 							.filter(Objects::nonNull)
 							.map(e -> XmlSerializationUtils.mapEoscIf(e))
 							.collect(Collectors.toList()));
-			}
-
-			if (r.getContext() != null) {
-				contexts.addAll(r.getContext().stream().map(c -> c.getId()).collect(Collectors.toList()));
-				/* FIXME: Workaround for CLARIN mining issue: #3670#note-29 */
-				if (contexts.contains("dh-ch::subcommunity::2")) {
-					contexts.add("clarin");
-				}
 			}
 
 			if (r.getTitle() != null) {
@@ -390,6 +386,7 @@ public class XmlRecordFactory implements Serializable {
 							.getSubject()
 							.stream()
 							.filter(Objects::nonNull)
+							.filter(ProvisionModelSupport::filterFosL1L2)
 							.map(s -> XmlSerializationUtils.mapStructuredProperty("subject", s))
 							.collect(Collectors.toList()));
 			}
@@ -1039,6 +1036,48 @@ public class XmlRecordFactory implements Serializable {
 				}
 
 				break;
+			case person:
+				final Person person = (Person) entity;
+
+				if (person.getGivenName() != null) {
+					metadata.add(XmlSerializationUtils.asXmlElement("givenname", person.getGivenName()));
+				}
+				if (person.getFamilyName() != null) {
+					metadata.add(XmlSerializationUtils.asXmlElement("familyname", person.getFamilyName()));
+				}
+				if (person.getAlternativeNames() != null) {
+					metadata
+						.addAll(
+							person
+								.getAlternativeNames()
+								.stream()
+								.map(altName -> XmlSerializationUtils.asXmlElement("alternativename", altName))
+								.collect(Collectors.toList()));
+				}
+				if (person.getBiography() != null) {
+					metadata.add(XmlSerializationUtils.asXmlElement("biography", person.getBiography()));
+				}
+				if (person.getSubject() != null) {
+					metadata
+						.addAll(
+							person
+								.getSubject()
+								.stream()
+								.map(pt -> {
+									List<Tuple2<String, String>> attrs = Lists.newArrayList();
+									attrs.add(new Tuple2<>("schema", pt.getSchema()));
+									attrs.add(new Tuple2<>("value", pt.getValue()));
+									attrs.add(new Tuple2<>("fromYear", String.valueOf(pt.getFromYear())));
+									attrs.add(new Tuple2<>("toYear", String.valueOf(pt.getToYear())));
+									return XmlSerializationUtils.asXmlElement("subject", attrs);
+								})
+								.collect(Collectors.toList()));
+				}
+				if (person.getConsent() != null) {
+					metadata.add(XmlSerializationUtils.asXmlElement("consent", String.valueOf(person.getConsent())));
+				}
+
+				break;
 			default:
 				throw new IllegalArgumentException("invalid entity type: " + type);
 		}
@@ -1243,6 +1282,25 @@ public class XmlRecordFactory implements Serializable {
 								.collect(Collectors.toList()));
 				}
 				break;
+
+			case person:
+
+				if (isNotBlank(re.getGivenName())) {
+					metadata.add(XmlSerializationUtils.asXmlElement("givenname", re.getGivenName()));
+				}
+				if (isNotBlank(re.getFamilyName())) {
+					metadata.add(XmlSerializationUtils.asXmlElement("familyname", re.getFamilyName()));
+				}
+				if (re.getAlternativeNames() != null && !re.getAlternativeNames().isEmpty()) {
+					metadata
+						.addAll(
+							re
+								.getAlternativeNames()
+								.stream()
+								.map(name -> XmlSerializationUtils.asXmlElement("alternativename", name))
+								.collect(Collectors.toList()));
+				}
+				break;
 			default:
 				throw new IllegalArgumentException("invalid target type: " + targetType);
 		}
@@ -1315,7 +1373,7 @@ public class XmlRecordFactory implements Serializable {
 								instance
 									.getCollectedfrom()
 									.stream()
-									.filter(cf -> kvNotBlank(cf))
+									.filter(XmlRecordFactory::kvNotBlank)
 									.map(cf -> XmlSerializationUtils.mapKeyValue("collectedfrom", cf))
 									.collect(Collectors.toList()));
 					}
@@ -1326,7 +1384,7 @@ public class XmlRecordFactory implements Serializable {
 								instance
 									.getHostedby()
 									.stream()
-									.filter(hb -> kvNotBlank(hb))
+									.filter(XmlRecordFactory::kvNotBlank)
 									.map(hb -> XmlSerializationUtils.mapKeyValue("hostedby", hb))
 									.collect(Collectors.toList()));
 					}
@@ -1336,7 +1394,7 @@ public class XmlRecordFactory implements Serializable {
 								instance
 									.getDateofacceptance()
 									.stream()
-									.filter(d -> isNotBlank(d))
+									.filter(StringUtils::isNotBlank)
 									.map(d -> XmlSerializationUtils.asXmlElement("dateofacceptance", d))
 									.collect(Collectors.toList()));
 					}
@@ -1346,7 +1404,7 @@ public class XmlRecordFactory implements Serializable {
 								instance
 									.getInstancetype()
 									.stream()
-									.filter(t -> !StringUtils.isNotBlank(t.getClassid()))
+									.filter(t -> StringUtils.isNotBlank(t.getClassid()))
 									.map(t -> XmlSerializationUtils.mapQualifier("instancetype", t))
 									.collect(Collectors.toList()));
 					}
@@ -1356,7 +1414,7 @@ public class XmlRecordFactory implements Serializable {
 								instance
 									.getDistributionlocation()
 									.stream()
-									.filter(d -> isNotBlank(d))
+									.filter(StringUtils::isNotBlank)
 									.map(d -> XmlSerializationUtils.asXmlElement("distributionlocation", d))
 									.collect(Collectors.toList()));
 					}
@@ -1409,7 +1467,7 @@ public class XmlRecordFactory implements Serializable {
 								instance
 									.getLicense()
 									.stream()
-									.filter(d -> isNotBlank(d))
+									.filter(StringUtils::isNotBlank)
 									.map(d -> XmlSerializationUtils.asXmlElement("license", d))
 									.collect(Collectors.toList()));
 					}
@@ -1540,11 +1598,16 @@ public class XmlRecordFactory implements Serializable {
 					.min(new RefereedComparator())
 					.orElse(XmlInstance.UNKNOWN_REVIEW_LEVEL));
 
+		Map<String, Qualifier> instanceTypes = Maps.newHashMap();
+
 		instances.forEach(p -> {
 			final Instance i = p.getRight();
 			instance.getCollectedfrom().add(i.getCollectedfrom());
 			instance.getHostedby().add(i.getHostedby());
-			instance.getInstancetype().add(i.getInstancetype());
+
+			if (Optional.ofNullable(i.getInstancetype()).map(Qualifier::getClassid).isPresent()) {
+				instanceTypes.putIfAbsent(i.getInstancetype().getClassid(), i.getInstancetype());
+			}
 			instance
 				.setProcessingchargeamount(
 					Optional.ofNullable(i.getProcessingchargeamount()).map(apc -> apc.getValue()).orElse(null));
@@ -1571,6 +1634,8 @@ public class XmlRecordFactory implements Serializable {
 				.ifPresent(instance::setFulltext);
 		});
 
+		instance.getInstancetype().addAll(instanceTypes.values());
+
 		if (instance.getHostedby().size() > 1
 			&& instance.getHostedby().stream().anyMatch(hb -> ModelConstants.UNKNOWN_REPOSITORY.equals(hb))) {
 			instance.getHostedby().remove(ModelConstants.UNKNOWN_REPOSITORY);
@@ -1596,9 +1661,7 @@ public class XmlRecordFactory implements Serializable {
 	private List<String> buildContexts(final String type, final Set<String> contexts) {
 		final List<String> res = Lists.newArrayList();
 
-		if (contextMapper != null
-			&& !contextMapper.isEmpty()
-			&& MainEntityType.result.toString().equals(type)) {
+		if (contextMapper != null && !contextMapper.isEmpty()) {
 
 			XMLTag document = XMLDoc.newDocument(true).addRoot("contextRoot");
 

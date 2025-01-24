@@ -68,15 +68,12 @@
         <FIELD copy="true" indexable="false" name="externalreflabel" result="false" stat="false" tokenizable="true" xpath="distinct-values(//*[local-name()='entity']/*//children/externalreference/label)"/>
         <FIELD copy="true" indexable="true" name="resultidentifier" result="false" stat="false" type="string_ci" xpath="distinct-values(//*[local-name()='entity']/*[local-name()='result']/children/instance/webresource/*[local-name()='url'])"/>
         <FIELD copy="true" indexable="false" name="resultsource" result="false" stat="false" xpath="distinct-values(//*[local-name()='entity']/*[local-name()='result']/source)"/>
-
         <FIELD indexable="true" multivalued="false" name="isgreen" result="false" stat="false" type="boolean" value="//*[local-name()='entity']/*[local-name()='result']/isgreen"/>
         <FIELD indexable="true" multivalued="false" name="openaccesscolor" result="false" stat="false" tokenizable="false" value="//*[local-name()='entity']/*[local-name()='result']/openaccesscolor"/>
         <FIELD indexable="true" multivalued="false" name="isindiamondjournal" result="false" stat="false" type="boolean" value="//*[local-name()='entity']/*[local-name()='result']/isindiamondjournal"/>
         <FIELD indexable="true" multivalued="false" name="publiclyfunded" result="false" stat="false" type="boolean" value="//*[local-name()='entity']/*[local-name()='result']/publiclyfunded"/>
-
         <FIELD indexable="true" multivalued="false" name="peerreviewed" result="false" stat="false" type="boolean" value="some $refereed in //*[local-name()='entity']/*[local-name()='result']/children/instance/*[local-name()='refereed']/@classid satisfies ($refereed = '0001')"/>
-
-
+        <FIELD indexable="true" multivalued="false" name="haslicense" result="false" stat="false" type="boolean" value="some $license in //*[local-name()='entity']/*[local-name()='result']/children/instance/*[local-name()='license']/text() satisfies (string-length($license) &gt; 0)"/>
         <FIELD indexable="true" name="eoscifguidelines" result="false" stat="false" tokenizable="false" xpath="distinct-values(//*[local-name() = 'result']/eoscifguidelines/@code)"/><!-- FOS and SDGs non tokenizable for faceted search-->
         <FIELD indexable="true" name="fos" result="false" stat="false" tokenizable="false" xpath="distinct-values(//*[local-name()='entity']/*[local-name()='result']/subject[@classid='FOS'])"/>
         <FIELD indexable="true" name="foslabel" result="false" stat="false" tokenizable="false" value="concat(./text(), '||', replace(./text(), '^\d+\s', ''))" xpath="//*[local-name()='entity']/*[local-name()='result']/subject[@classid='FOS']"/>
@@ -93,6 +90,7 @@
         <FIELD indexable="true" name="relorganizationid" result="false" stat="false" tokenizable="false" xpath="distinct-values(//*[local-name()='entity']/*//rel/to[@type='organization'])"/>
         <FIELD copy="true" indexable="true" name="relorganizationname" result="false" stat="false" xpath="distinct-values(//*[local-name()='entity']/*//rel[./to/@type='organization']/legalname)"/>
         <FIELD copy="true" indexable="true" name="relorganizationshortname" result="false" stat="false" xpath="distinct-values(//*[local-name()='entity']/*//rel[./to/@type='organization']/legalshortname)"/>
+        <FIELD indexable="true" name="relorganization" result="false" stat="false" tokenizable="false" value="distinct-values(concat(./to, '||', ./legalname))" xpath="//*[local-name()='entity']/*//rel[./to/@type='organization']"/>
         <FIELD indexable="true" name="relresultid" result="false" stat="false" tokenizable="false" xpath="distinct-values(//*[local-name()='entity']/*//rel/to[@type='publication' or @type='dataset' or @type='software' or @type='otherresearchproduct'])"/>
         <FIELD indexable="true" name="relresulttype" result="false" stat="false" tokenizable="false" xpath="distinct-values(//*[local-name()='entity']/*//rel/to/@type)"/>
         <FIELD indexable="true" name="relclass" result="false" stat="false" tokenizable="false" xpath="distinct-values(//*[local-name()='entity']/*//rel/to/@class)"/>
@@ -122,6 +120,7 @@
         <FIELD indexable="true" name="categoryid" result="false" stat="false" tokenizable="false" xpath="distinct-values(//*[local-name()='entity']/*[local-name()='result']/context/category/@id)"/>
         <FIELD indexable="true" name="conceptname" result="false" stat="false" tokenizable="false" xpath="distinct-values(//*[local-name()='entity']/*[local-name()='result']/context/category//concept/@label)"/><!-- new index field for country info from different xpaths for any type of entity -->
         <FIELD indexable="true" name="country" result="false" stat="false" tokenizable="false" xpath="distinct-values(//*[local-name()='entity']/*/country/@classid | //*[local-name()='entity']/*//rel[./to/@type='organization']/country/@classid | //*[local-name()='entity']//funder/@jurisdiction)"/>
+        <FIELD indexable="true" name="countrynojurisdiction" result="false" stat="false" tokenizable="false" xpath="distinct-values(//*[local-name()='entity']/*/country/@classid | //*[local-name()='entity']/*//rel[./to/@type='organization']/country/@classid)"/>
         <FIELD indexable="false" name="oafentity" result="true" stat="false" tokenizable="false" xpath="//*[local-name() = 'entity']"/><!-- impact indicators -->
         <FIELD copy="false" indexable="true" multivalued="false" name="influence" result="false" stat="false" type="pfloat" xpath="//measure[@id='influence']/@score/number()"/>
         <FIELD copy="false" indexable="true" multivalued="false" name="influence_class" result="false" stat="false" type="string" xpath="//measure[@id='influence']/@class/string()"/>

@@ -107,7 +107,8 @@ public class ReadCOCI implements Serializable {
 				.mode(SaveMode.Append)
 				.option("compression", "gzip")
 				.json(outputPath);
-			fileSystem.rename(fileStatus.getPath(), new Path("/tmp/miriam/OC/DONE"));
+
+			fileSystem.delete(fileStatus.getPath());
 		}
 
 	}

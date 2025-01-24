@@ -9,6 +9,26 @@
   ],
   "measures": [
     {
+      "id": "views",
+      "unit": [
+        {
+          "key": "opendoar____::358aee4cc897452c00244351e4d91f69||ZENODO",
+          "value": "5",
+          "dataInfo": null
+        }
+      ]
+    },
+    {
+      "id": "downloads",
+      "unit": [
+        {
+          "key": "opendoar____::358aee4cc897452c00244351e4d91f69||ZENODO",
+          "value": "2",
+          "dataInfo": null
+        }
+      ]
+    },
+    {
       "id": "influence",
       "unit": [
         {
@@ -1886,12 +1906,34 @@
         "trust": ""
       },
       "qualifier": {
-        "classid": "keyword",
-        "classname": "keyword",
+        "classid": "FOS",
+        "classname": "Fields of Science and Technology classification",
         "schemeid": "dnet:subject_classification_typologies",
         "schemename": "dnet:subject_classification_typologies"
       },
-      "value": "Thermal conductivity"
+      "value": "0101 mathematics"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "",
+          "classname": "",
+          "schemeid": "",
+          "schemename": ""
+        },
+        "trust": ""
+      },
+      "qualifier": {
+        "classid": "FOS",
+        "classname": "Fields of Science and Technology classification",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "value": "010101 applied mathematics"
     }
   ],
   "title": [

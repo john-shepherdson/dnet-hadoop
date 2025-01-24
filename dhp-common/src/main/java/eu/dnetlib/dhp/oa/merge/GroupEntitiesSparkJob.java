@@ -2,8 +2,7 @@
 package eu.dnetlib.dhp.oa.merge;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
-import static org.apache.spark.sql.functions.col;
-import static org.apache.spark.sql.functions.when;
+import static org.apache.spark.sql.functions.*;
 
 import java.util.Map;
 import java.util.Optional;
@@ -86,8 +85,6 @@ public class GroupEntitiesSparkJob {
 		log.info("filterInvisible: {}", filterInvisible);
 
 		SparkConf conf = new SparkConf();
-		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
-		conf.registerKryoClasses(ModelSupport.getOafModelClasses());
 
 		final VocabularyGroup vocs = VocabularyGroup.loadVocsFromIS(isLookUpService);
 
@@ -135,7 +132,9 @@ public class GroupEntitiesSparkJob {
 					.applyCoarVocabularies(entity, vocs),
 				OAFENTITY_KRYO_ENC)
 			.groupByKey((MapFunction<OafEntity, String>) OafEntity::getId, Encoders.STRING())
-			.mapGroups((MapGroupsFunction<String, OafEntity, OafEntity>) MergeUtils::mergeById, OAFENTITY_KRYO_ENC)
+			.mapGroups(
+				(MapGroupsFunction<String, OafEntity, OafEntity>) (key, group) -> MergeUtils.mergeById(group, vocs),
+				OAFENTITY_KRYO_ENC)
 			.map(
 				(MapFunction<OafEntity, Tuple2<String, OafEntity>>) t -> new Tuple2<>(
 					t.getClass().getName(), t),

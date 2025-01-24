@@ -7,7 +7,7 @@ import eu.dnetlib.dhp.schema.oaf.utils.{GraphCleaningFunctions, IdentifierFactor
 import eu.dnetlib.dhp.utils.DHPUtils
 import eu.dnetlib.doiboost.DoiBoostMappingUtil
 import eu.dnetlib.doiboost.DoiBoostMappingUtil._
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
 import org.json4s
 import org.json4s.DefaultFormats
 import org.json4s.JsonAST._
@@ -560,9 +560,32 @@ case object Crossref2Oaf {
                 "10.13039/501100000266" | "10.13039/501100006041" | "10.13039/501100000265" | "10.13039/501100000270" |
                 "10.13039/501100013589" | "10.13039/501100000271" =>
               generateSimpleRelationFromAward(funder, "ukri________", a => a)
-
+            //DFG
+            case "10.13039/501100001659" =>
+              val targetId = getProjectId("dfgf________", "1e5e62235d094afd01cd56e65112fc63")
+              queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
+              queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
             case _ => logger.debug("no match for " + funder.DOI.get)
-
+            //Add for Danish funders
+            //Independent Research Fund Denmark (IRFD)
+            case "10.13039/501100004836" =>
+              generateSimpleRelationFromAward(funder, "irfd________", a => a)
+              val targetId = getProjectId("irfd________", "1e5e62235d094afd01cd56e65112fc63")
+              queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
+              queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
+            //Carlsberg Foundation (CF)
+            case "10.13039/501100002808" =>
+              generateSimpleRelationFromAward(funder, "cf__________", a => a)
+              val targetId = getProjectId("cf__________", "1e5e62235d094afd01cd56e65112fc63")
+              queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
+              queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
+            //Novo Nordisk Foundation (NNF)
+            case "10.13039/501100009708" =>
+              generateSimpleRelationFromAward(funder, "nnf___________", a => a)
+              val targetId = getProjectId("nnf_________", "1e5e62235d094afd01cd56e65112fc63")
+              queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
+              queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
+            case _ => logger.debug("no match for " + funder.DOI.get)
           }
 
         } else {

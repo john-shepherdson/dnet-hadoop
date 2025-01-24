@@ -30,6 +30,18 @@
     "paramRequired": true
   },
   {
+  "paramName": "wip",
+  "paramLongName": "webCrawlInputPath",
+  "paramDescription": "the path to get the input data from Web Crawl",
+  "paramRequired": true
+  },
+  {
+    "paramName": "pub",
+    "paramLongName": "publisherInputPath",
+    "paramDescription": "the path to get the input data from publishers",
+    "paramRequired": true
+  },
+  {
     "paramName": "o",
     "paramLongName": "outputPath",
     "paramDescription": "the path of the new ActionSet",

@@ -1,0 +1,53 @@
+<workflow-app name="Update_RAiD_action_set" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>raidJsonInputPath</name>
+            <description>the path of the json</description>
+        </property>
+        <property>
+            <name>raidActionSetPath</name>
+            <description>path where to store the action set</description>
+        </property>
+    </parameters>
+
+    <start to="deleteoutputpath"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <action name="deleteoutputpath">
+        <fs>
+            <delete path='${raidActionSetPath}'/>
+            <mkdir path='${raidActionSetPath}'/>
+        </fs>
+        <ok to="processRAiDFile"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="processRAiDFile">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>ProcessRAiDFile</name>
+            <class>eu.dnetlib.dhp.actionmanager.raid.GenerateRAiDActionSetJob</class>
+            <jar>dhp-aggregation-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=3840
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${raidJsonInputPath}</arg>
+            <arg>--outputPath</arg><arg>${raidActionSetPath}</arg>
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <end name="End"/>
+</workflow-app>

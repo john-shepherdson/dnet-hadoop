@@ -13,8 +13,8 @@
   },
   {
     "paramName": "f",
-    "paramLongName": "format",
-    "paramDescription": "MDFormat name found in the IS profile",
+    "paramLongName": "shadowFormat",
+    "paramDescription": "MDFormat name found in the IS profile bound to the shadow index collection to feed",
     "paramRequired": true
   },
   {

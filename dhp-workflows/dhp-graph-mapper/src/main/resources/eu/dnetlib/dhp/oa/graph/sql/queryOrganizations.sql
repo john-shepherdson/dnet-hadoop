@@ -25,7 +25,8 @@ SELECT
 		o.country || '@@@dnet:countries'                          AS country,
 		array[]::text[]                                           AS alternativenames,
 		'sysimport:crosswalk:entityregistry@@@dnet:provenance_actions' AS provenanceaction,
-		 array_remove(array_agg(DISTINCT i.pid || '###' || i.issuertype || '@@@' || i.issuertype), NULL) AS pid
+		 array_remove(array_agg(DISTINCT i.pid || '###' || i.issuertype || '@@@' || i.issuertype), NULL) AS pid,
+        'Unknown'                                                 AS typology
 FROM dsm_organizations o
 	LEFT OUTER JOIN dsm_services d ON (d.id = o.collectedfrom)
 	LEFT OUTER JOIN dsm_organizationpids p ON (p.organization = o.id)

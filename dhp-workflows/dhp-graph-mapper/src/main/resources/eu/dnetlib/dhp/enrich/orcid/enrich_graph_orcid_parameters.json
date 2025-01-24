@@ -22,5 +22,11 @@
     "paramLongName": "targetPath",
     "paramDescription": "the output path of the graph enriched",
     "paramRequired": true
+  },
+  {
+    "paramName": "wp",
+    "paramLongName": "workingDir",
+    "paramDescription": "the working dir",
+    "paramRequired": true
   }
 ]

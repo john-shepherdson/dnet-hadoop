@@ -9,10 +9,7 @@ import java.util.Optional;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.SaveMode;
-import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,8 +21,6 @@ import eu.dnetlib.dhp.schema.oaf.Oaf;
 public class GraphHiveTableImporterJob {
 
 	private static final Logger log = LoggerFactory.getLogger(GraphHiveTableImporterJob.class);
-
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	public static void main(String[] args) throws Exception {
 
@@ -74,7 +69,12 @@ public class GraphHiveTableImporterJob {
 	private static <T extends Oaf> void loadGraphTable(SparkSession spark, String inputPath, String hiveDbName,
 		Class<T> clazz, int numPartitions) {
 
-		Dataset<String> dataset = spark.read().textFile(inputPath);
+		final Encoder<T> clazzEncoder = Encoders.bean(clazz);
+
+		Dataset<Row> dataset = spark
+			.read()
+			.schema(clazzEncoder.schema())
+			.json(inputPath);
 
 		if (numPartitions > 0) {
 			log.info("repartitioning {} to {} partitions", clazz.getSimpleName(), numPartitions);
@@ -82,7 +82,6 @@ public class GraphHiveTableImporterJob {
 		}
 
 		dataset
-			.map((MapFunction<String, T>) s -> OBJECT_MAPPER.readValue(s, clazz), Encoders.bean(clazz))
 			.write()
 			.mode(SaveMode.Overwrite)
 			.saveAsTable(tableIdentifier(hiveDbName, clazz));

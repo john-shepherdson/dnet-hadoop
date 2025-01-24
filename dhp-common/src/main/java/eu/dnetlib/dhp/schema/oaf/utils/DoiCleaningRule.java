@@ -6,18 +6,11 @@ import org.apache.commons.lang3.StringUtils;
 public class DoiCleaningRule {
 
 	public static String clean(final String doi) {
-		return doi
-			.toLowerCase()
-			.replaceAll("\\s", "")
-			.replaceAll("^doi:", "")
-			.replaceFirst(CleaningFunctions.DOI_PREFIX_REGEX, CleaningFunctions.DOI_PREFIX);
-	}
-
-	public static String normalizeDoi(final String input) {
-		if (input == null)
+		if (doi == null)
 			return null;
-		final String replaced = input
+		final String replaced = doi
 			.replaceAll("\\n|\\r|\\t|\\s", "")
+			.replaceAll("^doi:", "")
 			.toLowerCase()
 			.replaceFirst(CleaningFunctions.DOI_PREFIX_REGEX, CleaningFunctions.DOI_PREFIX);
 		if (StringUtils.isEmpty(replaced))
@@ -32,7 +25,6 @@ public class DoiCleaningRule {
 			return null;
 
 		return ret;
-
 	}
 
 }

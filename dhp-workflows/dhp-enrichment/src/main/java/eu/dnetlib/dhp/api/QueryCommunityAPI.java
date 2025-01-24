@@ -8,6 +8,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -37,15 +38,15 @@ public class QueryCommunityAPI {
 
 	}
 
-	public static String community(String id, String baseURL) throws IOException {
+	public static String subcommunities(String communityId, String baseURL) throws IOException {
 
-		return get(baseURL + id);
+		return get(baseURL + communityId + "/subcommunities");
 
 	}
 
 	public static String communityDatasource(String id, String baseURL) throws IOException {
 
-		return get(baseURL + id + "/contentproviders");
+		return get(baseURL + id + "/datasources");
 
 	}
 
@@ -59,6 +60,10 @@ public class QueryCommunityAPI {
 
 		return get(baseURL + id + "/projects/" + page + "/" + size);
 
+	}
+
+	public static String propagationOrganizationCommunityMap(String baseURL) throws IOException {
+		return get(StringUtils.substringBefore(baseURL, "community") + "propagationOrganizationCommunityMap");
 	}
 
 	@NotNull
@@ -78,4 +83,24 @@ public class QueryCommunityAPI {
 		return body;
 	}
 
+	public static String subcommunityDatasource(String communityId, String subcommunityId, String baseURL)
+		throws IOException {
+		return get(baseURL + communityId + "/subcommunities/datasources?subCommunityId=" + subcommunityId);
+	}
+
+	public static String subcommunityPropagationOrganization(String communityId, String subcommunityId, String baseURL)
+		throws IOException {
+		return get(baseURL + communityId + "/subcommunities/propagationOrganizations?subCommunityId=" + subcommunityId);
+	}
+
+	public static String subcommunityProjects(String communityId, String subcommunityId, String page, String size,
+		String baseURL) throws IOException {
+		return get(
+			baseURL + communityId + "/subcommunities/projects/" + page + "/" + size + "?subCommunityId="
+				+ subcommunityId);
+	}
+
+	public static String propagationDatasourceCommunityMap(String baseURL) throws IOException {
+		return get(baseURL + "propagationDatasourceCommunityMap");
+	}
 }

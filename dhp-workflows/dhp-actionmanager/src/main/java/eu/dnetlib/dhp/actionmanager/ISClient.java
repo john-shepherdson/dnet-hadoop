@@ -4,7 +4,6 @@ package eu.dnetlib.dhp.actionmanager;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -22,7 +21,6 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
-import eu.dnetlib.actionmanager.rmi.ActionManagerException;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
@@ -65,7 +63,7 @@ public class ISClient implements Serializable {
 						.map(t -> buildDirectory(basePath, t))
 						.collect(Collectors.toList()))
 				.orElseThrow(() -> new IllegalStateException("empty set list"));
-		} catch (ActionManagerException | ISLookUpException e) {
+		} catch (ISLookUpException e) {
 			throw new IllegalStateException("unable to query ActionSets info from the IS");
 		}
 	}
@@ -89,31 +87,18 @@ public class ISClient implements Serializable {
 		return Joiner.on("/").join(basePath, t.getMiddle(), t.getRight());
 	}
 
-	private String getBasePathHDFS(ISLookUpService isLookup) throws ActionManagerException {
+	private String getBasePathHDFS(ISLookUpService isLookup) throws ISLookUpException {
 		return queryServiceProperty(isLookup, "basePath");
 	}
 
 	private String queryServiceProperty(ISLookUpService isLookup, final String propertyName)
-		throws ActionManagerException {
+		throws ISLookUpException {
 		final String q = "for $x in /RESOURCE_PROFILE[.//RESOURCE_TYPE/@value='ActionManagerServiceResourceType'] return $x//SERVICE_PROPERTIES/PROPERTY[./@ key='"
 			+ propertyName
 			+ "']/@value/string()";
 		log.debug("quering for service property: {}", q);
-		try {
-			final List<String> value = isLookup.quickSearchProfile(q);
-			return Iterables.getOnlyElement(value);
-		} catch (ISLookUpException e) {
-			String msg = "Error accessing service profile, using query: " + q;
-			log.error(msg, e);
-			throw new ActionManagerException(msg, e);
-		} catch (NoSuchElementException e) {
-			String msg = "missing service property: " + propertyName;
-			log.error(msg, e);
-			throw new ActionManagerException(msg, e);
-		} catch (IllegalArgumentException e) {
-			String msg = "found more than one service property: " + propertyName;
-			log.error(msg, e);
-			throw new ActionManagerException(msg, e);
-		}
+
+		final List<String> value = isLookup.quickSearchProfile(q);
+		return Iterables.getOnlyElement(value);
 	}
 }

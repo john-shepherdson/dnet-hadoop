@@ -5,12 +5,12 @@ import eu.dnetlib.pace.common.AbstractPaceFunctions
 import eu.dnetlib.pace.config.{DedupConfig, Type}
 import eu.dnetlib.pace.util.{MapDocumentUtil, SparkCompatUtils}
 import org.apache.commons.lang3.StringUtils
-import org.apache.spark.sql.catalyst.encoders.RowEncoder
 import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema
 import org.apache.spark.sql.types.{DataTypes, Metadata, StructField, StructType}
 import org.apache.spark.sql.{Dataset, Row}
 
 import java.util.Locale
+import java.util.function.Predicate
 import java.util.regex.Pattern
 import scala.collection.JavaConverters._
 
@@ -29,8 +29,20 @@ case class SparkModel(conf: DedupConfig) {
     identifier.setName(identifierFieldName)
     identifier.setType(Type.String)
 
+    // create fields for blacklist
+    val filtered = conf.getPace.getModel.asScala.flatMap(fdef => {
+      if (conf.blacklists().containsKey(fdef.getName)) {
+        val fdef_filtered = fdef.clone()
+        fdef_filtered.setName(fdef.getName + "_filtered")
+        Seq(fdef, fdef_filtered)
+      }
+      else {
+        Seq(fdef)
+      }
+    })
+
     // Construct a Spark StructType representing the schema of the model
-    (Seq(identifier) ++ conf.getPace.getModel.asScala)
+    (Seq(identifier) ++ filtered)
       .foldLeft(
         new StructType()
       )((resType, fieldDef) => {
@@ -44,7 +56,6 @@ case class SparkModel(conf: DedupConfig) {
         })
       })
 
-
   }
 
   val identityFieldPosition: Int = schema.fieldIndex(identifierFieldName)
@@ -52,7 +63,8 @@ case class SparkModel(conf: DedupConfig) {
   val orderingFieldPosition: Int = schema.fieldIndex(orderingFieldName)
 
   val parseJsonDataset: (Dataset[String] => Dataset[Row]) = df => {
-    df.map(r => rowFromJson(r))(SparkCompatUtils.encoderFor(schema))
+    df
+      .map(r => rowFromJson(r))(SparkCompatUtils.encoderFor(schema))
   }
 
   def rowFromJson(json: String): Row = {
@@ -64,41 +76,63 @@ case class SparkModel(conf: DedupConfig) {
 
     schema.fieldNames.zipWithIndex.foldLeft(values) {
       case ((res, (fname, index))) =>
-        val fdef = conf.getPace.getModelMap.get(fname)
+
+        val fdef = conf.getPace.getModelMap.get(fname.split("_filtered")(0))
 
         if (fdef != null) {
-          res(index) = fdef.getType match {
-            case Type.String | Type.Int =>
-              MapDocumentUtil.truncateValue(
-                MapDocumentUtil.getJPathString(fdef.getPath, documentContext),
-                fdef.getLength
-              )
+          if (!fname.contains("_filtered")) { //process fields with no blacklist
+            res(index) = fdef.getType match {
+              case Type.String | Type.Int =>
+                MapDocumentUtil.truncateValue(
+                  MapDocumentUtil.getJPathString(fdef.getPath, documentContext),
+                  fdef.getLength
+                )
 
-            case Type.URL =>
-              var uv = MapDocumentUtil.getJPathString(fdef.getPath, documentContext)
-              if (!URL_REGEX.matcher(uv).matches)
-                uv = ""
-              uv
+              case Type.URL =>
+                var uv = MapDocumentUtil.getJPathString(fdef.getPath, documentContext)
+                if (!URL_REGEX.matcher(uv).matches)
+                  uv = ""
+                uv
 
-            case Type.List | Type.JSON =>
-              MapDocumentUtil.truncateList(
-                MapDocumentUtil.getJPathList(fdef.getPath, documentContext, fdef.getType),
-                fdef.getSize
-              ).asScala
+              case Type.List | Type.JSON =>
+                MapDocumentUtil.truncateList(
+                  MapDocumentUtil.getJPathList(fdef.getPath, documentContext, fdef.getType),
+                  fdef.getSize
+                ).asScala
 
-            case Type.StringConcat =>
-              val jpaths = CONCAT_REGEX.split(fdef.getPath)
+              case Type.StringConcat =>
+                val jpaths = CONCAT_REGEX.split(fdef.getPath)
 
-              MapDocumentUtil.truncateValue(
-                jpaths
-                  .map(jpath => MapDocumentUtil.getJPathString(jpath, documentContext))
-                  .mkString(" "),
-                fdef.getLength
-              )
+                MapDocumentUtil.truncateValue(
+                  jpaths
+                    .map(jpath => MapDocumentUtil.getJPathString(jpath, documentContext))
+                    .mkString(" "),
+                  fdef.getLength
+                )
 
-            case Type.DoubleArray =>
-              MapDocumentUtil.getJPathArray(fdef.getPath, json)
+              case Type.DoubleArray =>
+                MapDocumentUtil.getJPathArray(fdef.getPath, json)
+            }
           }
+          else { //process fields with blacklist
+            val blacklist: Predicate[String] = conf.blacklists().get(fdef.getName)
+
+            res(index) = fdef.getType match {
+              case Type.List | Type.JSON =>
+                MapDocumentUtil.truncateList(
+                  MapDocumentUtil.getJPathList(fdef.getPath, documentContext, fdef.getType),
+                  fdef.getSize
+                ).asScala.filter((v: String) => !blacklist.test(v))
+
+              case _ =>
+                val value: String = MapDocumentUtil.truncateValue(
+                  MapDocumentUtil.getJPathString(fdef.getPath, documentContext),
+                  fdef.getLength
+                )
+                if (blacklist.test(value)) "" else value
+            }
+          }
+
 
           val filter = fdef.getFilter
 
@@ -123,12 +157,22 @@ case class SparkModel(conf: DedupConfig) {
               case _ => res(index)
             }
           }
+
+          if (StringUtils.isNotBlank(fdef.getInfer)) {
+            val inferFrom: String = if (StringUtils.isNotBlank(fdef.getInferenceFrom)) fdef.getInferenceFrom else fdef.getPath
+            res(index) = res(index) match {
+              case x: Seq[String] => x.map(inference(_, MapDocumentUtil.getJPathString(inferFrom, documentContext), fdef.getInfer))
+              case _ => inference(res(index).toString, MapDocumentUtil.getJPathString(inferFrom, documentContext), fdef.getInfer)
+            }
+          }
         }
 
         res
+
     }
 
     new GenericRowWithSchema(values, schema)
+
   }
 
   def clean(value: String, cleantype: String) : String = {
@@ -142,6 +186,18 @@ case class SparkModel(conf: DedupConfig) {
 //      println(AbstractPaceFunctions.normalize(value))
 //      println()
 //    }
+
+    res
+  }
+
+  def inference(value: String, inferfrom: String, infertype: String) : String = {
+    val res = infertype match {
+      case "country" => AbstractPaceFunctions.countryInference(value, inferfrom)
+      case "city" => AbstractPaceFunctions.cityInference(value)
+      case "keyword" => AbstractPaceFunctions.keywordInference(value)
+      case "city_keyword" => AbstractPaceFunctions.cityKeywordInference(value)
+      case _ => value
+    }
 
     res
   }

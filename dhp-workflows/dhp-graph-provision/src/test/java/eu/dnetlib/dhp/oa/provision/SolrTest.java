@@ -1,6 +1,8 @@
 
 package eu.dnetlib.dhp.oa.provision;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.io.File;
 import java.nio.file.Path;
 
@@ -10,6 +12,7 @@ import org.apache.solr.client.solrj.impl.CloudSolrClient;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest;
 import org.apache.solr.client.solrj.request.ConfigSetAdminRequest;
 import org.apache.solr.client.solrj.request.QueryRequest;
+import org.apache.solr.client.solrj.response.CollectionAdminResponse;
 import org.apache.solr.cloud.MiniSolrCloudCluster;
 import org.apache.solr.common.params.CollectionParams;
 import org.apache.solr.common.params.CoreAdminParams;
@@ -21,13 +24,20 @@ import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import sun.security.provider.SHA;
+
 public abstract class SolrTest {
 
 	protected static final Logger log = LoggerFactory.getLogger(SolrTest.class);
 
-	protected static final String FORMAT = "test";
-	protected static final String DEFAULT_COLLECTION = FORMAT + "-index-openaire";
+	protected static final String SHADOW_FORMAT = "c1";
+	protected static final String SHADOW_COLLECTION = SHADOW_FORMAT + "-index-openaire";
+	protected static final String PUBLIC_FORMAT = "c2";
+	protected static final String PUBLIC_COLLECTION = PUBLIC_FORMAT + "-index-openaire";
+
 	protected static final String CONFIG_NAME = "testConfig";
+
+	protected static SolrAdminApplication admin;
 
 	protected static MiniSolrCloudCluster miniCluster;
 
@@ -72,10 +82,21 @@ public abstract class SolrTest {
 					.toString());
 
 		NamedList<Object> res = createCollection(
-			miniCluster.getSolrClient(), DEFAULT_COLLECTION, 4, 2, 20, CONFIG_NAME);
+			miniCluster.getSolrClient(), SHADOW_COLLECTION, 4, 2, 20, CONFIG_NAME);
 		res.forEach(o -> log.info(o.toString()));
 
-		miniCluster.getSolrClient().setDefaultCollection(DEFAULT_COLLECTION);
+		// miniCluster.getSolrClient().setDefaultCollection(SHADOW_COLLECTION);
+
+		res = createCollection(
+			miniCluster.getSolrClient(), PUBLIC_COLLECTION, 4, 2, 20, CONFIG_NAME);
+		res.forEach(o -> log.info(o.toString()));
+
+		admin = new SolrAdminApplication(miniCluster.getZkClient().getZkServerAddress());
+		CollectionAdminResponse rsp = (CollectionAdminResponse) admin
+			.createAlias(ProvisionConstants.PUBLIC_ALIAS_NAME, PUBLIC_COLLECTION);
+		assertEquals(0, rsp.getStatus());
+		rsp = (CollectionAdminResponse) admin.createAlias(ProvisionConstants.SHADOW_ALIAS_NAME, SHADOW_COLLECTION);
+		assertEquals(0, rsp.getStatus());
 
 		log
 			.info(
@@ -83,12 +104,12 @@ public abstract class SolrTest {
 					.getClusterStatus()
 					.process(miniCluster.getSolrClient())
 					.toString());
-
 	}
 
 	@AfterAll
 	public static void shutDown() throws Exception {
 		miniCluster.shutdown();
+		admin.close();
 		FileUtils.deleteDirectory(workingDir.toFile());
 	}
 

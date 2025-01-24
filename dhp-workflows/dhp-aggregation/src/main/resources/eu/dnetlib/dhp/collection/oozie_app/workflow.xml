@@ -48,12 +48,37 @@
             <description>Used to configure the heap size for the map JVM process. Should be 80% of mapreduce.map.memory.mb.</description>
         </property>
 
+        <property>
+            <name>JAVA_HOME</name>
+            <value>/srv/java/openjdk-17</value>
+            <description>Used to configure the Java home location for oozie.launcher.mapreduce.map.env</description>
+        </property>
+
+        <property>
+            <name>JAVA_OPTS</name>
+                <value>-Dcom.sun.security.enableAIAcaIssuers=true</value>
+            <description>Used to configure the JAVA_OPTS parameter</description>
+        </property>
 
     </parameters>
 
     <global>
         <job-tracker>${jobTracker}</job-tracker>
         <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>mapreduce.job.queuename</name>
+                <value>${queueName}</value>
+            </property>
+            <property>
+                <name>oozie.launcher.mapred.job.queue.name</name>
+                <value>${oozieLauncherQueueName}</value>
+            </property>
+            <property>
+                <name>oozie.launcher.mapreduce.map.env</name>
+                <value>JAVA_HOME=${JAVA_HOME}</value>
+            </property>
+        </configuration>
     </global>
 
     <start to="collection_mode"/>
@@ -99,7 +124,7 @@
     <action name="CollectionWorker">
         <java>
             <main-class>eu.dnetlib.dhp.collection.CollectorWorkerApplication</main-class>
-            <java-opts>${collection_java_xmx}</java-opts>
+            <java-opts>${JAVA_OPTS} ${collection_java_xmx}</java-opts>
             <arg>--apidescriptor</arg><arg>${apiDescription}</arg>
             <arg>--namenode</arg><arg>${nameNode}</arg>
             <arg>--workflowId</arg><arg>${workflowId}</arg>

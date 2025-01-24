@@ -14,4 +14,7 @@ public class ProvisionConstants {
 		return format + SEPARATOR + LAYOUT + SEPARATOR + INTERPRETATION;
 	}
 
+	public static final String PUBLIC_ALIAS_NAME = "public";
+	public static final String SHADOW_ALIAS_NAME = "shadow";
+
 }

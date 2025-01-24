@@ -1,0 +1,14 @@
+[
+  {
+    "paramName": "i",
+    "paramLongName": "inputPath",
+    "paramDescription": "the path of the input json",
+    "paramRequired": true
+  },
+  {
+    "paramName": "o",
+    "paramLongName": "outputPath",
+    "paramDescription": "the path of the new ActionSet",
+    "paramRequired": true
+  }
+]

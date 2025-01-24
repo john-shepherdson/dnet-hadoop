@@ -5,11 +5,11 @@ import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_PROVENANCE_ACTION
 import static eu.dnetlib.dhp.schema.common.ModelConstants.PROVENANCE_DEDUP;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
-import org.apache.spark.sql.SaveMode;
-import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.*;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +17,7 @@ import org.xml.sax.SAXException;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.common.EntityType;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
@@ -25,6 +26,8 @@ import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import eu.dnetlib.pace.config.DedupConfig;
+import scala.collection.JavaConversions;
+import scala.collection.JavaConverters;
 
 public class SparkCreateDedupRecord extends AbstractSparkAction {
 
@@ -85,6 +88,36 @@ public class SparkCreateDedupRecord extends AbstractSparkAction {
 				.mode(SaveMode.Overwrite)
 				.option("compression", "gzip")
 				.json(outputPath);
+
+			log.info("Updating mergerels for: '{}'", subEntity);
+			final Dataset<Row> dedupIds = spark
+				.read()
+				.schema("`id` STRING, `mergedIds` ARRAY<STRING>")
+				.json(outputPath)
+				.selectExpr("id as source", "explode(mergedIds) as target");
+			spark
+				.read()
+				.load(mergeRelPath)
+				.where("relClass == 'merges'")
+				.join(dedupIds, JavaConversions.asScalaBuffer(Arrays.asList("source", "target")), "left_semi")
+				.write()
+				.mode(SaveMode.Overwrite)
+				.option("compression", "gzip")
+				.save(workingPath + "/mergerel_filtered");
+
+			final Dataset<Row> validRels = spark.read().load(workingPath + "/mergerel_filtered");
+
+			final Dataset<Row> filteredMergeRels = validRels
+				.union(
+					validRels
+						.withColumnRenamed("source", "source_tmp")
+						.withColumnRenamed("target", "target_tmp")
+						.withColumn("relClass", functions.lit(ModelConstants.IS_MERGED_IN))
+						.withColumnRenamed("target_tmp", "source")
+						.withColumnRenamed("source_tmp", "target"));
+
+			saveParquet(filteredMergeRels, mergeRelPath, SaveMode.Overwrite);
+			removeOutputDir(spark, workingPath + "/mergerel_filtered");
 		}
 	}
 

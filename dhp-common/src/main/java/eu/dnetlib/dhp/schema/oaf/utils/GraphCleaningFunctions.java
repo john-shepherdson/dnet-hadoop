@@ -2,7 +2,6 @@
 package eu.dnetlib.dhp.schema.oaf.utils;
 
 import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.OPENAIRE_META_RESOURCE_TYPE;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.getProvenance;
 
 import java.net.MalformedURLException;
@@ -363,6 +362,8 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 				// nothing to clean here
 			} else if (value instanceof Project) {
 				// nothing to clean here
+			} else if (value instanceof Person) {
+				// nothing to clean here
 			} else if (value instanceof Organization) {
 				Organization o = (Organization) value;
 				if (Objects.isNull(o.getCountry()) || StringUtils.isBlank(o.getCountry().getClassid())) {
@@ -563,12 +564,24 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 						Optional
 							.ofNullable(i.getPid())
 							.ifPresent(pid -> {
-								final Set<StructuredProperty> pids = Sets.newHashSet(pid);
+								final Set<HashableStructuredProperty> pids = pid
+									.stream()
+									.map(HashableStructuredProperty::newInstance)
+									.collect(Collectors.toCollection(HashSet::new));
 								Optional
 									.ofNullable(i.getAlternateIdentifier())
 									.ifPresent(altId -> {
-										final Set<StructuredProperty> altIds = Sets.newHashSet(altId);
-										i.setAlternateIdentifier(Lists.newArrayList(Sets.difference(altIds, pids)));
+										final Set<HashableStructuredProperty> altIds = altId
+											.stream()
+											.map(HashableStructuredProperty::newInstance)
+											.collect(Collectors.toCollection(HashSet::new));
+										i
+											.setAlternateIdentifier(
+												Sets
+													.difference(altIds, pids)
+													.stream()
+													.map(HashableStructuredProperty::toStructuredProperty)
+													.collect(Collectors.toList()));
 									});
 							});
 
@@ -682,6 +695,7 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 						}
 					}
 
+					// set ORCID_PENDING to all orcid values that are not coming from ORCID provenance
 					for (Author a : r.getAuthor()) {
 						if (Objects.isNull(a.getPid())) {
 							a.setPid(Lists.newArrayList());
@@ -738,6 +752,40 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 										.collect(Collectors.toList()));
 						}
 					}
+
+					// Identify clashing ORCIDS:that is same ORCID associated to multiple authors in this result
+					Map<String, Integer> clashing_orcid = new HashMap<>();
+
+					for (Author a : r.getAuthor()) {
+						a
+							.getPid()
+							.stream()
+							.filter(
+								p -> StringUtils
+									.contains(StringUtils.lowerCase(p.getQualifier().getClassid()), ORCID_PENDING))
+							.map(StructuredProperty::getValue)
+							.distinct()
+							.forEach(orcid -> clashing_orcid.compute(orcid, (k, v) -> (v == null) ? 1 : v + 1));
+					}
+
+					Set<String> clashing = clashing_orcid
+						.entrySet()
+						.stream()
+						.filter(ee -> ee.getValue() > 1)
+						.map(Map.Entry::getKey)
+						.collect(Collectors.toSet());
+
+					// filter out clashing orcids
+					for (Author a : r.getAuthor()) {
+						a
+							.setPid(
+								a
+									.getPid()
+									.stream()
+									.filter(p -> !clashing.contains(p.getValue()))
+									.collect(Collectors.toList()));
+					}
+
 				}
 				if (value instanceof Publication) {
 
@@ -796,7 +844,7 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 		return author;
 	}
 
-	private static Optional<String> cleanDateField(Field<String> dateofacceptance) {
+	public static Optional<String> cleanDateField(Field<String> dateofacceptance) {
 		return Optional
 			.ofNullable(dateofacceptance)
 			.map(Field::getValue)

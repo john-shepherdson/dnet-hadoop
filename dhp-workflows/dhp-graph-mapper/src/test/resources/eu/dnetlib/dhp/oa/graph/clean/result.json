@@ -801,28 +801,6 @@
         "inferred": false,
         "invisible": false,
         "provenanceaction": {
-          "classid": "sysimport:crosswalk:datasetarchive",
-          "classname": "sysimport:crosswalk:datasetarchive",
-          "schemeid": "dnet:provenanceActions",
-          "schemename": "dnet:provenanceActions"
-        },
-        "trust": "0.9"
-      },
-      "qualifier": {
-        "classid": "keyword",
-        "classname": "keyword",
-        "schemeid": "dnet:subject_classification_typologies",
-        "schemename": "dnet:subject_classification_typologies"
-      },
-      "value": "0101 mathematics"
-    },
-    {
-      "dataInfo": {
-        "deletedbyinference": false,
-        "inferenceprovenance": "",
-        "inferred": false,
-        "invisible": false,
-        "provenanceaction": {
           "classid": "subject:fos",
           "classname": "subject:fos",
           "schemeid": "dnet:provenanceActions",
@@ -831,8 +809,8 @@
         "trust": "0.9"
       },
       "qualifier": {
-        "classid": "keyword",
-        "classname": "keyword",
+        "classid": "FOS",
+        "classname": "Fields of Science and Technology classification",
         "schemeid": "dnet:subject_classification_typologies",
         "schemename": "dnet:subject_classification_typologies"
       },
@@ -910,8 +888,8 @@
         "inferred": false,
         "invisible": false,
         "provenanceaction": {
-          "classid": "sysimport:actionset",
-          "classname": "Harvested",
+          "classid": "subject:fos",
+          "classname": "subject:fos",
           "schemeid": "dnet:provenanceActions",
           "schemename": "dnet:provenanceActions"
         },
@@ -923,7 +901,7 @@
         "schemeid": "dnet:subject_classification_typologies",
         "schemename": "dnet:subject_classification_typologies"
       },
-      "value": "Avicennia"
+      "value": "0102 computer and information sciences"
     },
     {
       "dataInfo": {

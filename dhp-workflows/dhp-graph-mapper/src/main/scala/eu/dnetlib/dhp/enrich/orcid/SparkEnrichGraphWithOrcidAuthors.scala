@@ -47,13 +47,15 @@ class SparkEnrichGraphWithOrcidAuthors(propertyPath: String, args: Array[String]
     log.info(s"orcidPath is '$orcidPath'")
     val targetPath = parser.get("targetPath")
     log.info(s"targetPath is '$targetPath'")
+    val workingDir = parser.get("workingDir")
+    log.info(s"targetPath is '$workingDir'")
 
-    createTemporaryData(graphPath, orcidPath, targetPath)
-    analisys(targetPath)
-    generateGraph(graphPath, targetPath)
+    createTemporaryData(graphPath, orcidPath, workingDir)
+    analisys(workingDir)
+    generateGraph(graphPath, workingDir, targetPath)
   }
 
-  private def generateGraph(graphPath: String, targetPath: String): Unit = {
+  private def generateGraph(graphPath: String, workingDir: String, targetPath: String): Unit = {
 
     ModelSupport.entityTypes.asScala
       .filter(e => ModelSupport.isResult(e._1))
@@ -63,7 +65,7 @@ class SparkEnrichGraphWithOrcidAuthors(propertyPath: String, args: Array[String]
 
         val matched = spark.read
           .schema(Encoders.bean(classOf[ORCIDAuthorEnricherResult]).schema)
-          .parquet(s"${targetPath}/${resultType}_matched")
+          .parquet(s"${workingDir}/${resultType}_matched")
           .selectExpr("id", "enriched_author")
 
         spark.read

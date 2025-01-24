@@ -46,6 +46,9 @@ public class GetOpenCitationsRefs implements Serializable {
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath {}", outputPath);
 
+		final String backupPath = parser.get("backupPath");
+		log.info("backupPath {}", backupPath);
+
 		Configuration conf = new Configuration();
 		conf.set("fs.defaultFS", hdfsNameNode);
 
@@ -53,11 +56,11 @@ public class GetOpenCitationsRefs implements Serializable {
 
 		GetOpenCitationsRefs ocr = new GetOpenCitationsRefs();
 
-		ocr.doExtract(inputPath, outputPath, fileSystem);
+		ocr.doExtract(inputPath, outputPath, backupPath, fileSystem);
 
 	}
 
-	private void doExtract(String inputPath, String outputPath, FileSystem fileSystem)
+	private void doExtract(String inputPath, String outputPath, String backupPath, FileSystem fileSystem)
 		throws IOException {
 
 		RemoteIterator<LocatedFileStatus> fileStatusListIterator = fileSystem
@@ -89,6 +92,7 @@ public class GetOpenCitationsRefs implements Serializable {
 				}
 
 			}
+			fileSystem.rename(fileStatus.getPath(), new Path(backupPath));
 		}
 
 	}

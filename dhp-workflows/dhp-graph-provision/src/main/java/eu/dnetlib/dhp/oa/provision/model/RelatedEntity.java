@@ -51,6 +51,11 @@ public class RelatedEntity implements Serializable {
 	private Qualifier contracttype;
 	private List<String> fundingtree;
 
+	// person
+	private String givenName;
+	private String familyName;
+	private List<String> alternativeNames;
+
 	public String getId() {
 		return id;
 	}
@@ -251,6 +256,30 @@ public class RelatedEntity implements Serializable {
 		this.fundingtree = fundingtree;
 	}
 
+	public String getGivenName() {
+		return givenName;
+	}
+
+	public void setGivenName(String givenName) {
+		this.givenName = givenName;
+	}
+
+	public String getFamilyName() {
+		return familyName;
+	}
+
+	public void setFamilyName(String familyName) {
+		this.familyName = familyName;
+	}
+
+	public List<String> getAlternativeNames() {
+		return alternativeNames;
+	}
+
+	public void setAlternativeNames(List<String> alternativeNames) {
+		this.alternativeNames = alternativeNames;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o)
@@ -280,7 +309,10 @@ public class RelatedEntity implements Serializable {
 			&& Objects.equal(code, that.code)
 			&& Objects.equal(acronym, that.acronym)
 			&& Objects.equal(contracttype, that.contracttype)
-			&& Objects.equal(fundingtree, that.fundingtree);
+			&& Objects.equal(fundingtree, that.fundingtree)
+			&& Objects.equal(givenName, that.givenName)
+			&& Objects.equal(familyName, that.familyName)
+			&& Objects.equal(alternativeNames, that.alternativeNames);
 	}
 
 	@Override
@@ -309,6 +341,9 @@ public class RelatedEntity implements Serializable {
 				code,
 				acronym,
 				contracttype,
-				fundingtree);
+				fundingtree,
+				familyName,
+				givenName,
+				alternativeNames);
 	}
 }

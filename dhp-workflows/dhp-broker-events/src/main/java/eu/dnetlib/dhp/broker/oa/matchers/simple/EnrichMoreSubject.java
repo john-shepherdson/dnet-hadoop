@@ -53,7 +53,7 @@ public class EnrichMoreSubject extends UpdateMatcher<OaBrokerTypedValue> {
 			.collect(Collectors.toSet());
 
 		return source
-			.getPids()
+			.getSubjects()
 			.stream()
 			.filter(s -> !existingSubjects.contains(subjectAsString(s)))
 			.collect(Collectors.toList());

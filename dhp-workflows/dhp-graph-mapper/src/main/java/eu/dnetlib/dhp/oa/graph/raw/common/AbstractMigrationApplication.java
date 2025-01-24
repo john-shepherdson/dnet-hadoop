@@ -106,7 +106,7 @@ public class AbstractMigrationApplication implements Closeable {
 		return Arrays
 			.stream(paths.split(","))
 			.filter(StringUtils::isNotBlank)
-			.filter(p -> HdfsSupport.exists(p, sc.hadoopConfiguration()) || p.contains("/*"))
+			.filter(p -> HdfsSupport.exists(p, sc.hadoopConfiguration()))
 			.collect(Collectors.toList());
 	}
 

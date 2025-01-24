@@ -313,7 +313,7 @@ case object ConversionUtil {
       if (f.author.DisplayName.isDefined)
         a.setFullname(f.author.DisplayName.get)
       if (f.affiliation != null)
-        a.setAffiliation(List(asField(f.affiliation)).asJava)
+        a.setRawAffiliationString(List(f.affiliation).asJava)
       a.setPid(
         List(
           createSP(
@@ -386,7 +386,7 @@ case object ConversionUtil {
       a.setFullname(f.author.DisplayName.get)
 
       if (f.affiliation != null)
-        a.setAffiliation(List(asField(f.affiliation)).asJava)
+        a.setRawAffiliationString(List(f.affiliation).asJava)
 
       a.setPid(
         List(
