@@ -118,15 +118,15 @@ public class SparkExtractPersonRelations {
 
 	private static void extractRelations(SparkSession spark, String sourcePath, String workingPath) {
 
-		Dataset<Tuple2<String, Relation>> relationDataset = spark
-			.read()
-			.schema(Encoders.bean(Relation.class).schema())
-			.json(sourcePath + "relation")
-			.as(Encoders.bean(Relation.class))
-			.map(
-				(MapFunction<Relation, Tuple2<String, Relation>>) r -> new Tuple2<>(
-					r.getSource() + r.getRelClass() + r.getTarget(), r),
-				Encoders.tuple(Encoders.STRING(), Encoders.bean(Relation.class)));
+//		Dataset<Tuple2<String, Relation>> relationDataset = spark
+//			.read()
+//			.schema(Encoders.bean(Relation.class).schema())
+//			.json(sourcePath + "relation")
+//			.as(Encoders.bean(Relation.class))
+//			.map(
+//				(MapFunction<Relation, Tuple2<String, Relation>>) r -> new Tuple2<>(
+//					r.getSource() + r.getRelClass() + r.getTarget(), r),
+//				Encoders.tuple(Encoders.STRING(), Encoders.bean(Relation.class)));
 
 		ModelSupport.entityTypes
 			.keySet()
@@ -174,15 +174,16 @@ public class SparkExtractPersonRelations {
 						.map(
 							(MapFunction<Relation, Tuple2<String, Relation>>) r -> new Tuple2<>(
 								r.getSource() + r.getRelClass() + r.getTarget(), r),
-							Encoders.tuple(Encoders.STRING(), Encoders.bean(Relation.class)));
+							Encoders.tuple(Encoders.STRING(), Encoders.bean(Relation.class)))
+							.distinct();
 					newRelations
-						.joinWith(relationDataset, newRelations.col("_1").equalTo(relationDataset.col("_1")), "left")
-						.map((MapFunction<Tuple2<Tuple2<String, Relation>, Tuple2<String, Relation>>, Relation>) t2 -> {
-							if (t2._2() == null)
-								return t2._1()._2();
-							return null;
-						}, Encoders.bean(Relation.class))
-						.filter((FilterFunction<Relation>) r -> r != null)
+//						.joinWith(relationDataset, newRelations.col("_1").equalTo(relationDataset.col("_1")), "left")
+//						.map((MapFunction<Tuple2<Tuple2<String, Relation>, Tuple2<String, Relation>>, Relation>) t2 -> {
+//							if (t2._2() == null)
+//								return t2._1()._2();
+//							return null;
+//						}, Encoders.bean(Relation.class))
+//						.filter((FilterFunction<Relation>) r -> r != null)
 						.write()
 						.mode(SaveMode.Append)
 						.option("compression", "gzip")
@@ -206,13 +207,13 @@ public class SparkExtractPersonRelations {
 								r.getSource() + r.getRelClass() + r.getTarget(), r),
 							Encoders.tuple(Encoders.STRING(), Encoders.bean(Relation.class)));
 					newRelations
-						.joinWith(relationDataset, newRelations.col("_1").equalTo(relationDataset.col("_1")), "left")
-						.map((MapFunction<Tuple2<Tuple2<String, Relation>, Tuple2<String, Relation>>, Relation>) t2 -> {
-							if (t2._2() == null)
-								return t2._1()._2();
-							return null;
-						}, Encoders.bean(Relation.class))
-						.filter((FilterFunction<Relation>) r -> r != null)
+//						.joinWith(relationDataset, newRelations.col("_1").equalTo(relationDataset.col("_1")), "left")
+//						.map((MapFunction<Tuple2<Tuple2<String, Relation>, Tuple2<String, Relation>>, Relation>) t2 -> {
+//							if (t2._2() == null)
+//								return t2._1()._2();
+//							return null;
+//						}, Encoders.bean(Relation.class))
+//						.filter((FilterFunction<Relation>) r -> r != null)
 						.write()
 						.mode(SaveMode.Append)
 						.option("compression", "gzip")
@@ -273,7 +274,8 @@ public class SparkExtractPersonRelations {
 
 			relationList.addAll(a.getPid().stream().map(p -> {
 
-				if (p.getQualifier().getClassid().equalsIgnoreCase("orcid_pending"))
+				if (p.getQualifier().getClassid().equalsIgnoreCase("orcid") ||
+						p.getQualifier().getClassid().equalsIgnoreCase("orcid_pending"))
 					return getRelation(p.getValue(), r.getId());
 				return null;
 			})
