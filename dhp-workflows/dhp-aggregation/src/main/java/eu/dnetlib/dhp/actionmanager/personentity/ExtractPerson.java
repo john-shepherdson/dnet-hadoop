@@ -242,12 +242,12 @@ public class ExtractPerson implements Serializable {
 		people
 			.toJavaRDD()
 			.map(p -> new AtomicAction(p.getClass(), p))
-			.union(
-				getRelations(spark, workingDir + "/authorship").toJavaRDD().map(r -> new AtomicAction(r.getClass(), r)))
-			.union(
-				getRelations(spark, workingDir + "/coauthorship")
-					.toJavaRDD()
-					.map(r -> new AtomicAction(r.getClass(), r)))
+//			.union(
+//				getRelations(spark, workingDir + "/authorship").toJavaRDD().map(r -> new AtomicAction(r.getClass(), r)))
+//			.union(
+//				getRelations(spark, workingDir + "/coauthorship")
+//					.toJavaRDD()
+//					.map(r -> new AtomicAction(r.getClass(), r)))
 			.union(
 				getRelations(spark, workingDir + "/affiliation")
 					.toJavaRDD()
@@ -269,20 +269,20 @@ public class ExtractPerson implements Serializable {
 			.parquet(inputPath + "Authors")
 			.as(Encoders.bean(Author.class));
 
-		Dataset<Work> works = spark
-			.read()
-			.parquet(inputPath + "Works")
-			.as(Encoders.bean(Work.class))
-			.filter(
-				(FilterFunction<Work>) w -> Optional.ofNullable(w.getPids()).isPresent() &&
-					w
-						.getPids()
-						.stream()
-						.anyMatch(
-							p -> p.getSchema().equalsIgnoreCase("doi") ||
-								p.getSchema().equalsIgnoreCase("pmc") ||
-								p.getSchema().equalsIgnoreCase("pmid") ||
-								p.getSchema().equalsIgnoreCase("arxiv")));
+//		Dataset<Work> works = spark
+//			.read()
+//			.parquet(inputPath + "Works")
+//			.as(Encoders.bean(Work.class))
+//			.filter(
+//				(FilterFunction<Work>) w -> Optional.ofNullable(w.getPids()).isPresent() &&
+//					w
+//						.getPids()
+//						.stream()
+//						.anyMatch(
+//							p -> p.getSchema().equalsIgnoreCase("doi") ||
+//								p.getSchema().equalsIgnoreCase("pmc") ||
+//								p.getSchema().equalsIgnoreCase("pmid") ||
+//								p.getSchema().equalsIgnoreCase("arxiv")));
 
 		Dataset<Employment> employmentDataset = spark
 			.read()
@@ -369,41 +369,41 @@ public class ExtractPerson implements Serializable {
 			.mode(SaveMode.Overwrite)
 			.json(workingDir + "/people");
 
-		works
-			.flatMap(
-				(FlatMapFunction<Work, Relation>) ExtractPerson::getAuthorshipRelationIterator,
-				Encoders.bean(Relation.class))
-			.write()
-			.option("compression", "gzip")
-			.mode(SaveMode.Overwrite)
-			.json(workingDir + "/authorship");
+//		works
+//			.flatMap(
+//				(FlatMapFunction<Work, Relation>) ExtractPerson::getAuthorshipRelationIterator,
+//				Encoders.bean(Relation.class))
+//			.write()
+//			.option("compression", "gzip")
+//			.mode(SaveMode.Overwrite)
+//			.json(workingDir + "/authorship");
 
-		Dataset<Relation> coauthorship = works
-			.flatMap((FlatMapFunction<Work, Tuple2<String, String>>) w -> {
-				List<Tuple2<String, String>> lista = new ArrayList<>();
-				w.getPids().stream().forEach(p -> {
-					if (p.getSchema().equalsIgnoreCase("doi") || p.getSchema().equalsIgnoreCase("pmc")
-						|| p.getSchema().equalsIgnoreCase("pmid") || p.getSchema().equalsIgnoreCase("arxiv"))
-						lista.add(new Tuple2<>(p.getValue(), w.getOrcid()));
-				});
-				return lista.iterator();
-			}, Encoders.tuple(Encoders.STRING(), Encoders.STRING()))
-			.groupByKey((MapFunction<Tuple2<String, String>, String>) Tuple2::_1, Encoders.STRING())
-			.mapGroups(
-				(MapGroupsFunction<String, Tuple2<String, String>, Coauthors>) (k, it) -> extractCoAuthors(it),
-				Encoders.bean(Coauthors.class))
-			.flatMap(
-				(FlatMapFunction<Coauthors, Relation>) c -> new CoAuthorshipIterator(c.getCoauthors()),
-				Encoders.bean(Relation.class))
-			.groupByKey((MapFunction<Relation, String>) r -> r.getSource() + r.getTarget(), Encoders.STRING())
-			.mapGroups(
-				(MapGroupsFunction<String, Relation, Relation>) (k, it) -> it.next(), Encoders.bean(Relation.class));
-
-		coauthorship
-			.write()
-			.option("compression", "gzip")
-			.mode(SaveMode.Overwrite)
-			.json(workingDir + "/coauthorship");
+//		Dataset<Relation> coauthorship = works
+//			.flatMap((FlatMapFunction<Work, Tuple2<String, String>>) w -> {
+//				List<Tuple2<String, String>> lista = new ArrayList<>();
+//				w.getPids().stream().forEach(p -> {
+//					if (p.getSchema().equalsIgnoreCase("doi") || p.getSchema().equalsIgnoreCase("pmc")
+//						|| p.getSchema().equalsIgnoreCase("pmid") || p.getSchema().equalsIgnoreCase("arxiv"))
+//						lista.add(new Tuple2<>(p.getValue(), w.getOrcid()));
+//				});
+//				return lista.iterator();
+//			}, Encoders.tuple(Encoders.STRING(), Encoders.STRING()))
+//			.groupByKey((MapFunction<Tuple2<String, String>, String>) Tuple2::_1, Encoders.STRING())
+//			.mapGroups(
+//				(MapGroupsFunction<String, Tuple2<String, String>, Coauthors>) (k, it) -> extractCoAuthors(it),
+//				Encoders.bean(Coauthors.class))
+//			.flatMap(
+//				(FlatMapFunction<Coauthors, Relation>) c -> new CoAuthorshipIterator(c.getCoauthors()),
+//				Encoders.bean(Relation.class))
+//			.groupByKey((MapFunction<Relation, String>) r -> r.getSource() + r.getTarget(), Encoders.STRING())
+//			.mapGroups(
+//				(MapGroupsFunction<String, Relation, Relation>) (k, it) -> it.next(), Encoders.bean(Relation.class));
+//
+//		coauthorship
+//			.write()
+//			.option("compression", "gzip")
+//			.mode(SaveMode.Overwrite)
+//			.json(workingDir + "/coauthorship");
 
 		employment
 			.filter((FilterFunction<Employment>) e -> Optional.ofNullable(e.getAffiliationId()).isPresent())
@@ -427,15 +427,15 @@ public class ExtractPerson implements Serializable {
 				Encoders.bean(Relation.class));// spark.read().json(path).as(Encoders.bean(Relation.class));
 	}
 
-	private static Coauthors extractCoAuthors(Iterator<Tuple2<String, String>> it) {
-		Coauthors coauth = new Coauthors();
-		List<String> coauthors = new ArrayList<>();
-		while (it.hasNext())
-			coauthors.add(it.next()._2());
-		coauth.setCoauthors(coauthors);
-
-		return coauth;
-	}
+//	private static Coauthors extractCoAuthors(Iterator<Tuple2<String, String>> it) {
+//		Coauthors coauth = new Coauthors();
+//		List<String> coauthors = new ArrayList<>();
+//		while (it.hasNext())
+//			coauthors.add(it.next()._2());
+//		coauth.setCoauthors(coauthors);
+//
+//		return coauth;
+//	}
 
 	private static Relation getAffiliationRelation(Employment row) {
 		String source = PERSON_PREFIX + "::" + IdentifierFactory.md5(row.getOrcid());
@@ -471,57 +471,57 @@ public class ExtractPerson implements Serializable {
 
 	}
 
-	private static @NotNull Iterator<Relation> getAuthorshipRelationIterator(Work w) {
+//	private static @NotNull Iterator<Relation> getAuthorshipRelationIterator(Work w) {
+//
+//		if (Optional.ofNullable(w.getPids()).isPresent())
+//			return w
+//				.getPids()
+//				.stream()
+//				.map(pid -> getRelation(w.getOrcid(), pid))
+//				.filter(Objects::nonNull)
+//				.collect(Collectors.toList())
+//				.iterator();
+//		List<Relation> ret = new ArrayList<>();
+//		return ret.iterator();
+//	}
 
-		if (Optional.ofNullable(w.getPids()).isPresent())
-			return w
-				.getPids()
-				.stream()
-				.map(pid -> getRelation(w.getOrcid(), pid))
-				.filter(Objects::nonNull)
-				.collect(Collectors.toList())
-				.iterator();
-		List<Relation> ret = new ArrayList<>();
-		return ret.iterator();
-	}
-
-	private static Relation getRelation(String orcid, eu.dnetlib.dhp.collection.orcid.model.Pid pid) {
-		String target;
-		String source = PERSON_PREFIX + "::" + IdentifierFactory.md5(orcid);
-		switch (pid.getSchema()) {
-			case "doi":
-				target = DOI_PREFIX
-					+ IdentifierFactory
-						.md5(PidCleaner.normalizePidValue(PidType.doi.toString(), pid.getValue()));
-				break;
-			case "pmid":
-				target = PMID_PREFIX
-					+ IdentifierFactory
-						.md5(PidCleaner.normalizePidValue(PidType.pmid.toString(), pid.getValue()));
-				break;
-			case "arxiv":
-				target = ARXIV_PREFIX
-					+ IdentifierFactory
-						.md5(PidCleaner.normalizePidValue(PidType.arXiv.toString(), pid.getValue()));
-				break;
-			case "pmcid":
-				target = PMCID_PREFIX
-					+ IdentifierFactory
-						.md5(PidCleaner.normalizePidValue(PidType.pmc.toString(), pid.getValue()));
-				break;
-
-			default:
-				return null;
-		}
-		Relation relation = OafMapperUtils
-			.getRelation(
-				source, target, ModelConstants.RESULT_PERSON_RELTYPE,
-				ModelConstants.RESULT_PERSON_SUBRELTYPE,
-				ModelConstants.RESULT_PERSON_HASAUTHORED,
-				Arrays.asList(OafMapperUtils.keyValue(orcidKey, ModelConstants.ORCID_DS)),
-				ORCIDDATAINFO,
-				null);
-		relation.setValidated(true);
-		return relation;
-	}
+//	private static Relation getRelation(String orcid, eu.dnetlib.dhp.collection.orcid.model.Pid pid) {
+//		String target;
+//		String source = PERSON_PREFIX + "::" + IdentifierFactory.md5(orcid);
+//		switch (pid.getSchema()) {
+//			case "doi":
+//				target = DOI_PREFIX
+//					+ IdentifierFactory
+//						.md5(PidCleaner.normalizePidValue(PidType.doi.toString(), pid.getValue()));
+//				break;
+//			case "pmid":
+//				target = PMID_PREFIX
+//					+ IdentifierFactory
+//						.md5(PidCleaner.normalizePidValue(PidType.pmid.toString(), pid.getValue()));
+//				break;
+//			case "arxiv":
+//				target = ARXIV_PREFIX
+//					+ IdentifierFactory
+//						.md5(PidCleaner.normalizePidValue(PidType.arXiv.toString(), pid.getValue()));
+//				break;
+//			case "pmcid":
+//				target = PMCID_PREFIX
+//					+ IdentifierFactory
+//						.md5(PidCleaner.normalizePidValue(PidType.pmc.toString(), pid.getValue()));
+//				break;
+//
+//			default:
+//				return null;
+//		}
+//		Relation relation = OafMapperUtils
+//			.getRelation(
+//				source, target, ModelConstants.RESULT_PERSON_RELTYPE,
+//				ModelConstants.RESULT_PERSON_SUBRELTYPE,
+//				ModelConstants.RESULT_PERSON_HASAUTHORED,
+//				Arrays.asList(OafMapperUtils.keyValue(orcidKey, ModelConstants.ORCID_DS)),
+//				ORCIDDATAINFO,
+//				null);
+//		relation.setValidated(true);
+//		return relation;
+//	}
 }
