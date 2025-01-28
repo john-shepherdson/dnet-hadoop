@@ -5,10 +5,7 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 import static eu.dnetlib.dhp.schema.oaf.utils.ModelHardLimits.MAX_RELATIONS_BY_RELCLASS;
 import static eu.dnetlib.dhp.utils.DHPUtils.toSeq;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
@@ -17,7 +14,6 @@ import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.*;
 import org.apache.spark.util.LongAccumulator;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,13 +31,13 @@ import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
 import eu.dnetlib.dhp.oa.provision.model.TupleWrapper;
 import eu.dnetlib.dhp.oa.provision.utils.ContextMapper;
 import eu.dnetlib.dhp.oa.provision.utils.XmlRecordFactory;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.utils.ModelHardLimits;
+import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.solr.SolrRecord;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
-import scala.Tuple2;
 
 /**
  * XmlConverterJob converts the JoinedEntities as XML records
@@ -51,6 +47,9 @@ public class PayloadConverterJob {
 	private static final Logger log = LoggerFactory.getLogger(PayloadConverterJob.class);
 
 	public static final String schemaLocation = "https://www.openaire.eu/schema/1.0/oaf-1.0.xsd";
+
+	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
+		.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
 
 	public static void main(final String[] args) throws Exception {
 
@@ -118,29 +117,17 @@ public class PayloadConverterJob {
 
 		log.info("Found paths: {}", String.join(",", paths));
 
-		final ObjectMapper mapper = new ObjectMapper();
-		mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
 		spark
 			.read()
 			.load(toSeq(paths))
 			.as(Encoders.kryo(JoinedEntity.class))
 			.filter(
-				(FilterFunction<JoinedEntity>) je -> !Optional
-					.ofNullable(je.getEntity())
-					.map(Oaf::getDataInfo)
-					.map(DataInfo::getDeletedbyinference)
-					.orElse(false))
+				filterDeletedByInferenceFn())
 			.map(
-				(MapFunction<JoinedEntity, JoinedEntity>) PayloadConverterJob::pruneRelatedEntities,
+				pruneRelatedEntitiesFn(),
 				Encoders.kryo(JoinedEntity.class))
 			.map(
-				(MapFunction<JoinedEntity, Tuple2<String, SolrRecord>>) je -> new Tuple2<>(
-					recordFactory.build(je, validateXML),
-					ProvisionModelSupport.transform(je, contextMapper, vocabularies)),
-				Encoders.tuple(Encoders.STRING(), Encoders.bean(SolrRecord.class)))
-			.map(
-				(MapFunction<Tuple2<String, SolrRecord>, TupleWrapper>) t -> new TupleWrapper(
-					t._1(), mapper.writeValueAsString(t._2())),
+				mapPayloadTuple(contextMapper, vocabularies, validateXML, recordFactory),
 				Encoders.bean(TupleWrapper.class))
 			.write()
 			.mode(SaveMode.Overwrite)
@@ -148,30 +135,49 @@ public class PayloadConverterJob {
 			.json(outputPath);
 	}
 
+	private static FilterFunction<JoinedEntity> filterDeletedByInferenceFn() {
+		return je -> !Optional
+			.ofNullable(je.getEntity())
+			.map(Oaf::getDataInfo)
+			.map(DataInfo::getDeletedbyinference)
+			.orElse(false);
+	}
+
+	private static MapFunction<JoinedEntity, TupleWrapper> mapPayloadTuple(ContextMapper contextMapper,
+		VocabularyGroup vocabularies, Boolean validateXML, XmlRecordFactory recordFactory) {
+		return je -> {
+			final SolrRecord solrRecord = ProvisionModelSupport.transform(je, contextMapper, vocabularies);
+			final String xml = recordFactory.build(je, validateXML);
+			return new TupleWrapper(xml, OBJECT_MAPPER.writeValueAsString(solrRecord));
+		};
+	}
+
 	/**
 	 * This function iterates through the RelatedEntityWrapper(s) associated to the JoinedEntity and rules out
 	 * those exceeding the maximum allowed frequency defined in eu.dnetlib.dhp.schema.oaf.utils.ModelHardLimits#MAX_RELATIONS_BY_RELCLASS
 	 */
-	private static JoinedEntity pruneRelatedEntities(JoinedEntity je) {
-		Map<String, Long> freqs = Maps.newHashMap();
-		List<RelatedEntityWrapper> rew = Lists.newArrayList();
+	private static MapFunction<JoinedEntity, JoinedEntity> pruneRelatedEntitiesFn() {
+		return je -> {
+			Map<String, Long> freqs = Maps.newHashMap();
+			List<RelatedEntityWrapper> rew = Lists.newArrayList();
 
-		if (je.getLinks() != null) {
-			je.getLinks().forEach(link -> {
-				final String relClass = link.getRelation().getRelClass();
+			if (je.getLinks() != null) {
+				je.getLinks().forEach(link -> {
+					final String relClass = link.getRelation().getRelClass();
 
-				final Long count = freqs.getOrDefault(relClass, 0L);
-				final Long max = MAX_RELATIONS_BY_RELCLASS.getOrDefault(relClass, Long.MAX_VALUE);
+					final Long count = freqs.getOrDefault(relClass, 0L);
+					final Long max = MAX_RELATIONS_BY_RELCLASS.getOrDefault(relClass, Long.MAX_VALUE);
 
-				if (count <= max) {
-					rew.add(link);
-					freqs.put(relClass, freqs.getOrDefault(relClass, 0L) + 1);
-				}
-			});
-			je.setLinks(rew);
-		}
+					if (count <= max) {
+						rew.add(link);
+						freqs.put(relClass, freqs.getOrDefault(relClass, 0L) + 1);
+					}
+				});
+				je.setLinks(rew);
+			}
 
-		return je;
+			return je;
+		};
 	}
 
 	private static void removeOutputDir(final SparkSession spark, final String path) {

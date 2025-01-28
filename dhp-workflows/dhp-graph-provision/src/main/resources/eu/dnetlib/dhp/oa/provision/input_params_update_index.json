@@ -22,5 +22,11 @@
     "paramLongName": "batchSize",
     "paramDescription": "size of the batch of documents sent to solr",
     "paramRequired": false
+  },
+  {
+    "paramName": "sf",
+    "paramLongName": "shouldFilterXmlPayload",
+    "paramDescription": "activate filtering of the XML payloads",
+    "paramRequired": false
   }
 ]
