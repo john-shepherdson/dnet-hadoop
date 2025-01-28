@@ -4,20 +4,13 @@ package eu.dnetlib.dhp.person;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.FlatMapFunction;
-import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -25,9 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.countrypropagation.SparkCountryPropagationJob;
 import eu.dnetlib.dhp.schema.oaf.*;
-import scala.Tuple2;
 
 public class PersonPropagationJobTest {
 
@@ -73,7 +64,7 @@ public class PersonPropagationJobTest {
 			.getResource("/eu/dnetlib/dhp/personpropagation/graph")
 			.getPath();
 
-		SparkExtractPersonRelations
+		SparkExtractPersonRelationsAndAddIndicators
 			.main(
 				new String[] {
 					"--isSparkSessionManaged", Boolean.FALSE.toString(),

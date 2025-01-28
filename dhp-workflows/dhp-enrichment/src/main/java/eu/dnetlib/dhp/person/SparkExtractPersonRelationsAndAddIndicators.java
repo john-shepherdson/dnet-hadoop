@@ -1,14 +1,11 @@
 
 package eu.dnetlib.dhp.person;
 
-import static com.ibm.icu.text.PluralRules.Operand.w;
 import static eu.dnetlib.dhp.PropagationConstant.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
@@ -18,6 +15,7 @@ import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.MapGroupsFunction;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.Dataset;
+import org.postgresql.shaded.com.ongres.scram.common.bouncycastle.pbkdf2.EncodableDigest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +30,7 @@ import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import scala.Tuple2;
 
-public class SparkExtractPersonRelations {
+public class SparkExtractPersonRelationsAndAddIndicators {
 
 	private static final Logger log = LoggerFactory.getLogger(SparkCountryPropagationJob.class);
 	private static final String PERSON_PREFIX = ModelSupport.getIdPrefix(Person.class) + "|orcid_______";
@@ -82,8 +80,132 @@ public class SparkExtractPersonRelations {
 					spark,
 					sourcePath,
 					workingPath);
+				addIndicators(spark, sourcePath, workingPath);
 				removeIsolatedPerson(spark, sourcePath, workingPath);
 			});
+	}
+
+	private static void addIndicators(SparkSession spark, String sourcePath, String workingPath) {
+		//si leggono i result e si selezionano quelli con ordic.
+		//per ogni result si prendono gli orcid value distinti e si emettono i downloads e view
+		//si raggruppa per orcid e si sommano i vari contributi
+		ModelSupport.entityTypes
+				.keySet()
+				.stream()
+				.filter(ModelSupport::isResult)
+				.forEach(
+						e -> {
+							// 1. search for results having orcid_pending and orcid in the set of pids for the authors
+							spark
+									.read()
+									.schema(Encoders.bean(Result.class).schema())
+									.json(sourcePath + e.name())
+									.as(Encoders.bean(Result.class))
+									.filter(
+											(FilterFunction<Result>) r -> !r.getDataInfo().getDeletedbyinference() &&
+													!r.getDataInfo().getInvisible() &&
+													Optional
+															.ofNullable(r.getAuthor())
+															.isPresent())
+									.filter(
+											(FilterFunction<Result>) r -> r
+													.getAuthor()
+													.stream()
+													.anyMatch(
+															a -> Optional
+																	.ofNullable(
+																			a
+																					.getPid())
+																	.isPresent() &&
+																	a
+																			.getPid()
+																			.stream()
+																			.anyMatch(
+																					p -> Arrays
+																							.asList("orcid", "orcid_pending")
+																							.contains(p.getQualifier().getClassid().toLowerCase()))) &&
+											Optional.ofNullable(r.getMeasures()).isPresent() && r.getMeasures().stream().anyMatch(measure -> Arrays.asList("views","downloads")
+													.contains(measure.getId().toLowerCase())))
+									.flatMap((FlatMapFunction<Result, OrcidIndicators>) r -> {
+									List<OrcidIndicators> oi = new ArrayList<>();
+												r.getAuthor()
+														.stream()
+														.forEach(a -> {
+															List<StructuredProperty> orcid  = a.getPid().stream()
+																			.filter(p -> p.getQualifier().getClassid().equalsIgnoreCase("orcid"))
+																			.collect(Collectors.toList());
+															if (!orcid.isEmpty())
+																oi.add(OrcidIndicators.newInstance(r.getId(), orcid.get(0).getValue(), r.getMeasures()));
+															else
+																oi.add(OrcidIndicators.newInstance(r.getId(),a.getPid().stream()
+																		.filter(p -> p.getQualifier().getClassid().equalsIgnoreCase("orcid_pending"))
+																		.collect(Collectors.toList()).get(0).getValue(), r.getMeasures()));
+																}
+														);
+									return oi.iterator();
+											}
+											, Encoders.bean(OrcidIndicators.class))
+									.distinct()
+									.groupByKey((MapFunction<OrcidIndicators, String>) OrcidIndicators::getOrcid,Encoders.STRING() )
+									.mapGroups((MapGroupsFunction<String, OrcidIndicators, OrcidIndicators>) (k,it) -> {
+										OrcidIndicators acc = it.next();
+										it.forEachRemaining(oi -> acc.addIndicators(oi.getDownloads(), oi.getViews()));
+										return acc;
+
+							},Encoders.bean(OrcidIndicators.class))
+									.write()
+									.mode(SaveMode.Append)
+									.option("compression","gzip")
+									.json(workingPath + "/orcidIndicators");
+						}
+						);
+
+		Dataset<Person> person = spark.read().schema(Encoders.bean(Person.class).schema())
+				.json(sourcePath + "person")
+				.as(Encoders.bean(Person.class));
+
+		Dataset<OrcidIndicators> orcidIndicators = spark.read().schema(Encoders.bean(OrcidIndicators.class).schema())
+				.json(workingPath + "/orcidIndicators")
+				.as(Encoders.bean(OrcidIndicators.class))
+				.groupByKey((MapFunction<OrcidIndicators, String>) OrcidIndicators::getOrcid,Encoders.STRING() )
+				.mapGroups((MapGroupsFunction<String, OrcidIndicators, OrcidIndicators>) (k,it) -> {
+					OrcidIndicators acc = it.next();
+					it.forEachRemaining(oi -> acc.addIndicators(oi.getDownloads(), oi.getViews()));
+					return acc;
+
+				},Encoders.bean(OrcidIndicators.class));
+
+		person.joinWith(orcidIndicators, person.col("id").equalTo(orcidIndicators.col("orcid")),"left")
+				.map((MapFunction<Tuple2<Person, OrcidIndicators>, Person>) t2 -> {
+					Person p = t2._1();
+					if(t2._2() != null) {
+						p.setMeasures(Arrays.asList(getMeasure("downloads", String.valueOf(t2._2().getDownloads())),
+								getMeasure("views", String.valueOf(t2._2().getViews()))));
+					}
+					return p;
+				}, Encoders.bean(Person.class) )
+				.write()
+				.mode(SaveMode.Overwrite)
+				.option("compression","gzip")
+				.json(workingPath + "/person");
+
+		spark.read().schema(Encoders.bean(Person.class).schema())
+				.json(workingPath + "/person")
+				.write()
+				.mode(SaveMode.Overwrite)
+				.option("compression","gzip")
+				.json(sourcePath + "/person");
+
+	}
+
+	private static Measure getMeasure(String measureName, String measureValue){
+		Measure measure = new Measure();
+		measure.setId(measureName);
+		KeyValue kv = new KeyValue();
+		kv.setKey("score");
+		kv.setValue(measureValue);
+		measure.setUnit(Arrays.asList(kv));
+		return measure;
 	}
 
 	private static void removeIsolatedPerson(SparkSession spark, String sourcePath, String workingPath) {
