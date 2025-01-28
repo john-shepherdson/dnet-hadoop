@@ -178,7 +178,7 @@ public class SolrConfigExploreTest {
 
 		String inputPath = "src/test/resources/eu/dnetlib/dhp/oa/provision/xml";
 
-		new XmlIndexingJob(spark, inputPath, SHADOW_FORMAT, ProvisionConstants.SHADOW_ALIAS_NAME, batchSize)
+		new XmlIndexingJob(spark, inputPath, SHADOW_FORMAT, ProvisionConstants.SHADOW_ALIAS_NAME, batchSize, false)
 			.run(isLookupClient);
 		Assertions
 			.assertEquals(0, miniCluster.getSolrClient().commit(ProvisionConstants.SHADOW_ALIAS_NAME).getStatus());
