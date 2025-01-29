@@ -47,6 +47,11 @@
             <value>*:*</value>
             <description>query used in the deleted by query operation</description>
         </property>
+        <property>
+            <name>shouldFilterXmlPayload</name>
+            <value>false</value>
+            <description>activates filtering of the XML payloads</description>
+        </property>
 
         <property>
             <name>sparkDriverMemory</name>
@@ -734,6 +739,7 @@
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--shadowFormat</arg><arg>${shadowFormat}</arg>
             <arg>--batchSize</arg><arg>${batchSize}</arg>
+            <arg>--shouldFilterXmlPayload</arg><arg>${shouldFilterXmlPayload}</arg>
         </spark>
         <ok to="commit_solr_collection"/>
         <error to="Kill"/>
