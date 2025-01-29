@@ -1,0 +1,22 @@
+[
+  {
+    "paramName":"s",
+    "paramLongName":"sourcePath",
+    "paramDescription": "the input graph source path",
+    "paramRequired": true
+  },
+  {
+    "paramName":"t",
+    "paramLongName":"targetPath",
+    "paramDescription": "the output mini graph generated path",
+    "paramRequired": true
+  },
+  {
+    "paramName":"p",
+    "paramLongName":"pidListPath",
+    "paramDescription": "the path of the pid list t filter the graph",
+    "paramRequired": true
+  }
+]
+
+
