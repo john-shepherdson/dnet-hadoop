@@ -75,7 +75,7 @@ public class PrepareAffiliationRelations implements Serializable {
 		final String dataciteInputPath = parser.get("dataciteInputPath");
 		log.info("dataciteInputPath: {}", dataciteInputPath);
 
-		final String webcrawlInputPath = parser.get("webCrawlInputPath");
+		final String webcrawlInputPath = parser.get("webCrawlInputPath");//oalex
 		log.info("webcrawlInputPath: {}", webcrawlInputPath);
 
 		final String publisherInputPath = parser.get("publisherInputPath");

@@ -5,6 +5,7 @@ import static eu.dnetlib.dhp.PropagationConstant.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.util.*;
+import java.util.logging.Filter;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
@@ -123,42 +124,98 @@ public class SparkExtractPersonRelationsAndAddIndicators {
 																			.anyMatch(
 																					p -> Arrays
 																							.asList("orcid", "orcid_pending")
-																							.contains(p.getQualifier().getClassid().toLowerCase()))) &&
-											Optional.ofNullable(r.getMeasures()).isPresent() && r.getMeasures().stream().anyMatch(measure -> Arrays.asList("views","downloads")
-													.contains(measure.getId().toLowerCase())))
-									.flatMap((FlatMapFunction<Result, OrcidIndicators>) r -> {
-									List<OrcidIndicators> oi = new ArrayList<>();
-												r.getAuthor()
-														.stream()
-														.forEach(a -> {
-															List<StructuredProperty> orcid  = a.getPid().stream()
-																			.filter(p -> p.getQualifier().getClassid().equalsIgnoreCase("orcid"))
-																			.collect(Collectors.toList());
-															if (!orcid.isEmpty())
-																oi.add(OrcidIndicators.newInstance(r.getId(), orcid.get(0).getValue(), r.getMeasures()));
-															else
-																oi.add(OrcidIndicators.newInstance(r.getId(),a.getPid().stream()
-																		.filter(p -> p.getQualifier().getClassid().equalsIgnoreCase("orcid_pending"))
-																		.collect(Collectors.toList()).get(0).getValue(), r.getMeasures()));
-																}
-														);
-									return oi.iterator();
-											}
-											, Encoders.bean(OrcidIndicators.class))
-									.distinct()
-									.groupByKey((MapFunction<OrcidIndicators, String>) OrcidIndicators::getOrcid,Encoders.STRING() )
-									.mapGroups((MapGroupsFunction<String, OrcidIndicators, OrcidIndicators>) (k,it) -> {
-										OrcidIndicators acc = it.next();
-										it.forEachRemaining(oi -> acc.addIndicators(oi.getDownloads(), oi.getViews()));
-										return acc;
-
-							},Encoders.bean(OrcidIndicators.class))
+																							.contains(p.getQualifier().getClassid().toLowerCase()))))
+									.map((MapFunction<Result, ResultSubset>) ResultSubset::newInstance,Encoders.bean(ResultSubset.class))
 									.write()
 									.mode(SaveMode.Append)
-									.option("compression","gzip")
-									.json(workingPath + "/orcidIndicators");
+									.option("compression", "gzip")
+									.json(workingPath + "/resultWithPid");
+						});
+
+		Dataset<ResultSubset> resultSubset = spark.read().schema(Encoders.bean(ResultSubset.class).schema())
+				.json(workingPath + "/resultWithPid")
+				.as(Encoders.bean(ResultSubset.class));
+
+		Dataset<OrcidIndicators> downloads = resultSubset
+				.filter((FilterFunction<ResultSubset>) rs -> Optional.ofNullable(rs.getMeasures()).isPresent() &&
+						rs.getMeasures().stream().anyMatch(measure -> measure.getId().equalsIgnoreCase("downloads")))
+
+				.flatMap((FlatMapFunction<ResultSubset, OrcidIndicators>) r -> {
+							List<OrcidIndicators> oi = new ArrayList<>();
+							r.getAuthor()
+									.forEach(a -> {
+												List<StructuredProperty> orcid = a.getPid().stream()
+														.filter(p -> p.getQualifier().getClassid().equalsIgnoreCase("orcid"))
+														.collect(Collectors.toList());
+												if (!orcid.isEmpty())
+													oi.add(OrcidIndicators.newInstance(r.getId(), orcid.get(0).getValue(), r.getMeasures()));
+												else
+													oi.add(OrcidIndicators.newInstance(r.getId(), a.getPid().stream()
+															.filter(p -> p.getQualifier().getClassid().equalsIgnoreCase("orcid_pending"))
+															.collect(Collectors.toList()).get(0).getValue(), r.getMeasures()));
+											}
+									);
+							return oi.iterator();
 						}
-						);
+						, Encoders.bean(OrcidIndicators.class))
+				.distinct()
+				.groupByKey((MapFunction<OrcidIndicators, String>) OrcidIndicators::getOrcid, Encoders.STRING())
+				.mapGroups((MapGroupsFunction<String, OrcidIndicators, OrcidIndicators>) (k, it) -> {
+					OrcidIndicators acc = it.next();
+					it.forEachRemaining(oi -> acc.addIndicators(oi.getDownloads(), oi.getCitations()));
+					return acc;
+
+				}, Encoders.bean(OrcidIndicators.class));
+//				.write()
+//				.mode(SaveMode.Append)
+//				.option("compression","gzip")
+//				.json(workingPath + "/orcidDownloads");
+
+		Dataset<Relation> relations = spark.read().schema(Encoders.bean(Relation.class).schema())
+				.json(sourcePath + "relation")
+				.as(Encoders.bean(Relation.class))
+				.filter((FilterFunction<Relation>) r -> !r.getDataInfo().getDeletedbyinference() && r.getRelClass().equalsIgnoreCase(ModelConstants.CITES));
+
+		Dataset<OrcidIndicators> citations = resultSubset.joinWith(relations, resultSubset.col("id").equalTo(relations.col("target")))
+				.flatMap((FlatMapFunction<Tuple2<ResultSubset, Relation>, OrcidIndicators>) t2 -> {
+					List<OrcidIndicators> oi = new ArrayList<>();
+					t2._1().getAuthor()
+							.forEach(a -> {
+										List<StructuredProperty> orcid = a.getPid().stream()
+												.filter(p -> p.getQualifier().getClassid().equalsIgnoreCase("orcid"))
+												.collect(Collectors.toList());
+										if (!orcid.isEmpty())
+											oi.add(OrcidIndicators.newInstance(t2._1().getId(), orcid.get(0).getValue()));
+										else
+											oi.add(OrcidIndicators.newInstance(t2._1().getId(), a.getPid().stream()
+													.filter(p -> p.getQualifier().getClassid().equalsIgnoreCase("orcid_pending"))
+													.collect(Collectors.toList()).get(0).getValue()));
+									}
+							);
+					return oi.iterator();
+				}, Encoders.bean(OrcidIndicators.class))
+				.groupByKey((MapFunction<OrcidIndicators, String>) oi -> oi.getOrcid(), Encoders.STRING())
+				.mapGroups((MapGroupsFunction<String, OrcidIndicators, OrcidIndicators>) (k, it) -> {
+							OrcidIndicators oi = it.next();
+							it.forEachRemaining(e -> oi.setCitations(oi.getCitations() + e.getCitations()));
+							return oi;
+						}, Encoders.bean(OrcidIndicators.class)
+				);
+
+		downloads.joinWith(citations, downloads.col("orcid").equalTo(citations.col("orcid")),"full")
+				.map((MapFunction<Tuple2<OrcidIndicators, OrcidIndicators>, OrcidIndicators>) t2 -> {
+					if(t2._1() == null)
+						return t2._2();
+					if(t2._2() == null)
+						return t2._1();
+					t2._1().setCitations(t2._2().getCitations());
+					return t2._1();
+
+				}, Encoders.bean(OrcidIndicators.class))
+				.write()
+				.mode(SaveMode.Overwrite)
+				.option("compression","gzip")
+				.json(workingPath + "/orcidIndicators");
 
 		Dataset<Person> person = spark.read().schema(Encoders.bean(Person.class).schema())
 				.json(sourcePath + "person")
@@ -170,7 +227,7 @@ public class SparkExtractPersonRelationsAndAddIndicators {
 				.groupByKey((MapFunction<OrcidIndicators, String>) OrcidIndicators::getOrcid,Encoders.STRING() )
 				.mapGroups((MapGroupsFunction<String, OrcidIndicators, OrcidIndicators>) (k,it) -> {
 					OrcidIndicators acc = it.next();
-					it.forEachRemaining(oi -> acc.addIndicators(oi.getDownloads(), oi.getViews()));
+					it.forEachRemaining(oi -> acc.addIndicators(oi.getDownloads(),oi.getCitations()));
 					return acc;
 
 				},Encoders.bean(OrcidIndicators.class));
@@ -180,7 +237,7 @@ public class SparkExtractPersonRelationsAndAddIndicators {
 					Person p = t2._1();
 					if(t2._2() != null) {
 						p.setMeasures(Arrays.asList(getMeasure("downloads", String.valueOf(t2._2().getDownloads())),
-								getMeasure("views", String.valueOf(t2._2().getViews()))));
+								getMeasure("citations", String.valueOf(t2._2().getCitations()))));
 					}
 					return p;
 				}, Encoders.bean(Person.class) )

@@ -9,13 +9,14 @@ import eu.dnetlib.dhp.utils.DHPUtils;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.stream.Stream;
+
 
 public class OrcidIndicators implements Serializable {
     private String resultId;
     private String orcid;
     private Integer downloads;
-    private Integer views;
+    private Integer citations;
+
     private static final String PERSON_PREFIX = ModelSupport.getIdPrefix(Person.class)
             + IdentifierFactory.ID_PREFIX_SEPARATOR + ModelConstants.ORCID + "_______";
     public static OrcidIndicators newInstance(String id, String orcid, List<Measure> measures) {
@@ -26,10 +27,15 @@ public class OrcidIndicators implements Serializable {
                 .findFirst()
                 .map(m -> Integer.parseInt(m.getUnit().get(0).getValue()))
                 .orElse(0);
-        oi.views = measures.stream().filter(m -> m.getId().equalsIgnoreCase("views"))
-                .findFirst()
-                .map(m -> Integer.parseInt(m.getUnit().get(0).getValue()))
-                .orElse(0);
+        return oi;
+
+    }
+
+    public static OrcidIndicators newInstance(String id, String orcid) {
+        OrcidIndicators oi = new OrcidIndicators();
+        oi.resultId = id;
+        oi.orcid = DHPUtils.generateIdentifier(orcid, PERSON_PREFIX);
+        oi.citations = 1;
         return oi;
 
     }
@@ -50,13 +56,7 @@ public class OrcidIndicators implements Serializable {
         this.downloads = downloads;
     }
 
-    public Integer getViews() {
-        return views;
-    }
 
-    public void setViews(Integer views) {
-        this.views = views;
-    }
 
     public String getResultId() {
         return resultId;
@@ -66,8 +66,16 @@ public class OrcidIndicators implements Serializable {
         this.resultId = resultId;
     }
 
-    public void addIndicators(Integer downloads, Integer views) {
+    public void addIndicators(Integer downloads, Integer citations) {
         this.downloads += downloads;
-        this.views += views;
+        this.citations += citations;
+    }
+
+    public void setCitations(Integer citations) {
+        this.citations = citations;
+    }
+
+    public Integer getCitations() {
+        return citations;
     }
 }
