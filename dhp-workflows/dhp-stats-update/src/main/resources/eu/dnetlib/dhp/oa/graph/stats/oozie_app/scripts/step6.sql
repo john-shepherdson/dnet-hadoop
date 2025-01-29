@@ -49,17 +49,18 @@ DROP TABLE IF EXISTS ${stats_db_name}.project purge; /*EOS*/
 CREATE TABLE ${stats_db_name}.project stored as parquet as
 with pr_pub as (
     select pr.id as pr_id, pub.id as pub_id,
-        (case when datediff(pub.dt_dateofacceptance, pr.dt_enddate) > 0 then true else false end) as delayed,
+        max(datediff(pub.dt_dateofacceptance, pr.dt_enddate) > 0) AS delayed,
         max(datediff(pub.dt_dateofacceptance, pr.dt_enddate)) as daysForlastPub
-    from (select id, to_date(dateofacceptance.value) as dt_dateofacceptance from ${openaire_db_name}.publication
+    from (
+        select id, to_date(dateofacceptance.value) as dt_dateofacceptance
+        from ${openaire_db_name}.publication
         where datainfo.deletedbyinference = false and datainfo.invisible = false) pub
-    join ${openaire_db_name}.relation rel
-        on rel.reltype = 'resultProject' and rel.relclass = 'isProducedBy' and rel.source=pub.id
-            and rel.datainfo.deletedbyinference = false and rel.datainfo.invisible = false
-    join (select id, to_date(enddate.value) as dt_enddate from ${openaire_db_name}.project
-            where datainfo.deletedbyinference = false and datainfo.invisible = false) pr
-        on pr.id=rel.target
-    group by pr.id, pub.id, pub.dt_dateofacceptance, pr.dt_enddate
+    join ${openaire_db_name}.relation rel on rel.reltype = 'resultProject' and rel.relclass = 'isProducedBy' and rel.source=pub.id and rel.datainfo.deletedbyinference = false and rel.datainfo.invisible = false
+    join (
+        select id, to_date(enddate.value) as dt_enddate
+        from ${openaire_db_name}.project
+        where datainfo.deletedbyinference = false and datainfo.invisible = false) pr on pr.id=rel.target
+    group by pr.id, pub.id
 ),
 num_pubs_pr as (
     select pr_id, count( distinct pub_id) as num_pubs
