@@ -179,7 +179,7 @@ public class XmlIndexingJob extends AbstractSolrRecordTransformJob {
 									return isRelatedProject && "EC".equals(funderShortName);
 								}))
 					.orElse(false);
-				if (!isProject || !isRelatedToEcFunding) {
+				if (!(isProject || isRelatedToEcFunding)) {
 					doc.remove(StreamingInputDocumentFactory.INDEX_RESULT);
 				}
 			} catch (IOException e) {
