@@ -48,24 +48,22 @@ DROP TABLE IF EXISTS ${stats_db_name}.project purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.project stored as parquet as
 with pr_pub as (
-    select pr.id as pr_id, pub.id as pub_id,
-        max(datediff(pub.dt_dateofacceptance, pr.dt_enddate)) as daysForPub
+        select pr.id as pr_id, pub.id as pub_id, datediff(pub.dt_dateofacceptance, pr.dt_enddate) as daysForPub
     from (
-        select id, to_date(dateofacceptance.value) as dt_dateofacceptance
-        from ${openaire_db_name}.publication
-        where datainfo.deletedbyinference = false and datainfo.invisible = false) pub
+             select id, to_date(dateofacceptance.value) as dt_dateofacceptance
+    from ${openaire_db_name}.publication
+    where datainfo.deletedbyinference = false and datainfo.invisible = false) pub
     join ${openaire_db_name}.relation rel on rel.reltype = 'resultProject' and rel.relclass = 'isProducedBy' and rel.source=pub.id and rel.datainfo.deletedbyinference = false and rel.datainfo.invisible = false
     join (
-        select id, to_date(enddate.value) as dt_enddate
-        from ${openaire_db_name}.project
-        where datainfo.deletedbyinference = false and datainfo.invisible = false) pr on pr.id=rel.target
-    group by pr.id, pub.id
-),
+             select id, to_date(enddate.value) as dt_enddate
+    from ${openaire_db_name}.project
+    where datainfo.deletedbyinference = false and datainfo.invisible = false) pr on pr.id=rel.target
+    ),
 project_pub_stats as (
-    select pr.id, count(distinct pub.id) as num_pubs,  max(daysForPub) as daysForlastPub, sum(case when daysForPub > 0 then 1 else 0 end) as delayedPubs
-    from pr_pub
-    group by pr.id
-)
+                             select pr_id, count(distinct pub_id) as num_pubs,  max(daysForPub) as daysForlastPub, sum(case when daysForPub > 0 then 1 else 0 end) as delayedPubs
+    from pr_pub pr
+    group by pr_id
+    )
 select /*+ COALESCE(100) */
     substr(p.id, 4)                                                             as id,
     p.acronym.value                                                             as acronym,
@@ -91,7 +89,7 @@ select /*+ COALESCE(100) */
     p.fundedamount                                                              as fundedamount,
     p.currency.value                                                            as currency
 from ${openaire_db_name}.project p
-left outer join project_pub_stats on project_pub_stats.id = p.id
+left outer join project_pub_stats on project_pub_stats.pr_id = p.id
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible = false; /*EOS*/
 
 ANALYZE TABLE ${stats_db_name}.project COMPUTE STATISTICS; /*EOS*/
