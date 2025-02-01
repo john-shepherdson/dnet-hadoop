@@ -1,21 +1,17 @@
 
 package eu.dnetlib.dhp.person;
 
-import static com.ibm.icu.text.PluralRules.Operand.w;
 import static eu.dnetlib.dhp.PropagationConstant.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.api.java.function.MapGroupsFunction;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.Dataset;
 import org.slf4j.Logger;
@@ -118,16 +114,6 @@ public class SparkExtractPersonRelations {
 
 	private static void extractRelations(SparkSession spark, String sourcePath, String workingPath) {
 
-		Dataset<Tuple2<String, Relation>> relationDataset = spark
-			.read()
-			.schema(Encoders.bean(Relation.class).schema())
-			.json(sourcePath + "relation")
-			.as(Encoders.bean(Relation.class))
-			.map(
-				(MapFunction<Relation, Tuple2<String, Relation>>) r -> new Tuple2<>(
-					r.getSource() + r.getRelClass() + r.getTarget(), r),
-				Encoders.tuple(Encoders.STRING(), Encoders.bean(Relation.class)));
-
 		ModelSupport.entityTypes
 			.keySet()
 			.stream()
@@ -165,47 +151,42 @@ public class SparkExtractPersonRelations {
 													.contains(p.getQualifier().getClassid().toLowerCase()))));
 					// 2. create authorship relations between the result identifier and the person entity with
 					// orcid_pending.
-					Dataset<Tuple2<String, Relation>> newRelations = resultWithOrcids
+					resultWithOrcids
 						.flatMap(
-							(FlatMapFunction<Result, Relation>) r -> getAuthorshipRelations(r),
+							(FlatMapFunction<Result, Relation>) SparkExtractPersonRelations::getAuthorshipRelations,
 							Encoders.bean(Relation.class))
-//							.groupByKey((MapFunction<Relation, String>) r-> r.getSource()+r.getTarget(), Encoders.STRING() )
-//							.mapGroups((MapGroupsFunction<String, Relation, Relation>) (k,it) -> it.next(), Encoders.bean(Relation.class) )
-						.map(
-							(MapFunction<Relation, Tuple2<String, Relation>>) r -> new Tuple2<>(
-								r.getSource() + r.getRelClass() + r.getTarget(), r),
-							Encoders.tuple(Encoders.STRING(), Encoders.bean(Relation.class)));
-					newRelations
-						.joinWith(relationDataset, newRelations.col("_1").equalTo(relationDataset.col("_1")), "left")
-						.map((MapFunction<Tuple2<Tuple2<String, Relation>, Tuple2<String, Relation>>, Relation>) t2 -> {
-							if (t2._2() == null)
-								return t2._1()._2();
-							return null;
-						}, Encoders.bean(Relation.class))
-						.filter((FilterFunction<Relation>) r -> r != null)
-						.write()
-						.mode(SaveMode.Append)
-						.option("compression", "gzip")
-						.json(workingPath);
-
-					// 2.1 store in a separate location the relation between the person and the pids for the result?
+							.distinct()
+							.write()
+							.mode(SaveMode.Append)
+							.option("compression","gzip")
+							.json(workingPath +"/authorshipNew");
 
 					// 3. create co_authorship relations between the pairs of authors with orcid/orcid_pending pids
-					newRelations = resultWithOrcids
-						.map((MapFunction<Result, Coauthors>) r -> getAuthorsPidList(r), Encoders.bean(Coauthors.class))
+					resultWithOrcids
+						.map((MapFunction<Result, Coauthors>) SparkExtractPersonRelations::getAuthorsPidList, Encoders.bean(Coauthors.class))
 						.flatMap(
 							(FlatMapFunction<Coauthors, Relation>) c -> new CoAuthorshipIterator(c.getCoauthors()),
 							Encoders.bean(Relation.class))
-						.groupByKey(
-							(MapFunction<Relation, String>) r -> r.getSource() + r.getTarget(), Encoders.STRING())
-						.mapGroups(
-							(MapGroupsFunction<String, Relation, Relation>) (k, it) -> it.next(),
-							Encoders.bean(Relation.class))
-						.map(
-							(MapFunction<Relation, Tuple2<String, Relation>>) r -> new Tuple2<>(
+						.distinct()
+							.write()
+							.mode(SaveMode.Append)
+							.option("compression","gzip")
+							.json(workingPath + "/coauthorshipNew");
+				});
+		Dataset<Tuple2<String, Relation>> relationDataset = spark
+				.read()
+				.schema(Encoders.bean(Relation.class).schema())
+				.json(sourcePath + "relation")
+				.as(Encoders.bean(Relation.class))
+				.map((MapFunction<Relation, Tuple2<String, Relation>>) r -> new Tuple2<>(
 								r.getSource() + r.getRelClass() + r.getTarget(), r),
-							Encoders.tuple(Encoders.STRING(), Encoders.bean(Relation.class)));
-					newRelations
+						Encoders.tuple(Encoders.STRING(), Encoders.bean(Relation.class)));
+
+		Dataset<Tuple2<String, Relation>> newRelations =
+				getRelationMap(spark, workingPath+ "/authorshipNew")
+						.union(getRelationMap(spark, workingPath + "/coauthorshipNew"));
+
+		newRelations
 						.joinWith(relationDataset, newRelations.col("_1").equalTo(relationDataset.col("_1")), "left")
 						.map((MapFunction<Tuple2<Tuple2<String, Relation>, Tuple2<String, Relation>>, Relation>) t2 -> {
 							if (t2._2() == null)
@@ -216,18 +197,26 @@ public class SparkExtractPersonRelations {
 						.write()
 						.mode(SaveMode.Append)
 						.option("compression", "gzip")
-						.json(workingPath);
-
-				});
+						.json(workingPath + "/relation");
 		spark
 			.read()
 			.schema(Encoders.bean(Relation.class).schema())
-			.json(workingPath)
+			.json(workingPath + "/relation")
 			.write()
 			.mode(SaveMode.Append)
 			.option("compression", "gzip")
-			.json(sourcePath + "relation");
+			.json(sourcePath + "/relation");
 
+	}
+
+	private static Dataset<Tuple2<String, Relation>> getRelationMap(SparkSession spark, String workingPath) {
+		return spark.read().schema(Encoders.bean(Relation.class).schema())
+				.json(workingPath )
+				.as(Encoders.bean(Relation.class))
+				.distinct()
+				.map((MapFunction<Relation, Tuple2<String, Relation>>) r -> new Tuple2<>(
+								r.getSource() + r.getRelClass() + r.getTarget(), r),
+						Encoders.tuple(Encoders.STRING(), Encoders.bean(Relation.class)));
 	}
 
 	private static Coauthors getAuthorsPidList(Result r) {
@@ -256,11 +245,9 @@ public class SparkExtractPersonRelations {
 							.stream()
 							.filter(p -> p.getQualifier().getClassid().equalsIgnoreCase("orcid_pending"))
 							.findFirst();
-						if (tmp.isPresent())
-							return tmp.get().getValue();
+                        return tmp.map(StructuredProperty::getValue).orElse(null);
 
-						return null;
-					})
+                    })
 					.filter(Objects::nonNull)
 					.collect(Collectors.toList()));
 		return coauth;
