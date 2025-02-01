@@ -27,18 +27,26 @@ public class OrcidIndicators implements Serializable {
                 .findFirst()
                 .map(m -> Integer.parseInt(m.getUnit().get(0).getValue()))
                 .orElse(0);
+        oi.citations = measures.stream().filter(m -> m.getId().equalsIgnoreCase("influence_alt"))
+                .findFirst()
+                .map(m -> m.getUnit().stream().filter(u->u.getKey().equals("score")).findFirst()
+                        .map(u -> Integer.parseInt(u.getValue()))
+                        .orElse(0)
+                )
+                .orElse(0);
         return oi;
 
     }
 
-    public static OrcidIndicators newInstance(String id, String orcid) {
-        OrcidIndicators oi = new OrcidIndicators();
-        oi.resultId = id;
-        oi.orcid = DHPUtils.generateIdentifier(orcid, PERSON_PREFIX);
-        oi.citations = 1;
-        return oi;
-
-    }
+//    public static OrcidIndicators newInstance(String id, String orcid) {
+//        OrcidIndicators oi = new OrcidIndicators();
+//        oi.resultId = id;
+//        oi.orcid = DHPUtils.generateIdentifier(orcid, PERSON_PREFIX);
+//        oi.citations = 1;
+//        oi.downloads = 0;
+//        return oi;
+//
+//    }
 
     public String getOrcid() {
         return orcid;

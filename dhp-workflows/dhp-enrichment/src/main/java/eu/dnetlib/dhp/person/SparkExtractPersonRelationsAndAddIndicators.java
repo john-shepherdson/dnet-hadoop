@@ -88,7 +88,7 @@ public class SparkExtractPersonRelationsAndAddIndicators {
 
 	private static void addIndicators(SparkSession spark, String sourcePath, String workingPath) {
 		//si leggono i result e si selezionano quelli con ordic.
-		//per ogni result si prendono gli orcid value distinti e si emettono i downloads e view
+		//per ogni result si prendono gli orcid value distinti e si emettono i downloads e citation count
 		//si raggruppa per orcid e si sommano i vari contributi
 		ModelSupport.entityTypes
 				.keySet()
@@ -136,9 +136,8 @@ public class SparkExtractPersonRelationsAndAddIndicators {
 				.json(workingPath + "/resultWithPid")
 				.as(Encoders.bean(ResultSubset.class));
 
-		Dataset<OrcidIndicators> downloads = resultSubset
-				.filter((FilterFunction<ResultSubset>) rs -> Optional.ofNullable(rs.getMeasures()).isPresent() &&
-						rs.getMeasures().stream().anyMatch(measure -> measure.getId().equalsIgnoreCase("downloads")))
+		resultSubset
+				.filter((FilterFunction<ResultSubset>) rs -> Optional.ofNullable(rs.getMeasures()).isPresent() )
 
 				.flatMap((FlatMapFunction<ResultSubset, OrcidIndicators>) r -> {
 							List<OrcidIndicators> oi = new ArrayList<>();
@@ -165,57 +164,57 @@ public class SparkExtractPersonRelationsAndAddIndicators {
 					it.forEachRemaining(oi -> acc.addIndicators(oi.getDownloads(), oi.getCitations()));
 					return acc;
 
-				}, Encoders.bean(OrcidIndicators.class));
-//				.write()
-//				.mode(SaveMode.Append)
-//				.option("compression","gzip")
-//				.json(workingPath + "/orcidDownloads");
-
-		Dataset<Relation> relations = spark.read().schema(Encoders.bean(Relation.class).schema())
-				.json(sourcePath + "relation")
-				.as(Encoders.bean(Relation.class))
-				.filter((FilterFunction<Relation>) r -> !r.getDataInfo().getDeletedbyinference() && r.getRelClass().equalsIgnoreCase(ModelConstants.CITES));
-
-		Dataset<OrcidIndicators> citations = resultSubset.joinWith(relations, resultSubset.col("id").equalTo(relations.col("target")))
-				.flatMap((FlatMapFunction<Tuple2<ResultSubset, Relation>, OrcidIndicators>) t2 -> {
-					List<OrcidIndicators> oi = new ArrayList<>();
-					t2._1().getAuthor()
-							.forEach(a -> {
-										List<StructuredProperty> orcid = a.getPid().stream()
-												.filter(p -> p.getQualifier().getClassid().equalsIgnoreCase("orcid"))
-												.collect(Collectors.toList());
-										if (!orcid.isEmpty())
-											oi.add(OrcidIndicators.newInstance(t2._1().getId(), orcid.get(0).getValue()));
-										else
-											oi.add(OrcidIndicators.newInstance(t2._1().getId(), a.getPid().stream()
-													.filter(p -> p.getQualifier().getClassid().equalsIgnoreCase("orcid_pending"))
-													.collect(Collectors.toList()).get(0).getValue()));
-									}
-							);
-					return oi.iterator();
-				}, Encoders.bean(OrcidIndicators.class))
-				.groupByKey((MapFunction<OrcidIndicators, String>) oi -> oi.getOrcid(), Encoders.STRING())
-				.mapGroups((MapGroupsFunction<String, OrcidIndicators, OrcidIndicators>) (k, it) -> {
-							OrcidIndicators oi = it.next();
-							it.forEachRemaining(e -> oi.setCitations(oi.getCitations() + e.getCitations()));
-							return oi;
-						}, Encoders.bean(OrcidIndicators.class)
-				);
-
-		downloads.joinWith(citations, downloads.col("orcid").equalTo(citations.col("orcid")),"full")
-				.map((MapFunction<Tuple2<OrcidIndicators, OrcidIndicators>, OrcidIndicators>) t2 -> {
-					if(t2._1() == null)
-						return t2._2();
-					if(t2._2() == null)
-						return t2._1();
-					t2._1().setCitations(t2._2().getCitations());
-					return t2._1();
-
 				}, Encoders.bean(OrcidIndicators.class))
 				.write()
-				.mode(SaveMode.Overwrite)
+				.mode(SaveMode.Append)
 				.option("compression","gzip")
 				.json(workingPath + "/orcidIndicators");
+
+//		Dataset<Relation> relations = spark.read().schema(Encoders.bean(Relation.class).schema())
+//				.json(sourcePath + "relation")
+//				.as(Encoders.bean(Relation.class))
+//				.filter((FilterFunction<Relation>) r -> !r.getDataInfo().getDeletedbyinference() && r.getRelClass().equalsIgnoreCase(ModelConstants.CITES));
+//
+//		Dataset<OrcidIndicators> citations = resultSubset.joinWith(relations, resultSubset.col("id").equalTo(relations.col("target")))
+//				.flatMap((FlatMapFunction<Tuple2<ResultSubset, Relation>, OrcidIndicators>) t2 -> {
+//					List<OrcidIndicators> oi = new ArrayList<>();
+//					t2._1().getAuthor()
+//							.forEach(a -> {
+//										List<StructuredProperty> orcid = a.getPid().stream()
+//												.filter(p -> p.getQualifier().getClassid().equalsIgnoreCase("orcid"))
+//												.collect(Collectors.toList());
+//										if (!orcid.isEmpty())
+//											oi.add(OrcidIndicators.newInstance(t2._1().getId(), orcid.get(0).getValue()));
+//										else
+//											oi.add(OrcidIndicators.newInstance(t2._1().getId(), a.getPid().stream()
+//													.filter(p -> p.getQualifier().getClassid().equalsIgnoreCase("orcid_pending"))
+//													.collect(Collectors.toList()).get(0).getValue()));
+//									}
+//							);
+//					return oi.iterator();
+//				}, Encoders.bean(OrcidIndicators.class))
+//				.groupByKey((MapFunction<OrcidIndicators, String>) oi -> oi.getOrcid(), Encoders.STRING())
+//				.mapGroups((MapGroupsFunction<String, OrcidIndicators, OrcidIndicators>) (k, it) -> {
+//							OrcidIndicators oi = it.next();
+//							it.forEachRemaining(e -> oi.setCitations(oi.getCitations() + e.getCitations()));
+//							return oi;
+//						}, Encoders.bean(OrcidIndicators.class)
+//				);
+//
+//		downloads.joinWith(citations, downloads.col("orcid").equalTo(citations.col("orcid")),"full")
+//				.map((MapFunction<Tuple2<OrcidIndicators, OrcidIndicators>, OrcidIndicators>) t2 -> {
+//					if(t2._1() == null)
+//						return t2._2();
+//					if(t2._2() == null)
+//						return t2._1();
+//					t2._1().setCitations(t2._2().getCitations());
+//					return t2._1();
+//
+//				}, Encoders.bean(OrcidIndicators.class))
+//				.write()
+//				.mode(SaveMode.Overwrite)
+//				.option("compression","gzip")
+//				.json(workingPath + "/orcidIndicators");
 
 		Dataset<Person> person = spark.read().schema(Encoders.bean(Person.class).schema())
 				.json(sourcePath + "person")
@@ -223,14 +222,14 @@ public class SparkExtractPersonRelationsAndAddIndicators {
 
 		Dataset<OrcidIndicators> orcidIndicators = spark.read().schema(Encoders.bean(OrcidIndicators.class).schema())
 				.json(workingPath + "/orcidIndicators")
-				.as(Encoders.bean(OrcidIndicators.class))
-				.groupByKey((MapFunction<OrcidIndicators, String>) OrcidIndicators::getOrcid,Encoders.STRING() )
-				.mapGroups((MapGroupsFunction<String, OrcidIndicators, OrcidIndicators>) (k,it) -> {
-					OrcidIndicators acc = it.next();
-					it.forEachRemaining(oi -> acc.addIndicators(oi.getDownloads(),oi.getCitations()));
-					return acc;
-
-				},Encoders.bean(OrcidIndicators.class));
+				.as(Encoders.bean(OrcidIndicators.class));
+//				.groupByKey((MapFunction<OrcidIndicators, String>) OrcidIndicators::getOrcid,Encoders.STRING() )
+//				.mapGroups((MapGroupsFunction<String, OrcidIndicators, OrcidIndicators>) (k,it) -> {
+//					OrcidIndicators acc = it.next();
+//					it.forEachRemaining(oi -> acc.addIndicators(oi.getDownloads(),oi.getCitations()));
+//					return acc;
+//
+//				},Encoders.bean(OrcidIndicators.class));
 
 		person.joinWith(orcidIndicators, person.col("id").equalTo(orcidIndicators.col("orcid")),"left")
 				.map((MapFunction<Tuple2<Person, OrcidIndicators>, Person>) t2 -> {
@@ -336,7 +335,7 @@ public class SparkExtractPersonRelationsAndAddIndicators {
 					// orcid/orcid_pending.
 					resultWithOrcids
 						.flatMap(
-							(FlatMapFunction<Result, Relation>) SparkExtractPersonRelations::getAuthorshipRelations,
+							(FlatMapFunction<Result, Relation>) SparkExtractPersonRelationsAndAddIndicators::getAuthorshipRelations,
 							Encoders.bean(Relation.class))
 							.distinct()
 						.write()
@@ -346,7 +345,7 @@ public class SparkExtractPersonRelationsAndAddIndicators {
 
 					// 3. create co_authorship relations between the pairs of authors with orcid/orcid_pending pids
 					resultWithOrcids
-						.map((MapFunction<Result, Coauthors>) SparkExtractPersonRelations::getAuthorsPidList, Encoders.bean(Coauthors.class))
+						.map((MapFunction<Result, Coauthors>) SparkExtractPersonRelationsAndAddIndicators::getAuthorsPidList, Encoders.bean(Coauthors.class))
 						.flatMap(
 							(FlatMapFunction<Coauthors, Relation>) c -> new CoAuthorshipIterator(c.getCoauthors()),
 							Encoders.bean(Relation.class))
