@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.oa.graph.stats;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.spark.SparkConf;
+import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
