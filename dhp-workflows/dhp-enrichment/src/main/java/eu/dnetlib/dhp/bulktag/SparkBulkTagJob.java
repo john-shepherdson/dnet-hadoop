@@ -132,10 +132,10 @@ public class SparkBulkTagJob {
 					Utils.getProjectCommunityMap(baseURL),
 					Project.class, TaggingConstants.CLASS_ID_PROJECT, TaggingConstants.CLASS_NAME_BULKTAG_PROJECT);
 				execEntityTag(
-						spark, inputPath + "datasource", outputPath + "datasource",
-						mapWithMasterDatasource(spark, hdfsPath, Utils.getDatasourceCommunities(baseURL)),
-						Datasource.class, TaggingConstants.CLASS_ID_DATASOURCE,
-						TaggingConstants.CLASS_NAME_BULKTAG_DATASOURCE);
+					spark, inputPath + "datasource", outputPath + "datasource",
+					mapWithMasterDatasource(spark, hdfsPath, Utils.getDatasourceCommunities(baseURL)),
+					Datasource.class, TaggingConstants.CLASS_ID_DATASOURCE,
+					TaggingConstants.CLASS_NAME_BULKTAG_DATASOURCE);
 
 			});
 	}
