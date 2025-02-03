@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
+import eu.dnetlib.dhp.collection.plugin.dblp.DBLPCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.researchfi.ResearchFiCollectorPlugin;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -133,7 +134,9 @@ public class CollectorWorker extends ReportingJob {
 			case osfPreprints:
 				return new OsfPreprintsCollectorPlugin(this.clientParams);
 			case zenodoDump:
-				return new CollectZenodoDumpCollectorPlugin();
+				return new CollectZenodoDumpCollectorPlugin(this.fileSystem);
+			case dblp:
+				return new DBLPCollectorPlugin(this.fileSystem);
 			case research_fi:
 				return new ResearchFiCollectorPlugin();
 			case other:
