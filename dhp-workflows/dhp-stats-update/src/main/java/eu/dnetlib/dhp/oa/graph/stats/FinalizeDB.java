@@ -47,7 +47,7 @@ public class FinalizeDB {
 
         String sql = String.format(
                 "DROP DATABASE IF EXISTS %s CASCADE;/*EOS*/" +
-                "CREATE DATABASE %s;", shadowDb, shadowDb);
+                "CREATE DATABASE %s;/*EOS*/", shadowDb, shadowDb);
 
         runWithSparkHiveSession(
                 conf,
@@ -67,12 +67,17 @@ public class FinalizeDB {
                         final StringBuffer buffer = new StringBuffer();
 
                         buffer.append(String.format("CREATE VIEW %s.%s AS SELECT * FROM %s.%s;/*EOS*/", shadowDb, tableName, sourceDb, tableName));
+                        final String viewStatements = buffer.toString();
 
                         runWithSparkHiveSession(
                                 conf,
                                 isSparkSessionManaged,
                                 spark2 -> {
-                                    executeStatement(spark2, buffer.toString());
+
+                                    for (String statement : viewStatements.split(";\\s*/\\*\\s*EOS\\s*\\*/\\s*")) {
+                                        executeStatement(spark2, statement);
+                                    }
+                                    executeStatement(spark2, statement);
                                 });
                     });
                 });
