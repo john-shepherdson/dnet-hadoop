@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 public class FinalizeDB {
 
@@ -56,30 +57,18 @@ public class FinalizeDB {
                     for (String statement : sql.split(";\\s*/\\*\\s*EOS\\s*\\*/\\s*")) {
                         executeStatement(spark, statement);
                     }
-                });
 
-        runWithSparkHiveSession(
-                conf,
-                isSparkSessionManaged,
-                spark -> {
+                    final StringBuffer buffer = new StringBuffer();
                     spark.sql("SHOW TABLES IN " + sourceDb).collectAsList().forEach(row -> {
                         final String tableName = row.getString(1);
-                        final StringBuffer buffer = new StringBuffer();
 
                         buffer.append(String.format("CREATE VIEW %s.%s AS SELECT * FROM %s.%s;/*EOS*/", shadowDb, tableName, sourceDb, tableName));
-                        final String viewStatements = buffer.toString();
-
-                        runWithSparkHiveSession(
-                                conf,
-                                isSparkSessionManaged,
-                                spark2 -> {
-
-                                    for (String statement : viewStatements.split(";\\s*/\\*\\s*EOS\\s*\\*/\\s*")) {
-                                        executeStatement(spark2, statement);
-                                    }
-                                    executeStatement(spark2, statement);
-                                });
                     });
+
+                    final String viewStatements = buffer.toString();
+                    for (String statement : viewStatements.split(";\\s*/\\*\\s*EOS\\s*\\*/\\s*")) {
+                        executeStatement(spark, statement);
+                    }
                 });
     }
 
