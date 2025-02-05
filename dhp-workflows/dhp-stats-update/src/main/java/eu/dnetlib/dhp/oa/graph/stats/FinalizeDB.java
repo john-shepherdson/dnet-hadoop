@@ -36,13 +36,13 @@ public class FinalizeDB {
         String sourceDb = params.get("stats_db_name");
         String shadowDb = params.get("stats_db_shadow_name");
 
-        Boolean isSparkSessionManaged = Optional
+        final Boolean isSparkSessionManaged = Optional
                 .ofNullable(params.get("isSparkSessionManaged"))
                 .map(Boolean::valueOf)
                 .orElse(Boolean.TRUE);
         log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-        SparkConf conf = new SparkConf();
+        final SparkConf conf = new SparkConf();
         conf.set("hive.metastore.uris", params.get("hiveMetastoreUris"));
 
         String sql = String.format(
@@ -54,18 +54,7 @@ public class FinalizeDB {
                 isSparkSessionManaged,
                 spark -> {
                     for (String statement : sql.split(";\\s*/\\*\\s*EOS\\s*\\*/\\s*")) {
-                        log.info("executing: {}", statement);
-                        long startTime = System.currentTimeMillis();
-                        try {
-                            spark.sql(statement).show();
-                        } catch (Exception e) {
-                            log.error("Error executing statement: {}", statement, e);
-                            System.err.println("Error executing statement: " + statement + "\n" + e);
-                            throw e;
-                        }
-                        log.info(
-                            "executed in {}",
-                            DurationFormatUtils.formatDuration(System.currentTimeMillis() - startTime, "HH:mm:ss.S"));
+                        executeStatement(spark, statement);
                     }
                 });
 
@@ -74,10 +63,17 @@ public class FinalizeDB {
                 isSparkSessionManaged,
                 spark -> {
                     spark.sql("SHOW TABLES IN " + sourceDb).collectAsList().forEach(row -> {
-                        String tableName = row.getString(1);
-                        String statement = String.format("CREATE VIEW %s.%s AS SELECT * FROM %s.%s", shadowDb, tableName, sourceDb, tableName);
+                        final String tableName = row.getString(1);
+                        final StringBuffer buffer = new StringBuffer();
 
-                        executeStatement(spark, statement);
+                        buffer.append(String.format("CREATE VIEW %s.%s AS SELECT * FROM %s.%s;/*EOS*/", shadowDb, tableName, sourceDb, tableName));
+
+                        runWithSparkHiveSession(
+                                conf,
+                                isSparkSessionManaged,
+                                spark2 -> {
+                                    executeStatement(spark2, buffer.toString());
+                                });
                     });
                 });
     }
