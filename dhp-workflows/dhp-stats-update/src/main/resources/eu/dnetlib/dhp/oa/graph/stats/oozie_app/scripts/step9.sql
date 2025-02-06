@@ -15,6 +15,8 @@ SELECT /*+ COALESCE(100) */ substr(o.id, 4)        as id,
 FROM ${openaire_db_name}.organization o
 WHERE o.datainfo.deletedbyinference = FALSE and o.datainfo.invisible = FALSE; /*EOS*/
 
+ANALYZE TABLE ${stats_db_name}.organization COMPUTE STATISTICS; /*EOS*/
+
 CREATE OR REPLACE VIEW ${stats_db_name}.organization_datasources AS
 SELECT organization AS id, id AS datasource
 FROM ${stats_db_name}.datasource_organizations; /*EOS*/
