@@ -371,7 +371,7 @@
             <arg>--openaire_db_name</arg><arg>${openaire_db_name}</arg>
             <arg>--external_stats_db_name</arg><arg>${external_stats_db_name}</arg>
         </spark>
-        <ok to="Step11"/>
+        <ok to="Step12"/>
         <error to="Kill"/>
     </action>
 
@@ -604,7 +604,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Step16_5</name>
+            <name>Step19-finalize</name>
             <class>eu.dnetlib.dhp.oa.graph.stats.FinalizeDB</class>
             <jar>dhp-stats-update-${projectVersion}.jar</jar>
             <spark-opts>
