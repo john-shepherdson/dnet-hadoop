@@ -13,19 +13,34 @@ group by r.id; /*EOS*/
 
 ANALYZE TABLE ${stats_db_name}.result_projectcount COMPUTE STATISTICS; /*EOS*/
 
-DROP TABLE IF EXISTS ${stats_db_name}.project_resultcount purge; /*EOS*/
 
-create table if not exists ${stats_db_name}.project_res stored as parquet as
-select /*+ BROADCAST(${stats_db_name}.project), BROADCAST(${stats_db_name}.result_projects) */  distinct r.id as res, r.type, p.id as pid
+ANALYZE TABLE ${stats_db_name}.publication COMPUTE STATISTICS FOR COLUMNS id, type; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.dataset COMPUTE STATISTICS FOR COLUMNS id, type; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.software COMPUTE STATISTICS FOR COLUMNS id, type; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.otherresearchproduct COMPUTE STATISTICS FOR COLUMNS id, type; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.project COMPUTE STATISTICS FOR COLUMNS id; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.result_projects COMPUTE STATISTICS FOR COLUMNS id, project; /*EOS*/
+
+DROP TABLE IF EXISTS ${stats_db_name}.tmp purge; /*EOS*/
+create table if not exists ${stats_db_name}.tmp stored as parquet as
+select r.id as res, r.type, p.id as pid
 from ${stats_db_name}.project p
 left outer join ${stats_db_name}.result_projects rp on rp.project=p.id
 left outer join ${stats_db_name}.result r on r.id=rp.id; /*EOS*/
 
+ANALYZE TABLE ${stats_db_name}.tmp COMPUTE STATISTICS; /*EOS*/
+
+DROP table IF EXISTS ${stats_db_name}.project_res; /*EOS*/
+create table ${stats_db_name}.project_res stored as parquet as 
+select distinct * from ${stats_db_name}.tmp; /*EOS*/
+
+DROP table ${stats_db_name}.tmp purge; /*EOS*/
 ANALYZE TABLE ${stats_db_name}.project_res COMPUTE STATISTICS; /*EOS*/
 
 
-create  /*+ COALESCE(100) */ table if not exists ${stats_db_name}.project_resultcount STORED AS PARQUET as
-select pid,
+DROP TABLE IF EXISTS ${stats_db_name}.project_resultcount purge; /*EOS*/
+create table if not exists ${stats_db_name}.project_resultcount STORED AS PARQUET as
+select /*+ COALESCE(100) */ pid,
        sum(case when rp.type='publication' then 1 else 0 end) as publications,
        sum(case when rp.type='dataset' then 1 else 0 end) as datasets,
        sum(case when rp.type='software' then 1 else 0 end) as software,
