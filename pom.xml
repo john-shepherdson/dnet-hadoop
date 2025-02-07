@@ -1098,7 +1098,6 @@
                 <org.slf4j.version>2.0.7</org.slf4j.version>
                 <reflections.version>0.10.2</reflections.version>
                 <zookeeper.version>3.6.3</zookeeper.version>
-                <cxf.version>4.0.5</cxf.version>
                 <metro.version>4.0.4</metro.version>
             </properties>
         </profile>
