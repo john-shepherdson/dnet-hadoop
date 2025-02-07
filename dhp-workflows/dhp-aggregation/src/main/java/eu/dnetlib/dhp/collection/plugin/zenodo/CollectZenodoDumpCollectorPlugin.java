@@ -31,6 +31,12 @@ public class CollectZenodoDumpCollectorPlugin implements CollectorPlugin {
 
 	final private Logger log = LoggerFactory.getLogger(getClass());
 
+	private final  FileSystem fileSystem;
+
+	public CollectZenodoDumpCollectorPlugin(FileSystem fileSystem) {
+		this.fileSystem = fileSystem;
+	}
+
 	private void downloadItem(final String name, final String itemURL, final String basePath,
 		final FileSystem fileSystem) {
 		try {
@@ -63,24 +69,16 @@ public class CollectZenodoDumpCollectorPlugin implements CollectorPlugin {
 		}
 	}
 
-	public FileSystem initializeFileSystem(final String hdfsURI) {
-		try {
-			return FileSystem.get(getHadoopConfiguration(hdfsURI));
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
+
 
 	@Override
 	public Stream<String> collect(ApiDescriptor api, AggregatorReport report) throws CollectorException {
 
 		final String zenodoURL = api.getBaseUrl();
-		final String hdfsURI = api.getParams().get("hdfsURI");
-		final FileSystem fileSystem = initializeFileSystem(hdfsURI);
-		return doStream(fileSystem, zenodoURL, "/tmp");
+		return doStream(zenodoURL, "/tmp");
 	}
 
-	public Stream<String> doStream(FileSystem fileSystem, String zenodoURL, String basePath) throws CollectorException {
+	public Stream<String> doStream( String zenodoURL, String basePath) throws CollectorException {
 		try {
 
 			downloadItem("zenodoDump.tar.gz", zenodoURL, basePath, fileSystem);

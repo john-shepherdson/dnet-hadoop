@@ -101,7 +101,7 @@ public class XmlIndexingJobTest extends SolrTest {
 
 		long nRecord = records.count();
 
-		new XmlIndexingJob(spark, inputPath, SHADOW_FORMAT, ProvisionConstants.SHADOW_ALIAS_NAME, batchSize)
+		new XmlIndexingJob(spark, inputPath, SHADOW_FORMAT, ProvisionConstants.SHADOW_ALIAS_NAME, batchSize, false)
 			.run(isLookupClient);
 
 		assertEquals(0, miniCluster.getSolrClient().commit(SHADOW_COLLECTION).getStatus());

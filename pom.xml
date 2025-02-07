@@ -333,6 +333,12 @@
             </dependency>
 
             <dependency>
+                <groupId>com.fasterxml.woodstox</groupId>
+                <artifactId>woodstox-core</artifactId>
+                <version>7.1.0</version>
+            </dependency>
+
+            <dependency>
                 <groupId>dom4j</groupId>
                 <artifactId>dom4j</artifactId>
                 <version>1.6.1</version>
@@ -956,7 +962,7 @@
         <commons-validator.version>1.7</commons-validator.version>
         <cxf.version>3.5.10</cxf.version>
         <dateparser.version>1.0.7</dateparser.version>
-        <dhp-schemas.version>[10.0.0]</dhp-schemas.version>
+        <dhp-schemas.version>[10.1.3]</dhp-schemas.version>
         <dhp.cdh.version>cdh5.9.2</dhp.cdh.version>
         <dhp.commons.lang.version>3.5</dhp.commons.lang.version>
         <dhp.guava.version>11.0.2</dhp.guava.version>
