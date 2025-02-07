@@ -26,7 +26,7 @@ import eu.dnetlib.dhp.oa.graph.raw.CopyHdfsOafSparkApplication;
 import eu.dnetlib.dhp.oozie.RunSQLSparkJob;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.mdstore.MDStoreVersion;
-import scala.collection.JavaConversions;
+import eu.dnetlib.dhp.utils.DHPUtils;
 
 public class CollectNewOafResults {
 	private static final Logger log = LoggerFactory.getLogger(RunSQLSparkJob.class);
@@ -105,7 +105,7 @@ public class CollectNewOafResults {
 							"value",
 							"get_json_object(value, '$.id') AS id")
 						.where("id IS NOT NULL")
-						.join(currentIds, JavaConversions.asScalaBuffer(Collections.singletonList("id")), "left_anti")
+						.join(currentIds, DHPUtils.toSeq(Collections.singletonList("id")).toSeq(), "left_anti")
 						.withColumn("oaftype", getOafType.apply(new Column("value")))
 						.write()
 						.partitionBy("oaftype")
@@ -140,12 +140,12 @@ public class CollectNewOafResults {
 					rels
 						.join(
 							newIds.selectExpr("id as source"),
-							JavaConversions.asScalaBuffer(Collections.singletonList("source")), "left_semi")
+							DHPUtils.toSeq(Collections.singletonList("source")).toSeq(), "left_semi")
 						.union(
 							rels
 								.join(
 									newIds.selectExpr("id as target"),
-									JavaConversions.asScalaBuffer(Collections.singletonList("target")), "left_semi"))
+									DHPUtils.toSeq(Collections.singletonList("target")).toSeq(), "left_semi"))
 						.distinct()
 						.select("value")
 						.write()

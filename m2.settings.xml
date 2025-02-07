@@ -1,0 +1,14 @@
+<settings>
+    <servers>
+        <server>
+            <id>dnet45-releases</id>
+            <username>${env.NEXUS_USERNAME}</username>
+            <password>${env.NEXUS_PASSWORD}</password>
+        </server>
+        <server>
+            <id>dnet45-snapshots</id>
+            <username>${env.NEXUS_USERNAME}</username>
+            <password>${env.NEXUS_PASSWORD}</password>
+        </server>
+    </servers>
+</settings>

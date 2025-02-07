@@ -9,11 +9,10 @@ import org.apache.spark.sql.functions.{col, desc, expr, lit, udf}
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{Column, Dataset, Row, SaveMode, functions}
 
-import java.util.function.Predicate
 import java.util.stream.Collectors
-import scala.collection.JavaConversions._
-import scala.collection.JavaConverters._
 import scala.collection.mutable
+import scala.collection.JavaConverters._
+
 case class SparkDeduper(conf: DedupConfig) extends Serializable {
 
   val model: SparkModel = SparkModel(conf)
@@ -26,8 +25,8 @@ case class SparkDeduper(conf: DedupConfig) extends Serializable {
   val generateClustersWithCollect: (Dataset[Row] => Dataset[Row]) = df_with_filters => {
     var df_with_clustering_keys: Dataset[Row] = null
 
-    for ((cd, idx) <- conf.clusterings().zipWithIndex) {
-      val inputColumns = cd.getFields().foldLeft(Seq[Column]())((acc, fName) => {
+    for ((cd, idx) <- conf.clusterings().asScala.zipWithIndex) {
+      val inputColumns = cd.getFields.asScala.foldLeft(Seq[Column]())((acc, fName) => {
         val column = if (conf.blacklists.containsKey(fName))
           Seq(col(fName + "_filtered"))
         else
@@ -88,14 +87,14 @@ case class SparkDeduper(conf: DedupConfig) extends Serializable {
         case s: Any => Seq(s.toString)
       }.asJava;
 
-      mutable.WrappedArray.make(cd.clusteringFunction().apply(conf, valueList).toArray())
+      mutable.WrappedArray.make(cd.clusteringFunction().apply(conf, valueList).asScala.toArray[String])
 
     })
   }
 
   val processBlocks: (Dataset[Row] => Dataset[Row]) = df => {
     df.filter(functions.size(new Column("block")).geq(new Literal(2, DataTypes.IntegerType)))
-      .withColumn("relations", processBlock(df.sqlContext.sparkContext).apply(new Column("block")))
+      .withColumn("relations", processBlock(df.sparkSession.sparkContext).apply(new Column("block")))
       .select(functions.explode(new Column("relations")).as("relation"))
   }
 

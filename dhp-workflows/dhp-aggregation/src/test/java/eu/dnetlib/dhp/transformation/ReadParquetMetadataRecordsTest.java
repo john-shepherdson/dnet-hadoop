@@ -41,7 +41,7 @@ public class ReadParquetMetadataRecordsTest {
 
 	@Test
 	@Disabled
-	void testReadParquetAddNewField() {
+	void testReadParquetAddNewField() throws IOException {
 		try (final SparkSession spark = SparkSession.builder().config(this.sparkConf).getOrCreate()) {
 
 			final Dataset<MetadataRecord> records1 = spark
@@ -82,7 +82,7 @@ public class ReadParquetMetadataRecordsTest {
 
 	@Test
 	@Disabled
-	void testReadParquet() {
+	void testReadParquet() throws IOException {
 		try (final SparkSession spark = SparkSession.builder().config(this.sparkConf).getOrCreate()) {
 
 			final Dataset<MetadataRecord> records = spark

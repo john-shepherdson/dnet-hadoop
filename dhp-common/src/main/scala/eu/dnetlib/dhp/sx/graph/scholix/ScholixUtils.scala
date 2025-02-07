@@ -169,7 +169,7 @@ object ScholixUtils extends Serializable {
     if (summary.getCollectedFrom != null && !summary.getCollectedFrom.isEmpty) {
       val l: List[ScholixEntityId] = summary.getCollectedFrom.asScala.map { d =>
         new ScholixEntityId(d.getProvider.getName, d.getProvider.getIdentifiers)
-      }(collection.breakOut)
+      }.toList
       l
     } else List()
   }
@@ -181,7 +181,7 @@ object ScholixUtils extends Serializable {
           d.getDatasourceName,
           List(new ScholixIdentifier(d.getDatasourceId, "DNET Identifier", null)).asJava
         )
-      }(collection.breakOut)
+      }.toList
       l
     } else List()
   }
@@ -334,10 +334,9 @@ object ScholixUtils extends Serializable {
     s.setPublicationDate(d)
 
     if (source.getPublisher != null && !source.getPublisher.isEmpty) {
-      val l: List[ScholixEntityId] = source.getPublisher.asScala
-        .map { p =>
-          new ScholixEntityId(p, null)
-        }(collection.breakOut)
+      val l: List[ScholixEntityId] = source.getPublisher.asScala.map { p =>
+        new ScholixEntityId(p, null)
+      }.toList
 
       if (l.nonEmpty)
         s.setPublisher(l.asJava)
