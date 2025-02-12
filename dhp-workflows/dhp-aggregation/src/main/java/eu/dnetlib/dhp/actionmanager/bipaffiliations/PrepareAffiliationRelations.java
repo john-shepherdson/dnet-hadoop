@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
+import eu.dnetlib.dhp.utils.DHPUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.BZip2Codec;
@@ -48,6 +49,7 @@ public class PrepareAffiliationRelations implements Serializable {
 	public static final String OPENAIRE_DATASOURCE_NAME = "OpenAIRE";
 	public static final String DOI_URL_PREFIX = "https://doi.org/";
 	public static final int DOI_URL_PREFIX_LENGTH = 16;
+	private static final Object OPENORGS_NS_PREFIX = "openorgs____";
 
 	public static <I extends Result> void main(String[] args) throws Exception {
 
@@ -268,7 +270,7 @@ public class PrepareAffiliationRelations implements Serializable {
 					affId = GenerateRorActionSetJob.calculateOpenaireId(row.getAs("pidvalue"));
 				else
 					// getting the OpenOrgs identifier for the organization
-					affId = row.getAs("pidvalue");
+					affId = calculateOpenOrgsId(row.getAs("pidvalue"));
 
 				Qualifier qualifier = OafMapperUtils
 					.qualifier(
@@ -295,6 +297,12 @@ public class PrepareAffiliationRelations implements Serializable {
 			.mapToPair(
 				aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
 					new Text(OBJECT_MAPPER.writeValueAsString(aa))));
+	}
+
+	private static String calculateOpenOrgsId(String pidvalue) {
+
+			return String.format("20|%s::%s", OPENORGS_NS_PREFIX, DHPUtils.md5(pidvalue));
+
 	}
 
 	private static String removePrefix(String doi) {
