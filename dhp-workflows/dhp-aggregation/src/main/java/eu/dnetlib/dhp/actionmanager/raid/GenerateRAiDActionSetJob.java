@@ -11,6 +11,7 @@ import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.apache.avro.generic.GenericData;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
@@ -74,13 +75,16 @@ public class GenerateRAiDActionSetJob {
 		log.info("inputPath: {}", inputPath);
 
 		final String outputPath = parser.get("outputPath");
-		log.info("outputPath {}: ", outputPath);
+		log.info("outputPath: {} ", outputPath);
+
+		final String baseUrl = parser.get("baseUrl");
+		log.info("baseUrl: {}", baseUrl);
 
 		final SparkConf conf = new SparkConf();
 
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
 			removeOutputDir(spark, outputPath);
-			processRAiDEntities(spark, inputPath, outputPath);
+			processRAiDEntities(spark, inputPath, outputPath, baseUrl);
 		});
 	}
 
@@ -90,9 +94,10 @@ public class GenerateRAiDActionSetJob {
 
 	static void processRAiDEntities(final SparkSession spark,
 		final String inputPath,
-		final String outputPath) {
+		final String outputPath,
+		final String baseUrl) {
 		readInputPath(spark, inputPath)
-			.map(GenerateRAiDActionSetJob::prepareRAiD)
+			.map(r -> prepareRAiD(r, baseUrl))
 			.flatMap(List::iterator)
 			.mapToPair(
 				aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
@@ -101,7 +106,7 @@ public class GenerateRAiDActionSetJob {
 
 	}
 
-	protected static List<AtomicAction<? extends Oaf>> prepareRAiD(final RAiDEntity r) {
+	protected static List<AtomicAction<? extends Oaf>> prepareRAiD(final RAiDEntity r, final String baseUrl) {
 
 		final Date now = new Date();
 		final OtherResearchProduct orp = new OtherResearchProduct();
@@ -123,6 +128,7 @@ public class GenerateRAiDActionSetJob {
 
 		Instance instance = new Instance();
 		instance.setInstancetype(RAID_QUALIFIER);
+		instance.setUrl(Collections.singletonList(baseUrl + raidId.split("\\|")[1]));
 		orp.setInstance(Collections.singletonList(instance));
 		orp
 			.setSubject(
