@@ -1,0 +1,44 @@
+[
+  {
+    "paramName": "issm",
+    "paramLongName": "isSparkSessionManaged",
+    "paramDescription": "when true will stop SparkSession after job execution",
+    "paramRequired": false
+  },
+  {
+    "paramName": "mu",
+    "paramLongName": "mdStoreManagerURI",
+    "paramDescription": "the MDStore Manager URI",
+    "paramRequired": true
+  },
+  {
+    "paramName": "mi",
+    "paramLongName": "mdStoreID",
+    "paramDescription": "the Metadata Store ID",
+    "paramRequired": false
+  },
+  {
+    "paramName": "wd",
+    "paramLongName": "workingDir",
+    "paramDescription": "the path to store the output graph",
+    "paramRequired": true
+  },
+  {
+    "paramName": "o",
+    "paramLongName": "outputPath",
+    "paramDescription": "",
+    "paramRequired": true
+  },
+  {
+    "paramName": "hmu",
+    "paramLongName": "hiveMetastoreUris",
+    "paramDescription": "the hive metastore uris",
+    "paramRequired": true
+  },
+  {
+    "paramName": "db",
+    "paramLongName": "hiveDbName",
+    "paramDescription": "the graph hive database name",
+    "paramRequired": true
+  }
+]

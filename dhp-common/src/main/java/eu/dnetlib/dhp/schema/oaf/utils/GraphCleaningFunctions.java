@@ -2,7 +2,6 @@
 package eu.dnetlib.dhp.schema.oaf.utils;
 
 import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.OPENAIRE_META_RESOURCE_TYPE;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.getProvenance;
 
 import java.net.MalformedURLException;
@@ -696,6 +695,7 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 						}
 					}
 
+					// set ORCID_PENDING to all orcid values that are not coming from ORCID provenance
 					for (Author a : r.getAuthor()) {
 						if (Objects.isNull(a.getPid())) {
 							a.setPid(Lists.newArrayList());
@@ -752,6 +752,40 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 										.collect(Collectors.toList()));
 						}
 					}
+
+					// Identify clashing ORCIDS:that is same ORCID associated to multiple authors in this result
+					Map<String, Integer> clashing_orcid = new HashMap<>();
+
+					for (Author a : r.getAuthor()) {
+						a
+							.getPid()
+							.stream()
+							.filter(
+								p -> StringUtils
+									.contains(StringUtils.lowerCase(p.getQualifier().getClassid()), ORCID_PENDING))
+							.map(StructuredProperty::getValue)
+							.distinct()
+							.forEach(orcid -> clashing_orcid.compute(orcid, (k, v) -> (v == null) ? 1 : v + 1));
+					}
+
+					Set<String> clashing = clashing_orcid
+						.entrySet()
+						.stream()
+						.filter(ee -> ee.getValue() > 1)
+						.map(Map.Entry::getKey)
+						.collect(Collectors.toSet());
+
+					// filter out clashing orcids
+					for (Author a : r.getAuthor()) {
+						a
+							.setPid(
+								a
+									.getPid()
+									.stream()
+									.filter(p -> !clashing.contains(p.getValue()))
+									.collect(Collectors.toList()));
+					}
+
 				}
 				if (value instanceof Publication) {
 

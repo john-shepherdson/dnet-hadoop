@@ -66,6 +66,43 @@ public class ComparatorTest extends AbstractPaceTest {
 	}
 
 	@Test
+	public void datasetVersionCodeMatchTest() {
+
+		params.put("codeRegex", "(?=[\\w-]*[a-zA-Z])(?=[\\w-]*\\d)[\\w-]+");
+		CodeMatch codeMatch = new CodeMatch(params);
+
+		// names have different codes
+		assertEquals(
+			0.0,
+			codeMatch
+				.distance(
+					"physical oceanography at ctd station june 1998 ev02a",
+					"physical oceanography at ctd station june 1998 ir02", conf));
+
+		// names have same code
+		assertEquals(
+			1.0,
+			codeMatch
+				.distance(
+					"physical oceanography at ctd station june 1998 ev02a",
+					"physical oceanography at ctd station june 1998 ev02a", conf));
+
+		// code is not in both names
+		assertEquals(
+			-1,
+			codeMatch
+				.distance(
+					"physical oceanography at ctd station june 1998",
+					"physical oceanography at ctd station june 1998 ev02a", conf));
+		assertEquals(
+			1.0,
+			codeMatch
+				.distance(
+					"physical oceanography at ctd station june 1998", "physical oceanography at ctd station june 1998",
+					conf));
+	}
+
+	@Test
 	public void listContainsMatchTest() {
 
 		List<String> a = createFieldList(Arrays.asList("Article", "Publication", "ORP"), "instanceType");
@@ -257,15 +294,15 @@ public class ComparatorTest extends AbstractPaceTest {
 		List<String> a = createFieldList(
 			Arrays
 				.asList(
-					"{\"datainfo\":{\"deletedbyinference\":false,\"inferenceprovenance\":null,\"inferred\":false,\"invisible\":false,\"provenanceaction\":{\"classid\":\"sysimport:actionset\",\"classname\":\"Harvested\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"},\"trust\":\"0.9\"},\"qualifier\":{\"classid\":\"doi\",\"classname\":\"Digital Object Identifier\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"value\":\"10.1111/pbi.12655\"}"),
+					"{\"datainfo\":{\"deletedbyinference\":false,\"inferenceprovenance\":null,\"inferred\":false,\"invisible\":false,\"provenanceaction\":{\"classid\":\"sysimport:actionset\",\"classname\":\"Harvested\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"},\"trust\":\"0.9\"},\"qualifier\":{\"classid\":\"grid\",\"classname\":\"GRID Identifier\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"value\":\"grid_1\"}",
+					"{\"datainfo\":{\"deletedbyinference\":false,\"inferenceprovenance\":null,\"inferred\":false,\"invisible\":false,\"provenanceaction\":{\"classid\":\"sysimport:actionset\",\"classname\":\"Harvested\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"},\"trust\":\"0.9\"},\"qualifier\":{\"classid\":\"ror\",\"classname\":\"Research Organization Registry\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"value\":\"ror_1\"}"),
 			"authors");
 		List<String> b = createFieldList(
 			Arrays
 				.asList(
-					"{\"datainfo\":{\"deletedbyinference\":false,\"inferenceprovenance\":\"\",\"inferred\":false,\"invisible\":false,\"provenanceaction\":{\"classid\":\"sysimport:crosswalk:repository\",\"classname\":\"Harvested\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"},\"trust\":\"0.9\"},\"qualifier\":{\"classid\":\"pmc\",\"classname\":\"PubMed Central ID\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"value\":\"PMC5399005\"}",
-					"{\"datainfo\":{\"deletedbyinference\":false,\"inferenceprovenance\":\"\",\"inferred\":false,\"invisible\":false,\"provenanceaction\":{\"classid\":\"sysimport:crosswalk:repository\",\"classname\":\"Harvested\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"},\"trust\":\"0.9\"},\"qualifier\":{\"classid\":\"pmid\",\"classname\":\"PubMed ID\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"value\":\"27775869\"}",
-					"{\"datainfo\":{\"deletedbyinference\":false,\"inferenceprovenance\":\"\",\"inferred\":false,\"invisible\":false,\"provenanceaction\":{\"classid\":\"user:claim\",\"classname\":\"Linked by user\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"},\"trust\":\"0.9\"},\"qualifier\":{\"classid\":\"doi\",\"classname\":\"Digital Object Identifier\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"value\":\"10.1111/pbi.12655\"}",
-					"{\"datainfo\":{\"deletedbyinference\":false,\"inferenceprovenance\":\"\",\"inferred\":false,\"invisible\":false,\"provenanceaction\":{\"classid\":\"sysimport:crosswalk:repository\",\"classname\":\"Harvested\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"},\"trust\":\"0.9\"},\"qualifier\":{\"classid\":\"handle\",\"classname\":\"Handle\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"value\":\"1854/LU-8523529\"}"),
+					"{\"datainfo\":{\"deletedbyinference\":false,\"inferenceprovenance\":\"\",\"inferred\":false,\"invisible\":false,\"provenanceaction\":{\"classid\":\"sysimport:crosswalk:repository\",\"classname\":\"Harvested\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"},\"trust\":\"0.9\"},\"qualifier\":{\"classid\":\"grid\",\"classname\":\"GRID Identifier\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"value\":\"grid_1\"}",
+					"{\"datainfo\":{\"deletedbyinference\":false,\"inferenceprovenance\":\"\",\"inferred\":false,\"invisible\":false,\"provenanceaction\":{\"classid\":\"sysimport:crosswalk:repository\",\"classname\":\"Harvested\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"},\"trust\":\"0.9\"},\"qualifier\":{\"classid\":\"ror\",\"classname\":\"Research Organization Registry\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"value\":\"ror_2\"}",
+					"{\"datainfo\":{\"deletedbyinference\":false,\"inferenceprovenance\":\"\",\"inferred\":false,\"invisible\":false,\"provenanceaction\":{\"classid\":\"user:claim\",\"classname\":\"Linked by user\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"},\"trust\":\"0.9\"},\"qualifier\":{\"classid\":\"isni\",\"classname\":\"ISNI Identifier\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"value\":\"isni_1\"}"),
 			"authors");
 
 		double result = jsonListMatch.compare(a, b, conf);
@@ -277,6 +314,13 @@ public class ComparatorTest extends AbstractPaceTest {
 		result = jsonListMatch.compare(a, b, conf);
 
 		assertEquals(1.0, result);
+
+		params.put("mode", "type");
+		jsonListMatch = new JsonListMatch(params);
+		result = jsonListMatch.compare(a, b, conf);
+
+		assertEquals(0.5, result);
+
 	}
 
 	@Test
@@ -325,6 +369,24 @@ public class ComparatorTest extends AbstractPaceTest {
 		result = countryMatch.distance("CL", "CL", conf);
 		assertEquals(1.0, result);
 
+	}
+
+	@Test
+	public void dateMatch() {
+
+		DateRange dateRange = new DateRange(params);
+
+		double result = dateRange.distance("2021-05-13", "2023-05-13", conf);
+		assertEquals(1.0, result);
+
+		result = dateRange.distance("2021-05-13", "2025-05-13", conf);
+		assertEquals(0.0, result);
+
+		result = dateRange.distance("", "2020-05-05", conf);
+		assertEquals(-1.0, result);
+
+		result = dateRange.distance("invalid date", "2021-05-02", conf);
+		assertEquals(-1.0, result);
 	}
 
 	@Test

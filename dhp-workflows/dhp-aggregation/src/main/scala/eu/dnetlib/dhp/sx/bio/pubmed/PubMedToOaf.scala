@@ -294,6 +294,24 @@ object PubMedToOaf {
       author.setName(a.getForeName)
       author.setSurname(a.getLastName)
       author.setFullname(a.getFullName)
+      if (a.getIdentifier != null) {
+        author.setPid(
+          List(
+            OafMapperUtils.structuredProperty(
+              a.getIdentifier.getPid,
+              OafMapperUtils.qualifier(
+                a.getIdentifier.getType,
+                a.getIdentifier.getType,
+                ModelConstants.DNET_PID_TYPES,
+                ModelConstants.DNET_PID_TYPES
+              ),
+              dataInfo
+            )
+          ).asJava
+        )
+      }
+      if (a.getAffiliation != null)
+        author.setRawAffiliationString(List(a.getAffiliation.getName).asJava)
       author.setRank(index + 1)
       author
     }(collection.breakOut)

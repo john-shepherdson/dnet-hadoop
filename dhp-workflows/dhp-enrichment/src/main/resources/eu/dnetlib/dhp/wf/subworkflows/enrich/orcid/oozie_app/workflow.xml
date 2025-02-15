@@ -51,6 +51,7 @@
             <arg>--orcidPath</arg><arg>${orcidPath}</arg>
             <arg>--targetPath</arg><arg>${targetPath}</arg>
             <arg>--graphPath</arg><arg>${graphPath}</arg>
+            <arg>--workingDir</arg><arg>${workingDir}</arg>
             <arg>--master</arg><arg>yarn</arg>
         </spark>
         <ok to="reset_outputpath"/>

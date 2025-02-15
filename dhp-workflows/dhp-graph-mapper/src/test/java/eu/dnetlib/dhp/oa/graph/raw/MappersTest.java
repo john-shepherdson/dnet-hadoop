@@ -906,6 +906,30 @@ class MappersTest {
 		assertEquals("IT", p.getCountry().get(0).getClassid());
 		assertEquals("FR", p.getCountry().get(1).getClassid());
 		assertEquals("DE", p.getCountry().get(2).getClassid());
+
+		assertNotNull(p.getDescription());
+		assertEquals(1, p.getDescription().size());
+		assertNotNull(p.getDescription().get(0));
+		assertTrue(StringUtils.isNotBlank(p.getDescription().get(0).getValue()));
+	}
+
+	@Test
+	void testODFRecord_guidelines4() throws IOException {
+		final String xml = IOUtils
+			.toString(Objects.requireNonNull(getClass().getResourceAsStream("odf_guidelines4.xml")));
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
+
+		final Publication p = (Publication) list.get(0);
+		assertValidId(p.getId());
+		assertValidId(p.getCollectedfrom().get(0).getKey());
+		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
+
+		assertNotNull(p.getDescription());
+		assertEquals(2, p.getDescription().size());
+		assertNotNull(p.getDescription().get(0));
+		assertTrue(StringUtils.isNotBlank(p.getDescription().get(0).getValue()));
+		assertNotNull(p.getDescription().get(1));
+		assertTrue(StringUtils.isNotBlank(p.getDescription().get(1).getValue()));
 	}
 
 	@Test

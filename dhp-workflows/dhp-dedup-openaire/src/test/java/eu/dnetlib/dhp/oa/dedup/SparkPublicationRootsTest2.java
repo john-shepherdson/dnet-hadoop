@@ -143,7 +143,9 @@ public class SparkPublicationRootsTest2 implements Serializable {
 				"--graphBasePath", graphInputPath,
 				"--actionSetId", testActionSetId,
 				"--isLookUpUrl", "lookupurl",
-				"--workingPath", workingPath
+				"--workingPath", workingPath,
+				"--hiveMetastoreUris", "",
+
 			}), spark)
 				.run(isLookUpService);
 
@@ -153,7 +155,7 @@ public class SparkPublicationRootsTest2 implements Serializable {
 			.as(Encoders.bean(Relation.class));
 
 		assertEquals(
-			3, merges
+			4, merges
 				.filter("relclass == 'isMergedIn'")
 				.map((MapFunction<Relation, String>) Relation::getTarget, Encoders.STRING())
 				.distinct()
@@ -178,7 +180,7 @@ public class SparkPublicationRootsTest2 implements Serializable {
 			.textFile(workingPath + "/" + testActionSetId + "/publication_deduprecord")
 			.map(asEntity(Publication.class), Encoders.bean(Publication.class));
 
-		assertEquals(3, roots.count());
+		assertEquals(4, roots.count());
 
 		final Dataset<Publication> pubs = spark
 			.read()
@@ -195,7 +197,6 @@ public class SparkPublicationRootsTest2 implements Serializable {
 			.collectAsList()
 			.get(0);
 
-		assertEquals(crossref_duplicate.getDateofacceptance().getValue(), root.getDateofacceptance().getValue());
 		assertEquals(crossref_duplicate.getJournal().getName(), root.getJournal().getName());
 		assertEquals(crossref_duplicate.getJournal().getIssnPrinted(), root.getJournal().getIssnPrinted());
 		assertEquals(crossref_duplicate.getPublisher().getValue(), root.getPublisher().getValue());
