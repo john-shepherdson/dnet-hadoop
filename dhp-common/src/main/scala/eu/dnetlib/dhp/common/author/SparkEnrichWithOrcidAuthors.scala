@@ -24,7 +24,7 @@ abstract class SparkEnrichWithOrcidAuthors(propertyPath: String, args: Array[Str
     val targetPath = parser.get("targetPath")
     log.info(s"targetPath is '$targetPath'")
     val workingDir = parser.get("workingDir")
-    log.info(s"targetPath is '$workingDir'")
+    log.info(s"workingDir is '$workingDir'")
     val classid =
       Option(parser.get("matchingSource")).map(_ => ModelConstants.ORCID_PENDING).getOrElse(ModelConstants.ORCID)
 
@@ -33,12 +33,12 @@ abstract class SparkEnrichWithOrcidAuthors(propertyPath: String, args: Array[Str
       Option(parser.get("matchingSource")).map(_ => PROPAGATION_DATA_INFO_TYPE).getOrElse("ORCID_ENRICHMENT")
     log.info(s"targetPath is '$workingDir'")
 
-     createTemporaryData(spark, graphPath, orcidPath, workingDir)
+    createTemporaryData(spark, graphPath, orcidPath, workingDir)
     analisys(workingDir, classid, provenance)
     generateGraph(spark, graphPath, workingDir, targetPath)
   }
 
-  def generateGraph(spark: SparkSession, graphPath: String, workingDir: String, targetPath: String): Unit = {
+  private def generateGraph(spark: SparkSession, graphPath: String, workingDir: String, targetPath: String): Unit = {
 
     ModelSupport.entityTypes.asScala
       .filter(e => ModelSupport.isResult(e._1))
@@ -64,15 +64,7 @@ abstract class SparkEnrichWithOrcidAuthors(propertyPath: String, args: Array[Str
           .write
           .mode(SaveMode.Overwrite)
           .option("compression", "gzip")
-          .json(s"${workingDir}/enriched/${resultType}")
-
-        spark.read
-          .schema(enc.schema)
-          .json(s"${workingDir}/enriched/${resultType}")
-          .write
-          .mode(SaveMode.Overwrite)
-          .option("compression", "gzip")
-          .json(s"$graphPath/$resultType")
+          .json(s"${targetPath}/${resultType}")
 
       })
 
@@ -85,6 +77,8 @@ abstract class SparkEnrichWithOrcidAuthors(propertyPath: String, args: Array[Str
       .filter(e => ModelSupport.isResult(e._1))
       .foreach(e => {
         val resultType = e._1.name()
+        val c = classid
+        val p = provenance
 
         try{
         spark.read
@@ -92,7 +86,7 @@ abstract class SparkEnrichWithOrcidAuthors(propertyPath: String, args: Array[Str
           .where("size(graph_authors) > 0")
           .as[MatchData](Encoders.bean(classOf[MatchData]))
           .map(md => {
-            ORCIDAuthorEnricher.enrichOrcid(md.id, md.graph_authors, md.orcid_authors, classid, provenance)
+            ORCIDAuthorEnricher.enrichOrcid(md.id, md.graph_authors, md.orcid_authors, c, p)
           })(Encoders.bean(classOf[ORCIDAuthorEnricherResult]))
           .write
           .option("compression", "gzip")

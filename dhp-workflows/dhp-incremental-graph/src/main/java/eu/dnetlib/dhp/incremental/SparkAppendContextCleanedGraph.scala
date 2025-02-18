@@ -1,8 +1,8 @@
 package eu.dnetlib.dhp.incremental
 
-import eu.dnetlib.dhp.PropagationConstant
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.bulktag.community.TaggingConstants
+import eu.dnetlib.dhp.common.enrichment.Constants
 import eu.dnetlib.dhp.schema.common.ModelSupport
 import eu.dnetlib.dhp.schema.oaf.{Oaf, OafEntity}
 import org.apache.commons.io.IOUtils
@@ -10,7 +10,11 @@ import org.apache.spark.SparkConf
 import org.apache.spark.sql._
 import org.slf4j.{Logger, LoggerFactory}
 
-import scala.collection.JavaConverters.{collectionAsScalaIterableConverter, mapAsScalaMapConverter, seqAsJavaListConverter}
+import scala.collection.JavaConverters.{
+  collectionAsScalaIterableConverter,
+  mapAsScalaMapConverter,
+  seqAsJavaListConverter
+}
 
 object SparkAppendContextCleanedGraph {
 
@@ -60,7 +64,7 @@ object SparkAppendContextCleanedGraph {
                         .filter(
                           di =>
                             di == null || di.getInferenceprovenance == null ||
-                              (!di.getInferenceprovenance.equals(eu.dnetlib.dhp.common.enrichment.Constants.PROPAGATION_DATA_INFO_TYPE)
+                              (!di.getInferenceprovenance.equals(Constants.PROPAGATION_DATA_INFO_TYPE)
                                 && !di.getInferenceprovenance.equals(TaggingConstants.BULKTAG_DATA_INFO_TYPE))
                         )
                         .toList
