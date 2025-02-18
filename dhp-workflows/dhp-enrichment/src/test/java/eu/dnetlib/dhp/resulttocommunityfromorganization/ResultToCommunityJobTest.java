@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.orcidtoresultfromsemrel.OrcidPropagationJobTest;
@@ -30,7 +31,8 @@ public class ResultToCommunityJobTest {
 
 	private static final Logger log = LoggerFactory.getLogger(ResultToCommunityJobTest.class);
 
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
+		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
 	private static SparkSession spark;
 
