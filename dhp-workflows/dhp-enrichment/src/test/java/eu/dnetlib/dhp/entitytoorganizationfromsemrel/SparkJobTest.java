@@ -3,7 +3,6 @@ package eu.dnetlib.dhp.entitytoorganizationfromsemrel;
 
 import static eu.dnetlib.dhp.PropagationConstant.readPath;
 
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

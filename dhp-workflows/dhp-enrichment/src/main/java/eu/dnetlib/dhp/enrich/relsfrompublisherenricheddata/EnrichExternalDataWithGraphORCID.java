@@ -4,6 +4,8 @@ package eu.dnetlib.dhp.enrich.relsfrompublisherenricheddata;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.PropagationConstant;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.MapFunction;
@@ -30,21 +32,24 @@ import scala.Tuple2;
 import scala.collection.JavaConverters;
 import scala.collection.mutable.WrappedArray;
 
+import static eu.dnetlib.dhp.common.enrichment.Constants.PROPAGATION_DATA_INFO_TYPE;
+
 public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthors {
 	private static final Logger log = LoggerFactory.getLogger(EnrichExternalDataWithGraphORCID.class);
 	public static final DataInfo DATAINFO = OafMapperUtils
 		.dataInfo(
 			false,
-			"openaire",
+				PROPAGATION_DATA_INFO_TYPE,
 			true,
 			false,
 			OafMapperUtils
 				.qualifier(
-					ModelConstants.SYSIMPORT_CROSSWALK_REPOSITORY,
-					ModelConstants.SYSIMPORT_CROSSWALK_REPOSITORY,
+					PropagationConstant.PROPAGATION_AUTHORSHIP_CLASS_ID,
+						PropagationConstant.PROPAGATION_AUTHORSHIP_CLASS_NAME,
 					ModelConstants.DNET_PROVENANCE_ACTIONS,
 					ModelConstants.DNET_PROVENANCE_ACTIONS),
 			"0.85");
+
 
 	public EnrichExternalDataWithGraphORCID(String propertyPath, String[] args, Logger log) {
 		super(propertyPath, args, log);
@@ -101,29 +106,26 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 		return null;
 
 	}
-
+//graphPath is the path to the publisher file
+	//targetPath is the path to the graph
 	@Override
 	public void generateGraph(SparkSession spark, String graphPath, String workingDir, String targetPath) {
 		// creates new relations of authorship
-		spark
-				.read()
-				.schema(Encoders.bean(ORCIDAuthorEnricherResult.class).schema())
-				.parquet(workingDir + "/publication_matched").show(false);
 		Dataset<Relation> newRelations = spark
 			.read()
 			.schema(Encoders.bean(ORCIDAuthorEnricherResult.class).schema())
 			.parquet(workingDir + "/publication_matched")
 			.selectExpr("id as doi", "enriched_author")
-			.flatMap((FlatMapFunction<Row, Relation>) this::getRelationsList, Encoders.bean(Relation.class));
-newRelations.show(false);
+			.flatMap((FlatMapFunction<Row, Relation>) EnrichExternalDataWithGraphORCID::getRelationsList, Encoders.bean(Relation.class));
+
 		// redirects new relations versus representatives if any
 		Dataset<Row> graph_relations = spark
 			.read()
 			.schema(Encoders.bean(Relation.class).schema())
-			.json(graphPath + "/relation")
+			.json(targetPath + "/relation")
 			.filter("relClass = 'merges'")
 			.select("source", "target");
-graph_relations.show(false);
+		graph_relations.show(false);
 		Dataset<Relation> redirectedRels = newRelations
 			.joinWith(graph_relations, newRelations.col("target").equalTo(graph_relations.col("target")), "left")
 			.map((MapFunction<Tuple2<Relation, Row>, Relation>) t2 -> {
@@ -131,12 +133,12 @@ graph_relations.show(false);
 					t2._1().setSource(t2._2().getAs("source"));
 				return t2._1();
 			}, Encoders.bean(Relation.class));
-redirectedRels.show(false);
+		redirectedRels.show(false);
 		// need to merge the relations with same source target and semantics
 		spark
 			.read()
 			.schema(Encoders.bean(Relation.class).schema())
-			.json(graphPath + "/relation")
+			.json(targetPath + "/relation")
 			.as(Encoders.bean(Relation.class))
 			.union(redirectedRels)
 			.groupByKey(
@@ -161,26 +163,31 @@ redirectedRels.show(false);
 			.write()
 			.option("compression", "gzip")
 			.mode(SaveMode.Overwrite)
-			.json(graphPath + "/relation");
+			.json(targetPath + "/relation");
 
 	}
 
-	private Iterator<Relation> getRelationsList(Row r) {
+	private static Iterator<Relation> getRelationsList(Row r) {
+
 		List<Relation> relationList = new ArrayList<>();
-		List<Row> eauthors = r.getAs("enriched_author");
+
+		List<Row> eauthors = JavaConverters.seqAsJavaListConverter(((WrappedArray<Row>) r.getAs("enriched_author")).seq()).asJava();
 
 		eauthors.forEach(author -> {
-			List<Row> pids = author.getAs("pid");
+			List<Row> pids = JavaConverters.seqAsJavaListConverter(((WrappedArray<Row>) author.getAs("pid")).seq()).asJava();
 			List<Row> pidList = pids
 				.stream()
 				.filter(
-					p -> ModelConstants.ORCID.equalsIgnoreCase(p.getAs("schema"))
-						|| ModelConstants.ORCID_PENDING.equalsIgnoreCase(p.getAs("schema")))
+					p -> {
+						Row qualifier = p.getAs("qualifier");
+						return ModelConstants.ORCID.equalsIgnoreCase(qualifier.getAs("classid"))
+						|| ModelConstants.ORCID_PENDING.equalsIgnoreCase(qualifier.getAs("classid"));
+					})
 				.collect(Collectors.toList());
 			pidList
 				.forEach(
 					p -> relationList
-						.add(getRelations(r.getAs("doi"), author.getAs("raw_affiliation_string"), p.getAs("value"))));
+						.add(getRelations(r.getAs("doi"), JavaConverters.seqAsJavaListConverter(((WrappedArray<String>)author.getAs("rawAffiliationString")).seq()).asJava(), p.getAs("value"))));
 			new CoAuthorshipIterator(extractCoAuthors(pidList)).forEachRemaining(relationList::add);
 
 		});
@@ -191,12 +198,12 @@ redirectedRels.show(false);
 
 		List<String> coauthors = new ArrayList<>();
 		for (Row pid : pidList)
-			coauthors.add(pid.getAs("Value"));
+			coauthors.add(pid.getAs("value"));
 
 		return coauthors;
 	}
 
-	private Relation getRelations(String doi, List<String> rawAffiliationString, String orcid) {
+	private static Relation getRelations(String doi, List<String> rawAffiliationString, String orcid) {
 		Relation rel = OafMapperUtils
 			.getRelation(
 				"30|orcid_______::" + DHPUtils.md5(orcid), "50|doi_________::" + DHPUtils.md5(doi),
@@ -206,12 +213,26 @@ redirectedRels.show(false);
 		rawAffiliationString.forEach(raf -> {
 			String[] affiliationInfo = raf.split("@@");
 			KeyValue kv = new KeyValue();
-			kv.setKey("declared_affiliation");
-			if (affiliationInfo[0].equalsIgnoreCase("ror"))
+			if (affiliationInfo[0].equalsIgnoreCase("ror")){
+				kv.setKey("declared_affiliation");
 				kv.setValue(affiliationInfo[1]);
-			if (!Optional.ofNullable(rel.getProperties()).isPresent())
-				rel.setProperties(new ArrayList<>());
-			rel.getProperties().add(kv);
+				kv.setDataInfo(OafMapperUtils
+						.dataInfo(
+								false,
+								"openaire:inference",
+								true,
+								false,
+								null,
+								affiliationInfo[2]));
+			}
+			if(!StringUtils.isEmpty(kv.getKey())){
+				if (!Optional.ofNullable(rel.getProperties()).isPresent())
+					rel.setProperties(new ArrayList<>());
+				rel.getProperties().add(kv);
+			}
+
+
+
 
 		});
 
@@ -329,7 +350,6 @@ redirectedRels.show(false);
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.parquet(targetPath + "/publication_unmatched");
-
 
 	}
 

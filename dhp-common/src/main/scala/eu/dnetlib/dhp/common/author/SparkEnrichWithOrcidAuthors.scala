@@ -38,7 +38,7 @@ abstract class SparkEnrichWithOrcidAuthors(propertyPath: String, args: Array[Str
     generateGraph(spark, graphPath, workingDir, targetPath)
   }
 
-  private def generateGraph(spark: SparkSession, graphPath: String, workingDir: String, targetPath: String): Unit = {
+  def generateGraph(spark: SparkSession, graphPath: String, workingDir: String, targetPath: String): Unit = {
 
     ModelSupport.entityTypes.asScala
       .filter(e => ModelSupport.isResult(e._1))
@@ -80,22 +80,23 @@ abstract class SparkEnrichWithOrcidAuthors(propertyPath: String, args: Array[Str
         val c = classid
         val p = provenance
 
-        try{
-        spark.read
-          .parquet(s"$targetPath/${resultType}_unmatched")
-          .where("size(graph_authors) > 0")
-          .as[MatchData](Encoders.bean(classOf[MatchData]))
-          .map(md => {
-            ORCIDAuthorEnricher.enrichOrcid(md.id, md.graph_authors, md.orcid_authors, c, p)
-          })(Encoders.bean(classOf[ORCIDAuthorEnricherResult]))
-          .write
-          .option("compression", "gzip")
-          .mode("overwrite")
-          .parquet(s"$targetPath/${resultType}_matched")
-        }catch {
+        try {
+          spark.read
+            .parquet(s"$targetPath/${resultType}_unmatched")
+            .where("size(graph_authors) > 0")
+            .as[MatchData](Encoders.bean(classOf[MatchData]))
+            .map(md => {
+              ORCIDAuthorEnricher.enrichOrcid(md.id, md.graph_authors, md.orcid_authors, c, p)
+            })(Encoders.bean(classOf[ORCIDAuthorEnricherResult]))
+            .write
+            .option("compression", "gzip")
+            .mode("overwrite")
+            .parquet(s"$targetPath/${resultType}_matched")
+        } catch {
           case _: Exception =>
             println(s"Skipping missing file: $targetPath/${resultType}_matched")
         }
       })
   }
 }
+
