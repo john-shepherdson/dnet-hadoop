@@ -20,9 +20,9 @@ case class OrcidAuthor(
 }
 
 case class MatchedAuthors(
-                           @BeanProperty var author: Author,
-                           @BeanProperty var orcid: OrcidAuthor,
-                           @BeanProperty var `type`: String
+  @BeanProperty var author: Author,
+  @BeanProperty var orcid: OrcidAuthor,
+  @BeanProperty var `type`: String
 )
 
 case class MatchData(
@@ -47,8 +47,8 @@ object ORCIDAuthorEnricher extends Serializable {
     id: String,
     graph_authors: java.util.List[Author],
     orcid_authors: java.util.List[OrcidAuthor],
-    classid:String,
-    provenance:String
+    classid: String,
+    provenance: String
   ): ORCIDAuthorEnricherResult = {
     // Author enriching strategy:
     // 1) create a copy of graph author list in unmatched_authors
@@ -116,12 +116,12 @@ object ORCIDAuthorEnricher extends Serializable {
   }
 
   private def extractAndEnrichMatches(
-                                       graph_authors: java.util.List[Author],
-                                       orcid_authors: java.util.List[OrcidAuthor],
-                                       matchingFunc: (Author, OrcidAuthor) => Boolean,
-                                       matchName: String,
-                                       classid:String,
-                                       provenance : String
+    graph_authors: java.util.List[Author],
+    orcid_authors: java.util.List[OrcidAuthor],
+    matchingFunc: (Author, OrcidAuthor) => Boolean,
+    matchName: String,
+    classid: String,
+    provenance: String
   ) = {
     val matched = scala.collection.mutable.ArrayBuffer.empty[MatchedAuthors]
 
@@ -145,8 +145,8 @@ object ORCIDAuthorEnricher extends Serializable {
                 author.setPid(new util.ArrayList[StructuredProperty]())
               }
 
-             val orcidPID = OafUtils.createSP(orcid.orcid, classid, classid)
-             //val orcidPID = OafUtils.createSP(orcid.orcid, ModelConstants.ORCID, ModelConstants.ORCID)
+              val orcidPID = OafUtils.createSP(orcid.orcid, classid, classid)
+              //val orcidPID = OafUtils.createSP(orcid.orcid, ModelConstants.ORCID, ModelConstants.ORCID)
               orcidPID.setDataInfo(OafUtils.generateDataInfo())
               orcidPID.getDataInfo.setProvenanceaction(
                 //OafUtils.createQualifier("ORCID_ENRICHMENT", "ORCID_ENRICHMENT")

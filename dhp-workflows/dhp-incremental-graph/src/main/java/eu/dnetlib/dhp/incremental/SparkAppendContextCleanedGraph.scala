@@ -60,7 +60,7 @@ object SparkAppendContextCleanedGraph {
                         .filter(
                           di =>
                             di == null || di.getInferenceprovenance == null ||
-                              (!di.getInferenceprovenance.equals(PropagationConstant.PROPAGATION_DATA_INFO_TYPE)
+                              (!di.getInferenceprovenance.equals(eu.dnetlib.dhp.common.enrichment.Constants.PROPAGATION_DATA_INFO_TYPE)
                                 && !di.getInferenceprovenance.equals(TaggingConstants.BULKTAG_DATA_INFO_TYPE))
                         )
                         .toList

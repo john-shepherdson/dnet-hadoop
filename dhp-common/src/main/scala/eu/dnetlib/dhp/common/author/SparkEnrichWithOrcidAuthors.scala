@@ -25,18 +25,20 @@ abstract class SparkEnrichWithOrcidAuthors(propertyPath: String, args: Array[Str
     log.info(s"targetPath is '$targetPath'")
     val workingDir = parser.get("workingDir")
     log.info(s"targetPath is '$workingDir'")
-    val classid = Option(parser.get("matchingSource")).map(_=>ModelConstants.ORCID_PENDING).getOrElse(ModelConstants.ORCID)
+    val classid =
+      Option(parser.get("matchingSource")).map(_ => ModelConstants.ORCID_PENDING).getOrElse(ModelConstants.ORCID)
 
     log.info(s"classid is '$classid'")
-    val provenance = Option(parser.get("matchingSource")).map(_=>PROPAGATION_DATA_INFO_TYPE).getOrElse("ORCID_ENRICHMENT")
+    val provenance =
+      Option(parser.get("matchingSource")).map(_ => PROPAGATION_DATA_INFO_TYPE).getOrElse("ORCID_ENRICHMENT")
     log.info(s"targetPath is '$workingDir'")
 
-    createTemporaryData(spark, graphPath, orcidPath, workingDir)
-    analisys(workingDir,classid,provenance)
+     createTemporaryData(spark, graphPath, orcidPath, workingDir)
+    analisys(workingDir, classid, provenance)
     generateGraph(spark, graphPath, workingDir, targetPath)
   }
 
-   def generateGraph(spark: SparkSession, graphPath: String, workingDir: String, targetPath: String): Unit = {
+  def generateGraph(spark: SparkSession, graphPath: String, workingDir: String, targetPath: String): Unit = {
 
     ModelSupport.entityTypes.asScala
       .filter(e => ModelSupport.isResult(e._1))
@@ -69,7 +71,7 @@ abstract class SparkEnrichWithOrcidAuthors(propertyPath: String, args: Array[Str
           .json(s"${workingDir}/enriched/${resultType}")
           .write
           .mode(SaveMode.Overwrite)
-          .option("compression","gzip")
+          .option("compression", "gzip")
           .json(s"$graphPath/$resultType")
 
       })
@@ -78,12 +80,13 @@ abstract class SparkEnrichWithOrcidAuthors(propertyPath: String, args: Array[Str
 
   def createTemporaryData(spark: SparkSession, graphPath: String, orcidPath: String, targetPath: String): Unit
 
-  private def analisys(targetPath: String, classid:String, provenance:String): Unit = {
+  private def analisys(targetPath: String, classid: String, provenance: String): Unit = {
     ModelSupport.entityTypes.asScala
       .filter(e => ModelSupport.isResult(e._1))
       .foreach(e => {
         val resultType = e._1.name()
 
+        try{
         spark.read
           .parquet(s"$targetPath/${resultType}_unmatched")
           .where("size(graph_authors) > 0")
@@ -95,7 +98,10 @@ abstract class SparkEnrichWithOrcidAuthors(propertyPath: String, args: Array[Str
           .option("compression", "gzip")
           .mode("overwrite")
           .parquet(s"$targetPath/${resultType}_matched")
+        }catch {
+          case _: Exception =>
+            println(s"Skipping missing file: $targetPath/${resultType}_matched")
+        }
       })
   }
 }
-

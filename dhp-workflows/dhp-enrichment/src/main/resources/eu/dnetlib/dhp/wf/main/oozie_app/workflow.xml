@@ -151,7 +151,7 @@
                 </property>
             </configuration>
         </sub-workflow>
-        <ok to="bulk_tagging" />
+        <ok to="orcid_propagation" />
         <error to="Kill" />
     </action>
 

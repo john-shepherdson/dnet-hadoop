@@ -236,7 +236,9 @@ public class SparkExtractPersonRelations {
 							.getPid()
 							.stream()
 							.anyMatch(
-								p -> Arrays.asList("eu/dnetlib/dhp/enrich/orcid", "orcid_pending").contains(p.getQualifier().getClassid())))
+								p -> Arrays
+									.asList("eu/dnetlib/dhp/enrich/orcid", "orcid_pending")
+									.contains(p.getQualifier().getClassid())))
 					.map(a -> {
 						Optional<StructuredProperty> tmp = a
 							.getPid()
