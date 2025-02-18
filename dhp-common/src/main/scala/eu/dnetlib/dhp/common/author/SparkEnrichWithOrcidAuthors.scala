@@ -11,11 +11,11 @@ import eu.dnetlib.dhp.common.enrichment.Constants.PROPAGATION_DATA_INFO_TYPE
 import scala.collection.JavaConverters._
 
 abstract class SparkEnrichWithOrcidAuthors(propertyPath: String, args: Array[String], log: Logger)
-  extends AbstractScalaApplication(propertyPath, args, log: Logger) {
+    extends AbstractScalaApplication(propertyPath, args, log: Logger) {
 
   /** Here all the spark applications runs this method
-   * where the whole logic of the spark node is defined
-   */
+    * where the whole logic of the spark node is defined
+    */
   override def run(): Unit = {
     val graphPath = parser.get("graphPath")
     log.info(s"graphPath is '$graphPath'")
@@ -24,7 +24,7 @@ abstract class SparkEnrichWithOrcidAuthors(propertyPath: String, args: Array[Str
     val targetPath = parser.get("targetPath")
     log.info(s"targetPath is '$targetPath'")
     val workingDir = parser.get("workingDir")
-    log.info(s"targetPath is '$workingDir'")
+    log.info(s"workingDir is '$workingDir'")
     val classid =
       Option(parser.get("matchingSource")).map(_ => ModelConstants.ORCID_PENDING).getOrElse(ModelConstants.ORCID)
 
@@ -50,8 +50,6 @@ abstract class SparkEnrichWithOrcidAuthors(propertyPath: String, args: Array[Str
           .schema(Encoders.bean(classOf[ORCIDAuthorEnricherResult]).schema)
           .parquet(s"${workingDir}/${resultType}_matched")
           .selectExpr("id", "enriched_author")
-
-        matched.show(false)
 
         spark.read
           .schema(enc.schema)

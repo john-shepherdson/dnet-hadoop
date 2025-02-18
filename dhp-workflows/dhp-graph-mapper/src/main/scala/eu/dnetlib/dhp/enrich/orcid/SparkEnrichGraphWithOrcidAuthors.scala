@@ -9,9 +9,14 @@ import org.slf4j.{Logger, LoggerFactory}
 import scala.collection.JavaConverters._
 
 class SparkEnrichGraphWithOrcidAuthors(propertyPath: String, args: Array[String], log: Logger)
-  extends SparkEnrichWithOrcidAuthors(propertyPath, args, log: Logger) {
+    extends SparkEnrichWithOrcidAuthors(propertyPath, args, log: Logger) {
 
-  override def createTemporaryData(spark:SparkSession, graphPath: String, orcidPath: String, targetPath: String): Unit = {
+  override def createTemporaryData(
+    spark: SparkSession,
+    graphPath: String,
+    orcidPath: String,
+    targetPath: String
+  ): Unit = {
 
     val orcidAuthors =
       spark.read.load(s"$orcidPath/Authors").select("orcid", "familyName", "givenName", "creditName", "otherNames")
@@ -93,4 +98,3 @@ object SparkEnrichGraphWithOrcidAuthors {
       .run()
   }
 }
-

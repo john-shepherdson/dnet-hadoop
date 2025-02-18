@@ -8,9 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -25,17 +23,18 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.resulttocommunityfromorganization.ResultCommunityList;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
-import scala.collection.Seq;
 
 public class ResultToCommunityJobTest {
 
 	private static final Logger log = LoggerFactory.getLogger(ResultToCommunityJobTest.class);
 
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
+		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
 	private static SparkSession spark;
 

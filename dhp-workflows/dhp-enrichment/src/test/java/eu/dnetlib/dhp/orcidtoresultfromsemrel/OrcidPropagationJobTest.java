@@ -1,22 +1,13 @@
 
 package eu.dnetlib.dhp.orcidtoresultfromsemrel;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Optional;
-import java.util.logging.Filter;
-
-import eu.dnetlib.dhp.common.enrichment.Constants;
-import eu.dnetlib.dhp.schema.oaf.Author;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.Dataset;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.FilterFunction;
-import org.apache.spark.api.java.function.FlatMapFunction;
-import org.apache.spark.api.java.function.ForeachFunction;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -27,10 +18,9 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.Dataset;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class OrcidPropagationJobTest {
 
@@ -55,6 +45,7 @@ public class OrcidPropagationJobTest {
 		conf.set("hive.metastore.local", "true");
 		conf.set("spark.ui.enabled", "false");
 		conf.set("spark.sql.warehouse.dir", workingDir.toString());
+		conf.set("mapreduce.input.fileinputformat.input.dir.recursive", "true");
 		conf.set("hive.metastore.warehouse.dir", workingDir.resolve("warehouse").toString());
 
 		spark = SparkSession
@@ -72,26 +63,21 @@ public class OrcidPropagationJobTest {
 
 	@Test
 	void noUpdateTest() throws Exception {
-		final String sourcePath = getClass()
-			.getResource("/eu/dnetlib/dhp/orcidtoresultfromsemrel/sample/noupdate")
-			.getPath();
-		final String possibleUpdatesPath = getClass()
-			.getResource(
-				"/eu/dnetlib/dhp/orcidtoresultfromsemrel/preparedInfo/mergedOrcidAssoc")
-			.getPath();
+
 		SparkPropagateOrcidAuthor
-				.main(
-						new String[] {
-								"-graphPath",
-								getClass()
-										.getResource(
-												"/eu/dnetlib/dhp/orcidtoresultfromsemrel/sample/noupdate")
-										.getPath(),
-								"-targetPath",
-								workingDir.toString() + "/graph",
-								"-orcidPath", "",
-								"-workingDir", workingDir.toString()
-						});
+			.main(
+				new String[] {
+					"-graphPath",
+					getClass()
+						.getResource(
+							"/eu/dnetlib/dhp/orcidtoresultfromsemrel/sample/noupdate")
+						.getPath(),
+					"-orcidPath", "",
+					"-targetPath",
+					workingDir.toString() + "/graph",
+					"-workingDir", workingDir.toString(),
+					"-matchingSource", "xx"
+				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
@@ -120,26 +106,25 @@ public class OrcidPropagationJobTest {
 	@Test
 	void oneUpdateTest() throws Exception {
 		SparkPropagateOrcidAuthor
-				.main(
-						new String[] {
-								"-graphPath",
-								getClass()
-										.getResource(
-												"/eu/dnetlib/dhp/orcidtoresultfromsemrel/sample/oneupdate")
-										.getPath(),
-								"-targetPath",
-								workingDir.toString() + "/graph",
-								"-orcidPath", "",
-								"-workingDir", workingDir.toString(),
-								"-matchingSource", "propagation"
-						});
+			.main(
+				new String[] {
+					"-graphPath",
+					getClass()
+						.getResource(
+							"/eu/dnetlib/dhp/orcidtoresultfromsemrel/sample/oneupdate")
+						.getPath(),
+					"-targetPath",
+					workingDir.toString() + "/graph",
+					"-orcidPath", "",
+					"-workingDir", workingDir.toString(),
+					"-matchingSource", "xx"
+				});
 
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
 		JavaRDD<Dataset> tmp = sc
 			.textFile(workingDir.toString() + "/graph/dataset")
 			.map(item -> OBJECT_MAPPER.readValue(item, Dataset.class));
-
 
 		Assertions.assertEquals(10, tmp.count());
 
@@ -183,19 +168,20 @@ public class OrcidPropagationJobTest {
 						.getResource(
 							"/eu/dnetlib/dhp/orcidtoresultfromsemrel/sample/twoupdates")
 						.getPath(),
-					"-targetPath",
-					workingDir.toString() + "/dataset",
 					"-orcidPath", "",
-					"-workingDir", workingDir.toString()
+					"-targetPath",
+					workingDir.toString() + "/graph",
+					"-workingDir", workingDir.toString(),
+					"-matchingSource", "xx"
 				});
 
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
 		JavaRDD<Dataset> tmp = sc
-			.textFile(workingDir.toString() + "/dataset")
+			.textFile(workingDir.toString() + "/graph/dataset")
 			.map(item -> OBJECT_MAPPER.readValue(item, Dataset.class));
 
-		Assertions.assertEquals(10, tmp.count());
+		Assertions.assertEquals(11, tmp.count());
 
 		org.apache.spark.sql.Dataset<Dataset> verificationDataset = spark
 			.createDataset(tmp.rdd(), Encoders.bean(Dataset.class));
@@ -209,6 +195,8 @@ public class OrcidPropagationJobTest {
 			+ "where MyP.datainfo.inferenceprovenance = 'propagation'";
 
 		org.apache.spark.sql.Dataset<Row> propagatedAuthors = spark.sql(query);
+
+		propagatedAuthors.show(false);
 
 		Assertions.assertEquals(2, propagatedAuthors.count());
 
@@ -226,15 +214,31 @@ public class OrcidPropagationJobTest {
 
 		org.apache.spark.sql.Dataset<Row> authorsExplodedPids = spark.sql(query);
 
+		authorsExplodedPids.show(false);
+
 		Assertions
 			.assertEquals(
-				2, authorsExplodedPids.filter("name = 'Marc' and surname = 'Schmidtmann'").count());
+				3, authorsExplodedPids.filter("name = 'Marc' and surname = 'Schmidtmann'").count());
 		Assertions
 			.assertEquals(
 				1,
 				authorsExplodedPids
 					.filter(
 						"name = 'Marc' and surname = 'Schmidtmann' and pidType = 'MAG Identifier'")
+					.count());
+		Assertions
+			.assertEquals(
+				1,
+				authorsExplodedPids
+					.filter(
+						"name = 'Marc' and surname = 'Schmidtmann' and pidType = 'orcid'")
+					.count());
+		Assertions
+			.assertEquals(
+				1,
+				authorsExplodedPids
+					.filter(
+						"name = 'Marc' and surname = 'Schmidtmann' and pidType = 'orcid_pending'")
 					.count());
 	}
 }

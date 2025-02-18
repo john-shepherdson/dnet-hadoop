@@ -33,7 +33,7 @@ public class SparkPropagateOrcidAuthor extends SparkEnrichWithOrcidAuthors {
 
 		// Create instance and run the Spark application
 		SparkPropagateOrcidAuthor app = new SparkPropagateOrcidAuthor(
-				"/eu/dnetlib/dhp/wf/subworkflows/orcidtoresultfromsemrel/input_orcidtoresult_parameters.json", args, log);
+			"/eu/dnetlib/dhp/wf/subworkflows/orcidtoresultfromsemrel/input_orcidtoresult_parameters.json", args, log);
 		app.initialize().run();
 
 	}
@@ -41,42 +41,42 @@ public class SparkPropagateOrcidAuthor extends SparkEnrichWithOrcidAuthors {
 	private static OrcidAuthors getOrcidAuthorsList(List<Author> authors) {
 		OrcidAuthors oas = new OrcidAuthors();
 		List<OrcidAuthor> tmp = authors
-				.stream()
-				.map(SparkPropagateOrcidAuthor::getOrcidAuthor)
-				.filter(Objects::nonNull)
-				.collect(Collectors.toList());
+			.stream()
+			.map(SparkPropagateOrcidAuthor::getOrcidAuthor)
+			.filter(Objects::nonNull)
+			.collect(Collectors.toList());
 		oas.setOrcidAuthorList(tmp);
 		return oas;
 	}
 
 	private static OrcidAuthor getOrcidAuthor(Author a) {
 		return Optional
-				.ofNullable(getOrcid(a))
-				.map(orcid -> new OrcidAuthor(orcid, a.getSurname(), a.getName(), a.getFullname(), null))
-				.orElse(null);
+			.ofNullable(getOrcid(a))
+			.map(orcid -> new OrcidAuthor(orcid, a.getSurname(), a.getName(), a.getFullname(), null))
+			.orElse(null);
 
 	}
 
 	private static String getOrcid(Author a) {
 		if (a.getPid().stream().anyMatch(p -> p.getQualifier().getClassid().equalsIgnoreCase(ModelConstants.ORCID)))
 			return a
-					.getPid()
-					.stream()
-					.filter(p -> p.getQualifier().getClassid().equalsIgnoreCase(ModelConstants.ORCID))
-					.findFirst()
-					.get()
-					.getValue();
-		if (a
 				.getPid()
 				.stream()
-				.anyMatch(p -> p.getQualifier().getClassid().equalsIgnoreCase(ModelConstants.ORCID_PENDING)))
+				.filter(p -> p.getQualifier().getClassid().equalsIgnoreCase(ModelConstants.ORCID))
+				.findFirst()
+				.get()
+				.getValue();
+		if (a
+			.getPid()
+			.stream()
+			.anyMatch(p -> p.getQualifier().getClassid().equalsIgnoreCase(ModelConstants.ORCID_PENDING)))
 			return a
-					.getPid()
-					.stream()
-					.filter(p -> p.getQualifier().getClassid().equalsIgnoreCase(ModelConstants.ORCID_PENDING))
-					.findFirst()
-					.get()
-					.getValue();
+				.getPid()
+				.stream()
+				.filter(p -> p.getQualifier().getClassid().equalsIgnoreCase(ModelConstants.ORCID_PENDING))
+				.findFirst()
+				.get()
+				.getValue();
 		return null;
 
 	}
@@ -84,61 +84,61 @@ public class SparkPropagateOrcidAuthor extends SparkEnrichWithOrcidAuthors {
 	@Override
 	public void createTemporaryData(SparkSession spark, String graphPath, String orcidPath, String targetPath) {
 		ModelSupport.entityTypes
-				.keySet()
-				.stream()
-				.filter(ModelSupport::isResult)
-				.forEach(e -> {
-					Dataset<Row> orcidDnet = spark
-							.read()
-							.schema(Encoders.bean(Result.class).schema())
-							.json(graphPath + "/" + e.name())
-							.as(Encoders.bean(Result.class))
-							.filter(
-									(FilterFunction<Result>) r -> r.getAuthor() != null &&
-											r
-													.getAuthor()
-													.stream()
-													.anyMatch(
-															a -> a.getPid() != null && a
-																	.getPid()
-																	.stream()
-																	.anyMatch(
-																			p -> p.getQualifier().getClassid().equalsIgnoreCase(ModelConstants.ORCID) ||
-																					p
-																							.getQualifier()
-																							.getClassid()
-																							.equalsIgnoreCase(ModelConstants.ORCID_PENDING))))
-							.map(
-									(MapFunction<Result, Tuple2<String, OrcidAuthors>>) r -> new Tuple2<>(r.getId(),
-											getOrcidAuthorsList(r.getAuthor())),
-									Encoders.tuple(Encoders.STRING(), Encoders.bean(OrcidAuthors.class)))
-							.selectExpr("_1 as target", "_2.orcidAuthorList as orcid_authors");
+			.keySet()
+			.stream()
+			.filter(ModelSupport::isResult)
+			.forEach(e -> {
+				Dataset<Row> orcidDnet = spark
+					.read()
+					.schema(Encoders.bean(Result.class).schema())
+					.json(graphPath + "/" + e.name())
+					.as(Encoders.bean(Result.class))
+					.filter(
+						(FilterFunction<Result>) r -> r.getAuthor() != null &&
+							r
+								.getAuthor()
+								.stream()
+								.anyMatch(
+									a -> a.getPid() != null && a
+										.getPid()
+										.stream()
+										.anyMatch(
+											p -> p.getQualifier().getClassid().equalsIgnoreCase(ModelConstants.ORCID) ||
+												p
+													.getQualifier()
+													.getClassid()
+													.equalsIgnoreCase(ModelConstants.ORCID_PENDING))))
+					.map(
+						(MapFunction<Result, Tuple2<String, OrcidAuthors>>) r -> new Tuple2<>(r.getId(),
+							getOrcidAuthorsList(r.getAuthor())),
+						Encoders.tuple(Encoders.STRING(), Encoders.bean(OrcidAuthors.class)))
+					.selectExpr("_1 as target", "_2.orcidAuthorList as orcid_authors");
 
-					Dataset<Row> result = spark
-							.read()
-							.schema(Encoders.bean(Result.class).schema())
-							.json(graphPath + "/" + e.name())
-							.as(Encoders.bean(Result.class))
-							.selectExpr("id", "author as graph_authors");
+				Dataset<Row> result = spark
+					.read()
+					.schema(Encoders.bean(Result.class).schema())
+					.json(graphPath + "/" + e.name())
+					.as(Encoders.bean(Result.class))
+					.selectExpr("id", "author as graph_authors");
 
-					Dataset<Row> supplements = spark
-							.read()
-							.schema(Encoders.bean(Relation.class).schema())
-							.json(graphPath + "/" + "relation")
-							.where(
-									"relclass IN('" + ModelConstants.IS_SUPPLEMENT_TO + "', '" +
-											ModelConstants.IS_SUPPLEMENTED_BY + "')")
-							.selectExpr("source as id", "target");
+				Dataset<Row> supplements = spark
+					.read()
+					.schema(Encoders.bean(Relation.class).schema())
+					.json(graphPath + "/" + "relation")
+					.where(
+						"relclass IN('" + ModelConstants.IS_SUPPLEMENT_TO + "', '" +
+							ModelConstants.IS_SUPPLEMENTED_BY + "')")
+					.selectExpr("source as id", "target");
 
-					result
-							.join(supplements, "id")
-							.join(orcidDnet, "target")
-							.drop("target")
-							.write()
-							.mode(SaveMode.Overwrite)
-							.option("compression", "gzip")
-							.parquet(targetPath + "/" + e.name() + "_unmatched");
+				result
+					.join(supplements, "id")
+					.join(orcidDnet, "target")
+					.drop("target")
+					.write()
+					.mode(SaveMode.Overwrite)
+					.option("compression", "gzip")
+					.parquet(targetPath + "/" + e.name() + "_unmatched");
 
-				});
+			});
 	}
 }
