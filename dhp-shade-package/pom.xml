@@ -25,21 +25,21 @@
 
 
     <dependencies>
-<!--        <dependency>-->
-<!--            <groupId>eu.dnetlib.dhp</groupId>-->
-<!--            <artifactId>dhp-actionmanager</artifactId>-->
-<!--            <version>${project.version}</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>eu.dnetlib.dhp</groupId>
+            <artifactId>dhp-actionmanager</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>eu.dnetlib.dhp</groupId>
             <artifactId>dhp-aggregation</artifactId>
             <version>${project.version}</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>eu.dnetlib.dhp</groupId>-->
-<!--            <artifactId>dhp-blacklist</artifactId>-->
-<!--            <version>${project.version}</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>eu.dnetlib.dhp</groupId>
+            <artifactId>dhp-blacklist</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 <!--        <dependency>-->
 <!--            <groupId>eu.dnetlib.dhp</groupId>-->
 <!--            <artifactId>dhp-broker-events</artifactId>-->
@@ -58,6 +58,11 @@
         <dependency>
             <groupId>eu.dnetlib.dhp</groupId>
             <artifactId>dhp-graph-mapper</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.dnetlib.dhp</groupId>
+            <artifactId>dhp-incremental-graph</artifactId>
             <version>${project.version}</version>
         </dependency>
 <!--        <dependency>-->

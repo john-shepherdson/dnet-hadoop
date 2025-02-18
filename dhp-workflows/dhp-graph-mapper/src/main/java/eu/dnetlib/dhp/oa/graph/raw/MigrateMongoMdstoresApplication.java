@@ -52,6 +52,9 @@ public class MigrateMongoMdstoresApplication extends AbstractMigrationApplicatio
 	private static Map<String, MDStoreInfo> hdfsMDStoreInfo(FileSystem fs, final String basePath) throws IOException {
 		final Map<String, MDStoreInfo> hdfs_store = new HashMap<>();
 		final Path p = new Path(basePath);
+		if (!fs.exists(p)) {
+			return hdfs_store;
+		}
 		final RemoteIterator<LocatedFileStatus> ls = fs.listFiles(p, true);
 		while (ls.hasNext()) {
 

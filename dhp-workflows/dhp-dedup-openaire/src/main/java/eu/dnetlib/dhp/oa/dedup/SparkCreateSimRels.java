@@ -81,15 +81,25 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 			final String subEntity = dedupConf.getWf().getSubEntityValue();
 			log.info("Creating simrels for: '{}'", subEntity);
 
+			final String modelPath = DedupUtility.createModelPath(workingPath, actionSetId, subEntity);
+
 			final String outputPath = DedupUtility.createSimRelPath(workingPath, actionSetId, subEntity);
 			removeOutputDir(spark, outputPath);
 
 			SparkDeduper deduper = new SparkDeduper(dedupConf);
 
-			Dataset<?> simRels = spark
+			spark
 				.read()
 				.textFile(DedupUtility.createEntityPath(graphBasePath, subEntity))
 				.transform(deduper.model().parseJsonDataset())
+				.write()
+				.option("compression", "gzip")
+				.mode("overwrite")
+				.parquet(modelPath);
+
+			Dataset<?> simRels = spark
+				.read()
+				.parquet(modelPath)
 				.transform(deduper.dedup())
 				.distinct()
 				.map(

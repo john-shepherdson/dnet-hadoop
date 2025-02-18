@@ -36,6 +36,11 @@ public class DedupUtility {
 		return String.format("%s/%s", basePath, entityType);
 	}
 
+	public static String createModelPath(
+		final String basePath, final String actionSetId, final String entityType) {
+		return String.format("%s/%s/%s_model", basePath, actionSetId, entityType);
+	}
+
 	public static String createSimRelPath(
 		final String basePath, final String actionSetId, final String entityType) {
 		return String.format("%s/%s/%s_simrel", basePath, actionSetId, entityType);

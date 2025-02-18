@@ -1,18 +1,19 @@
 
 package eu.dnetlib.dhp.oa.merge;
 
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.common.HdfsSupport;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+
+import java.util.Optional;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.spark.SparkConf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Optional;
-
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.HdfsSupport;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 
 /**
  * Copy specified entities from a graph snapshot to another
