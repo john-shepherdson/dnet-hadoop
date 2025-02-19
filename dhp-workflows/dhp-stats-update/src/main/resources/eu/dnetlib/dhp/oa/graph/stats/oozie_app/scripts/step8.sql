@@ -30,7 +30,7 @@ select /*+ COALESCE(100) */
        case when dtrce.officialname.value='Unknown Repository' then 'Other' else dtrce.officialname.value end              as name,
        dtrce.datasourcetype.classname                                                                                      as type,
        dtrce.dateofvalidation.value                                                                                        as dateofvalidation,
-       case when dtrce.dateofvalidation.value='-1' then null else date_format(dtrce.dateofvalidation.value, 'yyyy') end    as yearofvalidation,
+       case when dtrce.dateofvalidation.value='-1' then null else cast(date_format(dtrce.dateofvalidation.value, 'yyyy') as int)  end as yearofvalidation,
        case when res.d_id is null then false else true end                                                                 as harvested,
        case when piwik_d.piwik_id is null then 0 else piwik_d.piwik_id end                                                 as piwik_id,
        dtrce.latitude.value                                                                                                as latitude,
