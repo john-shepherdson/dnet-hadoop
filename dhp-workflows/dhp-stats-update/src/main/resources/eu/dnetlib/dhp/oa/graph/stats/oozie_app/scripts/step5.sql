@@ -25,19 +25,19 @@ other_delayed as (
     group by other_id
 )
 select /*+ COALESCE(100) */
-    substr(other.id, 4)                                            as id,
-    other.title[0].value                                           as title,
-    other.publisher.value                                          as publisher,
-    cast(null as string)                                           as journal,
-    other.dateofacceptance.value                                   as date,
-    date_format(other.dateofacceptance.value, 'yyyy')              as year,
-    other.bestaccessright.classname                                as bestlicence,
-    other.embargoenddate.value                                     as embargo_end_date,
-    false                                                          as delayed,
-    size(other.author)                                             as authors,
-    concat_ws('\u003B', other.source.value)                        as source,
-    case when size(other.description) > 0 then true else false end as abstract,
-    'other'                                                        as type
+    substr(other.id, 4)                                             as id,
+    other.title[0].value                                            as title,
+    other.publisher.value                                           as publisher,
+    cast(null as string)                                            as journal,
+    other.dateofacceptance.value                                    as date,
+    cast(date_format(other.dateofacceptance.value, 'yyyy') as year) as year,
+    other.bestaccessright.classname                                 as bestlicence,
+    other.embargoenddate.value                                      as embargo_end_date,
+    false                                                           as delayed,
+    size(other.author)                                              as authors,
+    concat_ws('\u003B', other.source.value)                         as source,
+    case when size(other.description) > 0 then true else false end  as abstract,
+    'other'                                                         as type
 from ${openaire_db_name}.otherresearchproduct other
     left outer join other_delayed on other.id=other_delayed.other_id
 where other.datainfo.deletedbyinference = false and other.datainfo.invisible = false; /*EOS*/
