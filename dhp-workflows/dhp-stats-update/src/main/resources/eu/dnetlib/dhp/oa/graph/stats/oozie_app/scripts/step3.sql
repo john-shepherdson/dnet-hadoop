@@ -30,7 +30,7 @@ select /*+ COALESCE(100) */
     datast.publisher.value                                                as publisher,
     cast(null as string)                                                  as journal,
     datast.dateofacceptance.value                                         as date,
-    date_format(datast.dateofacceptance.value, 'yyyy')                    as year,
+    cast(date_format(datast.dateofacceptance.value, 'yyyy') as int)       as year,
     datast.bestaccessright.classname                                      as bestlicence,
     datast.embargoenddate.value                                           as embargo_end_date,
     coalesce(datast_delayed.delayed, false)                               as delayed, -- It's delayed, when the dataset was published after the end of the project.

@@ -6,7 +6,7 @@ set mapred.job.queue.name=analytics; /*EOS*/
 drop view if exists ${stats_db_name}.result; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.result stored as parquet as
-SELECT /*+ COALESCE(100) */ r.id, r.title, r.publisher, r.journal, r.`date`, r.year, r.bestlicence, r.access_mode, r.embargo_end_date, r.delayed, r.authors, r.source, r.abstract, r.type, pr.peer_reviewed, green.green, gold.gold
+SELECT /*+ COALESCE(100) */ r.id, r.title, r.publisher, r.journal, r.`date`, cast(r.year as int) as year, r.bestlicence, r.access_mode, r.embargo_end_date, r.delayed, r.authors, r.source, r.abstract, r.type, pr.peer_reviewed, green.green, gold.gold
 FROM (
     (SELECT id, title, publisher, journal, `date`, DATE_FORMAT(`date`, 'yyyy') as year, bestlicence, bestlicence as access_mode, embargo_end_date, delayed, authors, source, abstract, type
         FROM ${stats_db_name}.publication)

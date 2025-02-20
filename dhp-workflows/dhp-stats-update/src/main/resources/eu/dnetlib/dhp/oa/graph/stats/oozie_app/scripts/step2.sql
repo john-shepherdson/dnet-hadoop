@@ -30,7 +30,7 @@ select /*+ COALESCE(100) */
     pub.publisher.value                                                   as publisher,
     pub.journal.name                                                      as journal,
     pub.dateofacceptance.value                                            as date,
-    date_format(pub.dateofacceptance.value, 'yyyy')                       as year,
+    cast(date_format(pub.dateofacceptance.value, 'yyyy') as int)          as year,
     pub.bestaccessright.classname                                         as bestlicence,
     pub.embargoenddate.value                                              as embargo_end_date,
     coalesce(pub_delayed.delayed, false)                                  as delayed, -- It's delayed, when the publication was published after the end of at least one of its projects.
