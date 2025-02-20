@@ -13,7 +13,7 @@ import eu.dnetlib.dhp.common.collection.HttpClientParams;
 
 class Gtr2PublicationsIteratorTest {
 
-	private static final String baseURL = "https://gtr.ukri.org/gtr/api";
+	private static final String baseURL = "https://gtr.ukri.org/api";
 
 	private static final HttpClientParams clientParams = new HttpClientParams();
 
@@ -34,7 +34,7 @@ class Gtr2PublicationsIteratorTest {
 	@Test
 	@Disabled
 	public void testPaging() throws Exception {
-		final Iterator<String> iterator = new Gtr2PublicationsIterator(baseURL, null, "2", "2", clientParams);
+		final Iterator<String> iterator = new Gtr2PublicationsIterator(baseURL, null, "2", "3", clientParams);
 
 		while (iterator.hasNext()) {
 			Thread.sleep(300);
@@ -47,9 +47,9 @@ class Gtr2PublicationsIteratorTest {
 	@Test
 	@Disabled
 	public void testOnePage() throws Exception {
-		final Iterator<String> iterator = new Gtr2PublicationsIterator(baseURL, null, "12", "12", clientParams);
+		final Iterator<String> iterator = new Gtr2PublicationsIterator(baseURL, null, "379", "380", clientParams);
 		final int count = iterateAndCount(iterator);
-		assertEquals(20, count);
+		assertEquals(50, count);
 	}
 
 	@Test

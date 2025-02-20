@@ -1,6 +1,7 @@
 
 package eu.dnetlib.dhp.common.person;
 
+import java.util.*;
 import static eu.dnetlib.dhp.common.person.Constants.*;
 
 import java.util.Collections;
@@ -43,7 +44,7 @@ public class CoAuthorshipIterator implements Iterator<Relation> {
 	}
 
 	public CoAuthorshipIterator(List<String> authors) {
-		this.authors = authors;
+		this.authors = new ArrayList<>(new HashSet<>(authors));
 		this.firstIndex = 0;
 		this.secondIndex = 1;
 		this.firstRelation = Boolean.TRUE;

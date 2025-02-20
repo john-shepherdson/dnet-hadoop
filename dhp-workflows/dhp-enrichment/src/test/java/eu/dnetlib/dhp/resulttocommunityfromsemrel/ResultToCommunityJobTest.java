@@ -6,6 +6,7 @@ import static org.apache.spark.sql.functions.desc;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -22,15 +23,18 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.dhp.resulttocommunityfromorganization.ResultCommunityList;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
 
 public class ResultToCommunityJobTest {
 
 	private static final Logger log = LoggerFactory.getLogger(ResultToCommunityJobTest.class);
 
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
+		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
 	private static SparkSession spark;
 
@@ -271,4 +275,59 @@ public class ResultToCommunityJobTest {
 					.get(0)
 					.getString(0));
 	}
+
+	@Test
+	public void prepareStep1Test() throws Exception {
+		/*
+		 * final String allowedsemrel = join(",", Arrays.stream(parser.get("allowedsemrels").split(";")) .map(value ->
+		 * "'" + value.toLowerCase() + "'") .toArray(String[]::new)); log.info("allowedSemRel: {}", new
+		 * Gson().toJson(allowedsemrel)); final String baseURL = parser.get("baseURL"); log.info("baseURL: {}",
+		 * baseURL);
+		 */
+		PrepareResultCommunitySetStep1
+			.main(
+				new String[] {
+					"-isSparkSessionManaged", Boolean.FALSE.toString(),
+					"-sourcePath", getClass()
+						.getResource("/eu/dnetlib/dhp/resulttocommunityfromsemrel/graph")
+						.getPath(),
+					"-hive_metastore_uris", "",
+					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Publication",
+					"-outputPath", workingDir.toString() + "/preparedInfo",
+					"-allowedsemrels", "issupplementto;issupplementedby",
+					"-baseURL", "https://dev-openaire.d4science.org/openaire/community/"
+				});
+
+		org.apache.spark.sql.Dataset<ResultCommunityList> resultCommunityList = spark
+			.read()
+			.schema(Encoders.bean(ResultCommunityList.class).schema())
+			.json(workingDir.toString() + "/preparedInfo/publication")
+			.as(Encoders.bean(ResultCommunityList.class));
+
+		Assertions.assertEquals(2, resultCommunityList.count());
+		Assertions
+			.assertEquals(
+				1,
+				resultCommunityList.filter("resultId = '50|dedup_wf_001::06e51d2bf295531b2d2e7a1b55500783'").count());
+		Assertions
+			.assertEquals(
+				1,
+				resultCommunityList.filter("resultId = '50|pending_org_::82f63b2d21ae88596b9d8991780e9888'").count());
+
+		ArrayList<String> communities = resultCommunityList
+			.filter("resultId = '50|dedup_wf_001::06e51d2bf295531b2d2e7a1b55500783'")
+			.first()
+			.getCommunityList();
+		Assertions.assertEquals(2, communities.size());
+		Assertions.assertTrue(communities.stream().anyMatch(cid -> "beopen".equals(cid)));
+		Assertions.assertTrue(communities.stream().anyMatch(cid -> "dh-ch".equals(cid)));
+
+		communities = resultCommunityList
+			.filter("resultId = '50|pending_org_::82f63b2d21ae88596b9d8991780e9888'")
+			.first()
+			.getCommunityList();
+		Assertions.assertEquals(1, communities.size());
+		Assertions.assertEquals("dh-ch", communities.get(0));
+	}
+
 }

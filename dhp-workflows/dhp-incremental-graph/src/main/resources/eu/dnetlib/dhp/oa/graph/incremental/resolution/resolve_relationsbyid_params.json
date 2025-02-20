@@ -1,0 +1,32 @@
+[
+  {
+    "paramName": "g",
+    "paramLongName": "graphBasePath",
+    "paramDescription": "the path of the raw graph",
+    "paramRequired": true
+  },
+  {
+    "paramName": "t",
+    "paramLongName": "targetGraph",
+    "paramDescription": "the target path",
+    "paramRequired": true
+  },
+  {
+    "paramName": "wd",
+    "paramLongName": "workingDir",
+    "paramDescription": "the path to store the output graph",
+    "paramRequired": true
+  },
+  {
+    "paramName": "hmu",
+    "paramLongName": "hiveMetastoreUris",
+    "paramDescription": "the hive metastore uris",
+    "paramRequired": true
+  },
+  {
+    "paramName": "db",
+    "paramLongName": "hiveDbName",
+    "paramDescription": "the graph hive database name",
+    "paramRequired": true
+  }
+]

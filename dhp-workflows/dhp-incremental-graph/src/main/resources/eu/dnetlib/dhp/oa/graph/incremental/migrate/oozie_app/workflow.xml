@@ -1,0 +1,66 @@
+<workflow-app name="NewResultsCollect_Workflow" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>outputPath</name>
+            <description>outputDirectory</description>
+        </property>
+        <property>
+            <name>hiveMetastoreUris</name>
+            <description>hive server metastore URIs</description>
+        </property>
+        <property>
+            <name>sparkSqlWarehouseDir</name>
+        </property>
+        <property>
+            <name>hiveDbName</name>
+            <description>hive database containing last generated graph</description>
+        </property>
+        <!-- General oozie workflow properties -->
+        <property>
+            <name>sparkClusterOpts</name>
+            <value>--conf spark.network.timeout=600 --conf spark.extraListeners= --conf spark.sql.queryExecutionListeners= --conf spark.yarn.historyServer.address=http://iis-cdh5-test-m3.ocean.icm.edu.pl:18088 --conf spark.eventLog.dir=hdfs://nameservice1/user/spark/applicationHistory</value>
+            <description>spark cluster-wide options</description>
+        </property>
+        <property>
+            <name>sparkResourceOpts</name>
+            <value>--executor-memory=3G --conf spark.executor.memoryOverhead=3G --executor-cores=6 --driver-memory=8G --driver-cores=4</value>
+            <description>spark resource options</description>
+        </property>
+        <property>
+            <name>sparkApplicationOpts</name>
+            <value>--conf spark.sql.shuffle.partitions=1024</value>
+            <description>spark resource options</description>
+        </property>
+    </parameters>
+
+    <start to="MigrationJob"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <action name="MigrationJob">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Copy data from last graph</name>
+            <class>eu.dnetlib.dhp.oozie.RunSQLSparkJob</class>
+            <jar>dhp-incremental-graph-${projectVersion}.jar</jar>
+            <spark-opts>
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
+            </spark-opts>
+            <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
+            <arg>--sql</arg><arg>eu/dnetlib/dhp/oa/graph/incremental/migrate/oozie_app/migration.sql</arg>
+            <arg>--hiveDbName</arg><arg>${hiveDbName}</arg>
+            <arg>--outputPath</arg><arg>${outputPath}</arg>
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <end name="End"/>
+
+</workflow-app>

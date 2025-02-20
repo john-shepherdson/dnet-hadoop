@@ -1,0 +1,11 @@
+openaire_db_name=openaire_prod_20210716
+stats_db_name=openaire_prod_stats_20210716
+stats_db_shadow_name=openaire_prod_stats_shadow
+monitor_db_name=openaire_prod_stats_monitor_20210716
+monitor_db_shadow_name=openaire_prod_stats_monitor_shadow
+observatory_db_name=openaire_prod_stats_observatory_20210716
+observatory_db_shadow_name=openaire_prod_stats_observatory_shadow
+external_stats_db_name=stats_ext
+hive_timeout=150000
+stats_tool_api_url=https://services.openaire/stats-tool/
+context_api_url=https://services.openaire.eu/openaire

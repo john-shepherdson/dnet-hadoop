@@ -19,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.dnetlib.dhp.actionmanager.createunresolvedentities.model.SDGDataModel;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.Result;
@@ -60,33 +61,20 @@ public class PrepareSDGSparkJob implements Serializable {
 		runWithSparkSession(
 			conf,
 			isSparkSessionManaged,
-			spark -> {
-				if (distributeDOI)
-					doPrepare(
-						spark,
-						sourcePath,
-
-						outputPath);
-				else
-					doPrepareoaid(spark, sourcePath, outputPath);
-
-			});
+			spark -> doPrepare(spark, sourcePath, outputPath));
 	}
 
 	private static void doPrepare(SparkSession spark, String sourcePath, String outputPath) {
-		Dataset<Row> sdgDataset = spark
-			.read()
-			.format("csv")
-			.option("sep", DEFAULT_DELIMITER)
-			.option("inferSchema", "true")
-			.option("header", "true")
-			.option("quotes", "\"")
-			.load(sourcePath);
 
-		sdgDataset
-			.groupByKey((MapFunction<Row, String>) v -> ((String) v.getAs("doi")).toLowerCase(), Encoders.STRING())
+		final Encoder<SDGDataModel> sdgEncoder = Encoders.bean(SDGDataModel.class);
+		spark
+			.read()
+			.schema(sdgEncoder.schema())
+			.json(sourcePath)
+			.as(sdgEncoder)
+			.groupByKey((MapFunction<SDGDataModel, String>) v -> (v.getDoi().toLowerCase()), Encoders.STRING())
 			.mapGroups(
-				(MapGroupsFunction<String, Row, Result>) (k,
+				(MapGroupsFunction<String, SDGDataModel, Result>) (k,
 					it) -> getResult(
 						DHPUtils
 							.generateUnresolvedIdentifier(
@@ -100,37 +88,16 @@ public class PrepareSDGSparkJob implements Serializable {
 			.json(outputPath + "/sdg");
 	}
 
-	private static void doPrepareoaid(SparkSession spark, String sourcePath, String outputPath) {
-		Dataset<Row> sdgDataset = spark
-			.read()
-			.format("csv")
-			.option("sep", DEFAULT_DELIMITER)
-			.option("inferSchema", "true")
-			.option("header", "true")
-			.option("quotes", "\"")
-			.load(sourcePath);
-		;
-
-		sdgDataset
-			.groupByKey((MapFunction<Row, String>) r -> "50|" + ((String) r.getAs("oaid")), Encoders.STRING())
-			.mapGroups(
-				(MapGroupsFunction<String, Row, Result>) PrepareSDGSparkJob::getResult, Encoders.bean(Result.class))
-			.write()
-			.mode(SaveMode.Overwrite)
-			.option("compression", "gzip")
-			.json(outputPath + "/sdg");
-	}
-
-	private static @NotNull Result getResult(String id, Iterator<Row> it) {
+	private static @NotNull Result getResult(String id, Iterator<SDGDataModel> it) {
 		Result r = new Result();
 		r.setId(id);
-		Row first = it.next();
+		SDGDataModel first = it.next();
 		List<Subject> sbjs = new ArrayList<>();
-		sbjs.add(getSubject(first.getAs("sdg"), SDG_CLASS_ID, SDG_CLASS_NAME, UPDATE_SUBJECT_SDG_CLASS_ID));
+		sbjs.add(getSubject(first.getSbj(), SDG_CLASS_ID, SDG_CLASS_NAME, UPDATE_SUBJECT_SDG_CLASS_ID));
 		it
 			.forEachRemaining(
 				s -> sbjs
-					.add(getSubject(s.getAs("sdg"), SDG_CLASS_ID, SDG_CLASS_NAME, UPDATE_SUBJECT_SDG_CLASS_ID)));
+					.add(getSubject(s.getSbj(), SDG_CLASS_ID, SDG_CLASS_NAME, UPDATE_SUBJECT_SDG_CLASS_ID)));
 		r.setSubject(sbjs);
 
 		return r;

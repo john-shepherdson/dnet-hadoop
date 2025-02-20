@@ -39,9 +39,9 @@ public class StreamingInputDocumentFactory implements Serializable {
 
 	private static final String RESULT = "result";
 
-	private static final String INDEX_RESULT = INDEX_FIELD_PREFIX + RESULT;
+	public static final String INDEX_RESULT = INDEX_FIELD_PREFIX + RESULT;
 
-	private static final String INDEX_JSON_RESULT = INDEX_FIELD_PREFIX + "json";
+	public static final String INDEX_JSON_RESULT = INDEX_FIELD_PREFIX + "json";
 
 	private static final String INDEX_RECORD_ID = INDEX_FIELD_PREFIX + "indexrecordidentifier";
 

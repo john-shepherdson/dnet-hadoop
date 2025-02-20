@@ -16,6 +16,18 @@
             <name>startFrom></name>
             <value>undelete</value>
         </property>
+        <property>
+            <name>dbUrl</name>
+
+        </property>
+        <property>
+            <name>dbUser</name>
+
+        </property>
+        <property>
+            <name>dbPassword</name>
+
+        </property>
 
     </parameters>
 
@@ -77,6 +89,9 @@
             <arg>--pathMap</arg><arg>${pathMap}</arg>
             <arg>--baseURL</arg><arg>${baseURL}</arg>
             <arg>--nameNode</arg><arg>${nameNode}</arg>
+            <arg>--dbUrl</arg><arg>${dbUrl}</arg>
+            <arg>--dbUser</arg><arg>${dbUser}</arg>
+            <arg>--dbPassword</arg><arg>${dbPassword}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
