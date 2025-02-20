@@ -8,10 +8,6 @@
             <name>publisher path</name>
             <description>the path of the data we want to enrich</description>
         </property>
-<!--        <property>-->
-<!--            <name>targetPath</name>-->
-<!--            <description>the output path of the graph enriched</description>-->
-<!--        </property>-->
         <property>
             <name>spark2ExtraListeners</name>
             <value>com.cloudera.spark.lineage.NavigatorAppListener</value>
@@ -53,6 +49,7 @@
             <arg>--graphPath</arg><arg>${publisherPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
             <arg>--master</arg><arg>yarn</arg>
+            <arg>--matchingSource</arg><arg>graph</arg>
         </spark>
         <ok to="reset_outputpath"/>
         <error to="Kill"/>

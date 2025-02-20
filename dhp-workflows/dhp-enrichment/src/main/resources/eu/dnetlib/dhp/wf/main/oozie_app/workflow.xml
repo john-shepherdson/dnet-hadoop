@@ -37,6 +37,10 @@
             <name>blacklist</name>
             <description>list of datasources in blacklist for the affiliation from instrepo propagation</description>
         </property>
+        <property>
+            <name>publisherPath</name>
+            <description>path to the autput from affro of the publishers pages</description>
+        </property>
 <property>
     <name>orcidPath</name>
     <description>the path to the orcid information extracted from the orcid profiles</description>
@@ -127,6 +131,7 @@
             <case to="community_sem_rel">${wf:conf('resumeFrom') eq 'CommunitySemanticRelation'}</case>
             <case to="country_propagation">${wf:conf('resumeFrom') eq 'CountryPropagation'}</case>
             <case to="person_propagation">${wf:conf('resumeFrom') eq 'PersonPropagation'}</case>
+            <case to="publisher_propagation">${wf:conf('resumeFrom') eq 'PublisherPropagation'}</case>
             <default to="orcid_enrich"/>
         </switch>
     </decision>
@@ -343,9 +348,29 @@
                 </property>
             </configuration>
         </sub-workflow>
+        <ok to="publisher_propagation" />
+        <error to="Kill" />
+    </action>
+    <action name="publisher_propagation">
+        <sub-workflow>
+            <app-path>${wf:appPath()}/person_propagation
+            </app-path>
+            <propagate-configuration/>
+            <configuration>
+                <property>
+                    <name>sourcePath</name>
+                    <value>${outputPath}</value>
+                </property>
+                <property>
+                    <name>graphPath</name>
+                    <value>${publisherPath}</value>
+                </property>
+            </configuration>
+        </sub-workflow>
         <ok to="country_propagation" />
         <error to="Kill" />
     </action>
+
     <action name="country_propagation">
         <sub-workflow>
             <app-path>${wf:appPath()}/country_propagation
