@@ -229,6 +229,15 @@ public class CreatePersonAS {
 					.count());
 		Assertions.assertEquals(38, relations.count());
 
+		relations.foreach(r -> Assertions.assertTrue(r.getSource().startsWith("30|orcid_______::") ||
+				r.getTarget().startsWith("30|orcid_______::")
+		||r.getTarget().startsWith("50|doi_________::")
+				||r.getTarget().startsWith("50|arXiv_______::")
+				||r.getTarget().startsWith("50|pmc_________::")
+				||r.getTarget().startsWith("50|pmid________::")
+				||r.getTarget().startsWith("20|ror_________::")
+				||r.getTarget().startsWith("40|") ));
+
 		// check contribution from publisher papers
 		// the relation was merged with the other one already extracted from orcid
 		JavaRDD<Relation> filterRelations = relations

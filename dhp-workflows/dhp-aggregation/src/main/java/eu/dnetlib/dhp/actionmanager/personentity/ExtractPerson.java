@@ -53,62 +53,7 @@ import scala.Tuple2;
 
 public class ExtractPerson implements Serializable {
 	private static final Logger log = LoggerFactory.getLogger(ExtractPerson.class);
-	private static final String QUERY = "SELECT * FROM project_person WHERE pid_type = 'ORCID'";
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-	private static final String OPENAIRE_PREFIX = "openaire____";
-	private static final String SEPARATOR = "::";
-	private static final String orcidKey = "10|" + OPENAIRE_PREFIX + SEPARATOR
-		+ DHPUtils.md5(ModelConstants.ORCID.toLowerCase());
-
-	private static final String DOI_PREFIX = "50|doi_________::";
-
-	private static final String PMID_PREFIX = "50|pmid________::";
-	private static final String ARXIV_PREFIX = "50|arXiv_______::";
-
-	private static final String PMCID_PREFIX = "50|pmcid_______::";
-	private static final String ROR_PREFIX = "20|ror_________::";
-	private static final String PERSON_PREFIX = ModelSupport.getIdPrefix(Person.class)
-		+ IdentifierFactory.ID_PREFIX_SEPARATOR + ModelConstants.ORCID + "_______";
-	private static final String PROJECT_ID_PREFIX = ModelSupport.getIdPrefix(Project.class)
-		+ IdentifierFactory.ID_PREFIX_SEPARATOR;
-
-	public static final String ORCID_AUTHORS_CLASSID = "sysimport:crosswalk:orcid";
-	public static final String ORCID_AUTHORS_CLASSNAME = "Imported from ORCID";
-	public static final String FUNDER_AUTHORS_CLASSID = "sysimport:crosswalk:funderdatabase";
-	public static final String FUNDER_AUTHORS_CLASSNAME = "Imported from Funder Database";
-	public static final String OPENAIRE_DATASOURCE_ID = "10|infrastruct_::f66f1bd369679b5b077dcdf006089556";
-	public static final String OPENAIRE_DATASOURCE_NAME = "OpenAIRE";
-
-	public static List<KeyValue> collectedfromOpenAIRE = OafMapperUtils
-		.listKeyValues(OPENAIRE_DATASOURCE_ID, OPENAIRE_DATASOURCE_NAME);
-
-	public static final DataInfo ORCIDDATAINFO = OafMapperUtils
-		.dataInfo(
-			false,
-			null,
-			false,
-			false,
-			OafMapperUtils
-				.qualifier(
-					ORCID_AUTHORS_CLASSID,
-					ORCID_AUTHORS_CLASSNAME,
-					ModelConstants.DNET_PROVENANCE_ACTIONS,
-					ModelConstants.DNET_PROVENANCE_ACTIONS),
-			"0.91");
-
-	public static final DataInfo FUNDERDATAINFO = OafMapperUtils
-		.dataInfo(
-			false,
-			null,
-			false,
-			false,
-			OafMapperUtils
-				.qualifier(
-					FUNDER_AUTHORS_CLASSID,
-					FUNDER_AUTHORS_CLASSNAME,
-					ModelConstants.DNET_PROVENANCE_ACTIONS,
-					ModelConstants.DNET_PROVENANCE_ACTIONS),
-			"0.91");
 
 	public static void main(final String[] args) throws IOException, ParseException {
 
@@ -282,8 +227,12 @@ public class ExtractPerson implements Serializable {
 					.setValue(
 						OPENORGS_PREFIX
 							+ IdentifierFactory.md5(PidCleaner.normalizePidValue("OPENORGS", a.getAs("orgid"))));
-			kv.setDataInfo(OafMapperUtils.dataInfo(false,"openaire",true,false,null,
-					String.valueOf(trust)));
+			kv
+				.setDataInfo(
+					OafMapperUtils
+						.dataInfo(
+							false, "openaire", true, false, null,
+							String.valueOf(trust)));
 
 			if (!Optional.ofNullable(relation.getProperties()).isPresent())
 				relation.setProperties(new ArrayList<>());
@@ -327,7 +276,6 @@ public class ExtractPerson implements Serializable {
 				OafMapperUtils.listKeyValues(OPENAIRE_DATASOURCE_ID, OPENAIRE_DATASOURCE_NAME),
 				null,
 				null);
-
 
 	}
 
@@ -712,24 +660,28 @@ public class ExtractPerson implements Serializable {
 				Encoders.bean(Person.class));
 
 		Dataset<Relation> relations = getRelations(spark, workingDir + "/coauthorship")
-				.union(
-						getRelations(spark, workingDir + "/authorship"))
-				.union(
-						getRelations(spark, workingDir + "/affiliation"))
-				.union(
-						getRelations(spark, workingDir + "/project"))
-				.union(
-						getRelations(spark, workingDir + "/publishers"));
+			.union(
+				getRelations(spark, workingDir + "/authorship"))
+			.union(
+				getRelations(spark, workingDir + "/affiliation"))
+			.union(
+				getRelations(spark, workingDir + "/project"))
+			.union(
+				getRelations(spark, workingDir + "/publishers"));
 
 		System.out.println(relations.count());
-
 
 		people
 			.toJavaRDD()
 			.map(p -> new AtomicAction(p.getClass(), p))
-			.union(relations
-					.groupByKey((MapFunction<Relation, String>) r -> r.getSource() + r.getRelClass() + r.getTarget(), Encoders.STRING())
-					.mapGroups((MapGroupsFunction<String, Relation, Relation>) (k,it) ->  mergeRelation(it), Encoders.bean(Relation.class))
+			.union(
+				relations
+					.groupByKey(
+						(MapFunction<Relation, String>) r -> r.getSource() + r.getRelClass() + r.getTarget(),
+						Encoders.STRING())
+					.mapGroups(
+						(MapGroupsFunction<String, Relation, Relation>) (k, it) -> mergeRelation(it),
+						Encoders.bean(Relation.class))
 					.toJavaRDD()
 					.map(r -> new AtomicAction(r.getClass(), r)))
 			.mapToPair(
