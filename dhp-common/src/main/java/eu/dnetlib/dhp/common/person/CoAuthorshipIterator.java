@@ -1,9 +1,9 @@
 
 package eu.dnetlib.dhp.common.person;
 
-import java.util.*;
 import static eu.dnetlib.dhp.common.person.Constants.*;
 
+import java.util.*;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;

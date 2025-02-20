@@ -31,7 +31,7 @@ public class CollectZenodoDumpCollectorPlugin implements CollectorPlugin {
 
 	final private Logger log = LoggerFactory.getLogger(getClass());
 
-	private final  FileSystem fileSystem;
+	private final FileSystem fileSystem;
 
 	public CollectZenodoDumpCollectorPlugin(FileSystem fileSystem) {
 		this.fileSystem = fileSystem;
@@ -69,8 +69,6 @@ public class CollectZenodoDumpCollectorPlugin implements CollectorPlugin {
 		}
 	}
 
-
-
 	@Override
 	public Stream<String> collect(ApiDescriptor api, AggregatorReport report) throws CollectorException {
 
@@ -78,7 +76,7 @@ public class CollectZenodoDumpCollectorPlugin implements CollectorPlugin {
 		return doStream(zenodoURL, "/tmp");
 	}
 
-	public Stream<String> doStream( String zenodoURL, String basePath) throws CollectorException {
+	public Stream<String> doStream(String zenodoURL, String basePath) throws CollectorException {
 		try {
 
 			downloadItem("zenodoDump.tar.gz", zenodoURL, basePath, fileSystem);
