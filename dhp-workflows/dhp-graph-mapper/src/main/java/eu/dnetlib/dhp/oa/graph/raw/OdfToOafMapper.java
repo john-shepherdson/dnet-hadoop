@@ -234,7 +234,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	 */
 	@Override
 	protected String findOriginalType(Document doc) {
-		final String resourceType = Optional
+		return Optional
 			.ofNullable(
 				(Element) doc
 					.selectSingleNode(
@@ -261,9 +261,6 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 					.firstNonNull(resourceTypeURI, resourceTypeAnyURI, resourceTypeTxt, resourceTypeGeneral);
 			})
 			.orElse(null);
-
-		final String drCobjCategory = doc.valueOf("//dr:CobjCategory/text()");
-		return ObjectUtils.firstNonNull(resourceType, drCobjCategory);
 	}
 
 	@Override
