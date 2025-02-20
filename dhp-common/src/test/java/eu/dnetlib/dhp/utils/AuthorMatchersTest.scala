@@ -1,10 +1,10 @@
-package eu.dnetlib.dhp.enrich.orcid
+package eu.dnetlib.dhp.utils
 
-import eu.dnetlib.pace.util.AuthorMatchers.matchOrderedTokenAndAbbreviations
+import eu.dnetlib.dhp.utils.AuthorMatchers.matchOrderedTokenAndAbbreviations
 import org.junit.jupiter.api.Assertions.{assertFalse, assertTrue}
 import org.junit.jupiter.api.Test
 
-class ORCIDAuthorMatchersTest {
+class AuthorMatchersTest {
 
   @Test def testShortNames(): Unit = {
     assertTrue(matchOrderedTokenAndAbbreviations("Lasagni Mariozzi Federico", "Lasagni F. Mariozzi"))

@@ -26,6 +26,8 @@ from (
     left join peer_reviewed on peer_reviewed.id=non_peer_reviewed.id
     where peer_reviewed.id is null) pr; /*EOS*/
 
+ANALYZE TABLE ${stats_db_name}.publication_refereed COMPUTE STATISTICS; /*EOS*/
+
 DROP TABLE IF EXISTS ${stats_db_name}.dataset_refereed purge; /*EOS*/
 CREATE TABLE IF NOT EXISTS ${stats_db_name}.dataset_refereed STORED AS PARQUET as
 with peer_reviewed as (
@@ -43,6 +45,8 @@ from (
     select non_peer_reviewed.* from non_peer_reviewed
     left join peer_reviewed on peer_reviewed.id=non_peer_reviewed.id
     where peer_reviewed.id is null) pr; /*EOS*/
+
+ANALYZE TABLE ${stats_db_name}.dataset_refereed COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.software_refereed purge; /*EOS*/
 CREATE TABLE IF NOT EXISTS ${stats_db_name}.software_refereed STORED AS PARQUET as
@@ -62,6 +66,8 @@ from (
     left join peer_reviewed on peer_reviewed.id=non_peer_reviewed.id
     where peer_reviewed.id is null) pr; /*EOS*/
 
+ANALYZE TABLE ${stats_db_name}.software_refereed COMPUTE STATISTICS; /*EOS*/
+
 DROP TABLE IF EXISTS ${stats_db_name}.otherresearchproduct_refereed purge; /*EOS*/
 CREATE TABLE IF NOT EXISTS ${stats_db_name}.otherresearchproduct_refereed STORED AS PARQUET as
 with peer_reviewed as (
@@ -80,6 +86,8 @@ from (
     left join peer_reviewed on peer_reviewed.id=non_peer_reviewed.id
     where peer_reviewed.id is null) pr; /*EOS*/
 
+ANALYZE TABLE ${stats_db_name}.otherresearchproduct_refereed COMPUTE STATISTICS; /*EOS*/
+
 CREATE VIEW IF NOT EXISTS ${stats_db_name}.result_refereed as
 select * from ${stats_db_name}.publication_refereed
 union all
@@ -97,6 +105,8 @@ cast(measures_ids.unit.value[0] as decimal(6,3)) score_dec, measures_ids.unit.va
 from ${openaire_db_name}.result lateral view explode(measures) measures as measures_ids
 where measures_ids.id!='views' and measures_ids.id!='downloads'; /*EOS*/
 
+ANALYZE TABLE ${stats_db_name}.indi_impact_measures COMPUTE STATISTICS; /*EOS*/
+
 DROP TABLE IF EXISTS ${stats_db_name}.result_apc_affiliations purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.result_apc_affiliations STORED AS PARQUET as
@@ -107,3 +117,5 @@ from ${openaire_db_name}.relation rel
 join ${openaire_db_name}.organization o on o.id=rel.source
 join ${openaire_db_name}.result r on r.id=rel.target
 where rel.subreltype = 'affiliation' and rel.datainfo.deletedbyinference = false and size(rel.properties)>0; /*EOS*/
+
+ANALYZE TABLE ${stats_db_name}.result_apc_affiliations COMPUTE STATISTICS; /*EOS*/

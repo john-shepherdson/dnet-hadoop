@@ -8,6 +8,10 @@
             <name>raidActionSetPath</name>
             <description>path where to store the action set</description>
         </property>
+        <property>
+            <name>openaireBaseUrl</name>
+            <description>base url for instance url creation</description>
+        </property>
     </parameters>
 
     <start to="deleteoutputpath"/>
@@ -44,6 +48,7 @@
             </spark-opts>
             <arg>--inputPath</arg><arg>${raidJsonInputPath}</arg>
             <arg>--outputPath</arg><arg>${raidActionSetPath}</arg>
+            <arg>--baseUrl</arg><arg>${openaireBaseUrl}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

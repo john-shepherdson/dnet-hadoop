@@ -37,6 +37,7 @@ import scala.Tuple2;
 public class GenerateRAiDActionSetJobTest {
 	private static String input_path;
 	private static String output_path;
+	private static String baseUrl;
 	static SparkSession spark;
 
 	@BeforeEach
@@ -53,6 +54,8 @@ public class GenerateRAiDActionSetJobTest {
 		output_path = createTempDirectory(GenerateRAiDActionSetJobTest.class.getSimpleName() + "-")
 			.toAbsolutePath()
 			.toString();
+
+		baseUrl = "https://baseurl/";
 
 		SparkConf conf = new SparkConf();
 		conf.setAppName(GenerateRAiDActionSetJobTest.class.getSimpleName());
@@ -79,7 +82,7 @@ public class GenerateRAiDActionSetJobTest {
 	@Test
 	@Disabled
 	void testProcessRAiDEntities() {
-		GenerateRAiDActionSetJob.processRAiDEntities(spark, input_path, output_path + "/test_raid_action_set");
+		GenerateRAiDActionSetJob.processRAiDEntities(spark, input_path, output_path + "/test_raid_action_set", baseUrl);
 
 		JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
@@ -151,7 +154,8 @@ public class GenerateRAiDActionSetJobTest {
 							"50|dedup_wf_002::d08be0ed27b13d8a880e891e08d093ea",
 							"50|doi_dedup___::f8d8b3b9eddeca2fc0e3bc9e63996555"),
 					"Exploring Multi-Scale Map Generalization and Design",
-					"This project aims to advance the generalization of multi-scale maps by investigating the impact of different design elements on user experience. The research involves collecting and analyzing data from various sources, including surveys, eye-tracking studies, and user experiments. The goal is to identify best practices for map generalization and design, with a focus on reducing disorientation and improving information retrieval during exploration. The project has led to the development of several datasets, including BasqueRoads, AnchorWhat, and L'Alpe d'Huez, which can be used to benchmark road selection algorithms and topographic map generalization techniques. The research has also resulted in the creation of a Python library, Cartagen4py, for map generalization. The findings of this project have the potential to improve the design and usability of multi-scale maps, making them more effective tools for navigation and information retrieval."));
+					"This project aims to advance the generalization of multi-scale maps by investigating the impact of different design elements on user experience. The research involves collecting and analyzing data from various sources, including surveys, eye-tracking studies, and user experiments. The goal is to identify best practices for map generalization and design, with a focus on reducing disorientation and improving information retrieval during exploration. The project has led to the development of several datasets, including BasqueRoads, AnchorWhat, and L'Alpe d'Huez, which can be used to benchmark road selection algorithms and topographic map generalization techniques. The research has also resulted in the creation of a Python library, Cartagen4py, for map generalization. The findings of this project have the potential to improve the design and usability of multi-scale maps, making them more effective tools for navigation and information retrieval."),
+					"https://baseurl/");
 
 		OtherResearchProduct orp = (OtherResearchProduct) atomicActions.get(0).getPayload();
 		Relation rel = (Relation) atomicActions.get(1).getPayload();
