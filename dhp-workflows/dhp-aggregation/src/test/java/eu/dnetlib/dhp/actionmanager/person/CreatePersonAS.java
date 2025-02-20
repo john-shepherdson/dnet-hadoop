@@ -278,7 +278,7 @@ public class CreatePersonAS {
 		JavaRDD<Relation> filterAffiliation = relations
 			.filter(r -> r.getRelClass().equalsIgnoreCase(ModelConstants.ORG_PERSON_PARTICIPATES));
 		JavaRDD<Relation> rels = filterAffiliation;
-		rels.foreach(r -> System.out.println(new ObjectMapper().writeValueAsString(r)));
+		relations.foreach(r -> System.out.println(new ObjectMapper().writeValueAsString(r)));
 		Assertions.assertEquals(4, filterAffiliation.count());
 		Assertions
 			.assertEquals(
