@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Encoder;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
 
@@ -13,9 +14,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.Instance;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import eu.dnetlib.dhp.schema.oaf.Subject;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 
@@ -65,6 +63,16 @@ public class Constants {
 			.read()
 			.textFile(inputPath)
 			.map((MapFunction<String, R>) value -> OBJECT_MAPPER.readValue(value, clazz), Encoders.bean(clazz));
+	}
+
+	public static <R> Dataset<R> readJsonFromPath(
+		SparkSession spark, String inputPath, Class<R> clazz) {
+		final Encoder<R> encoder = Encoders.bean(clazz);
+		return spark
+			.read()
+			.schema(encoder.schema())
+			.json(inputPath)
+			.as(encoder);
 	}
 
 	public static Subject getSubject(String sbj, String classid, String classname, String diqualifierclassid,

@@ -26,7 +26,6 @@ import com.google.common.base.Joiner;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.oa.merge.AuthorMerger;
 import eu.dnetlib.dhp.schema.common.AccessRightComparator;
-import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
@@ -114,6 +113,15 @@ public class MergeUtils {
 
 	public static Oaf merge(final Oaf left, final Oaf right) {
 		return merge(left, right, false);
+	}
+
+	public static Oaf enrich(final Result left, final Result right) {
+
+		if (MergeEntitiesComparator.INSTANCE.compare(left, right) > 0) {
+			return mergeResultFields(left, right);
+		} else {
+			return mergeResultFields(right, left);
+		}
 	}
 
 	static Oaf merge(final Oaf left, final Oaf right, boolean checkDelegatedAuthority) {

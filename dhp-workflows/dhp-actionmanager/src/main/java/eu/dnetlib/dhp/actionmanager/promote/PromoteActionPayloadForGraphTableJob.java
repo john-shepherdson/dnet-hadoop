@@ -212,8 +212,9 @@ public class PromoteActionPayloadForGraphTableJob {
 		SerializableSupplier<Function<G, String>> rowIdFn = ModelSupport::idFn;
 		SerializableSupplier<Function<A, String>> actionPayloadIdFn = ModelSupport::idFn;
 		SerializableSupplier<BiFunction<G, A, G>> mergeRowWithActionPayloadAndGetFn = MergeAndGet
-			.functionFor(mergeAndGetStrategy);
-		SerializableSupplier<BiFunction<G, G, G>> mergeRowsAndGetFn = MergeAndGet.functionFor(mergeAndGetStrategy);
+			.functionFor(mergeAndGetStrategy, promoteActionStrategy);
+		SerializableSupplier<BiFunction<G, G, G>> mergeRowsAndGetFn = MergeAndGet
+			.functionFor(mergeAndGetStrategy, promoteActionStrategy);
 		SerializableSupplier<G> zeroFn = zeroFn(rowClazz);
 		SerializableSupplier<Function<G, Boolean>> isNotZeroFn = PromoteActionPayloadForGraphTableJob::isNotZeroFnUsingIdOrSourceAndTarget;
 
