@@ -65,7 +65,7 @@ public class SparkExtractPersonRelationsAndAddIndicators {
 		Boolean isSparkSessionManaged = isSparkSessionManaged(parser);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-		String sourcePath = parser.get("sourcePath");
+		String sourcePath = parser.get("sourcePath") + "/";
 		log.info("sourcePath: {}", sourcePath);
 
 		final String workingPath = parser.get("outputPath");
@@ -90,6 +90,7 @@ public class SparkExtractPersonRelationsAndAddIndicators {
 		//si leggono i result e si selezionano quelli con ordic.
 		//per ogni result si prendono gli orcid value distinti e si emettono i downloads e citation count
 		//si raggruppa per orcid e si sommano i vari contributi
+
 		ModelSupport.entityTypes
 				.keySet()
 				.stream()
@@ -220,6 +221,7 @@ public class SparkExtractPersonRelationsAndAddIndicators {
 				.json(sourcePath + "person")
 				.as(Encoders.bean(Person.class));
 
+
 		Dataset<OrcidIndicators> orcidIndicators = spark.read().schema(Encoders.bean(OrcidIndicators.class).schema())
 				.json(workingPath + "/orcidIndicators")
 				.as(Encoders.bean(OrcidIndicators.class));
@@ -230,6 +232,8 @@ public class SparkExtractPersonRelationsAndAddIndicators {
 //					return acc;
 //
 //				},Encoders.bean(OrcidIndicators.class));
+
+
 
 		person.joinWith(orcidIndicators, person.col("id").equalTo(orcidIndicators.col("orcid")),"left")
 				.map((MapFunction<Tuple2<Person, OrcidIndicators>, Person>) t2 -> {
@@ -250,7 +254,9 @@ public class SparkExtractPersonRelationsAndAddIndicators {
 				.write()
 				.mode(SaveMode.Overwrite)
 				.option("compression","gzip")
-				.json(sourcePath + "/person");
+				.json(sourcePath + "person");
+
+
 
 	}
 
@@ -331,8 +337,10 @@ public class SparkExtractPersonRelationsAndAddIndicators {
 												p -> Arrays
 													.asList("orcid", "orcid_pending")
 													.contains(p.getQualifier().getClassid().toLowerCase()))));
+
 					// 2. create authorship relations between the result identifier and the person entity with
 					// orcid/orcid_pending.
+
 					resultWithOrcids
 						.flatMap(
 							(FlatMapFunction<Result, Relation>) SparkExtractPersonRelationsAndAddIndicators::getAuthorshipRelations,
@@ -356,6 +364,7 @@ public class SparkExtractPersonRelationsAndAddIndicators {
 						.json(workingPath);
 
 				});
+
 		spark
 			.read()
 			.schema(Encoders.bean(Relation.class).schema())
