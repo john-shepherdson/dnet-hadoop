@@ -155,7 +155,7 @@ public class GenerateRAiDActionSetJobTest {
 							"50|doi_dedup___::f8d8b3b9eddeca2fc0e3bc9e63996555"),
 					"Exploring Multi-Scale Map Generalization and Design",
 					"This project aims to advance the generalization of multi-scale maps by investigating the impact of different design elements on user experience. The research involves collecting and analyzing data from various sources, including surveys, eye-tracking studies, and user experiments. The goal is to identify best practices for map generalization and design, with a focus on reducing disorientation and improving information retrieval during exploration. The project has led to the development of several datasets, including BasqueRoads, AnchorWhat, and L'Alpe d'Huez, which can be used to benchmark road selection algorithms and topographic map generalization techniques. The research has also resulted in the creation of a Python library, Cartagen4py, for map generalization. The findings of this project have the potential to improve the design and usability of multi-scale maps, making them more effective tools for navigation and information retrieval."),
-					"https://baseurl/");
+				"https://baseurl/");
 
 		OtherResearchProduct orp = (OtherResearchProduct) atomicActions.get(0).getPayload();
 		Relation rel = (Relation) atomicActions.get(1).getPayload();
