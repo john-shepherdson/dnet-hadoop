@@ -112,21 +112,16 @@ public class MergeUtils {
 	}
 
 	public static Oaf merge(final Oaf left, final Oaf right) {
-		return merge(left, right, false);
+		return merge(left, right, false, false);
 	}
 
-	public static Oaf enrich(final Result left, final Result right) {
-
-		if (MergeEntitiesComparator.INSTANCE.compare(left, right) > 0) {
-			return mergeResultFields(left, right);
-		} else {
-			return mergeResultFields(right, left);
-		}
+	public static Oaf merge(final Oaf left, final Oaf right, boolean promoting) {
+		return merge(left, right, false, promoting);
 	}
 
-	static Oaf merge(final Oaf left, final Oaf right, boolean checkDelegatedAuthority) {
+	static Oaf merge(final Oaf left, final Oaf right, boolean checkDelegatedAuthority, boolean promoting) {
 		if (sameClass(left, right, OafEntity.class)) {
-			return mergeEntities(left, right, checkDelegatedAuthority);
+			return mergeEntities(left, right, checkDelegatedAuthority, promoting);
 		} else if (sameClass(left, right, Relation.class)) {
 			return mergeRelation((Relation) left, (Relation) right);
 		} else {
@@ -142,7 +137,7 @@ public class MergeUtils {
 		return cls.isAssignableFrom(left.getClass()) && cls.isAssignableFrom(right.getClass());
 	}
 
-	private static Oaf mergeEntities(Oaf left, Oaf right, boolean checkDelegatedAuthority) {
+	private static Oaf mergeEntities(Oaf left, Oaf right, boolean checkDelegatedAuthority, boolean promoting) {
 
 		if (sameClass(left, right, Result.class)) {
 			if (checkDelegatedAuthority) {
@@ -162,7 +157,11 @@ public class MergeUtils {
 				return mergeSoftware((Software) left, (Software) right);
 			}
 
-			return left;
+			if (Boolean.TRUE.equals(promoting)) {
+				return mergeResultFields((Result) left, (Result) right);
+			} else {
+				return left;
+			}
 		} else if (sameClass(left, right, Datasource.class)) {
 			// TODO
 			final int trust = compareTrust(left, right);

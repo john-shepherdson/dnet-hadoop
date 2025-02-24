@@ -143,7 +143,7 @@ public class PromoteResultWithMeasuresTest {
 
 		final SerializableSupplier<Function<Publication, String>> rowIdFn = ModelSupport::idFn;
 		final SerializableSupplier<BiFunction<Publication, Result, Publication>> mergeAndGetFn = MergeAndGet
-			.functionFor(mergeFromAndGet, enrich);
+			.functionFor(mergeFromAndGet);
 		final SerializableSupplier<Publication> zeroFn = () -> Publication.class
 			.cast(new eu.dnetlib.dhp.schema.oaf.Publication());
 		final SerializableSupplier<Function<Publication, Boolean>> isNotZeroFn = PromoteResultWithMeasuresTest::isNotZeroFnUsingIdOrSourceAndTarget;
@@ -160,7 +160,7 @@ public class PromoteResultWithMeasuresTest {
 				Result.class);
 
 		SerializableSupplier<BiFunction<Publication, Publication, Publication>> mergeRowsAndGetFn = MergeAndGet
-			.functionFor(mergeFromAndGet, enrich);
+			.functionFor(mergeFromAndGet);
 
 		Dataset<Publication> mergedResults = PromoteActionPayloadFunctions
 			.groupGraphTableByIdAndMerge(

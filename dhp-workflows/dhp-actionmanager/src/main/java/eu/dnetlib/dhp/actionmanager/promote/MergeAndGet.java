@@ -30,23 +30,15 @@ public class MergeAndGet {
 	 * Returns a function for merging OAF model objects.
 	 *
 	 * @param mergeStrategy Strategy to be used to merge objects
-	 * @param promoteStrategy Strategy to be used to promote the objects
 	 * @param <G> Graph table type
 	 * @param <A> Action payload type
 	 * @return BiFunction to be used to merge OAF objects
 	 */
 	public static <G extends Oaf, A extends Oaf> SerializableSupplier<BiFunction<G, A, G>> functionFor(
-		MergeAndGet.Strategy mergeStrategy,
-		PromoteAction.Strategy promoteStrategy) {
+		MergeAndGet.Strategy mergeStrategy) {
 		switch (mergeStrategy) {
 			case MERGE_FROM_AND_GET:
-				switch (promoteStrategy) {
-					case UPSERT:
-						return () -> MergeAndGet::mergeFromAndGet;
-					case ENRICH:
-						return () -> MergeAndGet::enrichAndGet;
-				}
-				throw new RuntimeException("Unsupported promote strategy: " + promoteStrategy);
+				return () -> MergeAndGet::mergeFromAndGet;
 			case SELECT_NEWER_AND_GET:
 				return () -> MergeAndGet::selectNewerAndGet;
 		}
@@ -54,14 +46,7 @@ public class MergeAndGet {
 	}
 
 	private static <G extends Oaf, A extends Oaf> G mergeFromAndGet(G x, A y) {
-		return (G) MergeUtils.merge(x, y);
-	}
-
-	private static <G extends Oaf, A extends Oaf> G enrichAndGet(G x, A y) {
-		if (x instanceof Result && y instanceof Result) {
-			return (G) MergeUtils.enrich((Result) x, (Result) y);
-		}
-		return (G) MergeUtils.merge(x, y);
+		return (G) MergeUtils.merge(x, y, true);
 	}
 
 	@SuppressWarnings("unchecked")
