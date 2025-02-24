@@ -28,8 +28,7 @@ public class MergeAndGetTest {
 
 			// when
 			SerializableSupplier<BiFunction<Oaf, Oaf, Oaf>> fn = functionFor(
-				MergeAndGet.Strategy.MERGE_FROM_AND_GET,
-				PromoteAction.Strategy.UPSERT);
+				MergeAndGet.Strategy.MERGE_FROM_AND_GET);
 
 			// then
 			assertThrows(RuntimeException.class, () -> fn.get().apply(a, b));
@@ -43,8 +42,7 @@ public class MergeAndGetTest {
 
 			// when
 			SerializableSupplier<BiFunction<Oaf, Oaf, Oaf>> fn = functionFor(
-				MergeAndGet.Strategy.MERGE_FROM_AND_GET,
-				PromoteAction.Strategy.UPSERT);
+				MergeAndGet.Strategy.MERGE_FROM_AND_GET);
 
 			// then
 			assertThrows(RuntimeException.class, () -> fn.get().apply(a, b));
@@ -58,8 +56,7 @@ public class MergeAndGetTest {
 
 			// when
 			SerializableSupplier<BiFunction<Oaf, Oaf, Oaf>> fn = functionFor(
-				MergeAndGet.Strategy.MERGE_FROM_AND_GET,
-				PromoteAction.Strategy.UPSERT);
+				MergeAndGet.Strategy.MERGE_FROM_AND_GET);
 
 			// then
 			assertThrows(RuntimeException.class, () -> fn.get().apply(a, b));
@@ -73,8 +70,7 @@ public class MergeAndGetTest {
 
 			// when
 			SerializableSupplier<BiFunction<Oaf, Oaf, Oaf>> fn = functionFor(
-				MergeAndGet.Strategy.MERGE_FROM_AND_GET,
-				PromoteAction.Strategy.UPSERT);
+				MergeAndGet.Strategy.MERGE_FROM_AND_GET);
 
 			// then
 			assertThrows(RuntimeException.class, () -> fn.get().apply(a, b));
@@ -88,8 +84,7 @@ public class MergeAndGetTest {
 
 			// when
 			SerializableSupplier<BiFunction<Oaf, Oaf, Oaf>> fn = functionFor(
-				MergeAndGet.Strategy.MERGE_FROM_AND_GET,
-				PromoteAction.Strategy.UPSERT);
+				MergeAndGet.Strategy.MERGE_FROM_AND_GET);
 
 			// then
 			assertThrows(RuntimeException.class, () -> fn.get().apply(a, b));
@@ -104,8 +99,7 @@ public class MergeAndGetTest {
 
 			// when
 			SerializableSupplier<BiFunction<Oaf, Oaf, Oaf>> fn = functionFor(
-				MergeAndGet.Strategy.MERGE_FROM_AND_GET,
-				PromoteAction.Strategy.UPSERT);
+				MergeAndGet.Strategy.MERGE_FROM_AND_GET);
 
 			// then
 			Oaf x = fn.get().apply(a, b);
@@ -124,8 +118,7 @@ public class MergeAndGetTest {
 
 			// when
 			SerializableSupplier<BiFunction<Oaf, Oaf, Oaf>> fn = functionFor(
-				MergeAndGet.Strategy.MERGE_FROM_AND_GET,
-				PromoteAction.Strategy.UPSERT);
+				MergeAndGet.Strategy.MERGE_FROM_AND_GET);
 
 			// then
 			assertThrows(RuntimeException.class, () -> fn.get().apply(a, b));
@@ -139,8 +132,7 @@ public class MergeAndGetTest {
 
 			// when
 			SerializableSupplier<BiFunction<Oaf, Oaf, Oaf>> fn = functionFor(
-				MergeAndGet.Strategy.MERGE_FROM_AND_GET,
-				PromoteAction.Strategy.UPSERT);
+				MergeAndGet.Strategy.MERGE_FROM_AND_GET);
 
 			// then
 			assertThrows(RuntimeException.class, () -> fn.get().apply(a, b));
@@ -159,8 +151,7 @@ public class MergeAndGetTest {
 
 			// when
 			SerializableSupplier<BiFunction<Oaf, Oaf, Oaf>> fn = functionFor(
-				MergeAndGet.Strategy.MERGE_FROM_AND_GET,
-				PromoteAction.Strategy.UPSERT);
+				MergeAndGet.Strategy.MERGE_FROM_AND_GET);
 			// then
 			assertThrows(RuntimeException.class, () -> fn.get().apply(a, b));
 		}
@@ -174,8 +165,7 @@ public class MergeAndGetTest {
 
 			// when
 			SerializableSupplier<BiFunction<Oaf, Oaf, Oaf>> fn = functionFor(
-				MergeAndGet.Strategy.MERGE_FROM_AND_GET,
-				PromoteAction.Strategy.UPSERT);
+				MergeAndGet.Strategy.MERGE_FROM_AND_GET);
 
 			// then
 			Oaf x = fn.get().apply(a, b);
@@ -198,8 +188,7 @@ public class MergeAndGetTest {
 
 			// when
 			SerializableSupplier<BiFunction<Oaf, Oaf, Oaf>> fn = functionFor(
-				MergeAndGet.Strategy.MERGE_FROM_AND_GET,
-				PromoteAction.Strategy.UPSERT);
+				MergeAndGet.Strategy.MERGE_FROM_AND_GET);
 
 			// then
 			assertThrows(RuntimeException.class, () -> fn.get().apply(a, b));
@@ -213,8 +202,7 @@ public class MergeAndGetTest {
 
 			// when
 			SerializableSupplier<BiFunction<Oaf, Oaf, Oaf>> fn = functionFor(
-				MergeAndGet.Strategy.MERGE_FROM_AND_GET,
-				PromoteAction.Strategy.UPSERT);
+				MergeAndGet.Strategy.MERGE_FROM_AND_GET);
 
 			// then
 			assertThrows(RuntimeException.class, () -> fn.get().apply(a, b));
@@ -228,8 +216,7 @@ public class MergeAndGetTest {
 
 			// when
 			SerializableSupplier<BiFunction<Oaf, Oaf, Oaf>> fn = functionFor(
-				MergeAndGet.Strategy.MERGE_FROM_AND_GET,
-				PromoteAction.Strategy.UPSERT);
+				MergeAndGet.Strategy.MERGE_FROM_AND_GET);
 
 			// then
 			assertThrows(RuntimeException.class, () -> fn.get().apply(a, b));
@@ -247,8 +234,7 @@ public class MergeAndGetTest {
 
 			// when
 			SerializableSupplier<BiFunction<Oaf, Oaf, Oaf>> fn = functionFor(
-				MergeAndGet.Strategy.MERGE_FROM_AND_GET,
-				PromoteAction.Strategy.UPSERT);
+				MergeAndGet.Strategy.MERGE_FROM_AND_GET);
 
 			// then
 			assertThrows(RuntimeException.class, () -> fn.get().apply(a, b));
@@ -264,8 +250,7 @@ public class MergeAndGetTest {
 
 			// when
 			SerializableSupplier<BiFunction<Oaf, Oaf, Oaf>> fn = functionFor(
-				MergeAndGet.Strategy.MERGE_FROM_AND_GET,
-				PromoteAction.Strategy.UPSERT);
+				MergeAndGet.Strategy.MERGE_FROM_AND_GET);
 
 			// then
 			Oaf x = fn.get().apply(a, b);
@@ -283,8 +268,7 @@ public class MergeAndGetTest {
 
 			// when
 			SerializableSupplier<BiFunction<Oaf, Oaf, Oaf>> fn = functionFor(
-				MergeAndGet.Strategy.MERGE_FROM_AND_GET,
-				PromoteAction.Strategy.UPSERT);
+				MergeAndGet.Strategy.MERGE_FROM_AND_GET);
 
 			// then
 			Oaf x = fn.get().apply(a, b);
