@@ -14,7 +14,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.common.DbClient;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
@@ -37,6 +36,7 @@ import eu.dnetlib.dhp.api.model.CommunityEntityMap;
 import eu.dnetlib.dhp.api.model.EntityCommunities;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.bulktag.community.*;
+import eu.dnetlib.dhp.common.DbClient;
 import eu.dnetlib.dhp.common.action.ReadDatasourceMasterDuplicateFromDB;
 import eu.dnetlib.dhp.common.action.model.MasterDuplicate;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
@@ -150,33 +150,25 @@ public class SparkBulkTagJob {
 			});
 	}
 
-	private static void writeCommunityConfiguration(String configurationPath, String hdfsNameNode, CommunityConfiguration cc) throws IOException {
+	private static void writeCommunityConfiguration(String configurationPath, String hdfsNameNode,
+		CommunityConfiguration cc) throws IOException {
 
-        Configuration conf = new Configuration();
-        conf.set("fs.defaultFS", hdfsNameNode);
-        FileSystem fileSystem = FileSystem.get(conf);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		Configuration conf = new Configuration();
+		conf.set("fs.defaultFS", hdfsNameNode);
+		FileSystem fileSystem = FileSystem.get(conf);
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        // Converte la data in stringa
-        LocalDate today = null;
-        String formattedDate = today.format(formatter);
+		String formattedDate = LocalDate.now().format(formatter);
+		FSDataOutputStream fos = fileSystem.create(new Path(configurationPath + formattedDate));
 
-        // Stampa la stringa della data
-        ;
-        today = LocalDate.now();
-        long millis = today.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
+		try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fos, StandardCharsets.UTF_8))) {
+			for (Community c : cc.getCommunities().values()) {
+				writer.write(new ObjectMapper().writeValueAsString(c));
+				writer.write("\n");
+			}
+		}
 
-        // Stampa il valore in millisecondi
-        System.out.println(millis);
-        FSDataOutputStream fos = fileSystem.create(new Path(configurationPath + formattedDate));
-
-        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fos, StandardCharsets.UTF_8))) {
-            for (Community c : cc.getCommunities().values()) {
-                writer.write(new ObjectMapper().writeValueAsString(c));
-            }
-        }
-
-    }
+	}
 
 	private static CommunityEntityMap mapWithMasterDatasource(SparkSession spark, String masterDuplicatePath,
 		CommunityEntityMap datasourceCommunityMap) {
@@ -349,19 +341,19 @@ public class SparkBulkTagJob {
 		ProtoMap protoMappingParams,
 		CommunityConfiguration communityConfiguration) {
 
-		communityConfiguration
-			.getCommunities()
-			.keySet()
-			.forEach(c -> {
-				try {
-					log
-						.info(
-							"Community Configuration {}",
-							new ObjectMapper().writeValueAsString(communityConfiguration.getCommunities().get(c)));
-				} catch (Exception e) {
-
-				}
-			});
+//		communityConfiguration
+//			.getCommunities()
+//			.keySet()
+//			.forEach(c -> {
+//				try {
+//					log
+//						.info(
+//							"Community Configuration {}",
+//							new ObjectMapper().writeValueAsString(communityConfiguration.getCommunities().get(c)));
+//				} catch (Exception e) {
+//
+//				}
+//			});
 
 		ModelSupport.entityTypes
 			.keySet()
