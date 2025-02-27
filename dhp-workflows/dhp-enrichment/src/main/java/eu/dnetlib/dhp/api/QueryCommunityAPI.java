@@ -37,6 +37,12 @@ public class QueryCommunityAPI {
 
 	}
 
+	public static String community(String id, String baseURL) throws IOException {
+
+		return get(baseURL + id);
+
+	}
+
 	public static String subcommunities(String communityId, String baseURL) throws IOException {
 
 		return get(baseURL + communityId + "/subcommunities");

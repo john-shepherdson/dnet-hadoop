@@ -4,12 +4,19 @@ package eu.dnetlib.dhp.bulktag;
 import static eu.dnetlib.dhp.PropagationConstant.removeOutputDir;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.spark.SparkConf;
@@ -29,6 +36,7 @@ import eu.dnetlib.dhp.api.model.CommunityEntityMap;
 import eu.dnetlib.dhp.api.model.EntityCommunities;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.bulktag.community.*;
+import eu.dnetlib.dhp.common.DbClient;
 import eu.dnetlib.dhp.common.action.ReadDatasourceMasterDuplicateFromDB;
 import eu.dnetlib.dhp.common.action.model.MasterDuplicate;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
@@ -97,6 +105,8 @@ public class SparkBulkTagJob {
 		final String hdfsPath = outputPath + "masterDuplicate";
 		log.info("hdfsPath: {}", hdfsPath);
 
+		final String configurationPath = parser.get("configurationPath");
+
 		SparkConf conf = new SparkConf();
 		CommunityConfiguration cc;
 
@@ -109,7 +119,7 @@ public class SparkBulkTagJob {
 			cc = CommunityConfigurationFactory.newInstance(taggingConf);
 		} else {
 			cc = Utils.getCommunityConfiguration(baseURL);
-
+			writeCommunityConfiguration(configurationPath, hdfsNameNode, cc);
 		}
 
 		runWithSparkSession(
@@ -138,6 +148,26 @@ public class SparkBulkTagJob {
 					TaggingConstants.CLASS_NAME_BULKTAG_DATASOURCE);
 
 			});
+	}
+
+	private static void writeCommunityConfiguration(String configurationPath, String hdfsNameNode,
+		CommunityConfiguration cc) throws IOException {
+
+		Configuration conf = new Configuration();
+		conf.set("fs.defaultFS", hdfsNameNode);
+		FileSystem fileSystem = FileSystem.get(conf);
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+		String formattedDate = LocalDate.now().format(formatter);
+		FSDataOutputStream fos = fileSystem.create(new Path(configurationPath + formattedDate));
+
+		try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fos, StandardCharsets.UTF_8))) {
+			for (Community c : cc.getCommunities().values()) {
+				writer.write(new ObjectMapper().writeValueAsString(c));
+				writer.write("\n");
+			}
+		}
+
 	}
 
 	private static CommunityEntityMap mapWithMasterDatasource(SparkSession spark, String masterDuplicatePath,
@@ -310,6 +340,20 @@ public class SparkBulkTagJob {
 		String outputPath,
 		ProtoMap protoMappingParams,
 		CommunityConfiguration communityConfiguration) {
+
+//		communityConfiguration
+//			.getCommunities()
+//			.keySet()
+//			.forEach(c -> {
+//				try {
+//					log
+//						.info(
+//							"Community Configuration {}",
+//							new ObjectMapper().writeValueAsString(communityConfiguration.getCommunities().get(c)));
+//				} catch (Exception e) {
+//
+//				}
+//			});
 
 		ModelSupport.entityTypes
 			.keySet()
