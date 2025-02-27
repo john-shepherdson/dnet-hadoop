@@ -92,6 +92,7 @@
             <arg>--dbUrl</arg><arg>${dbUrl}</arg>
             <arg>--dbUser</arg><arg>${dbUser}</arg>
             <arg>--dbPassword</arg><arg>${dbPassword}</arg>
+            <arg>--configurationPath</arg><arg>/data/bulktagging/configuration_prod/</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

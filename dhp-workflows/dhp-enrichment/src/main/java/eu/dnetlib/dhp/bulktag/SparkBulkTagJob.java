@@ -4,12 +4,20 @@ package eu.dnetlib.dhp.bulktag;
 import static eu.dnetlib.dhp.PropagationConstant.removeOutputDir;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.common.DbClient;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.spark.SparkConf;
@@ -97,6 +105,8 @@ public class SparkBulkTagJob {
 		final String hdfsPath = outputPath + "masterDuplicate";
 		log.info("hdfsPath: {}", hdfsPath);
 
+		final String configurationPath = parser.get("configurationPath");
+
 		SparkConf conf = new SparkConf();
 		CommunityConfiguration cc;
 
@@ -109,7 +119,7 @@ public class SparkBulkTagJob {
 			cc = CommunityConfigurationFactory.newInstance(taggingConf);
 		} else {
 			cc = Utils.getCommunityConfiguration(baseURL);
-
+			writeCommunityConfiguration(configurationPath, hdfsNameNode, cc);
 		}
 
 		runWithSparkSession(
@@ -139,6 +149,34 @@ public class SparkBulkTagJob {
 
 			});
 	}
+
+	private static void writeCommunityConfiguration(String configurationPath, String hdfsNameNode, CommunityConfiguration cc) throws IOException {
+
+        Configuration conf = new Configuration();
+        conf.set("fs.defaultFS", hdfsNameNode);
+        FileSystem fileSystem = FileSystem.get(conf);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        // Converte la data in stringa
+        LocalDate today = null;
+        String formattedDate = today.format(formatter);
+
+        // Stampa la stringa della data
+        ;
+        today = LocalDate.now();
+        long millis = today.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
+
+        // Stampa il valore in millisecondi
+        System.out.println(millis);
+        FSDataOutputStream fos = fileSystem.create(new Path(configurationPath + formattedDate));
+
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fos, StandardCharsets.UTF_8))) {
+            for (Community c : cc.getCommunities().values()) {
+                writer.write(new ObjectMapper().writeValueAsString(c));
+            }
+        }
+
+    }
 
 	private static CommunityEntityMap mapWithMasterDatasource(SparkSession spark, String masterDuplicatePath,
 		CommunityEntityMap datasourceCommunityMap) {
@@ -310,6 +348,20 @@ public class SparkBulkTagJob {
 		String outputPath,
 		ProtoMap protoMappingParams,
 		CommunityConfiguration communityConfiguration) {
+
+		communityConfiguration
+			.getCommunities()
+			.keySet()
+			.forEach(c -> {
+				try {
+					log
+						.info(
+							"Community Configuration {}",
+							new ObjectMapper().writeValueAsString(communityConfiguration.getCommunities().get(c)));
+				} catch (Exception e) {
+
+				}
+			});
 
 		ModelSupport.entityTypes
 			.keySet()

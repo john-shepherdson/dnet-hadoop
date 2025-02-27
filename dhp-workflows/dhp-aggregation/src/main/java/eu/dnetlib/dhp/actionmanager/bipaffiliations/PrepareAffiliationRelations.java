@@ -7,7 +7,6 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
-import eu.dnetlib.dhp.utils.DHPUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.BZip2Codec;
@@ -32,6 +31,7 @@ import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.utils.DoiCleaningRule;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
+import eu.dnetlib.dhp.utils.DHPUtils;
 import scala.Tuple2;
 
 /**
@@ -301,7 +301,7 @@ public class PrepareAffiliationRelations implements Serializable {
 
 	private static String calculateOpenOrgsId(String pidvalue) {
 
-			return String.format("20|%s::%s", OPENORGS_NS_PREFIX, DHPUtils.md5(pidvalue));
+		return String.format("20|%s::%s", OPENORGS_NS_PREFIX, DHPUtils.md5(pidvalue));
 
 	}
 

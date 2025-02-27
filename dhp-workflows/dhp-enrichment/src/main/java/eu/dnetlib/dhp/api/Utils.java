@@ -8,12 +8,15 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 
 import eu.dnetlib.dhp.api.model.*;
+import eu.dnetlib.dhp.bulktag.SparkBulkTagJob;
 import eu.dnetlib.dhp.bulktag.community.Community;
 import eu.dnetlib.dhp.bulktag.community.CommunityConfiguration;
 import eu.dnetlib.dhp.bulktag.community.Provider;
@@ -31,6 +34,7 @@ import eu.dnetlib.dhp.schema.oaf.Project;
 public class Utils implements Serializable {
 	private static final ObjectMapper MAPPER = new ObjectMapper();
 	private static final VerbResolver resolver = VerbResolverFactory.newInstance();
+	private static final Logger log = LoggerFactory.getLogger(SparkBulkTagJob.class);
 
 	@FunctionalInterface
 	private interface ProjectQueryFunction {
@@ -177,16 +181,24 @@ public class Utils implements Serializable {
 	 * @return the community set with information from the community model and for the content providers
 	 */
 	private static Community getCommunity(String baseURL, CommunityModel communityModel) {
-		Community community = getCommunity(communityModel);
-		community.setProviders(getCommunityContentProviders(() -> {
-			try {
-				return QueryCommunityAPI.communityDatasource(community.getId(), baseURL);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		}));
+		log.info("getting community {}", communityModel.getId());
+		try {
+			Community community = getCommunity(
+				MAPPER
+					.readValue(QueryCommunityAPI.community(communityModel.getId(), baseURL), CommunityModel.class));
+			String id = community.getId();
+			community.setProviders(getCommunityContentProviders(() -> {
+				try {
+					return QueryCommunityAPI.communityDatasource(id, baseURL);
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			}));
+			return community;
+		} catch (IOException ioe) {
+			throw new RuntimeException(ioe);
+		}
 
-		return community;
 	}
 
 	/**
@@ -250,6 +262,46 @@ public class Utils implements Serializable {
 
 		return new CommunityConfiguration(communities);
 	}
+
+	/**
+	 * final Map<String, Community> communities = Maps.newHashMap();
+	 * 		List<Community> validCommunities = new ArrayList<>();
+	 * 		getValidCommunities(baseURL)
+	 * 			.forEach(community -> {
+	 * 				try {
+	 * 					CommunityModel cm = MAPPER
+	 * 						.readValue(QueryCommunityAPI.community(community.getId(), baseURL), CommunityModel.class);
+	 * 					validCommunities.add(getCommunity(cm));
+	 * 				                } catch (IOException e) {
+	 * 					throw new RuntimeException(e);
+	 *                }            * 			});
+	 * 		validCommunities.forEach(community -> {
+	 * 			try {
+	 * 				DatasourceList dl = MAPPER
+	 * 					.readValue(
+	 * 						QueryCommunityAPI.communityDatasource(community.getId(), baseURL), DatasourceList.class);
+	 * 				community.setProviders(dl.stream().map(d -> {
+	 * 					if (d.getEnabled() == null || Boolean.FALSE.equals(d.getEnabled()))
+	 * 						return null;
+	 * 					Provider p = new Provider();
+	 * 					p.setOpenaireId(ModelSupport.getIdPrefix(Datasource.class) + "|" + d.getOpenaireId());
+	 * 					p.setSelectionConstraints(d.getSelectioncriteria());
+	 * 					if (p.getSelectionConstraints() != null)
+	 * 						p.getSelectionConstraints().setSelection(resolver);
+	 * 					return p;                * 				})
+	 * 					.filter(Objects::nonNull)
+	 * 					.collect(Collectors.toList()));
+	 * 			} catch (IOException e) {
+	 * 				throw new RuntimeException(e);
+	 * 			        }
+	 * 		});
+	 *
+	 * 		validCommunities.forEach(community -> {
+	 * 			if (community.isValid())
+	 * 				communities.put(community.getId(), comm        ty);
+	 * 		});
+	 * 		return new CommunityConfiguration(communities);
+	 */
 
 	/**
 	 * filles the common fields in the community model for both the communityconfiguration and the subcommunityconfiguration
