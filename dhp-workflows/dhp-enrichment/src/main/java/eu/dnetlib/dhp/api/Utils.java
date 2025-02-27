@@ -263,45 +263,6 @@ public class Utils implements Serializable {
 		return new CommunityConfiguration(communities);
 	}
 
-	/**
-	 * final Map<String, Community> communities = Maps.newHashMap();
-	 * 		List<Community> validCommunities = new ArrayList<>();
-	 * 		getValidCommunities(baseURL)
-	 * 			.forEach(community -> {
-	 * 				try {
-	 * 					CommunityModel cm = MAPPER
-	 * 						.readValue(QueryCommunityAPI.community(community.getId(), baseURL), CommunityModel.class);
-	 * 					validCommunities.add(getCommunity(cm));
-	 * 				                } catch (IOException e) {
-	 * 					throw new RuntimeException(e);
-	 *                }            * 			});
-	 * 		validCommunities.forEach(community -> {
-	 * 			try {
-	 * 				DatasourceList dl = MAPPER
-	 * 					.readValue(
-	 * 						QueryCommunityAPI.communityDatasource(community.getId(), baseURL), DatasourceList.class);
-	 * 				community.setProviders(dl.stream().map(d -> {
-	 * 					if (d.getEnabled() == null || Boolean.FALSE.equals(d.getEnabled()))
-	 * 						return null;
-	 * 					Provider p = new Provider();
-	 * 					p.setOpenaireId(ModelSupport.getIdPrefix(Datasource.class) + "|" + d.getOpenaireId());
-	 * 					p.setSelectionConstraints(d.getSelectioncriteria());
-	 * 					if (p.getSelectionConstraints() != null)
-	 * 						p.getSelectionConstraints().setSelection(resolver);
-	 * 					return p;                * 				})
-	 * 					.filter(Objects::nonNull)
-	 * 					.collect(Collectors.toList()));
-	 * 			} catch (IOException e) {
-	 * 				throw new RuntimeException(e);
-	 * 			        }
-	 * 		});
-	 *
-	 * 		validCommunities.forEach(community -> {
-	 * 			if (community.isValid())
-	 * 				communities.put(community.getId(), comm        ty);
-	 * 		});
-	 * 		return new CommunityConfiguration(communities);
-	 */
 
 	/**
 	 * filles the common fields in the community model for both the communityconfiguration and the subcommunityconfiguration
