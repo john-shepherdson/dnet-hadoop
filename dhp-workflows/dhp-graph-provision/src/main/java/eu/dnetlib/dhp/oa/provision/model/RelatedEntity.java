@@ -50,6 +50,8 @@ public class RelatedEntity implements Serializable {
 	private String acronym;
 	private Qualifier contracttype;
 	private List<String> fundingtree;
+	private String startDate;
+	private String endDate;
 
 	// person
 	private String givenName;
@@ -254,6 +256,22 @@ public class RelatedEntity implements Serializable {
 
 	public void setFundingtree(List<String> fundingtree) {
 		this.fundingtree = fundingtree;
+	}
+
+	public String getStartDate() {
+		return startDate;
+	}
+
+	public void setStartDate(String startDate) {
+		this.startDate = startDate;
+	}
+
+	public String getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(String endDate) {
+		this.endDate = endDate;
 	}
 
 	public String getGivenName() {

@@ -193,6 +193,9 @@ public class ProvisionModelSupport {
 			&& StringUtils.isNotBlank(relation.getValidationDate())) {
 			rr.setValidationDate(relation.getValidationDate());
 		}
+
+		rr.setStartDate(re.getStartDate());
+		rr.setEndDate(re.getEndDate());
 		rr.setGivenName(re.getGivenName());
 		rr.setFamilyName(re.getFamilyName());
 
