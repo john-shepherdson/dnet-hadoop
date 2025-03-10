@@ -21,6 +21,7 @@ import java.util.Optional;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
@@ -71,12 +72,13 @@ public class GenerateNativeStoreSparkJob {
 		log.info("Provenance is {}", provenanceArgument);
 		final Provenance provenance = MAPPER.readValue(provenanceArgument, Provenance.class);
 
+		final String apiDescriptor = parser.get("apidescriptor");
+		log.info("apiDescriptor is {}", apiDescriptor);
+		final ApiDescriptor api = MAPPER.readValue(apiDescriptor, ApiDescriptor.class);
+
 		final String dateOfCollectionArgs = parser.get("dateOfCollection");
 		log.info("dateOfCollection is {}", dateOfCollectionArgs);
 		final Long dateOfCollection = Long.valueOf(dateOfCollectionArgs);
-
-		final ValidationType validationType = ValidationType.valueOf(parser.get("validationType"));
-		log.info("validationType is {}", validationType);
 
 		final String mdStoreVersion = parser.get("mdStoreVersion");
 		log.info("mdStoreVersion is {}", mdStoreVersion);
@@ -102,6 +104,11 @@ public class GenerateNativeStoreSparkJob {
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
 		final SparkConf conf = new SparkConf();
+
+		final ValidationType validationType = EnumUtils.isValidEnum(ValidationType.class, api.getCompatibilityLevel())
+			? ValidationType.valueOf(api.getCompatibilityLevel())
+			: null;
+
 		runWithSparkSession(
 			conf, isSparkSessionManaged,
 			spark -> createNativeMDStore(
@@ -265,7 +272,8 @@ public class GenerateNativeStoreSparkJob {
 
 	}
 
-	public static MetadataRecord addValidationReport(final MetadataRecord mdr, final ValidationType validationType,
+	public static MetadataRecord addValidationReport(final MetadataRecord mdr,
+		final ValidationType validationType,
 		final AbstractOpenAireProfile validator) {
 
 		if ((validationType == null) || (validator == null)) {

@@ -12,10 +12,12 @@ public class ApiDescriptor {
 
 	private String protocol;
 
+	private String compatibilityLevel;
+
 	private Map<String, String> params = new HashMap<>();
 
 	public String getBaseUrl() {
-		return baseUrl;
+		return this.baseUrl;
 	}
 
 	public void setBaseUrl(final String baseUrl) {
@@ -23,7 +25,7 @@ public class ApiDescriptor {
 	}
 
 	public String getId() {
-		return id;
+		return this.id;
 	}
 
 	public void setId(final String id) {
@@ -31,7 +33,7 @@ public class ApiDescriptor {
 	}
 
 	public Map<String, String> getParams() {
-		return params;
+		return this.params;
 	}
 
 	public void setParams(final Map<String, String> params) {
@@ -39,10 +41,18 @@ public class ApiDescriptor {
 	}
 
 	public String getProtocol() {
-		return protocol;
+		return this.protocol;
 	}
 
 	public void setProtocol(final String protocol) {
 		this.protocol = protocol;
+	}
+
+	public String getCompatibilityLevel() {
+		return compatibilityLevel;
+	}
+
+	public void setCompatibilityLevel(String compatibilityLevel) {
+		this.compatibilityLevel = compatibilityLevel;
 	}
 }
