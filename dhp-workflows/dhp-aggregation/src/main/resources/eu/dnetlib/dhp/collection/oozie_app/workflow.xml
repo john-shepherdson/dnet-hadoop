@@ -159,6 +159,7 @@
             <arg>--encoding</arg><arg>${metadataEncoding}</arg>
             <arg>--dateOfCollection</arg><arg>${timestamp}</arg>
             <arg>--provenance</arg><arg>${dataSourceInfo}</arg>
+            <arg>--apidescriptor</arg><arg>${apiDescription}</arg>
             <arg>--xpath</arg><arg>${identifierPath}</arg>
             <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
             <arg>--readMdStoreVersion</arg><arg>${wf:actionData('BeginRead')['mdStoreReadLockVersion']}</arg>
