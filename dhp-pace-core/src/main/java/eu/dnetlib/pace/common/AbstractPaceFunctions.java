@@ -90,7 +90,7 @@ public class AbstractPaceFunctions extends PaceCommonUtils {
 		inferFrom = normalize(inferFrom);
 		inferFrom = filterAllStopWords(inferFrom);
 		Set<String> cities = getCities(inferFrom, 4);
-		return citiesToCountry(cities).stream().findFirst().orElse("UNKNOWN");
+		return citiesToCountry(cities).stream().filter(Objects::nonNull).findFirst().orElse("UNKNOWN");
 	}
 
 	public static String cityInference(String original) {

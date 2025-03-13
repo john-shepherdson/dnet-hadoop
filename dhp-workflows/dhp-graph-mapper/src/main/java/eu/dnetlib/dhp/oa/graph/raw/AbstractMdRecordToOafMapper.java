@@ -153,34 +153,40 @@ public abstract class AbstractMdRecordToOafMapper {
 			final DataInfo entityInfo = prepareDataInfo(doc, this.invisible);
 			final long lastUpdateTimestamp = new Date().getTime();
 
-			final List<Instance> instances = prepareInstances(doc, entityInfo, collectedFrom, hostedBy);
+			final Instance instance = prepareInstances(doc, entityInfo, collectedFrom, hostedBy);
 
-			final String type = getResultType(doc, instances);
+			if (!Optional
+				.ofNullable(instance.getInstancetype())
+				.map(Qualifier::getClassid)
+				.filter(StringUtils::isNotBlank)
+				.isPresent()) {
+				return Lists.newArrayList();
+			}
 
-			return createOafs(doc, type, instances, collectedFrom, entityInfo, lastUpdateTimestamp);
+			final String type = getResultType(instance);
+
+			return createOafs(doc, type, instance, collectedFrom, entityInfo, lastUpdateTimestamp);
 		} catch (final DocumentException e) {
 			log.error("Error with record:\n" + xml);
 			return Lists.newArrayList();
 		}
 	}
 
-	protected String getResultType(final Document doc, final List<Instance> instances) {
-		final String type = doc.valueOf("//dr:CobjCategory/@type");
-
-		if (StringUtils.isBlank(type) && this.vocs.vocabularyExists(ModelConstants.DNET_RESULT_TYPOLOGIES)) {
-			final String instanceType = instances
-				.stream()
-				.map(i -> i.getInstancetype().getClassid())
-				.findFirst()
-				.filter(s -> !UNKNOWN.equalsIgnoreCase(s))
-				.orElse("0000"); // Unknown
+	protected String getResultType(final Instance instance) {
+		if (this.vocs.vocabularyExists(ModelConstants.DNET_RESULT_TYPOLOGIES)) {
 			return Optional
-				.ofNullable(this.vocs.getSynonymAsQualifier(ModelConstants.DNET_RESULT_TYPOLOGIES, instanceType))
+				.ofNullable(instance.getInstancetype())
 				.map(Qualifier::getClassid)
+				.map(
+					instanceType -> Optional
+						.ofNullable(
+							this.vocs.getSynonymAsQualifier(ModelConstants.DNET_RESULT_TYPOLOGIES, instanceType))
+						.map(Qualifier::getClassid)
+						.orElse("0000"))
 				.orElse("0000");
+		} else {
+			throw new IllegalStateException("Missing vocabulary: " + ModelConstants.DNET_RESULT_TYPOLOGIES);
 		}
-
-		return type;
 	}
 
 	private KeyValue getProvenanceDatasource(final Document doc, final String xpathId, final String xpathName) {
@@ -197,12 +203,12 @@ public abstract class AbstractMdRecordToOafMapper {
 	protected List<Oaf> createOafs(
 		final Document doc,
 		final String type,
-		final List<Instance> instances,
+		final Instance instance,
 		final KeyValue collectedFrom,
 		final DataInfo info,
 		final long lastUpdateTimestamp) {
 
-		final OafEntity entity = createEntity(doc, type, instances, collectedFrom, info, lastUpdateTimestamp);
+		final OafEntity entity = createEntity(doc, type, instance, collectedFrom, info, lastUpdateTimestamp);
 
 		final Set<String> originalId = Sets.newHashSet(entity.getOriginalId());
 		originalId.add(entity.getId());
@@ -235,19 +241,19 @@ public abstract class AbstractMdRecordToOafMapper {
 
 	private OafEntity createEntity(final Document doc,
 		final String type,
-		final List<Instance> instances,
+		final Instance instance,
 		final KeyValue collectedFrom,
 		final DataInfo info,
 		final long lastUpdateTimestamp) {
 		switch (type.toLowerCase()) {
 			case "publication":
 				final Publication p = new Publication();
-				populateResultFields(p, doc, instances, collectedFrom, info, lastUpdateTimestamp);
+				populateResultFields(p, doc, instance, collectedFrom, info, lastUpdateTimestamp);
 				p.setJournal(prepareJournal(doc, info));
 				return p;
 			case "dataset":
 				final Dataset d = new Dataset();
-				populateResultFields(d, doc, instances, collectedFrom, info, lastUpdateTimestamp);
+				populateResultFields(d, doc, instance, collectedFrom, info, lastUpdateTimestamp);
 				d.setStoragedate(prepareDatasetStorageDate(doc, info));
 				d.setDevice(prepareDatasetDevice(doc, info));
 				d.setSize(prepareDatasetSize(doc, info));
@@ -258,7 +264,7 @@ public abstract class AbstractMdRecordToOafMapper {
 				return d;
 			case "software":
 				final Software s = new Software();
-				populateResultFields(s, doc, instances, collectedFrom, info, lastUpdateTimestamp);
+				populateResultFields(s, doc, instance, collectedFrom, info, lastUpdateTimestamp);
 				s.setDocumentationUrl(prepareSoftwareDocumentationUrls(doc, info));
 				s.setLicense(prepareSoftwareLicenses(doc, info));
 				s.setCodeRepositoryUrl(prepareSoftwareCodeRepositoryUrl(doc, info));
@@ -268,7 +274,7 @@ public abstract class AbstractMdRecordToOafMapper {
 			case "otherresearchproducts":
 			default:
 				final OtherResearchProduct o = new OtherResearchProduct();
-				populateResultFields(o, doc, instances, collectedFrom, info, lastUpdateTimestamp);
+				populateResultFields(o, doc, instance, collectedFrom, info, lastUpdateTimestamp);
 				o.setContactperson(prepareOtherResearchProductContactPersons(doc, info));
 				o.setContactgroup(prepareOtherResearchProductContactGroups(doc, info));
 				o.setTool(prepareOtherResearchProductTools(doc, info));
@@ -415,7 +421,7 @@ public abstract class AbstractMdRecordToOafMapper {
 	private void populateResultFields(
 		final Result r,
 		final Document doc,
-		final List<Instance> instances,
+		final Instance instance,
 		final KeyValue collectedFrom,
 		final DataInfo info,
 		final long lastUpdateTimestamp) {
@@ -449,8 +455,8 @@ public abstract class AbstractMdRecordToOafMapper {
 		r.setExternalReference(new ArrayList<>()); // NOT PRESENT IN MDSTORES
 		r.setProcessingchargeamount(field(doc.valueOf("//oaf:processingchargeamount"), info));
 		r.setProcessingchargecurrency(field(doc.valueOf("//oaf:processingchargeamount/@currency"), info));
-		r.setInstance(instances);
-		r.setBestaccessright(OafMapperUtils.createBestAccessRights(instances));
+		r.setInstance(Arrays.asList(instance));
+		r.setBestaccessright(OafMapperUtils.createBestAccessRights(Arrays.asList(instance)));
 		r.setEoscifguidelines(prepareEOSCIfGuidelines(doc, info));
 	}
 
@@ -509,7 +515,7 @@ public abstract class AbstractMdRecordToOafMapper {
 
 	protected abstract Qualifier prepareResourceType(Document doc, DataInfo info);
 
-	protected abstract List<Instance> prepareInstances(
+	protected abstract Instance prepareInstances(
 		Document doc,
 		DataInfo info,
 		KeyValue collectedfrom,
@@ -657,13 +663,21 @@ public abstract class AbstractMdRecordToOafMapper {
 			final Node n = (Node) o;
 			final String classId = n.valueOf(xpathClassId).trim();
 			if (this.vocs.termExists(schemeId, classId)) {
-				res
-					.add(
-						HashableStructuredProperty
-							.newInstance(n.getText(), this.vocs.getTermAsQualifier(schemeId, classId), info));
+				final String value = n.getText();
+				if (StringUtils.isNotBlank(value)) {
+					res
+						.add(
+							HashableStructuredProperty
+								.newInstance(value, this.vocs.getTermAsQualifier(schemeId, classId), info));
+				}
 			}
 		}
-		return Lists.newArrayList(res);
+		return res
+			.stream()
+			.filter(Objects::nonNull)
+			.filter(p -> StringUtils.isNotBlank(p.getValue()))
+			.filter(p -> StringUtils.isNotBlank(p.getValue().trim()))
+			.collect(Collectors.toList());
 	}
 
 	protected List<StructuredProperty> prepareListStructProps(

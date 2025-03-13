@@ -73,14 +73,10 @@ public class GraphHiveImporterJobTest {
 		GraphHiveImporterJob
 			.main(
 				new String[] {
-					"-isSparkSessionManaged",
-					Boolean.FALSE.toString(),
-					"-inputPath",
-					getClass().getResource("/eu/dnetlib/dhp/oa/graph/sample").getPath(),
-					"-hiveMetastoreUris",
-					"",
-					"-hiveDbName",
-					dbName
+					"--isSparkSessionManaged", Boolean.FALSE.toString(),
+					"--inputPath", getClass().getResource("/eu/dnetlib/dhp/oa/graph/sample").getPath(),
+					"--hiveMetastoreUris", "",
+					"--hiveDbName", dbName
 				});
 
 		ModelSupport.oafTypes

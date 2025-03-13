@@ -227,4 +227,17 @@ public class ClusteringFunctionTest extends AbstractPaceTest {
 		System.out.println(cf.apply(conf, Lists.newArrayList(s)));
 	}
 
+	@Test
+	public void testNumAuthorsTitleSuffixPrefixChain() {
+
+		final ClusteringFunction cf = new NumAuthorsTitleSuffixPrefixChain(params);
+		params.put("mod", 10);
+
+		final String title = "PARP-2 Regulates SIRT1 Expression and Whole-Body Energy Expenditure";
+		final String num_authors = "10";
+		System.out.println("title = " + title);
+		System.out.println("num_authors = " + num_authors);
+		System.out.println(cf.apply(conf, Lists.newArrayList(num_authors, title)));
+	}
+
 }

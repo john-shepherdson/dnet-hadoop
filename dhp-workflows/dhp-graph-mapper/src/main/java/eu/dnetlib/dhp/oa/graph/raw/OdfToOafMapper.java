@@ -94,7 +94,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 					author.setFullname(String.format("%s, %s", author.getSurname(), author.getName()));
 				}
 
-				author.setAffiliation(prepareListFields(n, "./*[local-name()='affiliation']", info));
+				author.setRawAffiliationString(prepareListString(n, "./*[local-name()='affiliation']"));
 				author.setPid(preparePids(n, info));
 				author.setRank(pos++);
 				res.add(author);
@@ -126,7 +126,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	}
 
 	@Override
-	protected List<Instance> prepareInstances(
+	protected Instance prepareInstances(
 		final Document doc,
 		final DataInfo info,
 		final KeyValue collectedfrom,
@@ -210,7 +210,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 			instance.setUrl(new ArrayList<>());
 			instance.getUrl().addAll(validUrl);
 		}
-		return Arrays.asList(instance);
+		return instance;
 	}
 
 	protected String trimAndDecodeUrl(String url) {
@@ -234,7 +234,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	 */
 	@Override
 	protected String findOriginalType(Document doc) {
-		final String resourceType = Optional
+		return Optional
 			.ofNullable(
 				(Element) doc
 					.selectSingleNode(
@@ -261,9 +261,6 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 					.firstNonNull(resourceTypeURI, resourceTypeAnyURI, resourceTypeTxt, resourceTypeGeneral);
 			})
 			.orElse(null);
-
-		final String drCobjCategory = doc.valueOf("//dr:CobjCategory/text()");
-		return ObjectUtils.firstNonNull(resourceType, drCobjCategory);
 	}
 
 	@Override
@@ -319,7 +316,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 	@Override
 	protected List<Field<String>> prepareDescriptions(final Document doc, final DataInfo info) {
-		return prepareListFields(doc, "//*[local-name()='description' and ./@descriptionType='Abstract']", info);
+		return prepareListFields(doc, "//datacite:description[./@descriptionType='Abstract'] | //dc:description", info);
 	}
 
 	@Override

@@ -144,8 +144,8 @@ public class SparkPublicationRootsTest2 implements Serializable {
 				"--actionSetId", testActionSetId,
 				"--isLookUpUrl", "lookupurl",
 				"--workingPath", workingPath,
-				"--hiveMetastoreUris", "none",
-				"--pivotHistoryDatabase", ""
+				"--hiveMetastoreUris", "",
+
 			}), spark)
 				.run(isLookUpService);
 
@@ -197,7 +197,6 @@ public class SparkPublicationRootsTest2 implements Serializable {
 			.collectAsList()
 			.get(0);
 
-		assertEquals("2022-01-01", root.getDateofacceptance().getValue());
 		assertEquals(crossref_duplicate.getJournal().getName(), root.getJournal().getName());
 		assertEquals(crossref_duplicate.getJournal().getIssnPrinted(), root.getJournal().getIssnPrinted());
 		assertEquals(crossref_duplicate.getPublisher().getValue(), root.getPublisher().getValue());

@@ -1053,6 +1053,26 @@
   "openaire_id": "fairsharing_::2975",
   "datacite_name": "EBRAINS",
   "official_name": "EBRAINS"
+ },
+ "BMBF.HIRZQT": {
+ "openaire_id": "fairsharing_::3567",
+ "datacite_name": "Brain-CODE",
+ "official_name": "Brain-CODE"
+},
+ "PSC.BIL": {
+  "openaire_id": "fairsharing_::4347",
+  "datacite_name": "Brain Image Library",
+  "official_name": "Brain Image Library"
+ },
+ "DARTLIB.DANDI": {
+  "openaire_id": "fairsharing_::3322",
+  "datacite_name": "DANDI Archive",
+  "official_name": "Distributed Archives for Neurophysiology Data Integration"
+ },
+ "NIHNIMHH.DAR": {
+  "openaire_id": "fairsharing_::3209",
+  "datacite_name": "National Institutes of Health, National Institute of Mental Health (NIMH) Data Archive Repository",
+  "official_name": "National Institute of Mental Health Data Archive"
  }
 
 }

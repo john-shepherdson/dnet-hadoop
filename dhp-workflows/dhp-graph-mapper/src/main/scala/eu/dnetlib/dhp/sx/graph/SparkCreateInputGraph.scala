@@ -133,7 +133,7 @@ object SparkCreateInputGraph {
     val ds: Dataset[T] = spark.read.load(sourcePath).as[T]
 
     ds.groupByKey(_.getId)
-      .mapGroups { (id, it) => MergeUtils.mergeGroup(id, it.asJava).asInstanceOf[T] }
+      .mapGroups { (id, it) => MergeUtils.mergeGroup(it.asJava).asInstanceOf[T] }
 //      .reduceGroups { (x: T, y: T) => MergeUtils.merge(x, y).asInstanceOf[T] }
 //      .map(_)
       .write

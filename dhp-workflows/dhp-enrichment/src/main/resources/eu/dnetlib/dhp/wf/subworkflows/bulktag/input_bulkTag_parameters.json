@@ -39,5 +39,27 @@
   "paramLongName": "nameNode",
   "paramDescription": "this parameter is to specify the api to be queried (beta or production)",
   "paramRequired": true
-}
+},
+  {
+    "paramName": "du",
+    "paramLongName": "dbUrl",
+    "paramDescription": "this parameter is to specify the api to be queried (beta or production)",
+    "paramRequired": true
+  },{
+  "paramName": "dus",
+  "paramLongName": "dbUser",
+  "paramDescription": "this parameter is to specify the api to be queried (beta or production)",
+  "paramRequired": true
+},{
+  "paramName": "dp",
+  "paramLongName": "dbPassword",
+  "paramDescription": "this parameter is to specify the api to be queried (beta or production)",
+  "paramRequired": true
+},
+  {
+    "paramName": "cp",
+    "paramLongName": "configurationPath",
+    "paramDescription": "the path where to store the configuration used to run the tagging",
+    "paramRequired": true
+  }
 ]

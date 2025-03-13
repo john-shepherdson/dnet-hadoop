@@ -130,7 +130,7 @@ public class ResultTagger implements Serializable {
 					// log.info("Remove constraints for " + communityId);
 					if (conf.getRemoveConstraintsMap().keySet().contains(communityId) &&
 						conf.getRemoveConstraintsMap().get(communityId).getCriteria() != null &&
-							!conf.getRemoveConstraintsMap().get(communityId).getCriteria().isEmpty() &&
+						!conf.getRemoveConstraintsMap().get(communityId).getCriteria().isEmpty() &&
 						conf
 							.getRemoveConstraintsMap()
 							.get(communityId)
@@ -228,7 +228,7 @@ public class ResultTagger implements Serializable {
 			.forEach(communityId -> {
 				if (!removeCommunities.contains(communityId) &&
 					conf.getSelectionConstraintsMap().get(communityId).getCriteria() != null &&
-						!conf.getSelectionConstraintsMap().get(communityId).getCriteria().isEmpty() &&
+					!conf.getSelectionConstraintsMap().get(communityId).getCriteria().isEmpty() &&
 					conf
 						.getSelectionConstraintsMap()
 						.get(communityId)

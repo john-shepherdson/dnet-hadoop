@@ -102,6 +102,7 @@
         <path start="import_datasource"/>
         <path start="import_organization"/>
         <path start="import_project"/>
+        <path start="import_person"/>
         <path start="import_relation"/>
     </fork>
 
@@ -301,6 +302,35 @@
             <arg>--inputPath</arg><arg>${inputPath}/project</arg>
             <arg>--hiveDbName</arg><arg>${hiveDbName}</arg>
             <arg>--className</arg><arg>eu.dnetlib.dhp.schema.oaf.Project</arg>
+            <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
+            <arg>--numPartitions</arg><arg>1000</arg>
+        </spark>
+        <ok to="join_import"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="import_person">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Import table person</name>
+            <class>eu.dnetlib.dhp.oa.graph.hive.GraphHiveTableImporterJob</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+                --conf spark.sql.shuffle.partitions=1000
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${inputPath}/person</arg>
+            <arg>--hiveDbName</arg><arg>${hiveDbName}</arg>
+            <arg>--className</arg><arg>eu.dnetlib.dhp.schema.oaf.Person</arg>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
             <arg>--numPartitions</arg><arg>1000</arg>
         </spark>

@@ -135,7 +135,7 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 	}
 
 	@Override
-	protected List<Instance> prepareInstances(
+	protected Instance prepareInstances(
 		final Document doc,
 		final DataInfo info,
 		final KeyValue collectedfrom,
@@ -197,7 +197,7 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 			instance.getUrl().addAll(validUrl);
 		}
 
-		return Lists.newArrayList(instance);
+		return instance;
 	}
 
 	/**
@@ -211,22 +211,20 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 	 * info:eu-repo/semantics/publishedVersion
 	 * info:eu-repo/semantics/updatedVersion
 	 *
-	 * Then, it picks the 1st dc:type text available and, in case there is no dc:type element, as last resort it tries
-	 * to extract the type from the dr:CobjCategory element
+	 * Then, it picks the 1st dc:type text available and returns null in case there is no dc:type element
 	 *
 	 * Examples:
 	 *
 	 *     	<dc:type>http://purl.org/coar/resource_type/c_5794</dc:type>
 	 *     	<dc:type>info:eu-repo/semantics/article</dc:type>
 	 *     	<dc:type>Conference article</dc:type>
-	 *     	<dr:CobjCategory type="publication">0006</dr:CobjCategory>
 	 *
 	 * @param doc the input document
 	 * @return the chosen resource type
 	 */
 	@Override
 	protected String findOriginalType(Document doc) {
-		final String dcType = (String) doc
+		return (String) doc
 			.selectNodes("//dc:type")
 			.stream()
 			.map(o -> "" + ((Node) o).getText().trim())
@@ -234,9 +232,6 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 			.sorted(new OriginalTypeComparator())
 			.findFirst()
 			.orElse(null);
-
-		final String drCobjCategory = doc.valueOf("//dr:CobjCategory/text()");
-		return ObjectUtils.firstNonNull(dcType, drCobjCategory);
 	}
 
 	@Override

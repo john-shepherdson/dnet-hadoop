@@ -7,6 +7,7 @@ import java.util.function.BiFunction;
 
 import eu.dnetlib.dhp.common.FunctionalInterfaceSupport.SerializableSupplier;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.utils.MergeUtils;
 
 /** OAF model merging support. */
@@ -28,24 +29,24 @@ public class MergeAndGet {
 	/**
 	 * Returns a function for merging OAF model objects.
 	 *
-	 * @param strategy Strategy to be used to merge objects
+	 * @param mergeStrategy Strategy to be used to merge objects
 	 * @param <G> Graph table type
 	 * @param <A> Action payload type
 	 * @return BiFunction to be used to merge OAF objects
 	 */
 	public static <G extends Oaf, A extends Oaf> SerializableSupplier<BiFunction<G, A, G>> functionFor(
-		Strategy strategy) {
-		switch (strategy) {
+		MergeAndGet.Strategy mergeStrategy) {
+		switch (mergeStrategy) {
 			case MERGE_FROM_AND_GET:
 				return () -> MergeAndGet::mergeFromAndGet;
 			case SELECT_NEWER_AND_GET:
 				return () -> MergeAndGet::selectNewerAndGet;
 		}
-		throw new RuntimeException();
+		throw new RuntimeException("Unsupported merge strategy: " + mergeStrategy);
 	}
 
 	private static <G extends Oaf, A extends Oaf> G mergeFromAndGet(G x, A y) {
-		return (G) MergeUtils.merge(x, y);
+		return (G) MergeUtils.merge(x, y, true);
 	}
 
 	@SuppressWarnings("unchecked")

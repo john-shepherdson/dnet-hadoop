@@ -49,9 +49,6 @@ public class ReadCOCI implements Serializable {
 		final String workingPath = parser.get("inputPath");
 		log.info("workingPath {}", workingPath);
 
-		final String backupPath = parser.get("backupPath");
-		log.info("backupPath {}", backupPath);
-
 		SparkConf sconf = new SparkConf();
 
 		Configuration conf = new Configuration();
@@ -71,14 +68,12 @@ public class ReadCOCI implements Serializable {
 					workingPath,
 					fileSystem,
 					outputPath,
-					backupPath,
 					delimiter);
 			});
 	}
 
 	private static void doRead(SparkSession spark, String workingPath, FileSystem fileSystem,
 		String outputPath,
-		String backupPath,
 		String delimiter) throws IOException {
 		RemoteIterator<LocatedFileStatus> fileStatusListIterator = fileSystem
 			.listFiles(
@@ -113,7 +108,7 @@ public class ReadCOCI implements Serializable {
 				.option("compression", "gzip")
 				.json(outputPath);
 
-			fileSystem.rename(fileStatus.getPath(), new Path(backupPath));
+			fileSystem.delete(fileStatus.getPath());
 		}
 
 	}
