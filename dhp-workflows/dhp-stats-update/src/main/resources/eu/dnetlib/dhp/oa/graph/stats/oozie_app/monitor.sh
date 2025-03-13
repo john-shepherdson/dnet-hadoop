@@ -119,28 +119,3 @@ hive -e "create database if not exists ${SHADOW}_monitor_ie"
 hive $HIVE_OPTS --database $TARGET_monitor_ie -e "show tables" | grep -v WARN | sed "s/\(.*\)/create view ${SHADOW}_monitor_ie.\1 as select * from $TARGET_monitor_ie.\1;/" > foo
 hive -f foo
 echo "Shadow db irish monitor ready!"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
