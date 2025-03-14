@@ -6,6 +6,8 @@ import java.util.Map;
 
 public class ApiDescriptor {
 
+	private Map<String, String> params = new HashMap<>();
+
 	private String id;
 
 	private String baseUrl;
@@ -14,7 +16,13 @@ public class ApiDescriptor {
 
 	private String compatibilityLevel;
 
-	private Map<String, String> params = new HashMap<>();
+	public Map<String, String> getParams() {
+		return this.params;
+	}
+
+	public void setParams(final Map<String, String> params) {
+		this.params = params;
+	}
 
 	public String getBaseUrl() {
 		return this.baseUrl;
@@ -30,14 +38,6 @@ public class ApiDescriptor {
 
 	public void setId(final String id) {
 		this.id = id;
-	}
-
-	public Map<String, String> getParams() {
-		return this.params;
-	}
-
-	public void setParams(final Map<String, String> params) {
-		this.params = params;
 	}
 
 	public String getProtocol() {

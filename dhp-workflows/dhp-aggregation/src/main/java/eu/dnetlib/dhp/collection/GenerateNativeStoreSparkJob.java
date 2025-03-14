@@ -14,6 +14,7 @@ import static eu.dnetlib.dhp.utils.DHPUtils.writeHdfsFile;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.Optional;
@@ -69,33 +70,33 @@ public class GenerateNativeStoreSparkJob {
 		parser.parseArgument(args);
 
 		final String provenanceArgument = parser.get("provenance");
-		log.info("Provenance is {}", provenanceArgument);
+		log.info("provenance: {}", provenanceArgument);
 		final Provenance provenance = MAPPER.readValue(provenanceArgument, Provenance.class);
 
 		final String apiDescriptor = parser.get("apidescriptor");
-		log.info("apiDescriptor is {}", apiDescriptor);
+		log.info("apidescriptor: {}", apiDescriptor);
 		final ApiDescriptor api = MAPPER.readValue(apiDescriptor, ApiDescriptor.class);
 
 		final String dateOfCollectionArgs = parser.get("dateOfCollection");
-		log.info("dateOfCollection is {}", dateOfCollectionArgs);
+		log.info("dateOfCollection: {}", dateOfCollectionArgs);
 		final Long dateOfCollection = Long.valueOf(dateOfCollectionArgs);
 
 		final String mdStoreVersion = parser.get("mdStoreVersion");
-		log.info("mdStoreVersion is {}", mdStoreVersion);
+		log.info("mdStoreVersion: {}", mdStoreVersion);
 
 		final MDStoreVersion currentVersion = MAPPER.readValue(mdStoreVersion, MDStoreVersion.class);
 
 		final String readMdStoreVersionParam = parser.get("readMdStoreVersion");
-		log.info("readMdStoreVersion is {}", readMdStoreVersionParam);
+		log.info("readMdStoreVersion: {}", readMdStoreVersionParam);
 
 		final MDStoreVersion readMdStoreVersion = StringUtils.isBlank(readMdStoreVersionParam) ? null
 			: MAPPER.readValue(readMdStoreVersionParam, MDStoreVersion.class);
 
 		final String xpath = parser.get("xpath");
-		log.info("xpath is {}", xpath);
+		log.info("xpath: {}", xpath);
 
 		final String encoding = parser.get("encoding");
-		log.info("encoding is {}", encoding);
+		log.info("encoding: {}", encoding);
 
 		final Boolean isSparkSessionManaged = Optional
 			.ofNullable(parser.get("isSparkSessionManaged"))
@@ -105,15 +106,30 @@ public class GenerateNativeStoreSparkJob {
 
 		final SparkConf conf = new SparkConf();
 
-		final ValidationType validationType = EnumUtils.isValidEnum(ValidationType.class, api.getCompatibilityLevel())
-			? ValidationType.valueOf(api.getCompatibilityLevel())
-			: null;
+		final ValidationType validationType = getValidationType(api.getCompatibilityLevel());
 
 		runWithSparkSession(
 			conf, isSparkSessionManaged,
 			spark -> createNativeMDStore(
 				spark, provenance, dateOfCollection, xpath, encoding, validationType, currentVersion,
 				readMdStoreVersion));
+	}
+
+	private static ValidationType getValidationType(String compatibilityLevel) {
+		switch (compatibilityLevel) {
+			case "openaire2.0":
+				return ValidationType.openaire2_0;
+			case "openaire3.0":
+				return ValidationType.openaire3_0;
+			case "openaire4.0":
+				return ValidationType.openaire4_0;
+			case "fair_data":
+				return ValidationType.fair_data;
+			case "fair_literature_v4":
+				return ValidationType.fair_literature_v4;
+			default:
+				throw new IllegalArgumentException("Unknown compatibility level: " + compatibilityLevel);
+		}
 	}
 
 	private static void createNativeMDStore(final SparkSession spark,
@@ -267,7 +283,7 @@ public class GenerateNativeStoreSparkJob {
 			case fair_literature_v4:
 				return new FAIR_Literature_GuidelinesV4Profile();
 			default:
-				return null;
+				throw new IllegalArgumentException("Unknown validation type: " + validationType);
 		}
 
 	}
