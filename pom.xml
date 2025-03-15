@@ -178,6 +178,17 @@
                 <version>${dhp-schemas.version}</version>
             </dependency>
             <dependency>
+                <groupId>eu.dnetlib</groupId>
+                <artifactId>uoa-validator-engine2</artifactId>
+                <version>2.0.0</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>logback-classic</artifactId>
+                        <groupId>ch.qos.logback</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.hadoop</groupId>
                 <artifactId>hadoop-hdfs</artifactId>
                 <version>${dhp.hadoop.version}</version>
