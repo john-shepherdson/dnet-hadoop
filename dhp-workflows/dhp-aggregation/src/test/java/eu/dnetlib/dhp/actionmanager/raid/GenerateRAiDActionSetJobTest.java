@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test;
 import eu.dnetlib.dhp.actionmanager.opencitations.CreateOpenCitationsASTest;
 import eu.dnetlib.dhp.actionmanager.raid.model.RAiDEntity;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.dhp.schema.oaf.OtherResearchProduct;
 import eu.dnetlib.dhp.schema.oaf.Relation;
@@ -38,6 +39,7 @@ public class GenerateRAiDActionSetJobTest {
 	private static String input_path;
 	private static String output_path;
 	private static String baseUrl;
+	private static String graphBasePath;
 	static SparkSession spark;
 
 	@BeforeEach
@@ -56,6 +58,13 @@ public class GenerateRAiDActionSetJobTest {
 			.toString();
 
 		baseUrl = "https://baseurl/";
+		graphBasePath = Paths
+			.get(
+				GenerateRAiDActionSetJobTest.class
+					.getResource("/eu/dnetlib/dhp/actionmanager/raid/")
+					.toURI())
+			.toFile()
+			.getAbsolutePath();
 
 		SparkConf conf = new SparkConf();
 		conf.setAppName(GenerateRAiDActionSetJobTest.class.getSimpleName());
@@ -80,63 +89,14 @@ public class GenerateRAiDActionSetJobTest {
 	}
 
 	@Test
-	@Disabled
-	void testProcessRAiDEntities() {
-		GenerateRAiDActionSetJob.processRAiDEntities(spark, input_path, output_path + "/test_raid_action_set", baseUrl);
+	void rawRAiDToGraphEntitiesTest() {
 
-		JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
-
-		JavaRDD<? extends Oaf> result = sc
-			.sequenceFile(output_path + "/test_raid_action_set", Text.class, Text.class)
-			.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
-			.map(AtomicAction::getPayload);
-
-		assertEquals(80, result.count());
-	}
-
-	@Test
-	void testPrepareRAiD() {
-
-		List<AtomicAction<? extends Oaf>> atomicActions = GenerateRAiDActionSetJob
-			.prepareRAiD(
+		List<? extends Oaf> graphEntities = GenerateRAiDActionSetJob
+			.rawRAiDtoGraphEntities(
 				new RAiDEntity(
 					"-92190526",
-					Arrays
-						.asList(
-							"Berli, Justin", "Le Mao, Bérénice", "Guillaume Touya", "Wenclik, Laura",
-							"Courtial, Azelle", "Muehlenhaus, Ian", "Justin Berli", "Touya, Guillaume",
-							"Gruget, Maïeul", "Azelle Courtial", "Ian Muhlenhaus", "Maïeul Gruget", "Marion Dumont",
-							"Maïeul GRUGET", "Cécile Duchêne"),
-					"2021-09-10",
-					"2024-02-16",
-					Arrays
-						.asList(
-							"cartography, zoom, pan, desert fog", "Road network", "zooming", "Pan-scalar maps",
-							"pan-scalar map", "Python library", "QGIS", "map design", "landmarks",
-							"Cartes transscalaires", "anchor", "disorientation", "[INFO]Computer Science [cs]",
-							"[SHS.GEO]Humanities and Social Sciences/Geography", "cognitive cartography",
-							"eye-tracking", "Computers in Earth Sciences", "Topographic map", "National Mapping Agency",
-							"General Medicine", "Geography, Planning and Development", "multi-scales",
-							"pan-scalar maps", "Selection", "cartography", "General Earth and Planetary Sciences",
-							"progressiveness", "map generalisation", "Eye-tracker", "zoom", "algorithms", "Map Design",
-							"cartography, map generalisation, zoom, multi-scale map", "Interactive maps",
-							"Map generalisation", "Earth and Planetary Sciences (miscellaneous)",
-							"Cartographic generalization", "rivers", "Benchmark", "General Environmental Science",
-							"open source", "drawing", "Constraint", "Multi-scale maps"),
-					Arrays
-						.asList(
-							"Where do people look at during multi-scale map tasks?", "FogDetector survey raw data",
-							"Collection of cartographic disorientation stories", "Anchorwhat dataset",
-							"BasqueRoads: A Benchmark for Road Network Selection",
-							"Progressive river network selection for pan-scalar maps",
-							"BasqueRoads, a dataset to benchmark road selection algorithms",
-							"Missing the city for buildings? A critical review of pan-scalar map generalization and design in contemporary zoomable maps",
-							"Empirical approach to advance the generalisation of multi-scale maps",
-							"L'Alpe d'Huez: a dataset to benchmark topographic map generalisation",
-							"eye-tracking data from a survey on zooming in a pan-scalar map",
-							"Material of the experiment 'More is Less' from the MapMuxing project",
-							"Cartagen4py, an open source Python library for map generalisation",
-							"L’Alpe d’Huez: A Benchmark for Topographic Map Generalisation"),
+					"Exploring Multi-Scale Map Generalization and Design",
+					"This project aims to advance the generalization of multi-scale maps by investigating the impact of different design elements on user experience. The research involves collecting and analyzing data from various sources, including surveys, eye-tracking studies, and user experiments. The goal is to identify best practices for map generalization and design, with a focus on reducing disorientation and improving information retrieval during exploration. The project has led to the development of several datasets, including BasqueRoads, AnchorWhat, and L'Alpe d'Huez, which can be used to benchmark road selection algorithms and topographic map generalization techniques. The research has also resulted in the creation of a Python library, Cartagen4py, for map generalization. The findings of this project have the potential to improve the design and usability of multi-scale maps, making them more effective tools for navigation and information retrieval.",
 					Arrays
 						.asList(
 							"50|doi_dedup___::6915135e0aa39f913394513f809ae58a",
@@ -153,16 +113,41 @@ public class GenerateRAiDActionSetJobTest {
 							"50|doi_dedup___::9e93c8f2d97c35de8a6a57a5b53ef283",
 							"50|dedup_wf_002::d08be0ed27b13d8a880e891e08d093ea",
 							"50|doi_dedup___::f8d8b3b9eddeca2fc0e3bc9e63996555"),
-					"Exploring Multi-Scale Map Generalization and Design",
-					"This project aims to advance the generalization of multi-scale maps by investigating the impact of different design elements on user experience. The research involves collecting and analyzing data from various sources, including surveys, eye-tracking studies, and user experiments. The goal is to identify best practices for map generalization and design, with a focus on reducing disorientation and improving information retrieval during exploration. The project has led to the development of several datasets, including BasqueRoads, AnchorWhat, and L'Alpe d'Huez, which can be used to benchmark road selection algorithms and topographic map generalization techniques. The research has also resulted in the creation of a Python library, Cartagen4py, for map generalization. The findings of this project have the potential to improve the design and usability of multi-scale maps, making them more effective tools for navigation and information retrieval."),
+					"2021-09-10",
+					"2024-02-16"),
 				"https://baseurl/");
 
-		OtherResearchProduct orp = (OtherResearchProduct) atomicActions.get(0).getPayload();
-		Relation rel = (Relation) atomicActions.get(1).getPayload();
+		OtherResearchProduct orp = (OtherResearchProduct) graphEntities.get(0);
+		Relation rel = (Relation) graphEntities.get(1);
 
 		assertEquals("Exploring Multi-Scale Map Generalization and Design", orp.getTitle().get(0).getValue());
+		assertEquals(
+			"https://baseurl/raid________::759a564ce5cc7360cab030c517c7366b", orp.getInstance().get(0).getUrl().get(0));
 		assertEquals("50|raid________::759a564ce5cc7360cab030c517c7366b", rel.getSource());
 		assertEquals("50|doi_dedup___::6915135e0aa39f913394513f809ae58a", rel.getTarget());
+
+	}
+
+	@Test
+	void raidEntitiesToAtomicActionsTest() {
+
+		JavaRDD<AtomicAction<? extends Oaf>> atomicActions = GenerateRAiDActionSetJob
+			.raidEntitiesToAtomicActions(spark, input_path, baseUrl, graphBasePath);
+
+		JavaRDD<Relation> relations = atomicActions
+			.filter(aa -> aa.getClazz().equals(Relation.class))
+			.map(AtomicAction::getPayload)
+			.map(p -> (Relation) p);
+		JavaRDD<OtherResearchProduct> raids = atomicActions
+			.filter(aa -> aa.getClazz().equals(OtherResearchProduct.class))
+			.map(AtomicAction::getPayload)
+			.map(p -> (OtherResearchProduct) p);
+
+		assertEquals(6, raids.count());
+		assertEquals(80, relations.count()); // all relations
+		assertEquals(4, relations.filter(r -> r.getRelType().equals(ModelConstants.RESULT_ORGANIZATION)).count());
+		assertEquals(2, relations.filter(r -> r.getRelType().equals(ModelConstants.RESULT_PROJECT)).count());
+		assertEquals(74, relations.filter(r -> r.getRelType().equals(ModelConstants.RESULT_RESULT)).count());
 
 	}
 
