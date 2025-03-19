@@ -7,7 +7,6 @@ import static eu.dnetlib.dhp.common.Constants.MDSTORE_DATA_PATH;
 import static eu.dnetlib.dhp.common.Constants.MDSTORE_SIZE_PATH;
 import static eu.dnetlib.dhp.common.Constants.SEQUENCE_FILE_NAME;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
-import static eu.dnetlib.dhp.utils.DHPUtils.MAPPER;
 import static eu.dnetlib.dhp.utils.DHPUtils.saveDataset;
 import static eu.dnetlib.dhp.utils.DHPUtils.writeHdfsFile;
 
@@ -17,6 +16,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Optional;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.IntWritable;
@@ -53,6 +54,9 @@ import scala.Tuple2;
 public class GenerateNativeStoreSparkJob {
 
 	private static final Logger log = LoggerFactory.getLogger(GenerateNativeStoreSparkJob.class);
+
+	private static final ObjectMapper MAPPER = new ObjectMapper()
+			.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
 	public static void main(final String[] args) throws Exception {
 
@@ -264,27 +268,20 @@ public class GenerateNativeStoreSparkJob {
 		}
 	}
 
-	public static MetadataRecord addValidationReport(final MetadataRecord mdr, final AbstractOpenAireProfile validationProfile) {
+	public static MetadataRecord addValidationReport(final MetadataRecord mdr,
+		final AbstractOpenAireProfile validationProfile) {
 
 		if (validationProfile == null) {
 			return mdr;
 		}
 
 		/*
-		if (mdr.getValidationResults() == null) {
-			mdr.setValidationResults(new HashMap<>());
-		}
-
-		try (ByteArrayInputStream is = new ByteArrayInputStream(mdr.getBody().getBytes(StandardCharsets.UTF_8))) {
-			final org.w3c.dom.Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
-			mdr.getValidationResults().put(validationType, validator.validate(mdr.getId(), doc));
-		} catch (final Throwable e) {
-			log
-				.warn(
-					"Error generating validation report, record id: " + mdr.getId() + ", validationType: "
-						+ validationType,
-					e);
-		}	
+		 * if (mdr.getValidationResults() == null) { mdr.setValidationResults(new HashMap<>()); } try
+		 * (ByteArrayInputStream is = new ByteArrayInputStream(mdr.getBody().getBytes(StandardCharsets.UTF_8))) { final
+		 * org.w3c.dom.Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
+		 * mdr.getValidationResults().put(validationType, validator.validate(mdr.getId(), doc)); } catch (final
+		 * Throwable e) { log .warn( "Error generating validation report, record id: " + mdr.getId() +
+		 * ", validationType: " + validationType, e); }
 		 */
 
 		return mdr;
