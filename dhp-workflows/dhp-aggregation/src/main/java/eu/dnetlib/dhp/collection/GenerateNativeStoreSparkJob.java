@@ -14,7 +14,6 @@ import static eu.dnetlib.dhp.utils.DHPUtils.writeHdfsFile;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.Optional;
@@ -22,7 +21,7 @@ import java.util.Optional;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.EnumUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
@@ -33,9 +32,11 @@ import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoder;
 import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.TypedColumn;
 import org.apache.spark.sql.expressions.Aggregator;
+import org.apache.spark.sql.functions;
 import org.apache.spark.util.LongAccumulator;
 import org.dom4j.Document;
 import org.dom4j.Node;
@@ -115,7 +116,7 @@ public class GenerateNativeStoreSparkJob {
 				readMdStoreVersion));
 	}
 
-	private static ValidationType getValidationType(String compatibilityLevel) {
+	private static ValidationType getValidationType(final String compatibilityLevel) {
 		switch (compatibilityLevel) {
 			case "openaire2.0":
 				return ValidationType.openaire2_0;
@@ -158,24 +159,24 @@ public class GenerateNativeStoreSparkJob {
 			.filter(Objects::nonNull)
 			.distinct();
 
-		final Encoder<MetadataRecord> encoder = Encoders.bean(MetadataRecord.class);
-		final Dataset<MetadataRecord> mdstore = spark.createDataset(nativeStore.rdd(), encoder);
+		final Dataset<MetadataRecord> mdstore = spark
+			.createDataset(nativeStore.rdd(), Encoders.bean(MetadataRecord.class));
 
 		final String targetPath = currentVersion.getHdfsPath() + MDSTORE_DATA_PATH;
 
 		if (readVersion != null) { // INCREMENTAL MODE
 			log.info("updating {} incrementally with {}", targetPath, readVersion.getHdfsPath());
-			final Dataset<MetadataRecord> currentMdStoreVersion = spark
-				.read()
-				.load(readVersion.getHdfsPath() + MDSTORE_DATA_PATH)
-				.as(encoder);
+			final Dataset<MetadataRecord> currentMdStoreVersion = loadCurrentDataset(spark, readVersion);
+
 			final TypedColumn<MetadataRecord, MetadataRecord> aggregator = new MDStoreAggregator().toColumn();
 
 			final Dataset<MetadataRecord> map = currentMdStoreVersion
 				.union(mdstore)
 				.groupByKey((MapFunction<MetadataRecord, String>) MetadataRecord::getId, Encoders.STRING())
 				.agg(aggregator)
-				.map((MapFunction<Tuple2<String, MetadataRecord>, MetadataRecord>) Tuple2::_2, encoder);
+				.map(
+					(MapFunction<Tuple2<String, MetadataRecord>, MetadataRecord>) Tuple2::_2,
+					Encoders.bean(MetadataRecord.class));
 
 			map.select("id").takeAsList(100).forEach(s -> log.info(s.toString()));
 
@@ -191,6 +192,21 @@ public class GenerateNativeStoreSparkJob {
 		writeHdfsFile(
 			spark.sparkContext().hadoopConfiguration(), total.toString(),
 			currentVersion.getHdfsPath() + MDSTORE_SIZE_PATH);
+	}
+
+	private static Dataset<MetadataRecord> loadCurrentDataset(final SparkSession spark,
+		final MDStoreVersion readVersion) {
+
+		final Dataset<Row> rows = spark.read().parquet(readVersion.getHdfsPath() + MDSTORE_DATA_PATH);
+
+		// Make compatible the old mdstores with the evolution of the model class
+		// ie: the addiction of the new field (validationResults)
+		final Dataset<Row> rowsWithNewField = ArrayUtils.contains(rows.schema().fieldNames(), "validationResults")
+			? rows
+			: rows.withColumn("validationResults", functions.map());
+
+		return rowsWithNewField.as(Encoders.bean(MetadataRecord.class));
+
 	}
 
 	public static class MDStoreAggregator extends Aggregator<MetadataRecord, MetadataRecord, MetadataRecord> {
