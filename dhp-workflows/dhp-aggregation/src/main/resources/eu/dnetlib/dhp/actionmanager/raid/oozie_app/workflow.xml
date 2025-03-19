@@ -12,6 +12,10 @@
             <name>openaireBaseUrl</name>
             <description>base url for instance url creation</description>
         </property>
+        <property>
+            <name>graphBasePath</name>
+            <description>base path of the graph</description>
+        </property>
     </parameters>
 
     <start to="deleteoutputpath"/>
@@ -49,6 +53,7 @@
             <arg>--inputPath</arg><arg>${raidJsonInputPath}</arg>
             <arg>--outputPath</arg><arg>${raidActionSetPath}</arg>
             <arg>--baseUrl</arg><arg>${openaireBaseUrl}</arg>
+            <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
