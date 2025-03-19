@@ -14,15 +14,10 @@ import static eu.dnetlib.dhp.utils.DHPUtils.writeHdfsFile;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Objects;
 import java.util.Optional;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
@@ -47,7 +42,6 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.mdstore.MDStoreVersion;
 import eu.dnetlib.dhp.schema.mdstore.MetadataRecord;
 import eu.dnetlib.dhp.schema.mdstore.Provenance;
-import eu.dnetlib.dhp.schema.mdstore.ValidationType;
 import eu.dnetlib.validator2.validation.guideline.openaire.AbstractOpenAireProfile;
 import eu.dnetlib.validator2.validation.guideline.openaire.DataArchiveGuidelinesV2Profile;
 import eu.dnetlib.validator2.validation.guideline.openaire.FAIR_Data_GuidelinesProfile;
@@ -106,27 +100,27 @@ public class GenerateNativeStoreSparkJob {
 
 		final SparkConf conf = new SparkConf();
 
-		final ValidationType validationType = getValidationType(api.getCompatibilityLevel());
+		final AbstractOpenAireProfile validationProfile = getValidationType(api.getCompatibilityLevel());
 
 		runWithSparkSession(
 			conf, isSparkSessionManaged,
 			spark -> createNativeMDStore(
-				spark, provenance, dateOfCollection, xpath, encoding, validationType, currentVersion,
+				spark, provenance, dateOfCollection, xpath, encoding, validationProfile, currentVersion,
 				readMdStoreVersion));
 	}
 
-	private static ValidationType getValidationType(String compatibilityLevel) {
+	private static AbstractOpenAireProfile getValidationType(String compatibilityLevel) {
 		switch (compatibilityLevel) {
 			case "openaire2.0":
-				return ValidationType.openaire2_0;
+				return new DataArchiveGuidelinesV2Profile();
 			case "openaire3.0":
-				return ValidationType.openaire3_0;
+				return new LiteratureGuidelinesV3Profile();
 			case "openaire4.0":
-				return ValidationType.openaire4_0;
+				return new LiteratureGuidelinesV4Profile();
 			case "fair_data":
-				return ValidationType.fair_data;
+				return new FAIR_Data_GuidelinesProfile();
 			case "fair_literature_v4":
-				return ValidationType.fair_literature_v4;
+				return new FAIR_Literature_GuidelinesV4Profile();
 			default:
 				throw new IllegalArgumentException("Unknown compatibility level: " + compatibilityLevel);
 		}
@@ -137,7 +131,7 @@ public class GenerateNativeStoreSparkJob {
 		final Long dateOfCollection,
 		final String xpath,
 		final String encoding,
-		final ValidationType validationType,
+		final AbstractOpenAireProfile validationProfile,
 		final MDStoreVersion currentVersion,
 		final MDStoreVersion readVersion) throws IOException {
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -147,14 +141,12 @@ public class GenerateNativeStoreSparkJob {
 
 		final String seqFilePath = currentVersion.getHdfsPath() + SEQUENCE_FILE_NAME;
 
-		final AbstractOpenAireProfile validator = findValidator(validationType);
-
 		final JavaRDD<MetadataRecord> nativeStore = sc
 			.sequenceFile(seqFilePath, IntWritable.class, Text.class)
 			.map(
 				item -> parseRecord(
 					item._2().toString(), xpath, encoding, provenance, dateOfCollection, totalItems, invalidRecords))
-			.map(mdr -> addValidationReport(mdr, validationType, validator))
+			.map(mdr -> addValidationReport(mdr, validationProfile))
 			.filter(Objects::nonNull)
 			.distinct();
 
@@ -194,6 +186,8 @@ public class GenerateNativeStoreSparkJob {
 	}
 
 	public static class MDStoreAggregator extends Aggregator<MetadataRecord, MetadataRecord, MetadataRecord> {
+
+		private static final long serialVersionUID = -3409563083332613984L;
 
 		@Override
 		public MetadataRecord zero() {
@@ -270,32 +264,13 @@ public class GenerateNativeStoreSparkJob {
 		}
 	}
 
-	public static AbstractOpenAireProfile findValidator(final ValidationType validationType) {
-		switch (validationType) {
-			case openaire2_0:
-				return new DataArchiveGuidelinesV2Profile();
-			case openaire3_0:
-				return new LiteratureGuidelinesV3Profile();
-			case openaire4_0:
-				return new LiteratureGuidelinesV4Profile();
-			case fair_data:
-				return new FAIR_Data_GuidelinesProfile();
-			case fair_literature_v4:
-				return new FAIR_Literature_GuidelinesV4Profile();
-			default:
-				throw new IllegalArgumentException("Unknown validation type: " + validationType);
-		}
+	public static MetadataRecord addValidationReport(final MetadataRecord mdr, final AbstractOpenAireProfile validationProfile) {
 
-	}
-
-	public static MetadataRecord addValidationReport(final MetadataRecord mdr,
-		final ValidationType validationType,
-		final AbstractOpenAireProfile validator) {
-
-		if ((validationType == null) || (validator == null)) {
+		if (validationProfile == null) {
 			return mdr;
 		}
 
+		/*
 		if (mdr.getValidationResults() == null) {
 			mdr.setValidationResults(new HashMap<>());
 		}
@@ -309,7 +284,8 @@ public class GenerateNativeStoreSparkJob {
 					"Error generating validation report, record id: " + mdr.getId() + ", validationType: "
 						+ validationType,
 					e);
-		}
+		}	
+		 */
 
 		return mdr;
 	}
