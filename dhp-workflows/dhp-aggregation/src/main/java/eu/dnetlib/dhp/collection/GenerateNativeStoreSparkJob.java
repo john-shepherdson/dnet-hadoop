@@ -14,6 +14,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -49,7 +51,7 @@ import eu.dnetlib.dhp.schema.mdstore.MDStoreVersion;
 import eu.dnetlib.dhp.schema.mdstore.MetadataRecord;
 import eu.dnetlib.dhp.schema.mdstore.Provenance;
 import eu.dnetlib.dhp.schema.mdstore.ValidationType;
-import eu.dnetlib.validator2.validation.StandardValidationResult;
+import eu.dnetlib.validator2.validation.XMLApplicationProfile.ValidationResult;
 import eu.dnetlib.validator2.validation.guideline.openaire.AbstractOpenAireProfile;
 import eu.dnetlib.validator2.validation.guideline.openaire.DataArchiveGuidelinesV2Profile;
 import eu.dnetlib.validator2.validation.guideline.openaire.FAIR_Data_GuidelinesProfile;
@@ -114,13 +116,11 @@ public class GenerateNativeStoreSparkJob {
 		final Pair<ValidationType, AbstractOpenAireProfile> validator = getValidationType(api.getCompatibilityLevel());
 
 		runWithSparkSession(
-			conf, isSparkSessionManaged,
-			spark -> createNativeMDStore(
-				spark, provenance, dateOfCollection, xpath, encoding, validator, currentVersion,
-				readMdStoreVersion));
+			conf, isSparkSessionManaged, spark -> createNativeMDStore(
+				spark, provenance, dateOfCollection, xpath, encoding, validator, currentVersion, readMdStoreVersion));
 	}
 
-	private static Pair<ValidationType, AbstractOpenAireProfile> getValidationType(String compatibilityLevel) {
+	private static Pair<ValidationType, AbstractOpenAireProfile> getValidationType(final String compatibilityLevel) {
 		switch (compatibilityLevel) {
 			case "openaire2.0":
 				return Pair.of(ValidationType.openaire2_0, new DataArchiveGuidelinesV2Profile());
@@ -153,12 +153,24 @@ public class GenerateNativeStoreSparkJob {
 
 		final String seqFilePath = currentVersion.getHdfsPath() + SEQUENCE_FILE_NAME;
 
+		final Map<String, LongAccumulator> validationErrors = new LinkedHashMap<>();
+		final Map<String, LongAccumulator> validationWarnings = new LinkedHashMap<>();
+
+		validator.getValue().guidelines().forEach(gdl -> {
+			validationErrors
+				.put(gdl.getName(), sc.sc().longAccumulator(gdl.getName().toLowerCase().replace(' ', '_') + "_errors"));
+			validationWarnings
+				.put(
+					gdl.getName(),
+					sc.sc().longAccumulator(gdl.getName().toLowerCase().replace(' ', '_') + "_warnings"));
+		});
+
 		final JavaRDD<MetadataRecord> nativeStore = sc
 			.sequenceFile(seqFilePath, IntWritable.class, Text.class)
 			.map(
 				item -> parseRecord(
 					item._2().toString(), xpath, encoding, provenance, dateOfCollection, totalItems, invalidRecords))
-			.map(mdr -> addValidationReport(mdr, validator))
+			.map(mdr -> addValidationReport(mdr, validator, validationErrors, validationWarnings))
 			.filter(Objects::nonNull)
 			.distinct();
 
@@ -277,7 +289,9 @@ public class GenerateNativeStoreSparkJob {
 	}
 
 	public static MetadataRecord addValidationReport(final MetadataRecord mdr,
-		final Pair<ValidationType, AbstractOpenAireProfile> validator) {
+		final Pair<ValidationType, AbstractOpenAireProfile> validator,
+		final Map<String, LongAccumulator> errors,
+		final Map<String, LongAccumulator> warnings) {
 
 		if (validator == null) {
 			return mdr;
@@ -290,11 +304,18 @@ public class GenerateNativeStoreSparkJob {
 		final ValidationType validationType = validator.getKey();
 		final AbstractOpenAireProfile profile = validator.getValue();
 
-		try (ByteArrayInputStream is = new ByteArrayInputStream(mdr.getBody().getBytes(StandardCharsets.UTF_8))) {
+		try (final ByteArrayInputStream is = new ByteArrayInputStream(mdr.getBody().getBytes(StandardCharsets.UTF_8))) {
 			final org.w3c.dom.Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
-			mdr
-				.getValidationResults()
-				.put(validationType, (StandardValidationResult) profile.validate(mdr.getId(), doc));
+			final ValidationResult report = profile.validate(mdr.getId(), doc);
+			mdr.getValidationResults().put(validationType, report);
+			report.getResults().forEach((name, result) -> {
+				if (errors.containsKey(name) && (result.getErrors().size() > 0)) {
+					errors.get(name).add(result.getErrors().size()); // TODO discuss if to add the list size or 1
+				}
+				if (warnings.containsKey(name) && (result.getWarnings().size() > 0)) {
+					warnings.get(name).add(result.getWarnings().size()); // TODO discuss if to add the list size or 1
+				}
+			});
 		} catch (final Throwable e) {
 			log
 				.warn(
