@@ -13,13 +13,15 @@ import static eu.dnetlib.dhp.utils.DHPUtils.writeHdfsFile;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.Optional;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.spark.SparkConf;
@@ -39,10 +41,15 @@ import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.mdstore.MDStoreVersion;
 import eu.dnetlib.dhp.schema.mdstore.MetadataRecord;
 import eu.dnetlib.dhp.schema.mdstore.Provenance;
+import eu.dnetlib.dhp.schema.mdstore.ValidationType;
+import eu.dnetlib.validator2.validation.StandardValidationResult;
 import eu.dnetlib.validator2.validation.guideline.openaire.AbstractOpenAireProfile;
 import eu.dnetlib.validator2.validation.guideline.openaire.DataArchiveGuidelinesV2Profile;
 import eu.dnetlib.validator2.validation.guideline.openaire.FAIR_Data_GuidelinesProfile;
@@ -56,7 +63,7 @@ public class GenerateNativeStoreSparkJob {
 	private static final Logger log = LoggerFactory.getLogger(GenerateNativeStoreSparkJob.class);
 
 	private static final ObjectMapper MAPPER = new ObjectMapper()
-			.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
 	public static void main(final String[] args) throws Exception {
 
@@ -104,27 +111,27 @@ public class GenerateNativeStoreSparkJob {
 
 		final SparkConf conf = new SparkConf();
 
-		final AbstractOpenAireProfile validationProfile = getValidationType(api.getCompatibilityLevel());
+		final Pair<ValidationType, AbstractOpenAireProfile> validator = getValidationType(api.getCompatibilityLevel());
 
 		runWithSparkSession(
 			conf, isSparkSessionManaged,
 			spark -> createNativeMDStore(
-				spark, provenance, dateOfCollection, xpath, encoding, validationProfile, currentVersion,
+				spark, provenance, dateOfCollection, xpath, encoding, validator, currentVersion,
 				readMdStoreVersion));
 	}
 
-	private static AbstractOpenAireProfile getValidationType(String compatibilityLevel) {
+	private static Pair<ValidationType, AbstractOpenAireProfile> getValidationType(String compatibilityLevel) {
 		switch (compatibilityLevel) {
 			case "openaire2.0":
-				return new DataArchiveGuidelinesV2Profile();
+				return Pair.of(ValidationType.openaire2_0, new DataArchiveGuidelinesV2Profile());
 			case "openaire3.0":
-				return new LiteratureGuidelinesV3Profile();
+				return Pair.of(ValidationType.openaire3_0, new LiteratureGuidelinesV3Profile());
 			case "openaire4.0":
-				return new LiteratureGuidelinesV4Profile();
+				return Pair.of(ValidationType.openaire4_0, new LiteratureGuidelinesV4Profile());
 			case "fair_data":
-				return new FAIR_Data_GuidelinesProfile();
+				return Pair.of(ValidationType.fair_data, new FAIR_Data_GuidelinesProfile());
 			case "fair_literature_v4":
-				return new FAIR_Literature_GuidelinesV4Profile();
+				return Pair.of(ValidationType.fair_literature_v4, new FAIR_Literature_GuidelinesV4Profile());
 			default:
 				throw new IllegalArgumentException("Unknown compatibility level: " + compatibilityLevel);
 		}
@@ -135,9 +142,10 @@ public class GenerateNativeStoreSparkJob {
 		final Long dateOfCollection,
 		final String xpath,
 		final String encoding,
-		final AbstractOpenAireProfile validationProfile,
+		final Pair<ValidationType, AbstractOpenAireProfile> validator,
 		final MDStoreVersion currentVersion,
 		final MDStoreVersion readVersion) throws IOException {
+
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		final LongAccumulator totalItems = sc.sc().longAccumulator(CONTENT_TOTALITEMS);
@@ -150,7 +158,7 @@ public class GenerateNativeStoreSparkJob {
 			.map(
 				item -> parseRecord(
 					item._2().toString(), xpath, encoding, provenance, dateOfCollection, totalItems, invalidRecords))
-			.map(mdr -> addValidationReport(mdr, validationProfile))
+			.map(mdr -> addValidationReport(mdr, validator))
 			.filter(Objects::nonNull)
 			.distinct();
 
@@ -269,20 +277,30 @@ public class GenerateNativeStoreSparkJob {
 	}
 
 	public static MetadataRecord addValidationReport(final MetadataRecord mdr,
-		final AbstractOpenAireProfile validationProfile) {
+		final Pair<ValidationType, AbstractOpenAireProfile> validator) {
 
-		if (validationProfile == null) {
+		if (validator == null) {
 			return mdr;
 		}
 
-		/*
-		 * if (mdr.getValidationResults() == null) { mdr.setValidationResults(new HashMap<>()); } try
-		 * (ByteArrayInputStream is = new ByteArrayInputStream(mdr.getBody().getBytes(StandardCharsets.UTF_8))) { final
-		 * org.w3c.dom.Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
-		 * mdr.getValidationResults().put(validationType, validator.validate(mdr.getId(), doc)); } catch (final
-		 * Throwable e) { log .warn( "Error generating validation report, record id: " + mdr.getId() +
-		 * ", validationType: " + validationType, e); }
-		 */
+		if (mdr.getValidationResults() == null) {
+			mdr.setValidationResults(new HashMap<>());
+		}
+
+		final ValidationType validationType = validator.getKey();
+		final AbstractOpenAireProfile profile = validator.getValue();
+
+		try (ByteArrayInputStream is = new ByteArrayInputStream(mdr.getBody().getBytes(StandardCharsets.UTF_8))) {
+			final org.w3c.dom.Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
+			mdr
+				.getValidationResults()
+				.put(validationType, (StandardValidationResult) profile.validate(mdr.getId(), doc));
+		} catch (final Throwable e) {
+			log
+				.warn(
+					"Error generating validation report, record id: {}, validationType: {}", mdr.getId(),
+					validationType, e);
+		}
 
 		return mdr;
 	}
