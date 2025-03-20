@@ -6,46 +6,55 @@ import java.util.List;
 
 public class RAiDEntity implements Serializable {
 
-	String raid;
-	List<String> authors;
+	String id;
+	String title;
+	String description;
+	List<String> ids;
 	String startDate;
 	String endDate;
-	List<String> subjects;
-	List<String> titles;
-	List<String> ids;
-	String title;
-	String summary;
 
 	public RAiDEntity() {
 	}
 
-	public RAiDEntity(String raid, List<String> authors, String startDate, String endDate, List<String> subjects,
-		List<String> titles, List<String> ids, String title, String summary) {
-		this.raid = raid;
-		this.authors = authors;
+	public RAiDEntity(String id, String title, String description, List<String> ids, String startDate, String endDate) {
+		this.id = id;
+		this.title = title;
+		this.description = description;
+		this.ids = ids;
 		this.startDate = startDate;
 		this.endDate = endDate;
-		this.subjects = subjects;
-		this.titles = titles;
-		this.ids = ids;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
 		this.title = title;
-		this.summary = summary;
 	}
 
-	public String getRaid() {
-		return raid;
+	public String getDescription() {
+		return description;
 	}
 
-	public void setRaid(String raid) {
-		this.raid = raid;
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
-	public List<String> getAuthors() {
-		return authors;
+	public void setIds(List<String> ids) {
+		this.ids = ids;
 	}
 
-	public void setAuthors(List<String> authors) {
-		this.authors = authors;
+	public List<String> getIds() {
+		return ids;
 	}
 
 	public String getStartDate() {
@@ -62,45 +71,5 @@ public class RAiDEntity implements Serializable {
 
 	public void setEndDate(String endDate) {
 		this.endDate = endDate;
-	}
-
-	public List<String> getSubjects() {
-		return subjects;
-	}
-
-	public void setSubjects(List<String> subjects) {
-		this.subjects = subjects;
-	}
-
-	public List<String> getTitles() {
-		return titles;
-	}
-
-	public void setTitles(List<String> titles) {
-		this.titles = titles;
-	}
-
-	public List<String> getIds() {
-		return ids;
-	}
-
-	public void setIds(List<String> ids) {
-		this.ids = ids;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public String getSummary() {
-		return summary;
-	}
-
-	public void setSummary(String summary) {
-		this.summary = summary;
 	}
 }
