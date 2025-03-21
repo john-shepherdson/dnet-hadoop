@@ -869,11 +869,6 @@
   "datacite_name": "UNC Dataverse",
   "official_name": "UNC Dataverse"
  },
- "CRUI.UNIBO": {
-  "openaire_id": "re3data_____::r3d100012604",
-  "datacite_name": "AMS Acta",
-  "official_name": "AMS Acta"
- },
  "LMU.UB": {
   "openaire_id": "re3data_____::r3d100010731",
   "datacite_name": "Open Data LMU",
