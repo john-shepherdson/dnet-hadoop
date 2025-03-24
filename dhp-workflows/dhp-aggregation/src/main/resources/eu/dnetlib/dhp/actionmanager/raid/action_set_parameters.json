@@ -16,5 +16,11 @@
     "paramLongName": "baseUrl",
     "paramDescription": "base url path for instance url creation",
     "paramRequired": true
+  },
+  {
+    "paramName": "g",
+    "paramLongName": "graphBasePath",
+    "paramDescription": "base url path of the graph",
+    "paramRequired": true
   }
 ]

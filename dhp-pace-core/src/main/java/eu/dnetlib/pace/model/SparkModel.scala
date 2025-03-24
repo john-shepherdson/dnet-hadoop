@@ -80,7 +80,6 @@ case class SparkModel(conf: DedupConfig) {
         val fdef = conf.getPace.getModelMap.get(fname.split("_filtered")(0))
 
         if (fdef != null) {
-          if (!fname.contains("_filtered")) { //process fields with no blacklist
             res(index) = fdef.getType match {
               case Type.String | Type.Int =>
                 MapDocumentUtil.truncateValue(
@@ -113,26 +112,16 @@ case class SparkModel(conf: DedupConfig) {
               case Type.DoubleArray =>
                 MapDocumentUtil.getJPathArray(fdef.getPath, json)
             }
-          }
-          else { //process fields with blacklist
+
+          if (fname.contains("_filtered")) { //filter fields in blacklist
             val blacklist: Predicate[String] = conf.blacklists().get(fdef.getName)
-
-            res(index) = fdef.getType match {
-              case Type.List | Type.JSON =>
-                MapDocumentUtil.truncateList(
-                  MapDocumentUtil.getJPathList(fdef.getPath, documentContext, fdef.getType),
-                  fdef.getSize
-                ).asScala.filter((v: String) => !blacklist.test(v))
-
-              case _ =>
-                val value: String = MapDocumentUtil.truncateValue(
-                  MapDocumentUtil.getJPathString(fdef.getPath, documentContext),
-                  fdef.getLength
-                )
-                if (blacklist.test(value)) "" else value
+            val v = res(index)
+            res(index) = v match {
+              case s: String => if (blacklist.test(s)) "" else v
+              case l: Seq[String] => l.filter((v: String) => !blacklist.test(v))
+              case _ => v
             }
           }
-
 
           val filter = fdef.getFilter
 
