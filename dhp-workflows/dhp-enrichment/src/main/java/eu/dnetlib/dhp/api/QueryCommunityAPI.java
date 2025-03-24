@@ -6,9 +6,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -35,6 +34,12 @@ public class QueryCommunityAPI {
 	public static String communities(String baseURL) throws IOException {
 
 		return get(baseURL + "communities");
+
+	}
+
+	public static String community(String id, String baseURL) throws IOException {
+
+		return get(baseURL + id);
 
 	}
 
@@ -101,6 +106,6 @@ public class QueryCommunityAPI {
 	}
 
 	public static String propagationDatasourceCommunityMap(String baseURL) throws IOException {
-		return get(baseURL + "/propagationDatasourceCommunityMap");
+		return get(baseURL + "propagationDatasourceCommunityMap");
 	}
 }

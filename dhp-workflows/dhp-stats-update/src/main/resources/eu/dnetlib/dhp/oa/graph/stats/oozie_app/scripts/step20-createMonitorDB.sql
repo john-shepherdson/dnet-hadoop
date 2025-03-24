@@ -1,4 +1,4 @@
-set mapred.job.queue.name=analytics; /*EOS*/
+set mapred.job.queue.name=analytics;
 
 create view if not exists TARGET.category as select * from SOURCE.category;
 create view if not exists TARGET.concept as select * from SOURCE.concept;

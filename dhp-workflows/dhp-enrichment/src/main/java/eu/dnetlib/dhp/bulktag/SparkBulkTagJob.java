@@ -4,12 +4,19 @@ package eu.dnetlib.dhp.bulktag;
 import static eu.dnetlib.dhp.PropagationConstant.removeOutputDir;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.spark.SparkConf;
@@ -29,6 +36,7 @@ import eu.dnetlib.dhp.api.model.CommunityEntityMap;
 import eu.dnetlib.dhp.api.model.EntityCommunities;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.bulktag.community.*;
+import eu.dnetlib.dhp.common.DbClient;
 import eu.dnetlib.dhp.common.action.ReadDatasourceMasterDuplicateFromDB;
 import eu.dnetlib.dhp.common.action.model.MasterDuplicate;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
@@ -97,6 +105,8 @@ public class SparkBulkTagJob {
 		final String hdfsPath = outputPath + "masterDuplicate";
 		log.info("hdfsPath: {}", hdfsPath);
 
+		final String configurationPath = parser.get("configurationPath");
+
 		SparkConf conf = new SparkConf();
 		CommunityConfiguration cc;
 
@@ -109,7 +119,7 @@ public class SparkBulkTagJob {
 			cc = CommunityConfigurationFactory.newInstance(taggingConf);
 		} else {
 			cc = Utils.getCommunityConfiguration(baseURL);
-
+			writeCommunityConfiguration(configurationPath, hdfsNameNode, cc);
 		}
 
 		runWithSparkSession(
@@ -118,6 +128,7 @@ public class SparkBulkTagJob {
 			spark -> {
 				extendCommunityConfigurationForEOSC(spark, inputPath, cc);
 				ReadDatasourceMasterDuplicateFromDB.execute(dbUrl, dbUser, dbPassword, hdfsPath, hdfsNameNode);
+
 				execBulkTag(
 					spark, inputPath, outputPath, protoMap, cc);
 				execEntityTag(
@@ -132,11 +143,31 @@ public class SparkBulkTagJob {
 					Project.class, TaggingConstants.CLASS_ID_PROJECT, TaggingConstants.CLASS_NAME_BULKTAG_PROJECT);
 				execEntityTag(
 					spark, inputPath + "datasource", outputPath + "datasource",
-					mapWithMasterDatasource(spark, hdfsPath, Utils.getDatasourceCommunityMap(baseURL)),
+					mapWithMasterDatasource(spark, hdfsPath, Utils.getDatasourceCommunities(baseURL)),
 					Datasource.class, TaggingConstants.CLASS_ID_DATASOURCE,
 					TaggingConstants.CLASS_NAME_BULKTAG_DATASOURCE);
 
 			});
+	}
+
+	private static void writeCommunityConfiguration(String configurationPath, String hdfsNameNode,
+		CommunityConfiguration cc) throws IOException {
+
+		Configuration conf = new Configuration();
+		conf.set("fs.defaultFS", hdfsNameNode);
+		FileSystem fileSystem = FileSystem.get(conf);
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+		String formattedDate = LocalDate.now().format(formatter);
+		FSDataOutputStream fos = fileSystem.create(new Path(configurationPath + formattedDate));
+
+		try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fos, StandardCharsets.UTF_8))) {
+			for (Community c : cc.getCommunities().values()) {
+				writer.write(new ObjectMapper().writeValueAsString(c));
+				writer.write("\n");
+			}
+		}
+
 	}
 
 	private static CommunityEntityMap mapWithMasterDatasource(SparkSession spark, String masterDuplicatePath,
@@ -148,13 +179,13 @@ public class SparkBulkTagJob {
 			.json(masterDuplicatePath)
 			.as(Encoders.bean(MasterDuplicate.class));
 		// list of id for the communities related entities
-		List<String> idList = entityIdList(ModelSupport.idPrefixMap.get(Datasource.class), datasourceCommunityMap);
+		List<String> idList = entityIdList(datasourceCommunityMap);
 
 		// find the mapping with the representative entity if any
 		Dataset<String> datasourceIdentifiers = spark.createDataset(idList, Encoders.STRING());
-		List<Row> mappedKeys = datasourceIdentifiers
+		List<Row> mappedKeys = masterDuplicate
 			.join(
-				masterDuplicate, datasourceIdentifiers.col("_1").equalTo(masterDuplicate.col("duplicateId")),
+				datasourceIdentifiers, datasourceIdentifiers.col("value").equalTo(masterDuplicate.col("duplicateId")),
 				"left_semi")
 			.selectExpr("masterId as source", "duplicateId as target")
 			.collectAsList();
@@ -163,13 +194,10 @@ public class SparkBulkTagJob {
 		return remapCommunityEntityMap(datasourceCommunityMap, mappedKeys);
 	}
 
-	private static List<String> entityIdList(String idPrefixMap, CommunityEntityMap datasourceCommunityMap) {
-		final String prefix = idPrefixMap + "|";
-		return datasourceCommunityMap
-			.keySet()
-			.stream()
-			.map(key -> prefix + key)
-			.collect(Collectors.toList());
+	private static List<String> entityIdList(CommunityEntityMap datasourceCommunityMap) {
+
+		return new ArrayList<>(datasourceCommunityMap
+			.keySet());
 	}
 
 	private static CommunityEntityMap mapWithRepresentativeOrganization(SparkSession spark, String relationPath,
@@ -178,14 +206,16 @@ public class SparkBulkTagJob {
 			.read()
 			.schema(Encoders.bean(Relation.class).schema())
 			.json(relationPath)
-			.filter("datainfo.deletedbyinference != true and relClass = 'merges")
+			.filter("datainfo.deletedbyinference != true and relClass = 'merges'")
 			.select("source", "target");
 
-		List<String> idList = entityIdList(ModelSupport.idPrefixMap.get(Organization.class), organizationCommunityMap);
+		List<String> idList = entityIdList(organizationCommunityMap);
 
 		Dataset<String> organizationIdentifiers = spark.createDataset(idList, Encoders.STRING());
-		List<Row> mappedKeys = organizationIdentifiers
-			.join(mergesRel, organizationIdentifiers.col("_1").equalTo(mergesRel.col("target")), "left_semi")
+		List<Row> mappedKeys = mergesRel
+			.join(
+				organizationIdentifiers, organizationIdentifiers.col("value").equalTo(mergesRel.col("target")),
+				"left_semi")
 			.select("source", "target")
 			.collectAsList();
 
@@ -198,12 +228,16 @@ public class SparkBulkTagJob {
 		for (Row mappedEntry : mappedKeys) {
 			String oldKey = mappedEntry.getAs("target");
 			String newKey = mappedEntry.getAs("source");
+			if (entityCommunityMap.containsKey(oldKey)) {
+				List<String> content = entityCommunityMap.remove(oldKey);
+				entityCommunityMap.put(newKey, content);
+			}
 			// inserts the newKey in the map while removing the oldKey. The remove produces the value in the Map, which
 			// will be used as the newValue parameter of the BiFunction
-			entityCommunityMap.merge(newKey, entityCommunityMap.remove(oldKey), (existing, newValue) -> {
-				existing.addAll(newValue);
-				return existing;
-			});
+//			entityCommunityMap.merge(newKey, entityCommunityMap.remove(oldKey), (existing, newValue) -> {
+//				existing.addAll(newValue);
+//				return existing;
+//			});
 
 		}
 		return entityCommunityMap;
@@ -306,6 +340,20 @@ public class SparkBulkTagJob {
 		String outputPath,
 		ProtoMap protoMappingParams,
 		CommunityConfiguration communityConfiguration) {
+
+//		communityConfiguration
+//			.getCommunities()
+//			.keySet()
+//			.forEach(c -> {
+//				try {
+//					log
+//						.info(
+//							"Community Configuration {}",
+//							new ObjectMapper().writeValueAsString(communityConfiguration.getCommunities().get(c)));
+//				} catch (Exception e) {
+//
+//				}
+//			});
 
 		ModelSupport.entityTypes
 			.keySet()

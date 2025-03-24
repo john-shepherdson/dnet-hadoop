@@ -30,7 +30,7 @@ select /*+ COALESCE(100) */
     soft.publisher.value                                                     as publisher,
     cast(null as string)                                                     as journal,
     soft.dateofacceptance.value                                              as date,
-    date_format(soft.dateofacceptance.value, 'yyyy')                         as year,
+    cast(date_format(soft.dateofacceptance.value, 'yyyy') as int)            as year,
     soft.bestaccessright.classname                                           as bestlicence,
     soft.embargoenddate.value                                                as embargo_end_date,
     coalesce(soft_delayed.delayed, false)                                    as delayed, -- It's delayed, when the software was published after the end of the project.
@@ -42,6 +42,7 @@ from ${openaire_db_name}.software soft
          left outer join soft_delayed on soft.id=soft_delayed.soft_id
 where soft.datainfo.deletedbyinference = false and soft.datainfo.invisible = false; /*EOS*/
 
+ANALYZE TABLE ${stats_db_name}.software COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.software_citations purge; /*EOS*/
 
@@ -52,6 +53,8 @@ FROM ${openaire_db_name}.software s
 where xpath_string(citation.value, "//citation/id[@type='openaire']/@value") != ""
   and s.datainfo.deletedbyinference = false and s.datainfo.invisible=false; /*EOS*/
 
+ANALYZE TABLE ${stats_db_name}.software_citations COMPUTE STATISTICS; /*EOS*/
+
 DROP TABLE IF EXISTS ${stats_db_name}.software_classifications purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.software_classifications STORED AS PARQUET AS
@@ -59,6 +62,8 @@ SELECT /*+ COALESCE(100) */ substr(p.id, 4) AS id, instancetype.classname AS typ
 FROM ${openaire_db_name}.software p
          LATERAL VIEW explode(p.instance.instancetype) instances AS instancetype
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
+
+ANALYZE TABLE ${stats_db_name}.software_classifications COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.software_concepts purge; /*EOS*/
 
@@ -70,6 +75,8 @@ SELECT /*+ COALESCE(100) */ substr(p.id, 4) as id, case
 FROM ${openaire_db_name}.software p
          LATERAL VIEW explode(p.context) contexts AS context
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
+
+ANALYZE TABLE ${stats_db_name}.software_concepts COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.software_datasources purge; /*EOS*/
 
@@ -85,12 +92,16 @@ FROM (
     FROM ${openaire_db_name}.datasource d
     WHERE d.datainfo.deletedbyinference = false and d.datainfo.invisible=false) d ON p.datasource = d.id; /*EOS*/
 
+ANALYZE TABLE ${stats_db_name}.software_datasources COMPUTE STATISTICS; /*EOS*/
+
 DROP TABLE IF EXISTS ${stats_db_name}.software_languages purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.software_languages STORED AS PARQUET AS
 select /*+ COALESCE(100) */ substr(p.id, 4) AS id, p.language.classname AS language
 FROM ${openaire_db_name}.software p
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
+
+ANALYZE TABLE ${stats_db_name}.software_languages COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.software_oids purge; /*EOS*/
 
@@ -100,6 +111,8 @@ FROM ${openaire_db_name}.software p
          LATERAL VIEW explode(p.originalid) oids AS ids
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
 
+ANALYZE TABLE ${stats_db_name}.software_oids  COMPUTE STATISTICS; /*EOS*/
+
 DROP TABLE IF EXISTS ${stats_db_name}.software_pids purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.software_pids STORED AS PARQUET AS
@@ -108,6 +121,8 @@ FROM ${openaire_db_name}.software p
          LATERAL VIEW explode(p.pid) pids AS ppid
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
 
+ANALYZE TABLE ${stats_db_name}.software_pids COMPUTE STATISTICS; /*EOS*/
+
 DROP TABLE IF EXISTS ${stats_db_name}.software_topics purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.software_topics STORED AS PARQUET AS
@@ -115,3 +130,5 @@ SELECT /*+ COALESCE(100) */ substr(p.id, 4) AS id, subjects.subject.qualifier.cl
 FROM ${openaire_db_name}.software p
          LATERAL VIEW explode(p.subject) subjects AS subject
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
+
+ANALYZE TABLE ${stats_db_name}.software_topics COMPUTE STATISTICS; /*EOS*/

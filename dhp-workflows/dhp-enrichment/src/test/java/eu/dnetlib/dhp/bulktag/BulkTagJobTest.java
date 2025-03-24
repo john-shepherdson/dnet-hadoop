@@ -31,6 +31,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
+import eu.dnetlib.dhp.api.QueryCommunityAPI;
 import eu.dnetlib.dhp.api.Utils;
 import eu.dnetlib.dhp.api.model.SubCommunityModel;
 import eu.dnetlib.dhp.bulktag.community.CommunityConfiguration;
@@ -1953,19 +1954,39 @@ public class BulkTagJobTest {
 
 	@Test
 	public void testApi() throws IOException {
-		String baseURL = "https://dev-openaire.d4science.org/openaire/community/";
+		String baseURL = "https://services.openaire.eu/openaire/community/";
 		List<SubCommunityModel> subcommunities = Utils.getSubcommunities("clarin", baseURL);
 
 		CommunityConfiguration tmp = Utils.getCommunityConfiguration(baseURL);
-		tmp.getCommunities().keySet().forEach(c -> {
+//		tmp.getCommunities().keySet().forEach(c -> {
+//			try {
+//				System.out.println(new ObjectMapper().writeValueAsString(tmp.getCommunities().get(c)));
+//			} catch (JsonProcessingException e) {
+//				throw new RuntimeException(e);
+//			}
+//		});
+
+		System.out.println(new ObjectMapper().writeValueAsString(Utils.getOrganizationCommunityMap(baseURL)));
+		System.out.println(new ObjectMapper().writeValueAsString(Utils.getDatasourceCommunities(baseURL)));
+	}
+
+	@Test
+	public void getConfigurationApi() throws IOException {
+		String baseURL = "https://services.openaire.eu/openaire/community/";
+		List<SubCommunityModel> subcommunities = Utils.getSubcommunities("clarin", baseURL);
+
+		CommunityConfiguration cc = Utils.getCommunityConfiguration(baseURL);
+
+		cc.getCommunities().keySet().forEach(c -> {
 			try {
-				System.out.println(new ObjectMapper().writeValueAsString(tmp.getCommunities().get(c)));
+				System.out.println(new ObjectMapper().writeValueAsString(cc.getCommunities().get(c)));
 			} catch (JsonProcessingException e) {
 				throw new RuntimeException(e);
 			}
 		});
 
-		System.out.println(new ObjectMapper().writeValueAsString(Utils.getOrganizationCommunityMap(baseURL)));
+//		System.out.println(new ObjectMapper().writeValueAsString(Utils.getOrganizationCommunityMap(baseURL)));
+//		System.out.println(new ObjectMapper().writeValueAsString(Utils.getDatasourceCommunities(baseURL)));
 	}
 
 }

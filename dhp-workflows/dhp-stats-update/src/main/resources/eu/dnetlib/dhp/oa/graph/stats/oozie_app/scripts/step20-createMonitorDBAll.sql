@@ -1,4 +1,4 @@
-set mapred.job.queue.name=analytics; /*EOS*/
+set mapred.job.queue.name=analytics;
 
 drop database if exists TARGET cascade;
 create database if not exists TARGET;

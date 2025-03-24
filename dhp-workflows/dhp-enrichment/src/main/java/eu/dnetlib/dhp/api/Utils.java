@@ -8,12 +8,15 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 
 import eu.dnetlib.dhp.api.model.*;
+import eu.dnetlib.dhp.bulktag.SparkBulkTagJob;
 import eu.dnetlib.dhp.bulktag.community.Community;
 import eu.dnetlib.dhp.bulktag.community.CommunityConfiguration;
 import eu.dnetlib.dhp.bulktag.community.Provider;
@@ -31,6 +34,7 @@ import eu.dnetlib.dhp.schema.oaf.Project;
 public class Utils implements Serializable {
 	private static final ObjectMapper MAPPER = new ObjectMapper();
 	private static final VerbResolver resolver = VerbResolverFactory.newInstance();
+	private static final Logger log = LoggerFactory.getLogger(SparkBulkTagJob.class);
 
 	@FunctionalInterface
 	private interface ProjectQueryFunction {
@@ -177,16 +181,24 @@ public class Utils implements Serializable {
 	 * @return the community set with information from the community model and for the content providers
 	 */
 	private static Community getCommunity(String baseURL, CommunityModel communityModel) {
-		Community community = getCommunity(communityModel);
-		community.setProviders(getCommunityContentProviders(() -> {
-			try {
-				return QueryCommunityAPI.communityDatasource(community.getId(), baseURL);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		}));
+		log.info("getting community {}", communityModel.getId());
+		try {
+			Community community = getCommunity(
+				MAPPER
+					.readValue(QueryCommunityAPI.community(communityModel.getId(), baseURL), CommunityModel.class));
+			String id = community.getId();
+			community.setProviders(getCommunityContentProviders(() -> {
+				try {
+					return QueryCommunityAPI.communityDatasource(id, baseURL);
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			}));
+			return community;
+		} catch (IOException ioe) {
+			throw new RuntimeException(ioe);
+		}
 
-		return community;
 	}
 
 	/**
@@ -300,12 +312,78 @@ public class Utils implements Serializable {
 	}
 
 	public static CommunityEntityMap getOrganizationCommunityMap(String baseURL) throws IOException {
-		return MAPPER
-			.readValue(QueryCommunityAPI.propagationOrganizationCommunityMap(baseURL), CommunityEntityMap.class);
+		return addPrefixToKey(
+			ModelSupport.getIdPrefix(Organization.class) + "|", MAPPER
+				.readValue(QueryCommunityAPI.propagationOrganizationCommunityMap(baseURL), CommunityEntityMap.class));
+	}
+
+	private static CommunityEntityMap addPrefixToKey(String prefix, CommunityEntityMap communityEntityMap) {
+		CommunityEntityMap cem = new CommunityEntityMap();
+		Set<String> keySet = communityEntityMap.keySet();
+		for (String key : keySet)
+			cem.put(prefix + key, communityEntityMap.get(key));
+		return cem;
 	}
 
 	public static CommunityEntityMap getDatasourceCommunityMap(String baseURL) throws IOException {
-		return MAPPER.readValue(QueryCommunityAPI.propagationDatasourceCommunityMap(baseURL), CommunityEntityMap.class);
+		return addPrefixToKey(
+			ModelSupport.getIdPrefix(Datasource.class) + "|",
+			MAPPER.readValue(QueryCommunityAPI.propagationDatasourceCommunityMap(baseURL), CommunityEntityMap.class));
+	}
+
+	public static CommunityEntityMap getDatasourceCommunities(String baseURL) throws IOException {
+		List<CommunityModel> validCommunities = getValidCommunities(baseURL);
+		HashMap<String, Set<String>> map = new HashMap<>();
+
+		validCommunities.forEach(c -> {
+			try {
+				addDatasources(c.getId(), QueryCommunityAPI.communityDatasource(c.getId(), baseURL), map);
+				Utils
+					.getSubcommunities(c.getId(), baseURL)
+					.forEach(sc -> {
+						try {
+							addDatasources(
+								sc.getSubCommunityId(),
+								QueryCommunityAPI.subcommunityDatasource(c.getId(), sc.getSubCommunityId(), baseURL),
+								map);
+						} catch (IOException ioException) {
+							throw new RuntimeException();
+						}
+					});
+
+			} catch (IOException e) {
+				throw new RuntimeException();
+			}
+
+		});
+		String prefix = ModelSupport.getIdPrefix(Datasource.class) + "|";
+		CommunityEntityMap cem = new CommunityEntityMap();
+		map
+			.keySet()
+			.forEach(k -> cem.put(prefix + k, getCollect(k, map)));
+
+		return cem;
+
+	}
+
+	private static void addDatasources(String communityId, String dsl, HashMap<String, Set<String>> map)
+		throws IOException {
+
+		new ObjectMapper()
+			.readValue(dsl, DatasourceList.class)
+			.forEach(d -> {
+				if (!map.keySet().contains(d.getOpenaireId()))
+					map.put(d.getOpenaireId(), new HashSet<>());
+
+				map.get(d.getOpenaireId()).add(communityId);
+			});
+
+	}
+
+	@NotNull
+	private static List<String> getCollect(String k, HashMap<String, Set<String>> map) {
+		List<String> temp = map.get(k).stream().collect(Collectors.toList());
+		return temp;
 	}
 
 	private static void getRelatedOrganizations(String communityId, String baseURL,

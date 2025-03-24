@@ -3,30 +3,29 @@ package eu.dnetlib.dhp.actionmanager.createunresolvedentities.model;
 
 import java.io.Serializable;
 
-import com.opencsv.bean.CsvBindByPosition;
-
 public class SDGDataModel implements Serializable {
 
-	@CsvBindByPosition(position = 0)
-//    @CsvBindByName(column = "doi")
 	private String doi;
 
-	@CsvBindByPosition(position = 1)
-//    @CsvBindByName(column = "sdg")
-	private String sbj;
+	private String oaid;
+
+	private String sdg;
 
 	public SDGDataModel() {
-
 	}
 
-	public SDGDataModel(String doi, String sbj) {
+	public SDGDataModel(String doi, String oaid, String sdg) {
 		this.doi = doi;
-		this.sbj = sbj;
-
+		this.oaid = oaid;
+		this.sdg = sdg;
 	}
 
-	public static SDGDataModel newInstance(String d, String sbj) {
-		return new SDGDataModel(d, sbj);
+	public static SDGDataModel newInstance(String doi, String sdg) {
+		return new SDGDataModel(doi, null, sdg);
+	}
+
+	public static SDGDataModel newInstance(String doi, String oaid, String sdg) {
+		return new SDGDataModel(doi, oaid, sdg);
 	}
 
 	public String getDoi() {
@@ -37,11 +36,19 @@ public class SDGDataModel implements Serializable {
 		this.doi = doi;
 	}
 
-	public String getSbj() {
-		return sbj;
+	public String getOaid() {
+		return oaid;
 	}
 
-	public void setSbj(String sbj) {
-		this.sbj = sbj;
+	public void setOaid(String oaid) {
+		this.oaid = oaid;
+	}
+
+	public String getSdg() {
+		return sdg;
+	}
+
+	public void setSdg(String sdg) {
+		this.sdg = sdg;
 	}
 }

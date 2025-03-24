@@ -108,7 +108,7 @@ public class SparkCreateDedupRecord extends AbstractSparkAction {
 			final Dataset<Row> validRels = spark.read().load(workingPath + "/mergerel_filtered");
 
 			final Dataset<Row> filteredMergeRels = validRels
-				.union(
+				.unionByName(
 					validRels
 						.withColumnRenamed("source", "source_tmp")
 						.withColumnRenamed("target", "target_tmp")

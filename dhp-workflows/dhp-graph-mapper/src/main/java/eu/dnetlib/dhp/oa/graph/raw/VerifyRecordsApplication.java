@@ -13,6 +13,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.Function;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
@@ -78,6 +79,7 @@ public class VerifyRecordsApplication extends AbstractMigrationApplication {
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		for (final String sp : existingSourcePaths) {
+
 			RDD<String> invalidRecords = sc
 				.sequenceFile(sp, Text.class, Text.class)
 				.map(k -> tryApplyMapping(k._1().toString(), k._2().toString(), true, vocs))

@@ -62,7 +62,6 @@ object CopyHdfsOafSparkApplication {
       val oaf = spark.read
         .textFile(validPaths: _*)
         .map(v => (getOafType(v), v))(Encoders.tuple(Encoders.STRING, Encoders.STRING))
-        .cache()
 
       try {
         ModelSupport.oafTypes
