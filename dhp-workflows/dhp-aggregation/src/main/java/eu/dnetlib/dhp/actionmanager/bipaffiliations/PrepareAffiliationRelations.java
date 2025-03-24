@@ -27,7 +27,6 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.utils.DoiCleaningRule;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
@@ -108,13 +107,13 @@ public class PrepareAffiliationRelations implements Serializable {
 		JavaPairRDD<Text, Text> crossrefRelations = prepareAffiliationRelationsNewModel(
 			spark, crossrefInputPath, collectedfromOpenAIRE, BIP_INFERENCE_PROVENANCE + ":crossref");
 
-		JavaPairRDD<Text, Text> pubmedRelations = prepareAffiliationRelations(
+		JavaPairRDD<Text, Text> pubmedRelations = prepareAffiliationRelationFromPublisherNewModel(
 			spark, pubmedInputPath, collectedfromOpenAIRE, BIP_INFERENCE_PROVENANCE + ":pubmed");
 
 		JavaPairRDD<Text, Text> openAPCRelations = prepareAffiliationRelationsNewModel(
 			spark, openapcInputPath, collectedfromOpenAIRE, BIP_INFERENCE_PROVENANCE + ":openapc");
 
-		JavaPairRDD<Text, Text> dataciteRelations = prepareAffiliationRelationsNewModel(
+		JavaPairRDD<Text, Text> dataciteRelations = prepareAffiliationRelationFromPublisherNewModel(
 			spark, dataciteInputPath, collectedfromOpenAIRE, BIP_INFERENCE_PROVENANCE + ":datacite");
 
 		JavaPairRDD<Text, Text> webCrawlRelations = prepareAffiliationRelationsNewModel(
@@ -252,7 +251,7 @@ public class PrepareAffiliationRelations implements Serializable {
 				new Column("matching.Value").as("pidvalue"),
 				new Column("matching.Confidence").as("confidence"),
 				new Column("matching.Status").as("status"))
-			.where("status = 'active'");
+			.where(functions.col("status").equalTo("active"));
 
 		// prepare action sets for affiliation relations
 		return df
