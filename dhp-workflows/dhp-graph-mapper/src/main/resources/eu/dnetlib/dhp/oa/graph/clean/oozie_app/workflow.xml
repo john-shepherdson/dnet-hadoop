@@ -46,6 +46,11 @@
             <value>NARCIS</value>
             <description>the only datasource for which the country NL will be removed from the country list</description>
         </property>
+        <property>
+            <name>zenodoWithdrawn</name>
+            <value>/data/zenodo/withdrawn/20250307</value>
+            <description>Zenodo withdrawn dataset</description>
+        </property>
 
         <property>
             <name>sparkDriverMemory</name>
@@ -83,7 +88,7 @@
         </property>
         <!-- General oozie workflow properties -->
         <property>
-                <name>sparkClusterOpts</name>
+            <name>sparkClusterOpts</name>
             <value>--conf spark.extraListeners= --conf spark.sql.queryExecutionListeners= --conf spark.yarn.historyServer.address=http://iis-cdh5-test-m3.ocean.icm.edu.pl:18088 --conf spark.eventLog.dir=hdfs://nameservice1/user/spark/applicationHistory</value>
             <description>spark cluster-wide options</description>
         </property>
@@ -140,6 +145,27 @@
             <arg>--hdfsPath</arg><arg>${workingDir}/masterduplicate</arg>
             <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
         </java>
+        <ok to="generate_blacklist"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="generate_blacklist">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Generate blacklist</name>
+            <class>eu.dnetlib.dhp.oa.graph.clean.GenerateBlacklistSparkJob</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
+                --conf spark.sql.shuffle.partitions=15000
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${graphInputPath}</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/blacklist</arg>
+            <arg>--zenodoWithdrawn</arg><arg>${zenodoWithdrawn}</arg>
+        </spark>
         <ok to="wait_prepare"/>
         <error to="Kill"/>
     </action>
@@ -183,6 +209,7 @@
             <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
             <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
             <arg>--deepClean</arg><arg>${shouldClean}</arg>
+            <arg>--blacklist</arg><arg>${workingDir}/blacklist</arg>
         </spark>
         <ok to="wait_clean"/>
         <error to="Kill"/>
@@ -213,6 +240,7 @@
             <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
             <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
             <arg>--deepClean</arg><arg>${shouldClean}</arg>
+            <arg>--blacklist</arg><arg>${workingDir}/blacklist</arg>
         </spark>
         <ok to="wait_clean"/>
         <error to="Kill"/>
@@ -243,6 +271,7 @@
             <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
             <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
             <arg>--deepClean</arg><arg>${shouldClean}</arg>
+            <arg>--blacklist</arg><arg>${workingDir}/blacklist</arg>
         </spark>
         <ok to="wait_clean"/>
         <error to="Kill"/>
@@ -273,6 +302,7 @@
             <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
             <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
             <arg>--deepClean</arg><arg>${shouldClean}</arg>
+            <arg>--blacklist</arg><arg>${workingDir}/blacklist</arg>
         </spark>
         <ok to="wait_clean"/>
         <error to="Kill"/>
@@ -303,6 +333,7 @@
             <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
             <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
             <arg>--deepClean</arg><arg>${shouldClean}</arg>
+            <arg>--blacklist</arg><arg>${workingDir}/blacklist</arg>
         </spark>
         <ok to="wait_clean"/>
         <error to="Kill"/>
@@ -333,6 +364,7 @@
             <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
             <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
             <arg>--deepClean</arg><arg>${shouldClean}</arg>
+            <arg>--blacklist</arg><arg>${workingDir}/blacklist</arg>
         </spark>
         <ok to="wait_clean"/>
         <error to="Kill"/>
@@ -363,6 +395,7 @@
             <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
             <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
             <arg>--deepClean</arg><arg>${shouldClean}</arg>
+            <arg>--blacklist</arg><arg>${workingDir}/blacklist</arg>
         </spark>
         <ok to="wait_clean"/>
         <error to="Kill"/>
@@ -393,6 +426,7 @@
             <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
             <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
             <arg>--deepClean</arg><arg>${shouldClean}</arg>
+            <arg>--blacklist</arg><arg>${workingDir}/blacklist</arg>
         </spark>
         <ok to="wait_clean"/>
         <error to="Kill"/>
@@ -423,6 +457,7 @@
             <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
             <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
             <arg>--deepClean</arg><arg>${shouldClean}</arg>
+            <arg>--blacklist</arg><arg>${workingDir}/blacklist</arg>
         </spark>
         <ok to="wait_clean"/>
         <error to="Kill"/>
