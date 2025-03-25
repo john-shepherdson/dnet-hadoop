@@ -7,7 +7,7 @@
   },
   {
     "paramName": "in",
-    "paramLongName": "inputGraph",
+    "paramLongName": "inputPath",
     "paramDescription": "the path to the graph data dump to read",
     "paramRequired": true
   },
