@@ -16,9 +16,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import eu.dnetlib.dhp.schema.mdstore.MetadataRecord;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 
-@Disabled
 public class ReadParquetMetadataRecordsTest {
 
 	private static final String PARQUET_ROOT_DIR = "/Users/michele/Develop/temp/store_native_validated";
@@ -34,16 +34,31 @@ public class ReadParquetMetadataRecordsTest {
 	}
 
 	@Test
-	void testReadParquet() {
+	@Disabled
+	void testReadParquetAddNewField() {
 		try (final SparkSession spark = SparkSession.builder().config(this.sparkConf).getOrCreate()) {
 			final Dataset<Row> rows = spark.read().parquet(PARQUET_ROOT_DIR);
 
 			final Dataset<Row> rowsWithNewField = ArrayUtils.contains(rows.schema().fieldNames(), "testField") ? rows
-				: rows.withColumn("testField", functions.map());
+					: rows.withColumn("testField", functions.map());
 
 			final Dataset<TestMetadataRecord> records = rowsWithNewField.as(Encoders.bean(TestMetadataRecord.class));
 
 			records.foreach(r -> System.out.println(r.getId() + " -- " + r.getTestField()));
+
+			assertTrue(records.count() > 0);
+		}
+	}
+
+	@Test
+	@Disabled
+	void testReadParquet() {
+		try (final SparkSession spark = SparkSession.builder().config(this.sparkConf).getOrCreate()) {
+			final Dataset<Row> rows = spark.read().parquet(PARQUET_ROOT_DIR);
+
+			final Dataset<MetadataRecord> records = rows.as(Encoders.bean(MetadataRecord.class));
+
+			records.foreach(r -> System.out.println(r.getId()));
 
 			assertTrue(records.count() > 0);
 		}
