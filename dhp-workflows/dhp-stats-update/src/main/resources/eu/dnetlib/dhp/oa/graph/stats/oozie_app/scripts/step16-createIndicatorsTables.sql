@@ -294,7 +294,7 @@ left outer join (
     join ${stats_db_name}.indi_pub_gold_oa indi_gold on indi_gold.id=p.id
     left outer join ${stats_db_name}.result_accessroute ra on ra.id=p.id
     where indi_gold.is_gold=0 and
-          ((d.type like '%Journal%' and ri.accessright not in ('Closed Access', 'Restricted', 'Not Available') and ri.license is not null) or ra.accessroute='hybrid')) tmp on p.id=tmp.id; /*EOS*/
+          ((d.type like '%Journal%' and ri.accessright not in ('Closed Access', 'Restricted', 'unspecified') and ri.license is not null) or ra.accessroute='hybrid')) tmp on p.id=tmp.id; /*EOS*/
 
 drop table if exists ${stats_db_name}.indi_org_fairness purge; /*EOS*/
 create table if not exists ${stats_db_name}.indi_org_fairness stored as parquet as
@@ -677,7 +677,7 @@ left outer join (
     join ${stats_db_name}.indi_pub_hybrid indi_hybrid on indi_hybrid.id=p.id
     left outer join ${stats_db_name}.result_accessroute ra on ra.id=p.id
     where indi_gold.is_gold=0 and indi_hybrid.is_hybrid=0
-    and ((d.type like '%Journal%' and ri.accessright not in ('Closed Access', 'Restricted', 'Not Available') and ri.license is null) or ra.accessroute='bronze')) tmp on p.id=tmp.id; /*EOS*/
+    and ((d.type like '%Journal%' and ri.accessright not in ('Closed Access', 'Restricted', 'unspecified') and ri.license is null) or ra.accessroute='bronze')) tmp on p.id=tmp.id; /*EOS*/
 
 CREATE TEMPORARY VIEW project_year_result_year as
 select p.id project_id, acronym, r.id result_id, r.year, p.end_year
