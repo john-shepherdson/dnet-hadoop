@@ -1,0 +1,9 @@
+[
+  {"paramName":"n",  "paramLongName":"namenode",               "paramDescription": "namenode",                  "paramRequired": true},
+  {"paramName":"t",   "paramLongName":"targetPath",          "paramDescription": "targetPath",                              "paramRequired": true},
+  {"paramName":"mh",   "paramLongName":"mongoHost",           "paramDescription": "mongoHost",                        "paramRequired": true},
+  {"paramName":"mo",  "paramLongName":"mongoDatabase", "paramDescription": "mongoDatabase",                 "paramRequired": true},
+  {"paramName":"mo",  "paramLongName":"mongoCollection", "paramDescription": "mongoCollection",                 "paramRequired": true},
+  {"paramName":"s",  "paramLongName":"startTime", "paramDescription": "startTime",                 "paramRequired": true}
+
+]

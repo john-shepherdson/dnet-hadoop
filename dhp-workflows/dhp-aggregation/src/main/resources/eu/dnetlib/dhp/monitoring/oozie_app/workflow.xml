@@ -1,0 +1,58 @@
+    <workflow-app name="Monitor_Aggregation_Workflow" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>targetPath</name>
+            <description>the working target Path</description>
+        </property>
+        <property>
+            <name>mongoHost</name>
+            <description>the mongo host</description>
+        </property>
+
+        <property>
+            <name>mongoDatabase</name>
+            <value>dnet_logs</value>
+            <description>the Mongo Database</description>
+        </property>
+        <property>
+            <name>mongoCollection</name>
+            <value>wf_logs</value>
+            <description>the Mongo Collection</description>
+        </property>
+        <property>
+            <name>startTime</name>
+            <value>0</value>
+            <description>for incremental harvesting</description>
+        </property>
+    </parameters>
+
+    <start to="RetrieveDump"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+        <action name="RetrieveDump">
+            <java>
+                <configuration>
+                    <property>
+                        <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                        <value>true</value>
+                    </property>
+                </configuration>
+
+                <main-class>eu.dnetlib.dhp.monitoring.MongoLogsDumper</main-class>
+                <java-opts> -Xmx6g </java-opts>
+                <arg>--namenode</arg><arg>${nameNode}</arg>
+                <arg>--mongoHost</arg><arg>${mongoHost}</arg>
+                <arg>--mongoDatabase</arg><arg>${mongoDatabase}</arg>
+                <arg>--mongoCollection</arg><arg>${mongoCollection}</arg>
+                <arg>--targetPath</arg><arg>${targetPath}</arg>
+                <arg>--startTime</arg><arg>${startTime}</arg>
+            </java>
+            <ok to="End"/>
+            <error to="Kill"/>
+        </action>
+    <end name="End"/>
+
+</workflow-app>
