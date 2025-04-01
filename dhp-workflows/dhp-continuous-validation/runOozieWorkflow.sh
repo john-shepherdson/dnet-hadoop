@@ -6,7 +6,7 @@ NEWER_VERSIONS_PROFILE='-P spark-34'
 CHOSEN_MAVEN_PROFILE=${DEFAULT_PROFILE}
 
 # Build and deploy this module.
-mvn clean package -U ${CHOSEN_MAVEN_PROFILE} -Poozie-package,deploy,run \
+mvn clean package -e -U ${CHOSEN_MAVEN_PROFILE} -Poozie-package,deploy,run \
       -Dworkflow.source.dir=eu/dnetlib/dhp/continuous_validation
 
 # Show the Oozie-job-ID.

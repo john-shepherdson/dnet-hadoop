@@ -18,8 +18,6 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.validator2.validation.StandardValidationResult;
-import eu.dnetlib.validator2.validation.XMLApplicationProfile;
-import eu.dnetlib.validator2.validation.guideline.Guideline;
 import eu.dnetlib.validator2.validation.guideline.StandardResult;
 import eu.dnetlib.validator2.validation.guideline.openaire.*;
 import eu.dnetlib.validator2.validation.utils.TestUtils;
@@ -115,15 +113,14 @@ public class ContinuousValidation {
 		conf.setAppName(ContinuousValidation.class.getSimpleName());
 		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
 		conf.registerKryoClasses(new Class[] {
-			XMLApplicationProfile.ValidationResult.class, Guideline.Result.class, StandardValidationResult.class,
-			StandardResult.class
+			StandardValidationResult.class, StandardResult.class
 		});
 		String finalParquetPath = parquetPath;
 		String finalOutputPath = outputPath;
 
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
 			// Use a new instance of Document Builder in each worker, as it is not thread-safe.
-			MapFunction<Row, XMLApplicationProfile.ValidationResult> validateMapFunction = row -> profile
+			MapFunction<Row, StandardValidationResult> validateMapFunction = row -> profile
 				.validate(
 					row.getAs("id").toString(),
 					TestUtils
@@ -134,7 +131,7 @@ public class ContinuousValidation {
 				.read()
 				.parquet(finalParquetPath)
 				.filter("encoding = 'XML' and id is not NULL and body is not NULL")
-				.map(validateMapFunction, Encoders.bean(XMLApplicationProfile.ValidationResult.class))
+				.map(validateMapFunction, Encoders.bean(StandardValidationResult.class));
 				.write()
 				.option("compression", "gzip")
 				.mode(SaveMode.Overwrite)
