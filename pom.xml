@@ -24,6 +24,7 @@
         <module>dhp-common</module>
         <module>dhp-workflows</module>
         <module>dhp-shade-package</module>
+        <module>dhp-actionsets</module>
     </modules>
 
     <issueManagement>

@@ -23,7 +23,6 @@
 
     <description>This module create a jar of all module dependencies</description>
 
-
     <dependencies>
         <dependency>
             <groupId>eu.dnetlib.dhp</groupId>
@@ -70,12 +69,12 @@
 <!--            <artifactId>dhp-graph-provision</artifactId>-->
 <!--            <version>${project.version}</version>-->
 <!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>eu.dnetlib.dhp</groupId>-->
-<!--            <artifactId>dhp-impact-indicators</artifactId>-->
-<!--            <version>${project.version}</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
+        <dependency>
+            <groupId>eu.dnetlib.dhp</groupId>
+            <artifactId>dhp-impact-indicators</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!--        <dependency>-->
 <!--            <groupId>eu.dnetlib.dhp</groupId>-->
 <!--            <artifactId>dhp-stats-actionsets</artifactId>-->
 <!--            <version>${project.version}</version>-->
