@@ -22,6 +22,7 @@ import java.util.Optional;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.hadoop.io.IntWritable;
@@ -33,9 +34,11 @@ import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoder;
 import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.TypedColumn;
 import org.apache.spark.sql.expressions.Aggregator;
+import org.apache.spark.sql.functions;
 import org.apache.spark.util.LongAccumulator;
 import org.dom4j.Document;
 import org.dom4j.Node;
@@ -170,10 +173,17 @@ public class GenerateNativeStoreSparkJob {
 		final Dataset<MetadataRecord> toSaveRecords;
 		if (readVersion != null) { // INCREMENTAL MODE
 			log.info("updating {} incrementally with {}", targetPath, readVersion.getHdfsPath());
-			final Dataset<MetadataRecord> oldRecords = spark
-				.read()
-				.load(readVersion.getHdfsPath() + MDSTORE_DATA_PATH)
-				.as(encoder);
+
+			// FIX TO INTRODUCE A NEW FIELD
+			final Dataset<Row> oldRows = spark.read().load(readVersion.getHdfsPath() + MDSTORE_DATA_PATH);
+
+			final Dataset<Row> oldRowsWithNewField = ArrayUtils
+				.contains(oldRows.schema().fieldNames(), "validationResults") ? oldRows
+					: oldRows.withColumn("validationResults", functions.map());
+
+			final Dataset<MetadataRecord> oldRecords = oldRowsWithNewField.as(encoder);
+			// END FIX
+
 			final TypedColumn<MetadataRecord, MetadataRecord> aggregator = new MDStoreAggregator().toColumn();
 
 			toSaveRecords = oldRecords

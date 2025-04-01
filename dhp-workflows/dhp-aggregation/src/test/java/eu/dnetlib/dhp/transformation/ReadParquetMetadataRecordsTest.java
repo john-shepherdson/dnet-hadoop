@@ -40,7 +40,7 @@ public class ReadParquetMetadataRecordsTest {
 			final Dataset<Row> rows = spark.read().parquet(PARQUET_ROOT_DIR);
 
 			final Dataset<Row> rowsWithNewField = ArrayUtils.contains(rows.schema().fieldNames(), "testField") ? rows
-					: rows.withColumn("testField", functions.map());
+				: rows.withColumn("testField", functions.map());
 
 			final Dataset<TestMetadataRecord> records = rowsWithNewField.as(Encoders.bean(TestMetadataRecord.class));
 
