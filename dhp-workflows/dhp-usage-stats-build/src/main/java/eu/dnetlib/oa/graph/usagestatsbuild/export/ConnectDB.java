@@ -8,6 +8,7 @@ package eu.dnetlib.oa.graph.usagestatsbuild.export;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -48,13 +49,21 @@ public abstract class ConnectDB {
 	}
 
 	public static Connection getHiveConnection() throws SQLException {
-		if (DB_HIVE_CONNECTION != null && !DB_HIVE_CONNECTION.isClosed()) {
-			return DB_HIVE_CONNECTION;
-		} else {
+		if (DB_HIVE_CONNECTION == null || DB_HIVE_CONNECTION.isClosed()) {
 			DB_HIVE_CONNECTION = connectHive();
 
-			return DB_HIVE_CONNECTION;
+			Statement stmt = DB_HIVE_CONNECTION.createStatement();
+
+			stmt.execute("set spark.executor.memory=19166291558;");
+			stmt.execute("set spark.yarn.executor.memoryOverhead=3225;");
+			stmt.execute("set spark.driver.memory=11596411699;");
+			stmt.execute("set spark.yarn.driver.memoryOverhead=1228;");
+
+			stmt.close();
+
 		}
+
+		return DB_HIVE_CONNECTION;
 	}
 
 	public static Connection getImpalaConnection() throws SQLException {
