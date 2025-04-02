@@ -13,6 +13,7 @@ import static eu.dnetlib.dhp.utils.DHPUtils.writeHdfsFile;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -39,6 +40,8 @@ import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.TypedColumn;
 import org.apache.spark.sql.expressions.Aggregator;
 import org.apache.spark.sql.functions;
+import org.apache.spark.sql.types.DataType;
+import org.apache.spark.sql.types.StructField;
 import org.apache.spark.util.LongAccumulator;
 import org.dom4j.Document;
 import org.dom4j.Node;
@@ -70,6 +73,8 @@ public class GenerateNativeStoreSparkJob {
 
 	private static final ObjectMapper MAPPER = new ObjectMapper()
 		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+	public static final String VALIDATION_RESULTS_FIELD = "validationResults";
 
 	public static void main(final String[] args) throws Exception {
 
@@ -175,11 +180,24 @@ public class GenerateNativeStoreSparkJob {
 			log.info("updating {} incrementally with {}", targetPath, readVersion.getHdfsPath());
 
 			// FIX TO INTRODUCE A NEW FIELD
+
+			final DataType dataType = Arrays
+				.stream(
+					newRecords
+						.schema()
+						.fields())
+				.filter(f -> VALIDATION_RESULTS_FIELD.equals(f.name()))
+				.map(StructField::dataType)
+				.findFirst()
+				.orElseThrow(
+					() -> new RuntimeException("Missing " + VALIDATION_RESULTS_FIELD + " field in new schema"));
+
 			final Dataset<Row> oldRows = spark.read().load(readVersion.getHdfsPath() + MDSTORE_DATA_PATH);
 
 			final Dataset<Row> oldRowsWithNewField = ArrayUtils
-				.contains(oldRows.schema().fieldNames(), "validationResults") ? oldRows
-					: oldRows.withColumn("validationResults", functions.map());
+				.contains(oldRows.schema().fieldNames(), VALIDATION_RESULTS_FIELD) ? oldRows
+					: oldRows
+						.withColumn(VALIDATION_RESULTS_FIELD, functions.lit(null).cast(dataType));
 
 			final Dataset<MetadataRecord> oldRecords = oldRowsWithNewField.as(encoder);
 			// END FIX
