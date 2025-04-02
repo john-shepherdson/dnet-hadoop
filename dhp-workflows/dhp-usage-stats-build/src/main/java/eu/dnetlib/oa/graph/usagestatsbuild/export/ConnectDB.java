@@ -67,14 +67,12 @@ public abstract class ConnectDB {
 	}
 
 	public static Connection getImpalaConnection() throws SQLException {
-		if (DB_IMPALA_CONNECTION != null && !DB_IMPALA_CONNECTION.isClosed()) {
-			return DB_IMPALA_CONNECTION;
-		} else {
-			DB_IMPALA_CONNECTION = connectImpala();
+        if (DB_IMPALA_CONNECTION == null || DB_IMPALA_CONNECTION.isClosed()) {
+            DB_IMPALA_CONNECTION = connectImpala();
+        }
 
-			return DB_IMPALA_CONNECTION;
-		}
-	}
+        return DB_IMPALA_CONNECTION;
+    }
 
 	public static String getUsageRawDataDBSchema() {
 		return ConnectDB.usageRawDataDBSchema;

@@ -29,7 +29,6 @@ public class UsageStatsExporter {
 		logger.info("Initialising DB properties");
 		ConnectDB.init();
 
-//		runImpalaQuery();
 		PiwikStatsDB piwikstatsdb = new PiwikStatsDB();
 
 		logger.info("Re-creating database and tables");
@@ -37,10 +36,7 @@ public class UsageStatsExporter {
 			piwikstatsdb.recreateDBAndTables();
 			logger.info("DB-Tables are created ");
 		}
-//                else {
-//                    piwikstatsdb.createTmpTables();
-//                    logger.info("TmpTables are created ");
-//                }
+
 		if (ExecuteWorkflow.processPiwikLogs) {
 			logger.info("Processing Piwik logs");
 			piwikstatsdb.processLogs();
@@ -54,26 +50,20 @@ public class UsageStatsExporter {
 
 		}
 
-		LaReferenciaStats lastats = new LaReferenciaStats();
-
 		if (ExecuteWorkflow.processLaReferenciaLogs) {
 			logger.info("Processing LaReferencia logs");
-			lastats.processLogs();
+			LaReferenciaStats.processLogs();
 			logger.info("LaReferencia logs done");
 		}
 
-		IrusStats irusstats = new IrusStats();
-
 		if (ExecuteWorkflow.irusProcessStats) {
 			logger.info("Processing IRUS");
-			irusstats.processIrusStats();
+			IrusStats.processIrusStats();
 			logger.info("Irus done");
 		}
 
-		SarcStats sarcStats = new SarcStats();
-
 		if (ExecuteWorkflow.sarcProcessStats) {
-			sarcStats.processSarc();
+			new SarcStats().processSarc();
 		}
 		logger.info("Sarc done");
 

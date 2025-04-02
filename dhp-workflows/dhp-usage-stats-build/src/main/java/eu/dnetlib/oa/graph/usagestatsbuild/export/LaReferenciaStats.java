@@ -1,47 +1,17 @@
-
 package eu.dnetlib.oa.graph.usagestatsbuild.export;
 
-import java.io.*;
-import java.net.URLDecoder;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.LocatedFileStatus;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.RemoteIterator;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author D. Pierrakos, S. Zoupanos
  */
-public class LaReferenciaStats {
+public abstract class LaReferenciaStats {
 
 	private static final Logger logger = LoggerFactory.getLogger(LaReferenciaStats.class);
 
-	private String logRepoPath;
-
-	private Statement stmt = null;
-
-	private String CounterRobotsURL;
-	private ArrayList robotsList;
-
-	public LaReferenciaStats() throws Exception {
-	}
-
-	public void processLogs() throws Exception {
+	public static void processLogs() throws Exception {
 		try {
 			logger.info("LaReferencia creating viewsStats");
 			viewsStats();
@@ -50,17 +20,13 @@ public class LaReferenciaStats {
 			downloadsStats();
 			logger.info("LaReferencia created downloadsStats");
 
-//                        logger.info("LaReferencia updating Production Tables");
-//			updateProdTables();
-//			logger.info("LaReferencia updated Production Tables");
-
 		} catch (Exception e) {
-			logger.error("Failed to process logs: " + e);
-			throw new Exception("Failed to process logs: " + e.toString(), e);
+			logger.error("Failed to process logs: ", e);
+			throw new Exception("Failed to process logs: ", e);
 		}
 	}
 
-	public void viewsStats() throws Exception {
+	public static void viewsStats() throws Exception {
 
 		Statement stmt = ConnectDB.getHiveConnection().createStatement();
 		ConnectDB.getHiveConnection().setAutoCommit(false);
@@ -98,10 +64,9 @@ public class LaReferenciaStats {
 		logger.info("Created la_views_stats_tmp table");
 
 		stmt.close();
-		// ConnectDB.getHiveConnection().close();
 	}
 
-	private void downloadsStats() throws Exception {
+	private static void downloadsStats() throws Exception {
 
 		Statement stmt = ConnectDB.getHiveConnection().createStatement();
 		ConnectDB.getHiveConnection().setAutoCommit(false);
@@ -139,7 +104,5 @@ public class LaReferenciaStats {
 		logger.info("Created la_downloads_stats_tmp table");
 
 		stmt.close();
-		// ConnectDB.getHiveConnection().close();
 	}
-
 }
