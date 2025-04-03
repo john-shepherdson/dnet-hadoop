@@ -6,15 +6,15 @@ DROP VIEW IF EXISTS ${usagestats_db}.openaire_piwikresult_views_monthly_tmp; /*E
 
 CREATE OR REPLACE VIEW ${usagestats_db}.openaire_result_views_monthly_tmp AS
 SELECT entity_id,
-       reflect('java.net.URLDecoder', 'decode', entity_id) AS id,
+       reflect('java.net.URLDecoder', 'decode', trim(entity_id)) AS id,
        COUNT(entity_id) as views,
        SUM(CASE WHEN referrer_name LIKE '%openaire%' THEN 1 ELSE 0 END) AS openaire_referrer,
        CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')) AS month,
        source
 FROM ${usagestats_raw_db}.piwiklog
-WHERE action='action' and (source_item_type='oaItem' or source_item_type='repItem') AND entity_id RLIKE '^([A-Za-z0-9._~\\-]|(%[0-9A-Fa-f]{2}))*$'
-GROUP BY entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')),
-source ORDER BY source, entity_id; /*EOS*/
+WHERE action='action' and (source_item_type='oaItem' or source_item_type='repItem') AND trim(entity_id) RLIKE '^([-A-Za-zA-Z0-9._~:/?#@!$&''()*+,;=]|(%[0-9A-Fa-f]{2}))*$'
+GROUP BY entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')), source
+ORDER BY source, entity_id; /*EOS*/
 
 DROP TABLE IF EXISTS ${usagestats_db}.openaire_views_stats_tmp; /*EOS*/
 CREATE TABLE IF NOT EXISTS ${usagestats_db}.openaire_views_stats_tmp AS
@@ -42,13 +42,13 @@ ORDER BY d.id, ro.id, month; /*EOS*/
 DROP VIEW IF EXISTS ${usagestats_db}.openaire_result_downloads_monthly_tmp; /*EOS*/
 CREATE OR REPLACE VIEW ${usagestats_db}.openaire_result_downloads_monthly_tmp AS
 SELECT entity_id,
-       reflect('java.net.URLDecoder', 'decode', entity_id) AS id,
+       reflect('java.net.URLDecoder', 'decode', trim(entity_id)) AS id,
        COUNT(entity_id) as downloads,
        SUM(CASE WHEN referrer_name LIKE '%openaire%' THEN 1 ELSE 0 END) AS openaire_referrer,
        CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')) AS month,
        source
 FROM ${usagestats_raw_db}.piwiklog
-WHERE action='download' AND (source_item_type='oaItem' OR source_item_type='repItem') AND entity_id RLIKE '^([A-Za-z0-9._~\\-]|(%[0-9A-Fa-f]{2}))*$'
+WHERE action='download' AND (source_item_type='oaItem' OR source_item_type='repItem') AND trim(entity_id) RLIKE '^([-A-Za-zA-Z0-9._~:/?#@!$&''()*+,;=]|(%[0-9A-Fa-f]{2}))*$'
 GROUP BY entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')) , source
 ORDER BY source, entity_id, month; /*EOS*/
 
@@ -90,13 +90,13 @@ DROP TABLE IF EXISTS ${usagestats_db}.tudelft_downloads_stats_tmp; /*EOS*/
 
 CREATE OR REPLACE VIEW ${usagestats_db}.tudelft_result_views_monthly_tmp AS
 SELECT entity_id,
-       reflect('java.net.URLDecoder', 'decode', entity_id) AS id,
+       reflect('java.net.URLDecoder', 'decode', trim(entity_id)) AS id,
        COUNT(entity_id) as views,
        SUM(CASE WHEN referrer_name LIKE '%openaire%' THEN 1 ELSE 0 END) AS openaire_referrer,
        CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')) AS month,
        source
 FROM ${usagestats_raw_db}.piwiklog
-WHERE action='action' and (source_item_type='oaItem' or source_item_type='repItem') and source=252 AND entity_id RLIKE '^([A-Za-z0-9._~\\-]|(%[0-9A-Fa-f]{2}))*$'
+WHERE action='action' and (source_item_type='oaItem' or source_item_type='repItem') and source=252 AND trim(entity_id) RLIKE '^([-A-Za-zA-Z0-9._~:/?#@!$&''()*+,;=]|(%[0-9A-Fa-f]{2}))*$'
 GROUP BY entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')), source
 ORDER BY source, entity_id; /*EOS*/
 
@@ -110,13 +110,13 @@ ORDER BY d.id, ro.id; /*EOS*/
 
 CREATE OR REPLACE VIEW ${usagestats_db}.tudelft_result_downloads_monthly_tmp AS
 SELECT entity_id,
-       reflect('java.net.URLDecoder', 'decode', entity_id) AS id,
+       reflect('java.net.URLDecoder', 'decode', trim(entity_id)) AS id,
        COUNT(entity_id) as views,
        SUM(CASE WHEN referrer_name LIKE '%openaire%' THEN 1 ELSE 0 END) AS openaire_referrer,
        CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')) AS month,
        source
 FROM ${usagestats_raw_db}.piwiklog
-WHERE action='download' and (source_item_type='oaItem' or source_item_type='repItem') and source=252 AND entity_id RLIKE '^([A-Za-z0-9._~\\-]|(%[0-9A-Fa-f]{2}))*$'
+WHERE action='download' and (source_item_type='oaItem' or source_item_type='repItem') and source=252 AND trim(entity_id) RLIKE '^([-A-Za-zA-Z0-9._~:/?#@!$&''()*+,;=]|(%[0-9A-Fa-f]{2}))*$'
 GROUP BY entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')), source
 ORDER BY source, entity_id; /*EOS*/
 
