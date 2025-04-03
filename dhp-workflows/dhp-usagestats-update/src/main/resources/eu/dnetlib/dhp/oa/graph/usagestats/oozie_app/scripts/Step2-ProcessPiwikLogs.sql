@@ -12,7 +12,7 @@ SELECT entity_id,
        CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')) AS month,
        source
 FROM ${usagestats_raw_db}.piwiklog
-WHERE action='action' and (source_item_type='oaItem' or source_item_type='repItem') AND entity_id IS NOT NULL
+WHERE action='action' and (source_item_type='oaItem' or source_item_type='repItem') AND entity_id RLIKE '^([A-Za-z0-9._~\\-]|(%[0-9A-Fa-f]{2}))*$'
 GROUP BY entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')),
 source ORDER BY source, entity_id; /*EOS*/
 
@@ -44,7 +44,7 @@ SELECT entity_id,
        CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')) AS month,
        source
 FROM ${usagestats_raw_db}.piwiklog
-WHERE action='download' AND (source_item_type='oaItem' OR source_item_type='repItem') AND entity_id IS NOT NULL
+WHERE action='download' AND (source_item_type='oaItem' OR source_item_type='repItem') AND entity_id RLIKE '^([A-Za-z0-9._~\\-]|(%[0-9A-Fa-f]{2}))*$'
 GROUP BY entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')) , source
 ORDER BY source, entity_id, month; /*EOS*/
 
@@ -90,7 +90,7 @@ SELECT entity_id,
        CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')) AS month,
        source
 FROM ${usagestats_raw_db}.piwiklog
-WHERE action='action' and (source_item_type='oaItem' or source_item_type='repItem') and source=252 AND entity_id IS NOT NULL
+WHERE action='action' and (source_item_type='oaItem' or source_item_type='repItem') and source=252 AND entity_id RLIKE '^([A-Za-z0-9._~\\-]|(%[0-9A-Fa-f]{2}))*$'
 GROUP BY entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')), source
 ORDER BY source, entity_id; /*EOS*/
 
@@ -109,7 +109,7 @@ SELECT entity_id,
        CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')) AS month,
        source
 FROM ${usagestats_raw_db}.piwiklog
-WHERE action='download' and (source_item_type='oaItem' or source_item_type='repItem') and source=252 AND entity_id IS NOT NULL
+WHERE action='download' and (source_item_type='oaItem' or source_item_type='repItem') and source=252 AND entity_id RLIKE '^([A-Za-z0-9._~\\-]|(%[0-9A-Fa-f]{2}))*$'
 GROUP BY entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')), source
 ORDER BY source, entity_id; /*EOS*/
 
