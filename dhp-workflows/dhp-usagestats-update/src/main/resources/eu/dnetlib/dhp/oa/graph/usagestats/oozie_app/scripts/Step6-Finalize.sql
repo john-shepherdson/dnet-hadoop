@@ -31,18 +31,21 @@ SELECT * FROM ${usagestats_db}.openaire_pageviews_stats_tmp; /*EOS*/
 
 DROP TABLE IF EXISTS ${usagestats_db}.full_dates; /*EOS*/
 
--- Create a temporary table to generate a sequence of months
-WITH month_seq AS (
-    SELECT explode(sequence(
-            to_date('2016-01-01', 'yyyy-MM-dd'),
-            current_date(),
-            interval 1 month
-    )) AS txn_date
-)
 -- Create the full_dates table if not exists
-CREATE TABLE IF NOT EXISTS ${usagestats_db}.full_dates AS
+CREATE OR REPLACE TEMP VIEW full_dates_view AS
+WITH month_seq AS (
+  SELECT explode(sequence(
+    to_date('2016-01-01', 'yyyy-MM-dd'),
+    current_date(),
+    interval 1 month
+  )) AS txn_date
+)
 SELECT date_format(txn_date, 'yyyy/MM') AS txn_date
 FROM month_seq; /*EOS*/
+
+CREATE TABLE IF NOT EXISTS ${usagestats_db}.full_dates AS
+SELECT * FROM full_dates_view; /*EOS*/
+
 
 CREATE TABLE IF NOT EXISTS ${usagestats_db}.usage_stats AS
 SELECT coalesce(ds.source, vs.source) as source,
