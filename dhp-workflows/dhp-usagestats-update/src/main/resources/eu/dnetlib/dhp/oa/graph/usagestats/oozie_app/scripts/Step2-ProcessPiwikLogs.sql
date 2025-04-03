@@ -19,16 +19,20 @@ source ORDER BY source, entity_id; /*EOS*/
 DROP TABLE IF EXISTS ${usagestats_db}.openaire_views_stats_tmp; /*EOS*/
 CREATE TABLE IF NOT EXISTS ${usagestats_db}.openaire_views_stats_tmp AS
 SELECT 'OpenAIRE' as source, d.id as repository_id, ro.id as result_id, month as date, max(views) AS count, max(openaire_referrer) AS openaire
-FROM ${usagestats_db}.openaire_result_views_monthly_tmp p, ${stats_db}.datasource d, ${stats_db}.result_oids ro
-WHERE p.source=d.piwik_id AND p.id=ro.oid AND ro.oid!='200'
+FROM ${usagestats_db}.openaire_result_views_monthly_tmp p
+JOIN ${stats_db}.datasource d on p.source=d.piwik_id
+JOIN ${stats_db}.result_oids ro on p.id=ro.oid
+WHERE ro.oid!='200'
 GROUP BY d.id, ro.id, month
 ORDER BY d.id, ro.id, month; /*EOS*/
 
 DROP TABLE IF EXISTS ${usagestats_db}.openaire_pageviews_stats_tmp; /*EOS*/
 CREATE TABLE IF NOT EXISTS ${usagestats_db}.openaire_pageviews_stats_tmp AS
 SELECT 'OpenAIRE' as source, d.id as repository_id, ro.id as result_id, month as date, max(views) AS count
-FROM ${usagestats_db}.openaire_result_views_monthly_tmp p, ${stats_db}.datasource d, ${stats_db}.result_oids ro
-WHERE p.source=${portalMatomoID} AND p.source=d.piwik_id and p.id=ro.id AND ro.oid!='200'
+FROM ${usagestats_db}.openaire_result_views_monthly_tmp p
+JOIN ${stats_db}.datasource d on p.source=d.piwik_id AND p.source=${portalMatomoID}
+JOIN ${stats_db}.result_oids ro on p.id=ro.oid
+WHERE ro.oid!='200'
 GROUP BY d.id, ro.id, month
 ORDER BY d.id, ro.id, month; /*EOS*/
 
@@ -51,8 +55,10 @@ ORDER BY source, entity_id, month; /*EOS*/
 DROP TABLE IF EXISTS ${usagestats_db}.openaire_downloads_stats_tmp; /*EOS*/
 CREATE TABLE IF NOT EXISTS ${usagestats_db}.openaire_downloads_stats_tmp AS
 SELECT 'OpenAIRE' as source, d.id as repository_id, ro.id as result_id, month as date, max(downloads) AS count, max(openaire_referrer) AS openaire
-FROM ${usagestats_db}.openaire_result_downloads_monthly_tmp p, ${stats_db}.datasource d, ${stats_db} .result_oids ro
-WHERE p.source=d.piwik_id and p.id=ro.oid AND ro.oid!='200'
+FROM ${usagestats_db}.openaire_result_downloads_monthly_tmp p
+JOIN ${stats_db}.datasource d on p.source=d.piwik_id
+JOIN ${stats_db}.result_oids ro on p.id=ro.oid
+WHERE ro.oid!='200'
 GROUP BY d.id, ro.id, month
 ORDER BY d.id, ro.id, month; /*EOS*/
 
@@ -66,13 +72,13 @@ DROP TABLE IF EXISTS ${usagestats_db}.pedocs_downloads_stats; /*EOS*/
 
 CREATE TABLE IF NOT EXISTS ${usagestats_db}.pedocs_views_stats_tmp AS
 SELECT 'OpenAIRE' as source, 'opendoar____::ab1a4d0dd4d48a2ba1077c4494791306' as repository_id, r.id as result_id, date, counter_abstract as count, 0 as openaire
-FROM ${usagestats_raw_db}.pedocsoldviews p, ${stats_db}.result_oids r
-WHERE r.oid=p.identifier; /*EOS*/
+FROM ${usagestats_raw_db}.pedocsoldviews p
+JOIN ${stats_db}.result_oids r ON r.oid=p.identifier; /*EOS*/
 
 CREATE TABLE IF NOT EXISTS ${usagestats_db}.pedocs_downloads_stats_tmp AS
 SELECT 'OpenAIRE' as source, 'opendoar____::ab1a4d0dd4d48a2ba1077c4494791306' as repository_id, r.id as result_id, date, counter as count, 0 as openaire
-FROM ${usagestats_raw_db}.pedocsolddownloads p, ${stats_db}.result_oids r
-WHERE r.oid=p.identifier; /*EOS*/
+FROM ${usagestats_raw_db}.pedocsolddownloads p
+JOIN ${stats_db}.result_oids r ON r.oid=p.identifier; /*EOS*/
 
 -------------
 -- TUDELFT --
@@ -96,8 +102,9 @@ ORDER BY source, entity_id; /*EOS*/
 
 CREATE TABLE IF NOT EXISTS ${usagestats_db}.tudelft_views_stats_tmp AS
 SELECT 'OpenAIRE' as source, d.id as repository_id, ro.id as result_id, month as date, max(views) AS count, max(openaire_referrer) AS openaire
-FROM ${usagestats_db}.tudelft_result_views_monthly_tmp p, ${stats_db}.datasource d, ${stats_db}.result_oids ro
-WHERE concat('tud:',p.id)=ro.oid and d.id='opendoar____::c9892a989183de32e976c6f04e700201'
+FROM ${usagestats_db}.tudelft_result_views_monthly_tmp p
+JOIN ${stats_db}.datasource d on p.source=d.piwik_id AND d.id='opendoar____::c9892a989183de32e976c6f04e700201'
+JOIN ${stats_db}.result_oids ro on concat('tud:',p.id)=ro.oid
 GROUP BY d.id, ro.id, month
 ORDER BY d.id, ro.id; /*EOS*/
 
@@ -115,8 +122,9 @@ ORDER BY source, entity_id; /*EOS*/
 
 CREATE TABLE IF NOT EXISTS ${usagestats_db}.tudelft_downloads_stats_tmp AS
 SELECT 'OpenAIRE' as source, d.id as repository_id, ro.id as result_id, month as date, max(views) AS count, max(openaire_referrer) AS openaire
-FROM ${usagestats_db}.tudelft_result_downloads_monthly_tmp p, ${stats_db}.datasource d, ${stats_db}.result_oids ro
-WHERE concat('tud:',p.id)=ro.oid and d.id='opendoar____::c9892a989183de32e976c6f04e700201'
+FROM ${usagestats_db}.tudelft_result_downloads_monthly_tmp p
+JOIN ${stats_db}.datasource d on p.source=d.piwik_id AND d.id='opendoar____::c9892a989183de32e976c6f04e700201'
+JOIN ${stats_db}.result_oids ro on concat('tud:',p.id)=ro.oid
 GROUP BY d.id, ro.id, month
 ORDER BY d.id, ro.id; /*EOS*/
 

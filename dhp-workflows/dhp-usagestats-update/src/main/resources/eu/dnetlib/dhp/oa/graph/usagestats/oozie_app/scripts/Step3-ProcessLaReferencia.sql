@@ -12,8 +12,9 @@ ORDER BY source, entity_id; /*EOS*/
 DROP TABLE IF EXISTS ${usagestats_db}.la_views_stats_tmp; /*EOS*/
 CREATE TABLE IF NOT EXISTS ${usagestats_db}.la_views_stats_tmp AS
 SELECT 'LaReferencia' as source, d.id as repository_id, ro.id as result_id, month as date, max(views) AS count, max(openaire_referrer) AS openaire
-FROM ${usagestats_db}.la_result_views_monthly_tmp p, ${stats_db}.datasource_oids d, ${stats_db} .result_oids ro
-WHERE p.source=d.oid AND p.id=ro.oid
+FROM ${usagestats_db}.la_result_views_monthly_tmp p
+JOIN ${stats_db}.datasource_oids d on p.source=d.oid
+JOIN ${stats_db} .result_oids ro on p.id=ro.oid
 GROUP BY d.id, ro.id, month
 ORDER BY d.id, ro.id, month; /*EOS*/
 
@@ -31,7 +32,8 @@ ORDER BY source, entity_id; /*EOS*/
 DROP TABLE IF EXISTS ${usagestats_db}.la_downloads_stats_tmp; /*EOS*/
 CREATE TABLE IF NOT EXISTS ${usagestats_db}.la_downloads_stats_tmp AS
 SELECT 'LaReferencia' as source, d.id as repository_id, ro.id as result_id, month as date, max(downloads) AS count, max(openaire_referrer) AS openaire
-FROM ${usagestats_db}.la_result_downloads_monthly_tmp p, ${stats_db}.datasource_oids d, ${stats_db}.result_oids ro
-WHERE p.source=d.oid AND p.id=ro.oid
+FROM ${usagestats_db}.la_result_downloads_monthly_tmp p
+JOIN ${stats_db}.datasource_oids d on p.source=d.oid
+JOIN ${stats_db}.result_oids ro on p.id=ro.oid
 GROUP BY d.id, ro.id, month
 ORDER BY d.id, ro.id, month; /*EOS*/
