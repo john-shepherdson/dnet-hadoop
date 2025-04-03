@@ -113,7 +113,7 @@
                 ${sparkApplicationOpts}
             </spark-opts>
             <arg>--hiveMetastoreUris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--sql</arg><arg>eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/Step1-CreateDB.sql</arg>
+            <arg>--sql</arg><arg>eu/dnetlib/dhp/oa/graph/usagestats/oozie_app/scripts/Step1-CreateDB.sql</arg>
             <arg>--usagestats_db</arg><arg>${usagestats_db}</arg>
             <arg>--permanent_usagestats_db</arg><arg>${permanent_usagestats_db}</arg>
             <arg>--usagestats_raw_db</arg><arg>${usagestats_raw_db}</arg>
@@ -137,7 +137,7 @@
                 ${sparkApplicationOpts}
             </spark-opts>
             <arg>--hiveMetastoreUris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--sql</arg><arg>eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/Step2-ProcessPiwikLogs.sql</arg>
+            <arg>--sql</arg><arg>eu/dnetlib/dhp/oa/graph/usagestats/oozie_app/scripts/Step2-ProcessPiwikLogs.sql</arg>
             <arg>--usagestats_db</arg><arg>${usagestats_db}</arg>
             <arg>--permanent_usagestats_db</arg><arg>${permanent_usagestats_db}</arg>
             <arg>--usagestats_raw_db</arg><arg>${usagestats_raw_db}</arg>
@@ -161,7 +161,7 @@
                 ${sparkApplicationOpts}
             </spark-opts>
             <arg>--hiveMetastoreUris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--sql</arg><arg>eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/Step3-ProcessLaReferencia.sql</arg>
+            <arg>--sql</arg><arg>eu/dnetlib/dhp/oa/graph/usagestats/oozie_app/scripts/Step3-ProcessLaReferencia.sql</arg>
             <arg>--usagestats_db</arg><arg>${usagestats_db}</arg>
             <arg>--permanent_usagestats_db</arg><arg>${permanent_usagestats_db}</arg>
             <arg>--usagestats_raw_db</arg><arg>${usagestats_raw_db}</arg>
@@ -185,7 +185,7 @@
                 ${sparkApplicationOpts}
             </spark-opts>
             <arg>--hiveMetastoreUris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--sql</arg><arg>eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/Step4-ProcessIrusStats.sql</arg>
+            <arg>--sql</arg><arg>eu/dnetlib/dhp/oa/graph/usagestats/oozie_app/scripts/Step4-ProcessIrusStats.sql</arg>
             <arg>--usagestats_db</arg><arg>${usagestats_db}</arg>
             <arg>--permanent_usagestats_db</arg><arg>${permanent_usagestats_db}</arg>
             <arg>--usagestats_raw_db</arg><arg>${usagestats_raw_db}</arg>
@@ -209,7 +209,7 @@
                 ${sparkApplicationOpts}
             </spark-opts>
             <arg>--hiveMetastoreUris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--sql</arg><arg>eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/Step5-ProcessSarcStats.sql</arg>
+            <arg>--sql</arg><arg>eu/dnetlib/dhp/oa/graph/usagestats/oozie_app/scripts/Step5-ProcessSarcStats.sql</arg>
             <arg>--usagestats_db</arg><arg>${usagestats_db}</arg>
             <arg>--permanent_usagestats_db</arg><arg>${permanent_usagestats_db}</arg>
             <arg>--usagestats_raw_db</arg><arg>${usagestats_raw_db}</arg>
@@ -233,7 +233,7 @@
                 ${sparkApplicationOpts}
             </spark-opts>
             <arg>--hiveMetastoreUris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--sql</arg><arg>eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/Step6-Finalize.sql</arg>
+            <arg>--sql</arg><arg>eu/dnetlib/dhp/oa/graph/usagestats/oozie_app/scripts/Step6-Finalize.sql</arg>
             <arg>--usagestats_db</arg><arg>${usagestats_db}</arg>
             <arg>--permanent_usagestats_db</arg><arg>${permanent_usagestats_db}</arg>
             <arg>--usagestats_raw_db</arg><arg>${usagestats_raw_db}</arg>
