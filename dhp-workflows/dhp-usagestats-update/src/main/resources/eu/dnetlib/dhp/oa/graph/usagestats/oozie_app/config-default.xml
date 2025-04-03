@@ -1,5 +1,9 @@
 <configuration>
     <property>
+        <name>portalMatomoID</name>
+        <value>109</value>
+    </property>
+    <property>
         <name>jobTracker</name>
         <value>${jobTracker}</value>
     </property>

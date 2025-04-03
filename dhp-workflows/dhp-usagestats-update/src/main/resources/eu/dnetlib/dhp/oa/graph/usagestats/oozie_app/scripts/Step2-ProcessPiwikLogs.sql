@@ -28,7 +28,7 @@ DROP TABLE IF EXISTS ${usagestats_db}.openaire_pageviews_stats_tmp; /*EOS*/
 CREATE TABLE IF NOT EXISTS ${usagestats_db}.openaire_pageviews_stats_tmp AS
 SELECT 'OpenAIRE' as source, d.id as repository_id, ro.id as result_id, month as date, max(views) AS count
 FROM ${usagestats_db}.openaire_result_views_monthly_tmp p, ${stats_db}.datasource d, ${stats_db}.result_oids ro
-WHERE p.source=ExecuteWorkflow.portalMatomoID AND p.source=d.piwik_id and p.id=ro.id AND ro.oid!='200'
+WHERE p.source=${portalMatomoID} AND p.source=d.piwik_id and p.id=ro.id AND ro.oid!='200'
 GROUP BY d.id, ro.id, month
 ORDER BY d.id, ro.id, month; /*EOS*/
 

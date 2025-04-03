@@ -17,6 +17,10 @@
             <description>the statistics database name</description>
         </property>
         <property>
+            <name>portalMatomoID</name>
+            <description>The site id of the OpenAIRE portal in matomo</description>
+        </property>
+        <property>
             <name>hive_metastore_uris</name>
             <description>hive server metastore URIs</description>
         </property>
@@ -118,6 +122,7 @@
             <arg>--permanent_usagestats_db</arg><arg>${permanent_usagestats_db}</arg>
             <arg>--usagestats_raw_db</arg><arg>${usagestats_raw_db}</arg>
             <arg>--stats_db</arg><arg>${stats_db}</arg>
+            <arg>--portalMatomoID</arg><arg>${portalMatomoID}</arg>
         </spark>
         <ok to="Step2-ProcessPiwikLogs"/>
         <error to="Kill"/>
@@ -142,6 +147,7 @@
             <arg>--permanent_usagestats_db</arg><arg>${permanent_usagestats_db}</arg>
             <arg>--usagestats_raw_db</arg><arg>${usagestats_raw_db}</arg>
             <arg>--stats_db</arg><arg>${stats_db}</arg>
+            <arg>--portalMatomoID</arg><arg>${portalMatomoID}</arg>
         </spark>
         <ok to="Step3-ProcessLaReferencia"/>
         <error to="Kill"/>
@@ -166,6 +172,7 @@
             <arg>--permanent_usagestats_db</arg><arg>${permanent_usagestats_db}</arg>
             <arg>--usagestats_raw_db</arg><arg>${usagestats_raw_db}</arg>
             <arg>--stats_db</arg><arg>${stats_db}</arg>
+            <arg>--portalMatomoID</arg><arg>${portalMatomoID}</arg>
         </spark>
         <ok to="Step4-ProcessIrusStats"/>
         <error to="Kill"/>
@@ -190,6 +197,7 @@
             <arg>--permanent_usagestats_db</arg><arg>${permanent_usagestats_db}</arg>
             <arg>--usagestats_raw_db</arg><arg>${usagestats_raw_db}</arg>
             <arg>--stats_db</arg><arg>${stats_db}</arg>
+            <arg>--portalMatomoID</arg><arg>${portalMatomoID}</arg>
         </spark>
         <ok to="Step5-ProcessSarcStats"/>
         <error to="Kill"/>
@@ -214,6 +222,7 @@
             <arg>--permanent_usagestats_db</arg><arg>${permanent_usagestats_db}</arg>
             <arg>--usagestats_raw_db</arg><arg>${usagestats_raw_db}</arg>
             <arg>--stats_db</arg><arg>${stats_db}</arg>
+            <arg>--portalMatomoID</arg><arg>${portalMatomoID}</arg>
         </spark>
         <ok to="Step6-Finalize"/>
         <error to="Kill"/>
@@ -238,6 +247,7 @@
             <arg>--permanent_usagestats_db</arg><arg>${permanent_usagestats_db}</arg>
             <arg>--usagestats_raw_db</arg><arg>${usagestats_raw_db}</arg>
             <arg>--stats_db</arg><arg>${stats_db}</arg>
+            <arg>--portalMatomoID</arg><arg>${portalMatomoID}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
