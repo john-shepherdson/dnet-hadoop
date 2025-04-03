@@ -105,7 +105,7 @@
             <mode>cluster</mode>
             <name>Step1-CreateDB</name>
             <class>eu.dnetlib.dhp.oozie.RunSQLSparkJob</class>
-            <jar>dhp-stats-update-${projectVersion}.jar</jar>
+            <jar>dhp-usagestats-update-${projectVersion}.jar</jar>
             <spark-opts>
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
                 ${sparkClusterOpts}
@@ -129,7 +129,7 @@
             <mode>cluster</mode>
             <name>Step2-ProcessPiwikLogs</name>
             <class>eu.dnetlib.dhp.oozie.RunSQLSparkJob</class>
-            <jar>dhp-stats-update-${projectVersion}.jar</jar>
+            <jar>dhp-usagestats-update-${projectVersion}.jar</jar>
             <spark-opts>
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
                 ${sparkClusterOpts}
@@ -153,7 +153,7 @@
             <mode>cluster</mode>
             <name>Step3-ProcessLaReferencia</name>
             <class>eu.dnetlib.dhp.oozie.RunSQLSparkJob</class>
-            <jar>dhp-stats-update-${projectVersion}.jar</jar>
+            <jar>dhp-usagestats-update-${projectVersion}.jar</jar>
             <spark-opts>
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
                 ${sparkClusterOpts}
@@ -177,7 +177,7 @@
             <mode>cluster</mode>
             <name>Step4-ProcessIrusStats</name>
             <class>eu.dnetlib.dhp.oozie.RunSQLSparkJob</class>
-            <jar>dhp-stats-update-${projectVersion}.jar</jar>
+            <jar>dhp-usagestats-update-${projectVersion}.jar</jar>
             <spark-opts>
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
                 ${sparkClusterOpts}
@@ -201,7 +201,7 @@
             <mode>cluster</mode>
             <name>Step5-ProcessSarcStats</name>
             <class>eu.dnetlib.dhp.oozie.RunSQLSparkJob</class>
-            <jar>dhp-stats-update-${projectVersion}.jar</jar>
+            <jar>dhp-usagestats-update-${projectVersion}.jar</jar>
             <spark-opts>
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
                 ${sparkClusterOpts}
@@ -225,7 +225,7 @@
             <mode>cluster</mode>
             <name>Step6-Finalize</name>
             <class>eu.dnetlib.dhp.oozie.RunSQLSparkJob</class>
-            <jar>dhp-stats-update-${projectVersion}.jar</jar>
+            <jar>dhp-usagestats-update-${projectVersion}.jar</jar>
             <spark-opts>
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
                 ${sparkClusterOpts}
