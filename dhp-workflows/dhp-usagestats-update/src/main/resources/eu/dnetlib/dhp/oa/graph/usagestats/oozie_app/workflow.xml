@@ -90,7 +90,7 @@
             <case to="Step4-ProcessIrusStats">${wf:conf('resumeFrom') eq 'Step4-ProcessIrusStats'}</case>
             <case to="Step5-ProcessSarcStats">${wf:conf('resumeFrom') eq 'Step5-ProcessSarcStats'}</case>
             <case to="Step6-Finalize">${wf:conf('resumeFrom') eq 'Step6-Finalize'}</case>
-            <default to="Step1"/>
+            <default to="Step1-CreateDB"/>
         </switch>
     </decision>
 
@@ -103,7 +103,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Step1</name>
+            <name>Step1-CreateDB</name>
             <class>eu.dnetlib.dhp.oozie.RunSQLSparkJob</class>
             <jar>dhp-stats-update-${projectVersion}.jar</jar>
             <spark-opts>
@@ -127,7 +127,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Step1</name>
+            <name>Step2-ProcessPiwikLogs</name>
             <class>eu.dnetlib.dhp.oozie.RunSQLSparkJob</class>
             <jar>dhp-stats-update-${projectVersion}.jar</jar>
             <spark-opts>
@@ -151,7 +151,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Step1</name>
+            <name>Step3-ProcessLaReferencia</name>
             <class>eu.dnetlib.dhp.oozie.RunSQLSparkJob</class>
             <jar>dhp-stats-update-${projectVersion}.jar</jar>
             <spark-opts>
@@ -175,7 +175,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Step1</name>
+            <name>Step4-ProcessIrusStats</name>
             <class>eu.dnetlib.dhp.oozie.RunSQLSparkJob</class>
             <jar>dhp-stats-update-${projectVersion}.jar</jar>
             <spark-opts>
@@ -199,7 +199,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Step1</name>
+            <name>Step5-ProcessSarcStats</name>
             <class>eu.dnetlib.dhp.oozie.RunSQLSparkJob</class>
             <jar>dhp-stats-update-${projectVersion}.jar</jar>
             <spark-opts>
@@ -223,7 +223,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Step1</name>
+            <name>Step6-Finalize</name>
             <class>eu.dnetlib.dhp.oozie.RunSQLSparkJob</class>
             <jar>dhp-stats-update-${projectVersion}.jar</jar>
             <spark-opts>
