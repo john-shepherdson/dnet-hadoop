@@ -1,0 +1,247 @@
+<workflow-app name="Graph Stats Hive" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>usagestats_db</name>
+            <description>the target usage stats database name</description>
+        </property>
+        <property>
+            <name>permanent_usagestats_db</name>
+            <description>the permanent graph database name</description>
+        </property>
+        <property>
+            <name>usagestats_raw_db</name>
+            <description>the db containing the raw usage events</description>
+        </property>
+        <property>
+            <name>stats_db</name>
+            <description>the statistics database name</description>
+        </property>
+        <property>
+            <name>hive_metastore_uris</name>
+            <description>hive server metastore URIs</description>
+        </property>
+        <property>
+            <name>hive_jdbc_url</name>
+            <description>hive server jdbc url</description>
+        </property>
+        <property>
+            <name>hive_timeout</name>
+            <description>the time period, in seconds, after which Hive fails a transaction if a Hive client has not sent a hearbeat. The default value is 300 seconds.</description>
+        </property>
+        <property>
+            <name>hadoop_user_name</name>
+            <description>user name of the wf owner</description>
+        </property>
+
+        <property>
+            <name>sparkSqlWarehouseDir</name>
+        </property>
+        <!-- General oozie workflow properties -->
+        <property>
+            <name>sparkClusterOpts</name>
+            <value>--conf spark.network.timeout=600 --conf spark.extraListeners= --conf spark.sql.queryExecutionListeners= --conf spark.yarn.historyServer.address=http://iis-cdh5-test-m3.ocean.icm.edu.pl:18088 --conf spark.eventLog.dir=hdfs://nameservice1/user/spark/applicationHistory</value>
+            <description>spark cluster-wide options</description>
+        </property>
+        <property>
+            <name>sparkResourceOpts</name>
+            <value>--executor-memory=6G --conf spark.executor.memoryOverhead=4G --executor-cores=6 --driver-memory=8G --driver-cores=4</value>
+            <description>spark resource options</description>
+        </property>
+        <property>
+            <name>sparkApplicationOpts</name>
+            <value>--conf spark.sql.shuffle.partitions=3840</value>
+            <description>spark resource options</description>
+        </property>
+    </parameters>
+
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>hive.metastore.uris</name>
+                <value>${hive_metastore_uris}</value>
+            </property>
+            <property>
+                <name>hive.txn.timeout</name>
+                <value>${hive_timeout}</value>
+            </property>
+            <property>
+                <name>hive.mapjoin.followby.gby.localtask.max.memory.usage</name>
+                <value>0.80</value>
+            </property>
+            <property>
+                <name>oozie.action.sharelib.for.spark</name>
+                <value>${oozieActionShareLibForSpark2}</value>
+            </property>
+            <property>
+                <name>mapred.job.queue.name</name>
+                <value>analytics</value>
+            </property>
+        </configuration>
+    </global>
+
+    <start to="resume_from"/>
+    <decision name="resume_from">
+        <switch>
+            <case to="Step1-CreateDB">${wf:conf('resumeFrom') eq 'Step1-CreateDB'}</case>
+            <case to="Step2-ProcessPiwikLogs">${wf:conf('resumeFrom') eq 'Step2-ProcessPiwikLogs'}</case>
+            <case to="Step3-ProcessLaReferencia">${wf:conf('resumeFrom') eq 'Step3-ProcessLaReferencia'}</case>
+            <case to="Step4-ProcessIrusStats">${wf:conf('resumeFrom') eq 'Step4-ProcessIrusStats'}</case>
+            <case to="Step5-ProcessSarcStats">${wf:conf('resumeFrom') eq 'Step5-ProcessSarcStats'}</case>
+            <case to="Step6-Finalize">${wf:conf('resumeFrom') eq 'Step6-Finalize'}</case>
+            <default to="Step1"/>
+        </switch>
+    </decision>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}
+            ${wf:actionData(wf:lastErrorNode())['stackTrace']}]</message>
+    </kill>
+
+    <action name="Step1-CreateDB">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Step1</name>
+            <class>eu.dnetlib.dhp.oozie.RunSQLSparkJob</class>
+            <jar>dhp-stats-update-${projectVersion}.jar</jar>
+            <spark-opts>
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
+            </spark-opts>
+            <arg>--hiveMetastoreUris</arg><arg>${hive_metastore_uris}</arg>
+            <arg>--sql</arg><arg>eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/Step1-CreateDB.sql</arg>
+            <arg>--usagestats_db</arg><arg>${usagestats_db}</arg>
+            <arg>--permanent_usagestats_db</arg><arg>${permanent_usagestats_db}</arg>
+            <arg>--usagestats_raw_db</arg><arg>${usagestats_raw_db}</arg>
+            <arg>--stats_db</arg><arg>${stats_db}</arg>
+        </spark>
+        <ok to="Step2-ProcessPiwikLogs"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="Step2-ProcessPiwikLogs">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Step1</name>
+            <class>eu.dnetlib.dhp.oozie.RunSQLSparkJob</class>
+            <jar>dhp-stats-update-${projectVersion}.jar</jar>
+            <spark-opts>
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
+            </spark-opts>
+            <arg>--hiveMetastoreUris</arg><arg>${hive_metastore_uris}</arg>
+            <arg>--sql</arg><arg>eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/Step2-ProcessPiwikLogs.sql</arg>
+            <arg>--usagestats_db</arg><arg>${usagestats_db}</arg>
+            <arg>--permanent_usagestats_db</arg><arg>${permanent_usagestats_db}</arg>
+            <arg>--usagestats_raw_db</arg><arg>${usagestats_raw_db}</arg>
+            <arg>--stats_db</arg><arg>${stats_db}</arg>
+        </spark>
+        <ok to="Step3-ProcessLaReferencia"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="Step3-ProcessLaReferencia">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Step1</name>
+            <class>eu.dnetlib.dhp.oozie.RunSQLSparkJob</class>
+            <jar>dhp-stats-update-${projectVersion}.jar</jar>
+            <spark-opts>
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
+            </spark-opts>
+            <arg>--hiveMetastoreUris</arg><arg>${hive_metastore_uris}</arg>
+            <arg>--sql</arg><arg>eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/Step3-ProcessLaReferencia.sql</arg>
+            <arg>--usagestats_db</arg><arg>${usagestats_db}</arg>
+            <arg>--permanent_usagestats_db</arg><arg>${permanent_usagestats_db}</arg>
+            <arg>--usagestats_raw_db</arg><arg>${usagestats_raw_db}</arg>
+            <arg>--stats_db</arg><arg>${stats_db}</arg>
+        </spark>
+        <ok to="Step4-ProcessIrusStats"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="Step4-ProcessIrusStats">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Step1</name>
+            <class>eu.dnetlib.dhp.oozie.RunSQLSparkJob</class>
+            <jar>dhp-stats-update-${projectVersion}.jar</jar>
+            <spark-opts>
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
+            </spark-opts>
+            <arg>--hiveMetastoreUris</arg><arg>${hive_metastore_uris}</arg>
+            <arg>--sql</arg><arg>eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/Step4-ProcessIrusStats.sql</arg>
+            <arg>--usagestats_db</arg><arg>${usagestats_db}</arg>
+            <arg>--permanent_usagestats_db</arg><arg>${permanent_usagestats_db}</arg>
+            <arg>--usagestats_raw_db</arg><arg>${usagestats_raw_db}</arg>
+            <arg>--stats_db</arg><arg>${stats_db}</arg>
+        </spark>
+        <ok to="Step5-ProcessSarcStats"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="Step5-ProcessSarcStats">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Step1</name>
+            <class>eu.dnetlib.dhp.oozie.RunSQLSparkJob</class>
+            <jar>dhp-stats-update-${projectVersion}.jar</jar>
+            <spark-opts>
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
+            </spark-opts>
+            <arg>--hiveMetastoreUris</arg><arg>${hive_metastore_uris}</arg>
+            <arg>--sql</arg><arg>eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/Step5-ProcessSarcStats.sql</arg>
+            <arg>--usagestats_db</arg><arg>${usagestats_db}</arg>
+            <arg>--permanent_usagestats_db</arg><arg>${permanent_usagestats_db}</arg>
+            <arg>--usagestats_raw_db</arg><arg>${usagestats_raw_db}</arg>
+            <arg>--stats_db</arg><arg>${stats_db}</arg>
+        </spark>
+        <ok to="Step6-Finalize"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="Step6-Finalize">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Step1</name>
+            <class>eu.dnetlib.dhp.oozie.RunSQLSparkJob</class>
+            <jar>dhp-stats-update-${projectVersion}.jar</jar>
+            <spark-opts>
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
+            </spark-opts>
+            <arg>--hiveMetastoreUris</arg><arg>${hive_metastore_uris}</arg>
+            <arg>--sql</arg><arg>eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/Step6-Finalize.sql</arg>
+            <arg>--usagestats_db</arg><arg>${usagestats_db}</arg>
+            <arg>--permanent_usagestats_db</arg><arg>${permanent_usagestats_db}</arg>
+            <arg>--usagestats_raw_db</arg><arg>${usagestats_raw_db}</arg>
+            <arg>--stats_db</arg><arg>${stats_db}</arg>
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <end name="End"/>
+</workflow-app>
