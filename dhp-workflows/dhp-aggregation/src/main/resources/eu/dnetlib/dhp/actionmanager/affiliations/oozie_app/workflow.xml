@@ -229,30 +229,24 @@
     <action name="run-affro-on-graph">
         <spark xmlns="uri:oozie:spark-action:0.2">
 
-            <master>yarn-cluster</master>
+            <master>yarn</master>
             <mode>cluster</mode>
             <name>Affiliations inference (Affro)</name>
             <jar>graph.py</jar>
 
             <spark-opts>
-                --executor-cores=6
-                --executor-memory=6G
-                --driver-memory=4G
-                --conf spark.dynamicAllocation.maxExecutors=27
-                --conf spark.executor.memoryOverhead=6G
-                --conf spark.sql.shuffle.partitions=20000
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
                 --conf spark.yarn.appMasterEnv.PYSPARK_PYTHON=python3
                 --conf spark.executorEnv.PYSPARK_PYTHON=python3
                 --py-files ${wfAppPath}/affRo/affro_cluster.py,${wfAppPath}/affRo/create_input_cluster.py,${wfAppPath}/affRo/functions_cluster.py,${wfAppPath}/affRo/matching_cluster.py,${wfAppPath}/affRo/schemas.py
-                --files ${wfAppPath}/affRo/dictionaries/dix_acad.json,${wfAppPath}/affRo/dictionaries/dix_acad_oaire.json,${wfAppPath}/affRo/dictionaries/dix_categ.json,${wfAppPath}/affRo/dictionaries/dix_city.json,${wfAppPath}/affRo/dictionaries/dix_country.json,${wfAppPath}/affRo/dictionaries/dix_country_oaire.json,${wfAppPath}/affRo/dictionaries/dix_grids_rors.json,,${wfAppPath}/affRo/dictionaries/dix_id_country.json,${wfAppPath}/affRo/dictionaries/dix_mult.json,${wfAppPath}/affRo/dictionaries/dix_mult_oaire.json,${wfAppPath}/affRo/dictionaries/dix_status.json,${wfAppPath}/affRo/txt_files/city_names.txt,${wfAppPath}/affRo/txt_files/remove_list.txt,${wfAppPath}/affRo/txt_files/country_names.txt,${wfAppPath}/affRo/txt_files/stop_words.txt,${wfAppPath}/affRo/txt_files/university_terms.txt
+                --files ${wfAppPath}/affRo/dictionaries/replacements_all.json,${wfAppPath}/affRo/dictionaries/dix_acad.json,${wfAppPath}/affRo/dictionaries/dix_acad_oaire.json,${wfAppPath}/affRo/dictionaries/dix_categ.json,${wfAppPath}/affRo/dictionaries/dix_city.json,${wfAppPath}/affRo/dictionaries/dix_country.json,${wfAppPath}/affRo/dictionaries/dix_country_oaire.json,${wfAppPath}/affRo/dictionaries/dix_grids_rors.json,,${wfAppPath}/affRo/dictionaries/dix_id_country.json,${wfAppPath}/affRo/dictionaries/dix_mult.json,${wfAppPath}/affRo/dictionaries/dix_mult_oaire.json,${wfAppPath}/affRo/dictionaries/dix_status.json,${wfAppPath}/affRo/txt_files/city_names.txt,${wfAppPath}/affRo/txt_files/remove_list.txt,${wfAppPath}/affRo/txt_files/country_names.txt,${wfAppPath}/affRo/txt_files/stop_words.txt,${wfAppPath}/affRo/txt_files/university_terms.txt
             </spark-opts>
 
             <arg>${inputFolder}</arg>
-            <arg>${matchinFile}</arg>
+            <arg>${outputFolder}</arg>
 
             <file>${wfAppPath}/affRo/graph.py#graph.py</file>
         </spark>
@@ -279,7 +273,7 @@
                     --conf spark.yarn.appMasterEnv.PYSPARK_PYTHON=python3
                     --conf spark.executorEnv.PYSPARK_PYTHON=python3
                     --py-files ${wfAppPath}/affRo/affro_cluster.py,${wfAppPath}/affRo/create_input_cluster.py,${wfAppPath}/affRo/functions_cluster.py,${wfAppPath}/affRo/matching_cluster.py,${wfAppPath}/affRo/schemas.py
-                    --files ${wfAppPath}/affRo/dictionaries/dix_acad.json,${wfAppPath}/affRo/dictionaries/dix_acad_oaire.json,${wfAppPath}/affRo/dictionaries/dix_categ.json,${wfAppPath}/affRo/dictionaries/dix_city.json,${wfAppPath}/affRo/dictionaries/dix_country.json,${wfAppPath}/affRo/dictionaries/dix_country_oaire.json,${wfAppPath}/affRo/dictionaries/dix_grids_rors.json,,${wfAppPath}/affRo/dictionaries/dix_id_country.json,${wfAppPath}/affRo/dictionaries/dix_mult.json,${wfAppPath}/affRo/dictionaries/dix_mult_oaire.json,${wfAppPath}/affRo/dictionaries/dix_status.json,${wfAppPath}/affRo/txt_files/city_names.txt,${wfAppPath}/affRo/txt_files/remove_list.txt,${wfAppPath}/affRo/txt_files/country_names.txt,${wfAppPath}/affRo/txt_files/stop_words.txt,${wfAppPath}/affRo/txt_files/university_terms.txt
+                    --files ${wfAppPath}/affRo/dictionaries/dix_acad.json,${wfAppPath}/affRo/dictionaries/dix_acad_oaire.json,${wfAppPath}/affRo/dictionaries/dix_categ.json,${wfAppPath}/affRo/dictionaries/dix_city.json,${wfAppPath}/affRo/dictionaries/dix_country.json,${wfAppPath}/affRo/dictionaries/dix_country_oaire.json,${wfAppPath}/affRo/dictionaries/dix_grids_rors.json,${wfAppPath}/affRo/dictionaries/dix_id_country.json,${wfAppPath}/affRo/dictionaries/dix_mult.json,${wfAppPath}/affRo/dictionaries/dix_mult_oaire.json,${wfAppPath}/affRo/dictionaries/dix_status.json,${wfAppPath}/affRo/dictionaries/replacements_all.json,${wfAppPath}/affRo/txt_files/city_names.txt,${wfAppPath}/affRo/txt_files/remove_list.txt,${wfAppPath}/affRo/txt_files/country_names.txt,${wfAppPath}/affRo/txt_files/stop_words.txt,${wfAppPath}/affRo/txt_files/university_terms.txt
                 </spark-opts>
 
                 <arg>${inputFolder}</arg>
