@@ -8,7 +8,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Iterator;
-import java.util.stream.IntStream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -18,7 +17,7 @@ public class MongoLogsDumperTests {
 	@Test
 	public void logsDump() throws IOException {
 		final MongoLogsDumper dumper = new MongoLogsDumper("localhost", 27017, "dnet_logs", "wf_logs", null);
-		Iterator<AggregationLog> result = dumper.dumpLogs(1742826036670L);
+		Iterator<AggregationLog> result = dumper.dumpLogs(1743499512881L);
 
 		Path outputPath = Paths.get( "/tmp/aggregation_logs.txt");
 		Files.createDirectories(outputPath.getParent());
