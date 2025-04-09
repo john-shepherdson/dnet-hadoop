@@ -6,6 +6,7 @@ import static eu.dnetlib.dhp.common.Constants.SEQUENCE_FILE_NAME;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -20,6 +21,7 @@ import eu.dnetlib.dhp.aggregation.common.ReporterCallback;
 import eu.dnetlib.dhp.aggregation.common.ReportingJob;
 import eu.dnetlib.dhp.collection.plugin.CollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.base.BaseCollectorPlugin;
+import eu.dnetlib.dhp.collection.plugin.dblp.DBLPCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.file.FileCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.file.FileGZipCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.gtr2.Gtr2PublicationsCollectorPlugin;
@@ -27,6 +29,7 @@ import eu.dnetlib.dhp.collection.plugin.mongodb.MDStoreCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.mongodb.MongoDbDumpCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.oai.OaiCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.osf.OsfPreprintsCollectorPlugin;
+import eu.dnetlib.dhp.collection.plugin.researchfi.ResearchFiCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.rest.RestCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.zenodo.CollectZenodoDumpCollectorPlugin;
 import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
@@ -131,7 +134,11 @@ public class CollectorWorker extends ReportingJob {
 			case osfPreprints:
 				return new OsfPreprintsCollectorPlugin(this.clientParams);
 			case zenodoDump:
-				return new CollectZenodoDumpCollectorPlugin();
+				return new CollectZenodoDumpCollectorPlugin(this.fileSystem);
+			case dblp:
+				return new DBLPCollectorPlugin(this.fileSystem);
+			case research_fi:
+				return new ResearchFiCollectorPlugin();
 			case other:
 				final CollectorPlugin.NAME.OTHER_NAME plugin = Optional
 					.ofNullable(this.api.getParams().get("other_plugin_type"))

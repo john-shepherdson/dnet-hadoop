@@ -1,5 +1,5 @@
 
-<workflow-app name="FOS no doi" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="FOS actionset" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>fosPath</name>
@@ -64,39 +64,11 @@
 
         </configuration>
     </global>
-    <start to="getFOS"/>
+    <start to="prepareFos"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
-
-
-
-    <action name="getFOS">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>Gets Data from FOS csv file</name>
-            <class>eu.dnetlib.dhp.actionmanager.createunresolvedentities.GetFOSSparkJob</class>
-            <jar>dhp-aggregation-${projectVersion}.jar</jar>
-            <spark-opts>
-                --executor-memory=${sparkExecutorMemory}
-                --executor-cores=${sparkExecutorCores}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
-            </spark-opts>
-            <arg>--sourcePath</arg><arg>${fosPath}</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/input/fos</arg>
-            <arg>--delimiter</arg><arg>${delimiter}</arg>
-        </spark>
-        <ok to="prepareFos"/>
-        <error to="Kill"/>
-    </action>
-
 
     <action name="prepareFos">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -115,15 +87,12 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${workingDir}/input/fos</arg>
+            <arg>--sourcePath</arg><arg>${fosPath}</arg>
             <arg>--outputPath</arg><arg>${workingDir}/prepared</arg>
-            <arg>--distributeDoi</arg><arg>false</arg>
         </spark>
         <ok to="produceActionSet"/>
         <error to="Kill"/>
     </action>
-
-
 
     <action name="produceActionSet">
         <spark xmlns="uri:oozie:spark-action:0.2">

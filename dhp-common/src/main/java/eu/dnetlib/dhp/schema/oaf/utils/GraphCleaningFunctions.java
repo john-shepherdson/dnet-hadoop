@@ -63,6 +63,8 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 		PEER_REVIEWED_TYPES.add("Thesis");
 		PEER_REVIEWED_TYPES.add("Bachelor thesis");
 		PEER_REVIEWED_TYPES.add("Conference object");
+		PEER_REVIEWED_TYPES.add("Software Paper");
+		PEER_REVIEWED_TYPES.add("Journal");
 
 		INVALID_AUTHOR_NAMES.add("(:null)");
 		INVALID_AUTHOR_NAMES.add("(:unap)");

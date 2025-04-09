@@ -228,6 +228,8 @@ public class CreateRelatedEntitiesJob_phase1 {
 				re.setCode(getValue(p.getCode()));
 				re.setAcronym(getValue(p.getAcronym()));
 				re.setContracttype(p.getContracttype());
+				re.setStartDate(getValue(p.getStartdate()));
+				re.setEndDate(getValue(p.getEnddate()));
 
 				final List<Field<String>> f = p.getFundingtree();
 				if (!f.isEmpty()) {

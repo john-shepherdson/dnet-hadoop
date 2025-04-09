@@ -86,7 +86,7 @@ public class JsonListMatch extends AbstractListComparator {
 		// for each path in the param list
 		for (String key : params.keySet().stream().filter(k -> k.contains("jpath")).collect(Collectors.toList())) {
 			String path = params.get(key);
-			String value = MapDocumentUtil.getJPathString(path, documentContext).toLowerCase();
+			String value = MapDocumentUtil.getJPathString(path, documentContext);
 			if (value == null || value.isEmpty())
 				value = "";
 			st.append(value);

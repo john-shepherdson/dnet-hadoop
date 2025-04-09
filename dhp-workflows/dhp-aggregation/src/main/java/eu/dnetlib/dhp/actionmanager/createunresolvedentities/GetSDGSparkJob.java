@@ -16,7 +16,6 @@ import org.apache.spark.sql.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.dnetlib.dhp.actionmanager.createunresolvedentities.model.FOSDataModel;
 import eu.dnetlib.dhp.actionmanager.createunresolvedentities.model.SDGDataModel;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 
@@ -77,11 +76,11 @@ public class GetSDGSparkJob implements Serializable {
 		sdgData.map((MapFunction<Row, SDGDataModel>) r -> {
 			SDGDataModel sdgDataModel = new SDGDataModel();
 			sdgDataModel.setDoi(r.getString(0).toLowerCase());
-			sdgDataModel.setSbj(r.getString(1));
+			sdgDataModel.setSdg(r.getString(1));
 
 			return sdgDataModel;
 		}, Encoders.bean(SDGDataModel.class))
-			.filter((FilterFunction<SDGDataModel>) sdg -> sdg.getSbj() != null)
+			.filter((FilterFunction<SDGDataModel>) sdg -> sdg.getSdg() != null)
 			.write()
 			.mode(SaveMode.Overwrite)
 			.json(outputPath);

@@ -21,13 +21,13 @@ public class RelatedEntity implements Serializable {
 	// common fields
 	private StructuredProperty title;
 	private String websiteurl; // datasource, organizations, projects
+	private List<StructuredProperty> pid;
 
 	// results
 	private String description;
 	private List<String> author;
 	private String dateofacceptance;
 	private String publisher;
-	private List<StructuredProperty> pid;
 	private String codeRepositoryUrl;
 	private Qualifier resulttype;
 	private List<KeyValue> collectedfrom;
@@ -50,6 +50,8 @@ public class RelatedEntity implements Serializable {
 	private String acronym;
 	private Qualifier contracttype;
 	private List<String> fundingtree;
+	private String startDate;
+	private String endDate;
 
 	// person
 	private String givenName;
@@ -254,6 +256,22 @@ public class RelatedEntity implements Serializable {
 
 	public void setFundingtree(List<String> fundingtree) {
 		this.fundingtree = fundingtree;
+	}
+
+	public String getStartDate() {
+		return startDate;
+	}
+
+	public void setStartDate(String startDate) {
+		this.startDate = startDate;
+	}
+
+	public String getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(String endDate) {
+		this.endDate = endDate;
 	}
 
 	public String getGivenName() {

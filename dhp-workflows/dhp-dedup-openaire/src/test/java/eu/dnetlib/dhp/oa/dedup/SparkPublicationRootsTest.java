@@ -324,7 +324,7 @@ public class SparkPublicationRootsTest implements Serializable {
 
 	private void verifyRoot_case_3(Dataset<Publication> roots, Dataset<Publication> pubs) {
 		Publication root = roots
-			.filter("id = '50|dedup_wf_001::31ca734cc22181b704c4aa8fd050062a'")
+			.filter("id = '50|dedup_wf_002::7143f4ff5708f3657db0b7e68ea74d55'")
 			.first();
 		assertNotNull(root);
 

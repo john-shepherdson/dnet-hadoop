@@ -6,16 +6,26 @@ import java.util.Map;
 
 public class ApiDescriptor {
 
+	private Map<String, String> params = new HashMap<>();
+
 	private String id;
 
 	private String baseUrl;
 
 	private String protocol;
 
-	private Map<String, String> params = new HashMap<>();
+	private String compatibilityLevel;
+
+	public Map<String, String> getParams() {
+		return this.params;
+	}
+
+	public void setParams(final Map<String, String> params) {
+		this.params = params;
+	}
 
 	public String getBaseUrl() {
-		return baseUrl;
+		return this.baseUrl;
 	}
 
 	public void setBaseUrl(final String baseUrl) {
@@ -23,26 +33,26 @@ public class ApiDescriptor {
 	}
 
 	public String getId() {
-		return id;
+		return this.id;
 	}
 
 	public void setId(final String id) {
 		this.id = id;
 	}
 
-	public Map<String, String> getParams() {
-		return params;
-	}
-
-	public void setParams(final Map<String, String> params) {
-		this.params = params;
-	}
-
 	public String getProtocol() {
-		return protocol;
+		return this.protocol;
 	}
 
 	public void setProtocol(final String protocol) {
 		this.protocol = protocol;
+	}
+
+	public String getCompatibilityLevel() {
+		return compatibilityLevel;
+	}
+
+	public void setCompatibilityLevel(String compatibilityLevel) {
+		this.compatibilityLevel = compatibilityLevel;
 	}
 }

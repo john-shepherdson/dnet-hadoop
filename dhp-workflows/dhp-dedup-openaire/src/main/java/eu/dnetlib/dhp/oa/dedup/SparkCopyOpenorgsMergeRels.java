@@ -68,22 +68,20 @@ public class SparkCopyOpenorgsMergeRels extends AbstractSparkAction {
 		final String relationPath = DedupUtility.createEntityPath(graphBasePath, "relation");
 
 		// collect organization merge relations from openorgs database
-		JavaRDD<Relation> mergeRelsRDD = spark
+		Dataset<Relation> relations = spark
 			.read()
-			.textFile(relationPath)
+			.schema(Encoders.bean(Relation.class).schema())
+			.json(relationPath)
+			.as(Encoders.bean(Relation.class))
 			.map(patchRelFn(), Encoders.bean(Relation.class))
-			.toJavaRDD()
 			.filter(this::isOpenorgs) // take only openorgs relations
 			.filter(this::isMergeRel); // take merges and isMergedIn relations
 
-		log.info("Number of Openorgs Merge Relations collected: {}", mergeRelsRDD.count());
-
-		final Dataset<Relation> relations = spark
-			.createDataset(
-				mergeRelsRDD.rdd(),
-				Encoders.bean(Relation.class));
+		relations.cache();
+		log.info("Number of Openorgs Merge Relations collected: {}", relations.count());
 
 		saveParquet(relations, outputPath, SaveMode.Append);
+		relations.unpersist();
 	}
 
 	private boolean isMergeRel(Relation rel) {

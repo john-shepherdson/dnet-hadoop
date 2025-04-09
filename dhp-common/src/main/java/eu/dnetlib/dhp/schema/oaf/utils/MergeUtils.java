@@ -26,7 +26,6 @@ import com.google.common.base.Joiner;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.oa.merge.AuthorMerger;
 import eu.dnetlib.dhp.schema.common.AccessRightComparator;
-import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
@@ -113,12 +112,16 @@ public class MergeUtils {
 	}
 
 	public static Oaf merge(final Oaf left, final Oaf right) {
-		return merge(left, right, false);
+		return merge(left, right, false, false);
 	}
 
-	static Oaf merge(final Oaf left, final Oaf right, boolean checkDelegatedAuthority) {
+	public static Oaf merge(final Oaf left, final Oaf right, boolean promoting) {
+		return merge(left, right, false, promoting);
+	}
+
+	static Oaf merge(final Oaf left, final Oaf right, boolean checkDelegatedAuthority, boolean promoting) {
 		if (sameClass(left, right, OafEntity.class)) {
-			return mergeEntities(left, right, checkDelegatedAuthority);
+			return mergeEntities(left, right, checkDelegatedAuthority, promoting);
 		} else if (sameClass(left, right, Relation.class)) {
 			return mergeRelation((Relation) left, (Relation) right);
 		} else {
@@ -134,7 +137,7 @@ public class MergeUtils {
 		return cls.isAssignableFrom(left.getClass()) && cls.isAssignableFrom(right.getClass());
 	}
 
-	private static Oaf mergeEntities(Oaf left, Oaf right, boolean checkDelegatedAuthority) {
+	private static Oaf mergeEntities(Oaf left, Oaf right, boolean checkDelegatedAuthority, boolean promoting) {
 
 		if (sameClass(left, right, Result.class)) {
 			if (checkDelegatedAuthority) {
@@ -154,7 +157,11 @@ public class MergeUtils {
 				return mergeSoftware((Software) left, (Software) right);
 			}
 
-			return left;
+			if (Boolean.TRUE.equals(promoting)) {
+				return mergeResultFields((Result) left, (Result) right);
+			} else {
+				return left;
+			}
 		} else if (sameClass(left, right, Datasource.class)) {
 			// TODO
 			final int trust = compareTrust(left, right);
@@ -481,7 +488,10 @@ public class MergeUtils {
 
 		// merge datainfo for same context id
 		merge.setContext(mergeLists(merge.getContext(), enrich.getContext(), trust, Context::getId, (r, l) -> {
-			r.getDataInfo().addAll(l.getDataInfo());
+			List<DataInfo> infos = new ArrayList<>();
+			infos.addAll(r.getDataInfo());
+			infos.addAll(l.getDataInfo());
+			r.setDataInfo(infos);
 			return r;
 		}));
 

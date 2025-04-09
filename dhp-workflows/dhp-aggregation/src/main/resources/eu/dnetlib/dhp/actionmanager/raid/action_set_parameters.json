@@ -10,5 +10,17 @@
     "paramLongName": "outputPath",
     "paramDescription": "the path of the new ActionSet",
     "paramRequired": true
+  },
+  {
+    "paramName": "b",
+    "paramLongName": "baseUrl",
+    "paramDescription": "base url path for instance url creation",
+    "paramRequired": true
+  },
+  {
+    "paramName": "g",
+    "paramLongName": "graphBasePath",
+    "paramDescription": "base url path of the graph",
+    "paramRequired": true
   }
 ]

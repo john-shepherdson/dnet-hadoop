@@ -6,13 +6,12 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.MapGroupsFunction;
-import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
@@ -20,18 +19,28 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import eu.dnetlib.dhp.actionmanager.createunresolvedentities.model.FOSDataModel;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.Result;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import eu.dnetlib.dhp.schema.oaf.Subject;
-import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
-import eu.dnetlib.dhp.utils.DHPUtils;
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
+import eu.dnetlib.dhp.schema.oaf.utils.PidCleaner;
+import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 
 public class PrepareFOSSparkJob implements Serializable {
+
 	private static final Logger log = LoggerFactory.getLogger(PrepareFOSSparkJob.class);
+
+	private static final String RESULT_ID_PREFIX = ModelSupport.entityIdPrefix
+		.get(Result.class.getSimpleName().toLowerCase()) + IdentifierFactory.ID_PREFIX_SEPARATOR;
+
+	private static final String DOI_PREFIX = "doi_________::";
+
+	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	public static void main(String[] args) throws Exception {
 
@@ -54,36 +63,18 @@ public class PrepareFOSSparkJob implements Serializable {
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
 
-		final Boolean distributeDOI = Optional
-			.ofNullable(parser.get("distributeDoi"))
-			.map(Boolean::valueOf)
-			.orElse(Boolean.TRUE);
-
 		SparkConf conf = new SparkConf();
 		runWithSparkSession(
 			conf,
 			isSparkSessionManaged,
-			spark -> {
-				if (distributeDOI)
-					distributeFOSdois(
-						spark,
-						sourcePath,
-
-						outputPath);
-				else
-					distributeFOSoaid(spark, sourcePath, outputPath);
-			});
+			spark -> processFOS(spark, sourcePath, outputPath));
 	}
 
-	private static void distributeFOSoaid(SparkSession spark, String sourcePath, String outputPath) {
-		Dataset<FOSDataModel> fosDataset = readPath(spark, sourcePath, FOSDataModel.class);
-
-		fosDataset
-			.groupByKey((MapFunction<FOSDataModel, String>) v -> v.getOaid().toLowerCase(), Encoders.STRING())
+	private static void processFOS(SparkSession spark, String sourcePath, String outputPath) {
+		readJsonFromPath(spark, sourcePath, FOSDataModel.class)
+			.groupByKey((MapFunction<FOSDataModel, String>) PrepareFOSSparkJob::createIdentifier, Encoders.STRING())
 			.mapGroups(
-				(MapGroupsFunction<String, FOSDataModel, Result>) (k,
-					it) -> getResult(
-						ModelSupport.entityIdPrefix.get(Result.class.getSimpleName().toLowerCase()) + "|" + k, it),
+				(MapGroupsFunction<String, FOSDataModel, Result>) PrepareFOSSparkJob::getResult,
 				Encoders.bean(Result.class))
 			.write()
 			.mode(SaveMode.Overwrite)
@@ -91,11 +82,23 @@ public class PrepareFOSSparkJob implements Serializable {
 			.json(outputPath + "/fos");
 	}
 
+	private static String createIdentifier(FOSDataModel v) throws JsonProcessingException {
+		if (StringUtils.isNotBlank(v.getDoi())) {
+			final String doi = PidCleaner.normalizePidValue(PidType.doi.toString(), v.getDoi());
+			return RESULT_ID_PREFIX + DOI_PREFIX + IdentifierFactory.md5(doi);
+		}
+		if (StringUtils.isNotBlank(v.getOaid())) {
+			final String oaid = v.getOaid();
+			return StringUtils.startsWith(oaid, RESULT_ID_PREFIX) ? oaid : RESULT_ID_PREFIX + oaid;
+		}
+		throw new RuntimeException("No identifier found for FOSDataModel: " + OBJECT_MAPPER.writeValueAsString(v));
+	}
+
 	@NotNull
-	private static Result getResult(String k, Iterator<FOSDataModel> it) {
+	private static Result getResult(String id, Iterator<FOSDataModel> it) {
 		Result r = new Result();
 		FOSDataModel first = it.next();
-		r.setId(k);
+		r.setId(id);
 
 		HashSet<String> level1 = new HashSet<>();
 		HashSet<String> level2 = new HashSet<>();
@@ -117,21 +120,6 @@ public class PrepareFOSSparkJob implements Serializable {
 		r.setSubject(sbjs);
 
 		return r;
-	}
-
-	private static void distributeFOSdois(SparkSession spark, String sourcePath, String outputPath) {
-		Dataset<FOSDataModel> fosDataset = readPath(spark, sourcePath, FOSDataModel.class);
-
-		fosDataset
-			.groupByKey((MapFunction<FOSDataModel, String>) v -> v.getDoi().toLowerCase(), Encoders.STRING())
-			.mapGroups(
-				(MapGroupsFunction<String, FOSDataModel, Result>) (k,
-					it) -> getResult(DHPUtils.generateUnresolvedIdentifier(k, DOI), it),
-				Encoders.bean(Result.class))
-			.write()
-			.mode(SaveMode.Overwrite)
-			.option("compression", "gzip")
-			.json(outputPath + "/fos");
 	}
 
 	private static void add(List<Subject> sbsjs, Subject sbj) {

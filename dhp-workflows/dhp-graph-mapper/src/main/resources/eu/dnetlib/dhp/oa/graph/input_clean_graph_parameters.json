@@ -76,5 +76,11 @@
     "paramLongName": "deepClean",
     "paramDescription": "flag to activate further cleaning steps",
     "paramRequired": true
+  },
+  {
+    "paramName": "bl",
+    "paramLongName": "blacklist",
+    "paramDescription": "Path to ids to filter out",
+    "paramRequired": false
   }
 ]

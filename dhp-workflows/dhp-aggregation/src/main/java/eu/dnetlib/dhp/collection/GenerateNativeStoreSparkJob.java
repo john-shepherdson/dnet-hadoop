@@ -1,9 +1,14 @@
 
 package eu.dnetlib.dhp.collection;
 
-import static eu.dnetlib.dhp.common.Constants.*;
+import static eu.dnetlib.dhp.common.Constants.CONTENT_INVALIDRECORDS;
+import static eu.dnetlib.dhp.common.Constants.CONTENT_TOTALITEMS;
+import static eu.dnetlib.dhp.common.Constants.MDSTORE_DATA_PATH;
+import static eu.dnetlib.dhp.common.Constants.MDSTORE_SIZE_PATH;
+import static eu.dnetlib.dhp.common.Constants.SEQUENCE_FILE_NAME;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
-import static eu.dnetlib.dhp.utils.DHPUtils.*;
+import static eu.dnetlib.dhp.utils.DHPUtils.saveDataset;
+import static eu.dnetlib.dhp.utils.DHPUtils.writeHdfsFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -11,6 +16,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Optional;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.IntWritable;
@@ -19,7 +26,11 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.sql.*;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Encoder;
+import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.TypedColumn;
 import org.apache.spark.sql.expressions.Aggregator;
 import org.apache.spark.util.LongAccumulator;
 import org.dom4j.Document;
@@ -32,85 +43,114 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.mdstore.MDStoreVersion;
 import eu.dnetlib.dhp.schema.mdstore.MetadataRecord;
 import eu.dnetlib.dhp.schema.mdstore.Provenance;
+import eu.dnetlib.validator2.validation.guideline.openaire.AbstractOpenAireProfile;
+import eu.dnetlib.validator2.validation.guideline.openaire.DataArchiveGuidelinesV2Profile;
+import eu.dnetlib.validator2.validation.guideline.openaire.FAIR_Data_GuidelinesProfile;
+import eu.dnetlib.validator2.validation.guideline.openaire.FAIR_Literature_GuidelinesV4Profile;
+import eu.dnetlib.validator2.validation.guideline.openaire.LiteratureGuidelinesV3Profile;
+import eu.dnetlib.validator2.validation.guideline.openaire.LiteratureGuidelinesV4Profile;
 import scala.Tuple2;
 
 public class GenerateNativeStoreSparkJob {
 
 	private static final Logger log = LoggerFactory.getLogger(GenerateNativeStoreSparkJob.class);
 
-	public static void main(String[] args) throws Exception {
+	private static final ObjectMapper MAPPER = new ObjectMapper()
+			.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+	public static void main(final String[] args) throws Exception {
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
 					GenerateNativeStoreSparkJob.class
-						.getResourceAsStream(
-							"/eu/dnetlib/dhp/collection/generate_native_input_parameters.json")));
+						.getResourceAsStream("/eu/dnetlib/dhp/collection/generate_native_input_parameters.json")));
 		parser.parseArgument(args);
 
 		final String provenanceArgument = parser.get("provenance");
-		log.info("Provenance is {}", provenanceArgument);
+		log.info("provenance: {}", provenanceArgument);
 		final Provenance provenance = MAPPER.readValue(provenanceArgument, Provenance.class);
 
-		final String dateOfCollectionArgs = parser.get("dateOfCollection");
-		log.info("dateOfCollection is {}", dateOfCollectionArgs);
-		final Long dateOfCollection = new Long(dateOfCollectionArgs);
+		final String apiDescriptor = parser.get("apidescriptor");
+		log.info("apidescriptor: {}", apiDescriptor);
+		final ApiDescriptor api = MAPPER.readValue(apiDescriptor, ApiDescriptor.class);
 
-		String mdStoreVersion = parser.get("mdStoreVersion");
-		log.info("mdStoreVersion is {}", mdStoreVersion);
+		final String dateOfCollectionArgs = parser.get("dateOfCollection");
+		log.info("dateOfCollection: {}", dateOfCollectionArgs);
+		final Long dateOfCollection = Long.valueOf(dateOfCollectionArgs);
+
+		final String mdStoreVersion = parser.get("mdStoreVersion");
+		log.info("mdStoreVersion: {}", mdStoreVersion);
 
 		final MDStoreVersion currentVersion = MAPPER.readValue(mdStoreVersion, MDStoreVersion.class);
 
-		String readMdStoreVersionParam = parser.get("readMdStoreVersion");
-		log.info("readMdStoreVersion is {}", readMdStoreVersionParam);
+		final String readMdStoreVersionParam = parser.get("readMdStoreVersion");
+		log.info("readMdStoreVersion: {}", readMdStoreVersionParam);
 
 		final MDStoreVersion readMdStoreVersion = StringUtils.isBlank(readMdStoreVersionParam) ? null
 			: MAPPER.readValue(readMdStoreVersionParam, MDStoreVersion.class);
 
 		final String xpath = parser.get("xpath");
-		log.info("xpath is {}", xpath);
+		log.info("xpath: {}", xpath);
 
 		final String encoding = parser.get("encoding");
-		log.info("encoding is {}", encoding);
+		log.info("encoding: {}", encoding);
 
-		Boolean isSparkSessionManaged = Optional
+		final Boolean isSparkSessionManaged = Optional
 			.ofNullable(parser.get("isSparkSessionManaged"))
 			.map(Boolean::valueOf)
 			.orElse(Boolean.TRUE);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-		SparkConf conf = new SparkConf();
+		final SparkConf conf = new SparkConf();
+
+		final AbstractOpenAireProfile validationProfile = getValidationType(api.getCompatibilityLevel());
+
 		runWithSparkSession(
-			conf,
-			isSparkSessionManaged,
+			conf, isSparkSessionManaged,
 			spark -> createNativeMDStore(
-				spark, provenance, dateOfCollection, xpath, encoding, currentVersion, readMdStoreVersion));
+				spark, provenance, dateOfCollection, xpath, encoding, validationProfile, currentVersion,
+				readMdStoreVersion));
 	}
 
-	private static void createNativeMDStore(SparkSession spark,
-		Provenance provenance,
-		Long dateOfCollection,
-		String xpath,
-		String encoding,
-		MDStoreVersion currentVersion,
-		MDStoreVersion readVersion) throws IOException {
+	private static AbstractOpenAireProfile getValidationType(String compatibilityLevel) {
+		switch (compatibilityLevel) {
+			case "openaire2.0":
+				return new DataArchiveGuidelinesV2Profile();
+			case "openaire3.0":
+				return new LiteratureGuidelinesV3Profile();
+			case "openaire4.0":
+				return new LiteratureGuidelinesV4Profile();
+			case "fair_data":
+				return new FAIR_Data_GuidelinesProfile();
+			case "fair_literature_v4":
+				return new FAIR_Literature_GuidelinesV4Profile();
+			default:
+				throw new IllegalArgumentException("Unknown compatibility level: " + compatibilityLevel);
+		}
+	}
+
+	private static void createNativeMDStore(final SparkSession spark,
+		final Provenance provenance,
+		final Long dateOfCollection,
+		final String xpath,
+		final String encoding,
+		final AbstractOpenAireProfile validationProfile,
+		final MDStoreVersion currentVersion,
+		final MDStoreVersion readVersion) throws IOException {
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		final LongAccumulator totalItems = sc.sc().longAccumulator(CONTENT_TOTALITEMS);
 		final LongAccumulator invalidRecords = sc.sc().longAccumulator(CONTENT_INVALIDRECORDS);
 
 		final String seqFilePath = currentVersion.getHdfsPath() + SEQUENCE_FILE_NAME;
+
 		final JavaRDD<MetadataRecord> nativeStore = sc
 			.sequenceFile(seqFilePath, IntWritable.class, Text.class)
 			.map(
 				item -> parseRecord(
-					item._2().toString(),
-					xpath,
-					encoding,
-					provenance,
-					dateOfCollection,
-					totalItems,
-					invalidRecords))
+					item._2().toString(), xpath, encoding, provenance, dateOfCollection, totalItems, invalidRecords))
+			.map(mdr -> addValidationReport(mdr, validationProfile))
 			.filter(Objects::nonNull)
 			.distinct();
 
@@ -121,17 +161,15 @@ public class GenerateNativeStoreSparkJob {
 
 		if (readVersion != null) { // INCREMENTAL MODE
 			log.info("updating {} incrementally with {}", targetPath, readVersion.getHdfsPath());
-			Dataset<MetadataRecord> currentMdStoreVersion = spark
+			final Dataset<MetadataRecord> currentMdStoreVersion = spark
 				.read()
 				.load(readVersion.getHdfsPath() + MDSTORE_DATA_PATH)
 				.as(encoder);
-			TypedColumn<MetadataRecord, MetadataRecord> aggregator = new MDStoreAggregator().toColumn();
+			final TypedColumn<MetadataRecord, MetadataRecord> aggregator = new MDStoreAggregator().toColumn();
 
 			final Dataset<MetadataRecord> map = currentMdStoreVersion
 				.union(mdstore)
-				.groupByKey(
-					(MapFunction<MetadataRecord, String>) MetadataRecord::getId,
-					Encoders.STRING())
+				.groupByKey((MapFunction<MetadataRecord, String>) MetadataRecord::getId, Encoders.STRING())
 				.agg(aggregator)
 				.map((MapFunction<Tuple2<String, MetadataRecord>, MetadataRecord>) Tuple2::_2, encoder);
 
@@ -153,32 +191,36 @@ public class GenerateNativeStoreSparkJob {
 
 	public static class MDStoreAggregator extends Aggregator<MetadataRecord, MetadataRecord, MetadataRecord> {
 
+		private static final long serialVersionUID = -3409563083332613984L;
+
 		@Override
 		public MetadataRecord zero() {
 			return null;
 		}
 
 		@Override
-		public MetadataRecord reduce(MetadataRecord b, MetadataRecord a) {
+		public MetadataRecord reduce(final MetadataRecord b, final MetadataRecord a) {
 			return getLatestRecord(b, a);
 		}
 
 		@Override
-		public MetadataRecord merge(MetadataRecord b, MetadataRecord a) {
+		public MetadataRecord merge(final MetadataRecord b, final MetadataRecord a) {
 			return getLatestRecord(b, a);
 		}
 
-		private MetadataRecord getLatestRecord(MetadataRecord b, MetadataRecord a) {
-			if (b == null)
+		private MetadataRecord getLatestRecord(final MetadataRecord b, final MetadataRecord a) {
+			if (b == null) {
 				return a;
+			}
 
-			if (a == null)
+			if (a == null) {
 				return b;
+			}
 			return (a.getDateOfCollection() > b.getDateOfCollection()) ? a : b;
 		}
 
 		@Override
-		public MetadataRecord finish(MetadataRecord r) {
+		public MetadataRecord finish(final MetadataRecord r) {
 			return r;
 		}
 
@@ -203,24 +245,46 @@ public class GenerateNativeStoreSparkJob {
 		final LongAccumulator totalItems,
 		final LongAccumulator invalidRecords) {
 
-		if (totalItems != null)
+		if (totalItems != null) {
 			totalItems.add(1);
+		}
 		try {
-			SAXReader reader = new SAXReader();
+			final SAXReader reader = new SAXReader();
 			reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-			Document document = reader.read(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)));
-			Node node = document.selectSingleNode(xpath);
+			final Document document = reader.read(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)));
+			final Node node = document.selectSingleNode(xpath);
 			final String originalIdentifier = node.getText();
 			if (StringUtils.isBlank(originalIdentifier)) {
-				if (invalidRecords != null)
+				if (invalidRecords != null) {
 					invalidRecords.add(1);
+				}
 				return null;
 			}
+
 			return new MetadataRecord(originalIdentifier, encoding, provenance, document.asXML(), dateOfCollection);
-		} catch (Throwable e) {
+		} catch (final Throwable e) {
 			invalidRecords.add(1);
 			return null;
 		}
+	}
+
+	public static MetadataRecord addValidationReport(final MetadataRecord mdr,
+		final AbstractOpenAireProfile validationProfile) {
+
+		if (validationProfile == null) {
+			return mdr;
+		}
+
+		/*
+		 * if (mdr.getValidationResults() == null) { mdr.setValidationResults(new HashMap<>()); } try
+		 * (ByteArrayInputStream is = new ByteArrayInputStream(mdr.getBody().getBytes(StandardCharsets.UTF_8))) { final
+		 * org.w3c.dom.Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
+		 * mdr.getValidationResults().put(validationType, validator.validate(mdr.getId(), doc)); } catch (final
+		 * Throwable e) { log .warn( "Error generating validation report, record id: " + mdr.getId() +
+		 * ", validationType: " + validationType, e); }
+		 */
+
+		return mdr;
 	}
 
 }

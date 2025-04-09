@@ -337,7 +337,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>community2resultfromorganization - move results</name>
+            <name>country propagation - move results</name>
             <class>eu.dnetlib.dhp.MoveResult</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>

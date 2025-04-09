@@ -106,6 +106,13 @@ public class OsfPreprintsIterator implements Iterator<String> {
 					group.addElement("primary_file").add(doc1.getRootElement().detach());
 				}
 			}
+			for (final Object o1 : n.selectNodes(".//relationships/license/links/related/href")) {
+				final String href = ((Node) o1).getText();
+				if (StringUtils.isNotBlank(href) && href.startsWith("http")) {
+					final Document doc1 = downloadUrl(href, 0);
+					group.addElement("license").add(doc1.getRootElement().detach());
+				}
+			}
 
 			this.recordQueue.add(DocumentHelper.createDocument(group).asXML());
 		}

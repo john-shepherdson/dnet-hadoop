@@ -3,38 +3,25 @@ package eu.dnetlib.dhp.actionmanager.createunresolvedentities.model;
 
 import java.io.Serializable;
 
-import com.opencsv.bean.CsvBindByPosition;
-
 public class FOSDataModel implements Serializable {
-	@CsvBindByPosition(position = 0)
-//    @CsvBindByName(column = "doi")
+
 	private String doi;
 
-	@CsvBindByPosition(position = 1)
-//    @CsvBindByName(column = "doi")
 	private String oaid;
-	@CsvBindByPosition(position = 2)
-//    @CsvBindByName(column = "level1")
+
 	private String level1;
 
-	@CsvBindByPosition(position = 3)
-//    @CsvBindByName(column = "level2")
 	private String level2;
 
-	@CsvBindByPosition(position = 4)
-//    @CsvBindByName(column = "level3")
 	private String level3;
 
-	@CsvBindByPosition(position = 5)
-//    @CsvBindByName(column = "level3")
 	private String level4;
-	@CsvBindByPosition(position = 6)
+
 	private String scoreL3;
-	@CsvBindByPosition(position = 7)
+
 	private String scoreL4;
 
 	public FOSDataModel() {
-
 	}
 
 	public FOSDataModel(String doi, String level1, String level2, String level3, String level4, String l3score,
