@@ -1,14 +1,36 @@
-CREATE TABLE IF NOT EXISTS ${usagestats_db}.irus_downloads_stats_tmp
-    (`source` string,
-     `repository_id` string,
-     `result_id` string,
-     `date`	string,
-     `count` bigint,
-     `openaire`	bigint); /*EOS*/
+-- IRUS Downloads Stats
+DROP TABLE IF EXISTS ${usagestats_db}.irus_downloads_stats_tmp; /*EOS*/
 
-INSERT INTO ${usagestats_db}.irus_downloads_stats_tmp
-SELECT s.source, d.id AS repository_id, ro.id as result_id, CONCAT(YEAR(date), '/', LPAD(MONTH(date), 2, '0')) as date, s.count, '0'
-FROM ${usagestats_raw_db}.sushilog s
-JOIN ${stats_db}.datasource_oids d on s.repository=d.oid
-JOIN ${stats_db}.result_oids ro on s.rid=ro.oid
-WHERE metric_type='ft_total' AND s.source='IRUS-UK'; /*EOS*/
+CREATE TABLE ${usagestats_db}.irus_downloads_stats_tmp
+    USING PARQUET
+AS
+SELECT
+    s.source,
+    d.id AS repository_id,
+    ro.id AS result_id,
+    CONCAT(YEAR(date), '/', LPAD(MONTH(date), 2, '0')) AS date,
+    s.count,
+    0 AS openaire
+FROM ${usagerawdata_db}.sushilog s
+    JOIN ${stats_db}.datasource_oids d ON s.repository = d.oid
+    JOIN ${stats_db}.result_oids ro ON s.rid = ro.oid
+WHERE s.metric_type = 'ft_total' AND s.source = 'IRUS-UK'; /*EOS*/
+
+-- IRUS CoP R5 Stats
+DROP TABLE IF EXISTS ${usagestats_db}.irus_r5_stats_tmp; /*EOS*/
+
+CREATE TABLE ${usagestats_db}.irus_r5_stats_tmp
+    USING PARQUET
+AS
+SELECT
+    s.source,
+    d.id AS repository_id,
+    ro.id AS result_id,
+    CONCAT(YEAR(date), '/', LPAD(MONTH(date), 2, '0')) AS date,
+    (s.total_item_investigations - s.total_item_requests) AS views,
+    s.total_item_requests AS downloads,
+    0 AS openaire
+FROM ${usagerawdata_db}.sushilog_cop_r5 s
+    JOIN ${stats_db}.datasource_oids d ON s.repository = d.oid
+    JOIN ${stats_db}.result_oids ro ON s.rid = ro.oid
+WHERE s.source = 'IRUS-UK'; /*EOS*/
