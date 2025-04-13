@@ -12,7 +12,7 @@ INSERT INTO ${usagestats_db}.views_stats SELECT * FROM ${usagestats_db}.pangaea_
 INSERT INTO ${usagestats_db}.views_stats SELECT * FROM ${usagestats_db}.tudelft_views_stats_tmp; /*EOS*/
 INSERT INTO ${usagestats_db}.views_stats SELECT * FROM ${usagestats_db}.la_views_stats_tmp; /*EOS*/
 INSERT INTO ${usagestats_db}.views_stats SELECT * FROM ${usagestats_db}.b2share_views_stats_tmp; /*EOS*/
-INSERT INTO ${usagestats_db}.views_stats SELECT * FROM ${usagerawdata_db}.datacite_views; /*EOS*/
+INSERT INTO ${usagestats_db}.views_stats SELECT * FROM ${usagestats_raw_db}.datacite_views; /*EOS*/
 
 -- Drop and create downloads_stats table
 DROP TABLE IF EXISTS ${usagestats_db}.downloads_stats; /*EOS*/
@@ -33,7 +33,7 @@ INSERT INTO ${usagestats_db}.downloads_stats
 SELECT source, repository_id, result_id, date, downloads, openaire
 FROM ${usagestats_db}.irus_R5_stats_tmp; /*EOS*/
 INSERT INTO ${usagestats_db}.downloads_stats SELECT * FROM ${usagestats_db}.sarc_downloads_stats_tmp; /*EOS*/
-INSERT INTO ${usagestats_db}.downloads_stats SELECT * FROM ${usagerawdata_db}.datacite_downloads; /*EOS*/
+INSERT INTO ${usagestats_db}.downloads_stats SELECT * FROM ${usagestats_raw_db}.datacite_downloads; /*EOS*/
 
 -- Insert IRUS views to views_stats
 INSERT INTO ${usagestats_db}.views_stats
@@ -140,7 +140,7 @@ SELECT
   s.total_item_investigations,
   s.unique_item_requests,
   s.total_item_requests
-FROM ${usagerawdata_db}.sushilog_cop_r5 s
+FROM ${usagestats_raw_db}.sushilog_cop_r5 s
     JOIN ${stats_db}.datasource_oids d ON s.repository = d.oid
     JOIN ${stats_db}.result_oids ro ON s.rid = ro.oid
 WHERE s.source = 'IRUS-UK'; /*EOS*/

@@ -30,7 +30,7 @@ SELECT
     (s.total_item_investigations - s.total_item_requests) AS views,
     s.total_item_requests AS downloads,
     0 AS openaire
-FROM ${usagerawdata_db}.sushilog_cop_r5 s
+FROM ${usagestats_raw_db}.sushilog_cop_r5 s
     JOIN ${stats_db}.datasource_oids d ON s.repository = d.oid
     JOIN ${stats_db}.result_oids ro ON s.rid = ro.oid
 WHERE s.source = 'IRUS-UK'; /*EOS*/

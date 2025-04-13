@@ -13,7 +13,7 @@ SELECT DISTINCT
     timestamp,
     referrer_name,
     agent
-FROM ${usagerawdata_db}.lareferencialog
+FROM ${usagestats_raw_db}.lareferencialog
 WHERE entity_id IS NOT NULL; /*EOS*/
 
 -- Create temporary view for monthly view aggregation

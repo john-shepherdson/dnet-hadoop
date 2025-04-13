@@ -10,7 +10,7 @@ SELECT
     CONCAT(CAST(YEAR(date) AS STRING), '/', LPAD(CAST(MONTH(date) AS STRING), 2, '0')) AS date,
     s.count,
     0 AS openaire
-FROM ${usagerawdata_db}.sushilog s
+FROM ${usagestats_raw_db}.sushilog s
     JOIN ${stats_db}.datasource_oids d
 ON d.oid LIKE CONCAT('%', s.repository, '%')
     AND d.id LIKE '%sarcservicod%'

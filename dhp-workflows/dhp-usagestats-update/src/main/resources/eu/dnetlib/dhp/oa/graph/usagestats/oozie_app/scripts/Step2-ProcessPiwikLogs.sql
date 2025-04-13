@@ -15,7 +15,7 @@ SELECT DISTINCT
     timestamp,
     referrer_name,
     agent
-FROM ${usagerawdata_db}.piwiklog
+FROM ${usagestats_raw_db}.piwiklog
 WHERE entity_id IS NOT NULL; /*EOS*/
 
 
@@ -361,7 +361,7 @@ DROP TABLE IF EXISTS ${usagestats_db}.episcienceslogdistinct; /*EOS*/
 
 CREATE TABLE ${usagestats_db}.episcienceslogdistinct AS
 SELECT DISTINCT *
-FROM ${usagerawdata_db}.episcienceslog
+FROM ${usagestats_raw_db}.episcienceslog
 WHERE entity_id IS NOT NULL; /*EOS*/
 
 -- STEP 2: Views stats
@@ -444,7 +444,7 @@ SELECT
     p.date,
     p.counter_abstract AS count,
     0 AS openaire
-FROM ${usagerawdata_db}.pedocsoldviews p
+FROM ${usagestats_raw_db}.pedocsoldviews p
     JOIN ${stats_db}.result_oids r ON r.oid = p.identifier; /*EOS*/
 
 -- Create Pedocs downloads stats table
@@ -456,7 +456,7 @@ SELECT
     p.date,
     p.counter AS count,
     0 AS openaire
-FROM ${usagerawdata_db}.pedocsolddownloads p
+FROM ${usagestats_raw_db}.pedocsolddownloads p
     JOIN ${stats_db}.result_oids r ON r.oid = p.identifier; /*EOS*/
 
 
