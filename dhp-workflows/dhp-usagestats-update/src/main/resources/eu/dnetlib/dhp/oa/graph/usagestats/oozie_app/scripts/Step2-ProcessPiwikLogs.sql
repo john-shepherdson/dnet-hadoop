@@ -1,5 +1,5 @@
 -- Drop existing piwiklogdistinct table if it exists
-DROP TABLE IF EXISTS ${usagestats_db}.piwiklogdistinct;
+DROP TABLE IF EXISTS ${usagestats_db}.piwiklogdistinct; /*EOS*/
 
 -- Create and populate piwiklogdistinct using Parquet format
 CREATE TABLE ${usagestats_db}.piwiklogdistinct
