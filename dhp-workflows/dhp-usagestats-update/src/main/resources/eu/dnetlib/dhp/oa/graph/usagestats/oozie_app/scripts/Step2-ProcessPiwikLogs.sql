@@ -387,7 +387,7 @@ SELECT
     month AS date,
     MAX(views) AS count,
     MAX(openaire_referrer) AS openaire
-    FROM ${usagestats_db}.episciences_views_monthly_tmp p
+    FROM episciences_views_monthly_tmp p
     JOIN ${stats_db}.datasource d ON p.source = d.piwik_id
     JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
     WHERE ro.oid NOT IN ('200', '204', '404', '400', '503')
@@ -492,11 +492,6 @@ JOIN ${stats_db}.result_oids r ON r.oid = p.result_id; /*EOS*/
 
 
 
-
--- Drop TUDELFT views & downloads monthly temp views
-DROP VIEW IF EXISTS ${usagestats_db}.tudelft_result_views_monthly_tmp; /*EOS*/
-DROP VIEW IF EXISTS ${usagestats_db}.tudelft_result_downloads_monthly_tmp; /*EOS*/
-
 -- Drop stats tables if they exist
 DROP TABLE IF EXISTS ${usagestats_db}.tudelft_views_stats_tmp; /*EOS*/
 DROP TABLE IF EXISTS ${usagestats_db}.tudelft_downloads_stats_tmp; /*EOS*/
@@ -559,16 +554,6 @@ SELECT
     JOIN ${stats_db}.datasource d ON d.id = 'opendoar____::c9892a989183de32e976c6f04e700201'
     GROUP BY d.id, ro.id, month; /*EOS*/
 
--- Drop TUDELFT temp views (cleanup)
-DROP VIEW IF EXISTS ${usagestats_db}.tudelft_result_views_monthly_tmp; /*EOS*/
-DROP VIEW IF EXISTS ${usagestats_db}.tudelft_result_downloads_monthly_tmp; /*EOS*/
-
-
-
-
--- Drop temp views if they exist
-DROP VIEW IF EXISTS ${usagestats_db}.b2share_result_views_monthly_tmp; /*EOS*/
-DROP VIEW IF EXISTS ${usagestats_db}.b2share_result_downloads_monthly_tmp; /*EOS*/
 
 -- Drop stats tables if they exist
 DROP TABLE IF EXISTS ${usagestats_db}.b2share_views_stats_tmp; /*EOS*/
@@ -631,7 +616,3 @@ SELECT
     JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
     JOIN ${stats_db}.datasource d ON d.id = 're3data_____::ad3609c351bd520edf6f10f5e0d9b877'
     GROUP BY d.id, ro.id, month; /*EOS*/
-
--- Drop temp views (cleanup)
-DROP VIEW IF EXISTS ${usagestats_db}.b2share_result_views_monthly_tmp; /*EOS*/
-DROP VIEW IF EXISTS ${usagestats_db}.b2share_result_downloads_monthly_tmp; /*EOS*/
