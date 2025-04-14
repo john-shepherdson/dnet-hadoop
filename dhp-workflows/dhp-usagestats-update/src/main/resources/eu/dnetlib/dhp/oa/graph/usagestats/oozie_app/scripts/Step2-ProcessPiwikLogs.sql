@@ -515,15 +515,14 @@ GROUP BY entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0'))
 CREATE TABLE ${usagestats_db}.tudelft_views_stats_tmp AS
 SELECT
     'OpenAIRE' AS source,
-    d.id AS repository_id,
+    'opendoar____::c9892a989183de32e976c6f04e700201' AS repository_id,
     ro.id AS result_id,
     month AS date,
     MAX(views) AS count,
     MAX(openaire_referrer) AS openaire
     FROM tudelft_result_views_monthly_tmp p
     JOIN ${stats_db}.result_oids ro ON CONCAT('tud:', p.id) = ro.oid
-    JOIN ${stats_db}.datasource d ON d.id = 'opendoar____::c9892a989183de32e976c6f04e700201'
-    GROUP BY d.id, ro.id, month; /*EOS*/
+    GROUP BY ro.id, month; /*EOS*/
 
 -- Create TUDELFT downloads monthly temp view
 CREATE OR REPLACE TEMP VIEW tudelft_result_downloads_monthly_tmp AS
@@ -544,15 +543,14 @@ GROUP BY entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0'))
 CREATE TABLE ${usagestats_db}.tudelft_downloads_stats_tmp AS
 SELECT
     'OpenAIRE' AS source,
-    d.id AS repository_id,
+    'opendoar____::c9892a989183de32e976c6f04e700201' AS repository_id,
     ro.id AS result_id,
     month AS date,
     MAX(views) AS count,
     MAX(openaire_referrer) AS openaire
     FROM tudelft_result_downloads_monthly_tmp p
     JOIN ${stats_db}.result_oids ro ON CONCAT('tud:', p.id) = ro.oid
-    JOIN ${stats_db}.datasource d ON d.id = 'opendoar____::c9892a989183de32e976c6f04e700201'
-    GROUP BY d.id, ro.id, month; /*EOS*/
+    GROUP BY ro.id, month; /*EOS*/
 
 
 -- Drop stats tables if they exist
@@ -578,15 +576,14 @@ GROUP BY entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0'))
 CREATE TABLE ${usagestats_db}.b2share_views_stats_tmp AS
 SELECT
     'B2SHARE' AS source,
-    d.id AS repository_id,
+    're3data_____::ad3609c351bd520edf6f10f5e0d9b877' AS repository_id,
     ro.id AS result_id,
     month AS date,
     MAX(views) AS count,
     MAX(openaire_referrer) AS openaire
     FROM b2share_result_views_monthly_tmp p
     JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
-    JOIN ${stats_db}.datasource d ON d.id = 're3data_____::ad3609c351bd520edf6f10f5e0d9b877'
-    GROUP BY d.id, ro.id, month; /*EOS*/
+    GROUP BY ro.id, month; /*EOS*/
 
 -- Create temp view for B2SHARE downloads
 CREATE OR REPLACE TEMP VIEW b2share_result_downloads_monthly_tmp AS
@@ -607,12 +604,11 @@ GROUP BY entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0'))
 CREATE TABLE ${usagestats_db}.b2share_downloads_stats_tmp AS
 SELECT
     'B2SHARE' AS source,
-    d.id AS repository_id,
+    're3data_____::ad3609c351bd520edf6f10f5e0d9b877' AS repository_id,
     ro.id AS result_id,
     month AS date,
     MAX(views) AS count,
     MAX(openaire_referrer) AS openaire
     FROM b2share_result_downloads_monthly_tmp p
     JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
-    JOIN ${stats_db}.datasource d ON d.id = 're3data_____::ad3609c351bd520edf6f10f5e0d9b877'
-    GROUP BY d.id, ro.id, month; /*EOS*/
+    GROUP BY ro.id, month; /*EOS*/
