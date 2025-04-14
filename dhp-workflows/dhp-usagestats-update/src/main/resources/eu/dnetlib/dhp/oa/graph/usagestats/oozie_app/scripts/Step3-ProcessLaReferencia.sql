@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS ${usagestats_db}.lareferencialogdistinct; /*EOS*/
+
 -- Create and populate lareferencialogdistinct in one step
 CREATE TABLE ${usagestats_db}.lareferencialogdistinct
     USING PARQUET AS
@@ -17,7 +19,7 @@ FROM ${usagestats_raw_db}.lareferencialog
 WHERE entity_id IS NOT NULL; /*EOS*/
 
 -- Create temporary view for monthly view aggregation
-CREATE OR REPLACE TEMP VIEW ${usagestats_db}.la_result_views_monthly_tmp AS
+CREATE OR REPLACE TEMP VIEW la_result_views_monthly_tmp AS
 SELECT
     entity_id AS id,
     COUNT(entity_id) AS views,
@@ -41,13 +43,13 @@ SELECT
     month AS date,
     MAX(views) AS count,
     MAX(openaire_referrer) AS openaire
-    FROM ${usagestats_db}.la_result_views_monthly_tmp p
+    FROM la_result_views_monthly_tmp p
     JOIN ${stats_db}.datasource_oids d ON p.source = d.oid
     JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
     GROUP BY d.id, ro.id, month; /*EOS*/
 
 -- Create temporary view for monthly downloads aggregation
-CREATE OR REPLACE TEMP VIEW ${usagestats_db}.la_result_downloads_monthly_tmp AS
+CREATE OR REPLACE TEMP VIEW la_result_downloads_monthly_tmp AS
 SELECT
     entity_id AS id,
     COUNT(entity_id) AS downloads,
@@ -71,13 +73,13 @@ SELECT
     month AS date,
     MAX(downloads) AS count,
     MAX(openaire_referrer) AS openaire
-    FROM ${usagestats_db}.la_result_downloads_monthly_tmp p
+    FROM la_result_downloads_monthly_tmp p
     JOIN ${stats_db}.datasource_oids d ON p.source = d.oid
     JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
     GROUP BY d.id, ro.id, month; /*EOS*/
 
 -- Unique Item Investigations
-CREATE OR REPLACE TEMP VIEW ${usagestats_db}.lr_view_unique_item_investigations AS
+CREATE OR REPLACE TEMP VIEW lr_view_unique_item_investigations AS
 SELECT
     id_visit,
     entity_id,
@@ -100,7 +102,7 @@ SELECT
     month AS date,
     SUM(unique_item_investigations) AS unique_item_investigations,
     SUM(openaire_referrer) AS openaire
-    FROM ${usagestats_db}.lr_view_unique_item_investigations p
+    FROM lr_view_unique_item_investigations p
     JOIN ${stats_db}.datasource d ON p.source = d.piwik_id
     JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
     WHERE ro.oid NOT IN ('200', '204', '400', '404', '503')
@@ -108,7 +110,7 @@ SELECT
     GROUP BY d.id, ro.id, month; /*EOS*/
 
 -- Total Item Investigations
-CREATE OR REPLACE TEMP VIEW ${usagestats_db}.lr_view_total_item_investigations AS
+CREATE OR REPLACE TEMP VIEW lr_view_total_item_investigations AS
 SELECT
     id_visit,
     entity_id,
@@ -131,7 +133,7 @@ SELECT
     month AS date,
     SUM(total_item_investigations) AS total_item_investigations,
     SUM(openaire_referrer) AS openaire
-    FROM ${usagestats_db}.lr_view_total_item_investigations p
+    FROM lr_view_total_item_investigations p
     JOIN ${stats_db}.datasource d ON p.source = d.piwik_id
     JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
     WHERE ro.oid NOT IN ('200', '204', '400', '404', '503')
