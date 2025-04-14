@@ -114,7 +114,7 @@ DROP VIEW IF EXISTS ${usagestats_db}.openaire_result_views_monthly_tmp; /*EOS*/
 
 
 -- Drop and create openaire_result_downloads_monthly_tmp as TEMP VIEW
-CREATE OR REPLACE TEMP VIEW ${usagestats_db}.openaire_result_downloads_monthly_tmp AS
+CREATE OR REPLACE TEMP VIEW openaire_result_downloads_monthly_tmp AS
 SELECT
     entity_id,
     reflect('java.net.URLDecoder', 'decode', entity_id) AS id,
@@ -188,7 +188,7 @@ DROP VIEW IF EXISTS ${usagestats_db}.openaire_result_downloads_monthly_tmp; /*EO
 
 
 -- Unique Item Investigations
-CREATE OR REPLACE TEMP VIEW ${usagestats_db}.view_unique_item_investigations AS
+CREATE OR REPLACE TEMP VIEW view_unique_item_investigations AS
 SELECT
     id_visit,
     entity_id,
@@ -219,7 +219,7 @@ SELECT
     GROUP BY d.id, ro.id, month; /*EOS*/
 
 -- Total Item Investigations
-CREATE OR REPLACE TEMP VIEW ${usagestats_db}.view_total_item_investigations AS
+CREATE OR REPLACE TEMP VIEW view_total_item_investigations AS
 SELECT
     id_visit,
     entity_id,
@@ -250,7 +250,7 @@ SELECT
     GROUP BY d.id, ro.id, month; /*EOS*/
 
 -- Unique Item Requests
-CREATE OR REPLACE TEMP VIEW ${usagestats_db}.view_unique_item_requests AS
+CREATE OR REPLACE TEMP VIEW view_unique_item_requests AS
 SELECT
     id_visit,
     entity_id,
@@ -281,7 +281,7 @@ SELECT
     GROUP BY d.id, ro.id, month; /*EOS*/
 
 -- Total Item Requests
-CREATE OR REPLACE TEMP VIEW ${usagestats_db}.view_total_item_requests AS
+CREATE OR REPLACE TEMP VIEW view_total_item_requests AS
 SELECT
     id_visit,
     entity_id,
@@ -364,7 +364,7 @@ FROM ${usagestats_raw_db}.episcienceslog
 WHERE entity_id IS NOT NULL; /*EOS*/
 
 -- STEP 2: Views stats
-CREATE OR REPLACE TEMP VIEW ${usagestats_db}.episciences_views_monthly_tmp AS
+CREATE OR REPLACE TEMP VIEW episciences_views_monthly_tmp AS
 SELECT
     entity_id,
     reflect('java.net.URLDecoder', 'decode', entity_id) AS id,
@@ -395,7 +395,7 @@ SELECT
     GROUP BY d.id, ro.id, month; /*EOS*/
 
 -- STEP 3: Downloads stats
-CREATE OR REPLACE TEMP VIEW ${usagestats_db}.episciences_downloads_monthly_tmp AS
+CREATE OR REPLACE TEMP VIEW episciences_downloads_monthly_tmp AS
 SELECT
     entity_id,
     reflect('java.net.URLDecoder', 'decode', entity_id) AS id,
@@ -502,7 +502,7 @@ DROP TABLE IF EXISTS ${usagestats_db}.tudelft_views_stats_tmp; /*EOS*/
 DROP TABLE IF EXISTS ${usagestats_db}.tudelft_downloads_stats_tmp; /*EOS*/
 
 -- Create TUDELFT views monthly temp view
-CREATE OR REPLACE TEMP VIEW ${usagestats_db}.tudelft_result_views_monthly_tmp AS
+CREATE OR REPLACE TEMP VIEW tudelft_result_views_monthly_tmp AS
 SELECT
     entity_id,
     reflect('java.net.URLDecoder', 'decode', entity_id) AS id,
@@ -531,7 +531,7 @@ SELECT
     GROUP BY d.id, ro.id, month; /*EOS*/
 
 -- Create TUDELFT downloads monthly temp view
-CREATE OR REPLACE TEMP VIEW ${usagestats_db}.tudelft_result_downloads_monthly_tmp AS
+CREATE OR REPLACE TEMP VIEW tudelft_result_downloads_monthly_tmp AS
 SELECT
     entity_id,
     reflect('java.net.URLDecoder', 'decode', entity_id) AS id,
@@ -575,7 +575,7 @@ DROP TABLE IF EXISTS ${usagestats_db}.b2share_views_stats_tmp; /*EOS*/
 DROP TABLE IF EXISTS ${usagestats_db}.b2share_downloads_stats_tmp; /*EOS*/
 
 -- Create temp view for B2SHARE views
-CREATE OR REPLACE TEMP VIEW ${usagestats_db}.b2share_result_views_monthly_tmp AS
+CREATE OR REPLACE TEMP VIEW b2share_result_views_monthly_tmp AS
 SELECT
     entity_id,
     reflect('java.net.URLDecoder', 'decode', entity_id) AS id,
@@ -604,7 +604,7 @@ SELECT
     GROUP BY d.id, ro.id, month; /*EOS*/
 
 -- Create temp view for B2SHARE downloads
-CREATE OR REPLACE TEMP VIEW ${usagestats_db}.b2share_result_downloads_monthly_tmp AS
+CREATE OR REPLACE TEMP VIEW b2share_result_downloads_monthly_tmp AS
 SELECT
     entity_id,
     reflect('java.net.URLDecoder', 'decode', entity_id) AS id,
