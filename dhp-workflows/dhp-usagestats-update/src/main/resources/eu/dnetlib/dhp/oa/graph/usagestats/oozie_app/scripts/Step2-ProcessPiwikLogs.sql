@@ -138,7 +138,7 @@ SELECT
     month AS date,
     MAX(downloads) AS count,
     MAX(openaire_referrer) AS openaire
-    FROM ${usagestats_db}.openaire_result_downloads_monthly_tmp p
+    FROM openaire_result_downloads_monthly_tmp p
     JOIN ${stats_db}.datasource d ON p.source = d.piwik_id
     JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
     WHERE ro.oid NOT IN ('200', '204', '404', '400', '503')
@@ -148,35 +148,35 @@ SELECT
 -- Insert missing piwik_id mappings
 INSERT INTO ${usagestats_db}.openaire_downloads_stats_tmp
 SELECT 'OpenAIRE', 'opendoar____::cfa5301358b9fcbe7aa45b1ceea088c6', ro.id, month, MAX(downloads), MAX(openaire_referrer)
-FROM ${usagestats_db}.openaire_result_downloads_monthly_tmp p
+FROM openaire_result_downloads_monthly_tmp p
     JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
 WHERE p.source = 630 AND ro.oid NOT IN ('200', '204', '404', '400', '503')
 GROUP BY ro.id, month; /*EOS*/
 
 INSERT INTO ${usagestats_db}.openaire_downloads_stats_tmp
 SELECT 'OpenAIRE', 'opendoar____::4e86eaf2685a67b743a475f86c7c0086', ro.id, month, MAX(downloads), MAX(openaire_referrer)
-FROM ${usagestats_db}.openaire_result_downloads_monthly_tmp p
+FROM openaire_result_downloads_monthly_tmp p
     JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
 WHERE p.source = 662 AND ro.oid NOT IN ('200', '204', '404', '400', '503')
 GROUP BY ro.id, month; /*EOS*/
 
 INSERT INTO ${usagestats_db}.openaire_downloads_stats_tmp
 SELECT 'OpenAIRE', 'opendoar____::f35fd567065af297ae65b621e0a21ae9', ro.id, month, MAX(downloads), MAX(openaire_referrer)
-FROM ${usagestats_db}.openaire_result_downloads_monthly_tmp p
+FROM openaire_result_downloads_monthly_tmp p
     JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
 WHERE p.source = 694 AND ro.oid NOT IN ('200', '204', '404', '400', '503')
 GROUP BY ro.id, month; /*EOS*/
 
 INSERT INTO ${usagestats_db}.openaire_downloads_stats_tmp
 SELECT 'OpenAIRE', 'opendoar____::7180cffd6a8e829dacfc2a31b3f72ece', ro.id, month, MAX(downloads), MAX(openaire_referrer)
-FROM ${usagestats_db}.openaire_result_downloads_monthly_tmp p
+FROM openaire_result_downloads_monthly_tmp p
     JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
 WHERE p.source = 725 AND ro.oid NOT IN ('200', '204', '404', '400', '503')
 GROUP BY ro.id, month; /*EOS*/
 
 INSERT INTO ${usagestats_db}.openaire_downloads_stats_tmp
 SELECT 'OpenAIRE', 'opendoar____::8b3bac12926cc1d9fb5d68783376971d', ro.id, month, MAX(downloads), MAX(openaire_referrer)
-FROM ${usagestats_db}.openaire_result_downloads_monthly_tmp p
+FROM openaire_result_downloads_monthly_tmp p
     JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
 WHERE p.source = 728 AND ro.oid NOT IN ('200', '204', '404', '400', '503')
 GROUP BY ro.id, month; /*EOS*/
@@ -211,7 +211,7 @@ SELECT
     month AS date,
     SUM(unique_item_investigations) AS unique_item_investigations,
     SUM(openaire_referrer) AS openaire
-    FROM ${usagestats_db}.view_unique_item_investigations p
+    FROM view_unique_item_investigations p
     JOIN ${stats_db}.datasource d ON p.source = d.piwik_id
     JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
     WHERE ro.oid NOT IN ('200', '204', '404', '400', '503')
@@ -242,7 +242,7 @@ SELECT
     month AS date,
     SUM(total_item_investigations) AS total_item_investigations,
     SUM(openaire_referrer) AS openaire
-    FROM ${usagestats_db}.view_total_item_investigations p
+    FROM view_total_item_investigations p
     JOIN ${stats_db}.datasource d ON p.source = d.piwik_id
     JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
     WHERE ro.oid NOT IN ('200', '204', '404', '400', '503')
@@ -273,7 +273,7 @@ SELECT
     month AS date,
     SUM(unique_item_requests) AS unique_item_requests,
     SUM(openaire_referrer) AS openaire
-    FROM ${usagestats_db}.view_unique_item_requests p
+    FROM view_unique_item_requests p
     JOIN ${stats_db}.datasource d ON p.source = d.piwik_id
     JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
     WHERE ro.oid NOT IN ('200', '204', '404', '400', '503')
@@ -304,7 +304,7 @@ SELECT
     month AS date,
     SUM(total_item_requests) AS total_item_requests,
     SUM(openaire_referrer) AS openaire
-    FROM ${usagestats_db}.view_total_item_requests p
+    FROM view_total_item_requests p
     JOIN ${stats_db}.datasource d ON p.source = d.piwik_id
     JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
     WHERE ro.oid NOT IN ('200', '204', '404', '400', '503')
@@ -418,7 +418,7 @@ SELECT
     month AS date,
     MAX(downloads) AS count,
     MAX(openaire_referrer) AS openaire
-    FROM ${usagestats_db}.episciences_downloads_monthly_tmp p
+    FROM episciences_downloads_monthly_tmp p
     JOIN ${stats_db}.datasource d ON p.source = d.piwik_id
     JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
     WHERE ro.oid NOT IN ('200', '204', '404', '400', '503')
@@ -525,7 +525,7 @@ SELECT
     month AS date,
     MAX(views) AS count,
     MAX(openaire_referrer) AS openaire
-    FROM ${usagestats_db}.tudelft_result_views_monthly_tmp p
+    FROM tudelft_result_views_monthly_tmp p
     JOIN ${stats_db}.result_oids ro ON CONCAT('tud:', p.id) = ro.oid
     JOIN ${stats_db}.datasource d ON d.id = 'opendoar____::c9892a989183de32e976c6f04e700201'
     GROUP BY d.id, ro.id, month; /*EOS*/
@@ -554,7 +554,7 @@ SELECT
     month AS date,
     MAX(views) AS count,
     MAX(openaire_referrer) AS openaire
-    FROM ${usagestats_db}.tudelft_result_downloads_monthly_tmp p
+    FROM tudelft_result_downloads_monthly_tmp p
     JOIN ${stats_db}.result_oids ro ON CONCAT('tud:', p.id) = ro.oid
     JOIN ${stats_db}.datasource d ON d.id = 'opendoar____::c9892a989183de32e976c6f04e700201'
     GROUP BY d.id, ro.id, month; /*EOS*/
@@ -598,7 +598,7 @@ SELECT
     month AS date,
     MAX(views) AS count,
     MAX(openaire_referrer) AS openaire
-    FROM ${usagestats_db}.b2share_result_views_monthly_tmp p
+    FROM b2share_result_views_monthly_tmp p
     JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
     JOIN ${stats_db}.datasource d ON d.id = 're3data_____::ad3609c351bd520edf6f10f5e0d9b877'
     GROUP BY d.id, ro.id, month; /*EOS*/
@@ -627,7 +627,7 @@ SELECT
     month AS date,
     MAX(views) AS count,
     MAX(openaire_referrer) AS openaire
-    FROM ${usagestats_db}.b2share_result_downloads_monthly_tmp p
+    FROM b2share_result_downloads_monthly_tmp p
     JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
     JOIN ${stats_db}.datasource d ON d.id = 're3data_____::ad3609c351bd520edf6f10f5e0d9b877'
     GROUP BY d.id, ro.id, month; /*EOS*/
