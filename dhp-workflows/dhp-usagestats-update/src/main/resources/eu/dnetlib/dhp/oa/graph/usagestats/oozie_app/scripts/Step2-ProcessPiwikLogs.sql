@@ -31,7 +31,7 @@ SELECT
     source
 FROM ${usagestats_db}.piwiklogdistinct
 WHERE action = 'action'
-  AND (source_item_type = 'oaItem' OR source_item_type = 'repItem')
+  AND (source_item_type = 'oaItem' OR source_item_type = 'repItem') and trim(entity_id) RLIKE '^([-A-Za-zA-Z0-9._~:/?#@!$&''()*+,;=]|(%[0-9A-Fa-f]{2}))*$'
 GROUP BY entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')), source; /*EOS*/
 
 -- Drop and create the temporary views stats table
@@ -124,7 +124,7 @@ SELECT
     source
 FROM ${usagestats_db}.piwiklogdistinct
 WHERE action = 'download'
-  AND (source_item_type = 'oaItem' OR source_item_type = 'repItem')
+  AND (source_item_type = 'oaItem' OR source_item_type = 'repItem') and trim(entity_id) RLIKE '^([-A-Za-zA-Z0-9._~:/?#@!$&''()*+,;=]|(%[0-9A-Fa-f]{2}))*$'
 GROUP BY entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')), source; /*EOS*/
 
 -- Drop and create downloads stats table
@@ -198,7 +198,7 @@ SELECT
     CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')) AS month,
     source
 FROM ${usagestats_db}.piwiklogdistinct
-WHERE (source_item_type = 'oaItem' OR source_item_type = 'repItem') AND entity_id IS NOT NULL
+WHERE (source_item_type = 'oaItem' OR source_item_type = 'repItem') AND entity_id IS NOT NULL and trim(entity_id) RLIKE '^([-A-Za-zA-Z0-9._~:/?#@!$&''()*+,;=]|(%[0-9A-Fa-f]{2}))*$'
 GROUP BY id_visit, entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')), source; /*EOS*/
 
 DROP TABLE IF EXISTS ${usagestats_db}.tbl_unique_item_investigations; /*EOS*/
@@ -229,7 +229,7 @@ SELECT
     CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')) AS month,
     source
 FROM ${usagestats_db}.piwiklogdistinct
-WHERE (source_item_type = 'oaItem' OR source_item_type = 'repItem') AND entity_id IS NOT NULL
+WHERE (source_item_type = 'oaItem' OR source_item_type = 'repItem') AND entity_id IS NOT NULL and trim(entity_id) RLIKE '^([-A-Za-zA-Z0-9._~:/?#@!$&''()*+,;=]|(%[0-9A-Fa-f]{2}))*$'
 GROUP BY id_visit, entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')), source; /*EOS*/
 
 DROP TABLE IF EXISTS ${usagestats_db}.tbl_total_item_investigations; /*EOS*/
@@ -260,7 +260,7 @@ SELECT
     CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')) AS month,
     source
 FROM ${usagestats_db}.piwiklogdistinct
-WHERE action = 'download' AND (source_item_type = 'oaItem' OR source_item_type = 'repItem') AND entity_id IS NOT NULL
+WHERE action = 'download' AND (source_item_type = 'oaItem' OR source_item_type = 'repItem') AND entity_id IS NOT NULL and trim(entity_id) RLIKE '^([-A-Za-zA-Z0-9._~:/?#@!$&''()*+,;=]|(%[0-9A-Fa-f]{2}))*$'
 GROUP BY id_visit, entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')), source; /*EOS*/
 
 DROP TABLE IF EXISTS ${usagestats_db}.tbl_unique_item_requests; /*EOS*/
@@ -291,7 +291,7 @@ SELECT
     CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')) AS month,
     source
 FROM ${usagestats_db}.piwiklogdistinct
-WHERE action = 'download' AND (source_item_type = 'oaItem' OR source_item_type = 'repItem') AND entity_id IS NOT NULL
+WHERE action = 'download' AND (source_item_type = 'oaItem' OR source_item_type = 'repItem') AND entity_id IS NOT NULL and trim(entity_id) RLIKE '^([-A-Za-zA-Z0-9._~:/?#@!$&''()*+,;=]|(%[0-9A-Fa-f]{2}))*$'
 GROUP BY id_visit, entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')), source; /*EOS*/
 
 DROP TABLE IF EXISTS ${usagestats_db}.tbl_total_item_requests; /*EOS*/
@@ -374,7 +374,7 @@ SELECT
     source
 FROM ${usagestats_db}.episcienceslogdistinct
 WHERE action = 'action'
-  AND (source_item_type = 'oaItem' OR source_item_type = 'repItem')
+  AND (source_item_type = 'oaItem' OR source_item_type = 'repItem') and trim(entity_id) RLIKE '^([-A-Za-zA-Z0-9._~:/?#@!$&''()*+,;=]|(%[0-9A-Fa-f]{2}))*$'
 GROUP BY entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')), source; /*EOS*/
 
 DROP TABLE IF EXISTS ${usagestats_db}.episciences_views_stats; /*EOS*/
@@ -405,7 +405,7 @@ SELECT
     source
 FROM ${usagestats_db}.episcienceslogdistinct
 WHERE action = 'download'
-  AND (source_item_type = 'oaItem' OR source_item_type = 'repItem')
+  AND (source_item_type = 'oaItem' OR source_item_type = 'repItem') and trim(entity_id) RLIKE '^([-A-Za-zA-Z0-9._~:/?#@!$&''()*+,;=]|(%[0-9A-Fa-f]{2}))*$'
 GROUP BY entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')), source; /*EOS*/
 
 DROP TABLE IF EXISTS ${usagestats_db}.episciences_downloads_stats; /*EOS*/
@@ -512,7 +512,7 @@ SELECT
     source
 FROM ${usagestats_db}.piwiklogdistinct
 WHERE action = 'action'
-  AND (source_item_type = 'oaItem' OR source_item_type = 'repItem')
+  AND (source_item_type = 'oaItem' OR source_item_type = 'repItem') and trim(entity_id) RLIKE '^([-A-Za-zA-Z0-9._~:/?#@!$&''()*+,;=]|(%[0-9A-Fa-f]{2}))*$'
   AND source = 252
 GROUP BY entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')), source; /*EOS*/
 
@@ -541,7 +541,7 @@ SELECT
     source
 FROM ${usagestats_db}.piwiklogdistinct
 WHERE action = 'download'
-  AND (source_item_type = 'oaItem' OR source_item_type = 'repItem')
+  AND (source_item_type = 'oaItem' OR source_item_type = 'repItem') and trim(entity_id) RLIKE '^([-A-Za-zA-Z0-9._~:/?#@!$&''()*+,;=]|(%[0-9A-Fa-f]{2}))*$'
   AND source = 252
 GROUP BY entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')), source; /*EOS*/
 
@@ -585,7 +585,7 @@ SELECT
     source
 FROM ${usagestats_db}.piwiklogdistinct
 WHERE action = 'action'
-  AND (source_item_type = 'oaItem' OR source_item_type = 'repItem')
+  AND (source_item_type = 'oaItem' OR source_item_type = 'repItem') and trim(entity_id) RLIKE '^([-A-Za-zA-Z0-9._~:/?#@!$&''()*+,;=]|(%[0-9A-Fa-f]{2}))*$'
   AND source = 412
 GROUP BY entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')), source; /*EOS*/
 
@@ -614,7 +614,7 @@ SELECT
     source
 FROM ${usagestats_db}.piwiklogdistinct
 WHERE action = 'download'
-  AND (source_item_type = 'oaItem' OR source_item_type = 'repItem')
+  AND (source_item_type = 'oaItem' OR source_item_type = 'repItem') and trim(entity_id) RLIKE '^([-A-Za-zA-Z0-9._~:/?#@!$&''()*+,;=]|(%[0-9A-Fa-f]{2}))*$'
   AND source = 412
 GROUP BY entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')), source; /*EOS*/
 

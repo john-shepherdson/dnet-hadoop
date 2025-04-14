@@ -87,7 +87,7 @@ SELECT
     CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')) AS month,
     source
 FROM ${usagestats_db}.lareferencialogdistinct
-WHERE source_item_type IN ('oaItem', 'repItem') AND entity_id IS NOT NULL
+WHERE source_item_type IN ('oaItem', 'repItem') AND entity_id IS NOT NULL and trim(entity_id) RLIKE '^([-A-Za-zA-Z0-9._~:/?#@!$&''()*+,;=]|(%[0-9A-Fa-f]{2}))*$'
 GROUP BY id_visit, entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')), source; /*EOS*/
 
 DROP TABLE IF EXISTS ${usagestats_db}.lr_tbl_unique_item_investigations; /*EOS*/
@@ -118,7 +118,7 @@ SELECT
     CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')) AS month,
     source
 FROM ${usagestats_db}.lareferencialogdistinct
-WHERE source_item_type IN ('oaItem', 'repItem') AND entity_id IS NOT NULL
+WHERE source_item_type IN ('oaItem', 'repItem') AND entity_id IS NOT NULL and trim(entity_id) RLIKE '^([-A-Za-zA-Z0-9._~:/?#@!$&''()*+,;=]|(%[0-9A-Fa-f]{2}))*$'
 GROUP BY id_visit, entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')), source; /*EOS*/
 
 DROP TABLE IF EXISTS ${usagestats_db}.lr_tbl_total_item_investigations; /*EOS*/
