@@ -19,10 +19,7 @@ FROM ${usagestats_raw_db}.piwiklog
 WHERE entity_id IS NOT NULL; /*EOS*/
 
 
--- Drop and create the monthly views temporary view
-DROP VIEW IF EXISTS ${usagestats_db}.openaire_result_views_monthly_tmp; /*EOS*/
-
-CREATE OR REPLACE TEMP VIEW ${usagestats_db}.openaire_result_views_monthly_tmp AS
+CREATE OR REPLACE VIEW ${usagestats_db}.openaire_result_views_monthly_tmp AS
 SELECT
     entity_id,
     reflect('java.net.URLDecoder', 'decode', entity_id) AS id,
