@@ -51,9 +51,9 @@ public class AuthorMatchers {
 	 * @return A list containing matched author-candidate pairs.
 	 */
 	static public List<String> removeMatches(
-		List<String> authors,
-		List<String> candidate_authors,
-		BiFunction<String, String, Boolean> matchingFunc) {
+			List<String> authors,
+			List<String> candidate_authors,
+			BiFunction<String, String, Boolean> matchingFunc) {
 		List<String> matched = new ArrayList<>();
 
 		if (authors != null && !authors.isEmpty()) {
@@ -97,28 +97,28 @@ public class AuthorMatchers {
 	 * @return A list of {@link AuthorMatch} objects representing the matches found.
 	 */
 	static public <UA, CA> List<AuthorMatch<UA, CA>> findMatches(
-		List<UA> authors,
-		List<CA> candidate_authors,
-		List<AuthorMatcherStep<UA, CA>> steps) {
+			List<UA> authors,
+			List<CA> candidate_authors,
+			List<AuthorMatcherStep<UA, CA>> steps) {
 		List<AuthorMatch<UA, CA>> result = new ArrayList<>();
 		List<UA> unmatched_authors = new ArrayList<>(authors);
 		List<CA> unmatched_candidates = new ArrayList<>(candidate_authors);
 
 		for (AuthorMatcherStep<UA, CA> s : steps) {
 			result
-				.addAll(
-					evaluateStep(
-						unmatched_authors,
-						unmatched_candidates,
-						s));
+					.addAll(
+							evaluateStep(
+									unmatched_authors,
+									unmatched_candidates,
+									s));
 		}
 		return result;
 	}
 
 	static private <UA, CA> List<AuthorMatch<UA, CA>> evaluateStep(
-		List<UA> unmatched_authors,
-		List<CA> candidate_authors,
-		AuthorMatcherStep<UA, CA> step) {
+			List<UA> unmatched_authors,
+			List<CA> candidate_authors,
+			AuthorMatcherStep<UA, CA> step) {
 		List<AuthorMatch<UA, CA>> result = new ArrayList<>();
 		if (unmatched_authors.isEmpty()) {
 			return result;
@@ -129,29 +129,40 @@ public class AuthorMatchers {
 			CA candidate = oit.next();
 
 			List<AuthorMatch<UA, CA>> potential_matches = unmatched_authors
-				.stream()
-				.map(x -> step.getMatchingFunc().apply(x, candidate))
-				.filter(Optional::isPresent)
-				.map(Optional::get)
-				.sorted(new Comparator<AuthorMatch<UA, CA>>() {
-					@Override
-					public int compare(AuthorMatch<UA, CA> o1, AuthorMatch<UA, CA> o2) {
-						return Double.compare(o1.getConfidence(), o2.getConfidence());
-					}
-				})
-				.collect(Collectors.toList());
+					.stream()
+					.map(x -> step.getMatchingFunc().apply(x, candidate))
+					.filter(Optional::isPresent)
+					.map(Optional::get)
+					.sorted(new Comparator<AuthorMatch<UA, CA>>() {
+						@Override
+						public int compare(AuthorMatch<UA, CA> o1, AuthorMatch<UA, CA> o2) {
+							return Double.compare(o1.getConfidence(), o2.getConfidence());
+						}
+					})
+					.collect(Collectors.toList());
 
 			if (potential_matches.size() == 1 ||
-				(potential_matches.size() > 1
-					&& (step.getExclusionPredicate() == null
-						|| !step.getExclusionPredicate().test(potential_matches)))) {
+					(potential_matches.size() > 1
+							&& (step.getExclusionPredicate() == null
+							|| !step.getExclusionPredicate().test(potential_matches)))) {
 				AuthorMatch<UA, CA> m = potential_matches.get(0);
-				result.add(m);
-				unmatched_authors.remove(m.getMatchedAuthor());
+				Optional<AuthorMatch<UA, CA>> existing = result.stream().filter(
+						x -> x.getMatchedAuthor().equals(x)).findFirst();
+				if (existing.isPresent()) {
+					if (existing.get().getConfidence() < m.getConfidence()) {
+						result.remove(existing.get());
+						result.add(m);
+					}
+				} else {
+					result.add(m);
+				}
+
 				oit.remove();
 			}
 
 		}
+
+		unmatched_authors.removeAll(result.stream().map(AuthorMatch::getMatchedAuthor).collect(Collectors.toList()));
 
 		return result;
 	}

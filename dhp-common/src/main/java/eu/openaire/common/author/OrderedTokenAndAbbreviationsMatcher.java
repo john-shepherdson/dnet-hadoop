@@ -2,6 +2,7 @@
 package eu.openaire.common.author;
 
 import java.text.Normalizer;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -62,6 +63,7 @@ public class OrderedTokenAndAbbreviationsMatcher {
 	 * @param a2 The second author name.
 	 * @return An {@code Optional<Double>} with a confidence score (1.0 if a match is found), or empty if no match.
 	 */
+	//TODO: cercare prima i fulltokens e poi gli altri
 	public static Optional<Double> compare(String a1, String a2) {
 		if (a1 == null || a2 == null) {
 			return Optional.empty();
@@ -85,38 +87,53 @@ public class OrderedTokenAndAbbreviationsMatcher {
 		int longMatches = 0;
 		int crossMatches = 0;
 
-		while (a1_tokens_idx < a1_tokens.size() && a2_tokens_idx < a2_tokens.size()) {
-			String a1_curr_token = a1_tokens.get(a1_tokens_idx);
-			char a1_curr_token_initial = a1_curr_token.charAt(0);
+		for (boolean onlyFullTokens : Arrays.asList(true, false)) {
+			while (a1_tokens_idx < a1_tokens.size() && a2_tokens_idx < a2_tokens.size()) {
+				String a1_curr_token = a1_tokens.get(a1_tokens_idx);
+				char a1_curr_token_initial = a1_curr_token.charAt(0);
 
-			String a2_curr_token = a2_tokens.get(a2_tokens_idx);
-			char a2_curr_token_initial = a2_curr_token.charAt(0);
+				String a2_curr_token = a2_tokens.get(a2_tokens_idx);
+				char a2_curr_token_initial = a2_curr_token.charAt(0);
 
-			if (a1_curr_token_initial < a2_curr_token_initial) {
-				// move ahead on a1 tokens
-				a1_tokens_idx += 1;
-			} else if (a1_curr_token_initial > a2_curr_token_initial) {
-				// move ahead on a2 tokens
-				a2_tokens_idx += 1;
-			} else if (a1_curr_token.equals(a2_curr_token)) {
-				if (a1_curr_token.length() > 1) {
-					longMatches++;
+				if (a1_curr_token_initial < a2_curr_token_initial) {
+					// move ahead on a1 tokens
+					a1_tokens_idx += 1;
+				} else if (a1_curr_token_initial > a2_curr_token_initial) {
+					// move ahead on a2 tokens
+					a2_tokens_idx += 1;
 				} else {
-					shortMatches++;
-				}
-				a1_tokens_idx++;
-				a2_tokens_idx++;
-			} else if (a1_curr_token.length() == 1 || a2_curr_token.length() == 1) {
-				// If one token is an initial, count it as a cross match
-				crossMatches++;
-				a1_tokens_idx++;
-				a2_tokens_idx++;
-			} else {
-				// Move forward based on lexicographic order
-				if (a1_curr_token.compareTo(a2_curr_token) < 0) {
-					a1_tokens_idx++;
-				} else {
-					a2_tokens_idx++;
+					if (onlyFullTokens) {
+						if (a1_curr_token.length() > 1 && a1_curr_token.equals(a2_curr_token)) {
+							longMatches++;
+							a1_tokens.remove(a1_tokens_idx);
+							a2_tokens.remove(a2_tokens_idx);
+						} else {
+							a1_tokens_idx++;
+							a2_tokens_idx++;
+						}
+					} else {
+						if (a1_curr_token.equals(a2_curr_token)) {
+							if (a1_curr_token.length() > 1) {
+								longMatches++;
+							} else {
+								shortMatches++;
+							}
+							a1_tokens_idx++;
+							a2_tokens_idx++;
+						} else if (a1_curr_token.length() == 1 || a2_curr_token.length() == 1) {
+							// If one token is an initial, count it as a cross match
+							crossMatches++;
+							a1_tokens_idx++;
+							a2_tokens_idx++;
+						} else {
+							// Move forward based on lexicographic order
+							if (a1_curr_token.compareTo(a2_curr_token) < 0) {
+								a1_tokens_idx++;
+							} else {
+								a2_tokens_idx++;
+							}
+						}
+					}
 				}
 			}
 		}
