@@ -16,7 +16,9 @@ SELECT DISTINCT
     referrer_name,
     agent
 FROM ${usagestats_raw_db}.piwiklog
-WHERE entity_id IS NOT NULL; /*EOS*/
+WHERE entity_id IS NOT NULL
+  AND TO_TIMESTAMP(timestamp, 'yyyy-MM-dd HH:mm:ss') >= ADD_MONTHS(CURRENT_TIMESTAMP(), -24); /*EOS*/
+
 
 
 CREATE OR REPLACE VIEW ${usagestats_db}.openaire_result_views_monthly_tmp AS
