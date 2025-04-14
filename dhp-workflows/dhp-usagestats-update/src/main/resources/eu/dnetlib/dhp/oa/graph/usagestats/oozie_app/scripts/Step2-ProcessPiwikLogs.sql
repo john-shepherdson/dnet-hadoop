@@ -104,7 +104,7 @@ SELECT
     FROM ${usagestats_db}.openaire_result_views_monthly_tmp p
     JOIN ${stats_db}.datasource d ON p.source = d.piwik_id
     JOIN ${stats_db}.result_oids ro ON p.id = ro.id
-    WHERE p.source = ${portal_matomo_id}
+    WHERE p.source = ${portalMatomoID}
     AND ro.oid NOT IN ('200', '204', '404', '400', '503')
     AND d.id != 're3data_____::7b0ad08687b2c960d5aeef06f811d5e6'
     GROUP BY d.id, ro.id, month; /*EOS*/
