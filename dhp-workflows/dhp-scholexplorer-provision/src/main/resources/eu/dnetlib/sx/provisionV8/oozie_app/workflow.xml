@@ -1,0 +1,89 @@
+<workflow-app name="Index_Scholix_Workflow" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>sourcePath</name>
+            <description>the path of scholix dump</description>
+        </property>
+        <property>
+            <name>index</name>
+            <description>the index name</description>
+        </property>
+        <property>
+            <name>indexHost</name>
+            <description>the index Host</description>
+        </property>
+        <property>
+            <name>JAVA_HOME</name>
+            <value>/srv/java/openjdk-17</value>
+            <description>Used to configure the Java home location</description>
+        </property>
+        <property>
+            <name>sparkResourceOpts</name>
+            <value>--executor-memory=6G --conf spark.executor.memoryOverhead=3G --executor-cores=6 --driver-memory=6G --driver-cores=4</value>
+            <description>spark resource options</description>
+        </property>
+        <property>
+            <name>sparkClusterOpts</name>
+            <value>--conf spark.network.timeout=600 --conf spark.shuffle.useOldFetchProtocol=true --conf spark.extraListeners= --conf spark.sql.queryExecutionListeners= --conf spark.yarn.historyServer.address=http://iis-cdh5-test-m3.ocean.icm.edu.pl:18088 --conf spark.eventLog.dir=hdfs://nameservice1/user/spark/applicationHistory --conf spark.executorEnv.JAVA_HOME=${JAVA_HOME} --conf spark.yarn.appMasterEnv.JAVA_HOME=${JAVA_HOME}</value>
+            <description>spark cluster-wide options</description>
+        </property>
+        <property>
+            <name>sparkApplicationOpts</name>
+            <value>--conf spark.sql.shuffle.partitions=3000</value>
+            <description>spark resource options</description>
+        </property>
+
+    </parameters>
+
+    <start to="indexScholixV8"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <action name="indexScholixV8">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Generate Scholix Graph</name>
+            <class>eu.dnetlib.sx.ScholexplorerFeeder</class>
+            <jar>dhp-scholexplorer-provision-${projectVersion}.jar</jar>
+            <spark-opts>
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
+            </spark-opts>
+            <arg>--namenode</arg><arg>${nameNode}</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
+            <arg>--index</arg><arg>${index}</arg>
+            <arg>--indexHost</arg><arg>${indexHost}</arg>
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+<!--    <action name="indexScholixV8">-->
+<!--        <java>-->
+<!--            <configuration>-->
+<!--                <property>-->
+<!--                    <name>oozie.launcher.mapreduce.user.classpath.first</name>-->
+<!--                    <value>true</value>-->
+<!--                </property>-->
+<!--                <property>-->
+<!--                <name>oozie.action.java.home</name>-->
+<!--                <value>${JAVA_HOME}</value>-->
+<!--            </property>-->
+<!--            </configuration>-->
+<!--            <main-class>eu.dnetlib.sx.ScholexplorerFeeder</main-class>-->
+<!--            <java-opts> -Xmx6g </java-opts>-->
+<!--            <arg>&#45;&#45;namenode</arg><arg>${nameNode}</arg>-->
+<!--            <arg>&#45;&#45;sourcePath</arg><arg>${sourcePath}</arg>-->
+<!--            <arg>&#45;&#45;index</arg><arg>${index}</arg>-->
+<!--            <arg>&#45;&#45;indexHost</arg><arg>${indexHost}</arg>-->
+<!--        </java>-->
+<!--        <ok to="End"/>-->
+<!--        <error to="Kill"/>-->
+<!--    </action>-->
+    <end name="End"/>
+
+</workflow-app>

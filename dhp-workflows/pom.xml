@@ -35,6 +35,7 @@
         <module>dhp-stats-hist-snaps</module>
         <module>dhp-stats-monitor-irish</module>
         <module>dhp-stats-monitor-update</module>
+        <module>dhp-scholexplorer-provision</module>
         <module>dhp-stats-update</module>
         <module>dhp-stats-promote</module>
         <module>dhp-usage-stats-build</module>

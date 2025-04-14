@@ -30,11 +30,11 @@
 <!--            <artifactId>dhp-actionmanager</artifactId>-->
 <!--            <version>${project.version}</version>-->
 <!--        </dependency>-->
-        <dependency>
-            <groupId>eu.dnetlib.dhp</groupId>
-            <artifactId>dhp-aggregation</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>eu.dnetlib.dhp</groupId>-->
+<!--            <artifactId>dhp-aggregation</artifactId>-->
+<!--            <version>${project.version}</version>-->
+<!--        </dependency>-->
 <!--        <dependency>-->
 <!--            <groupId>eu.dnetlib.dhp</groupId>-->
 <!--            <artifactId>dhp-blacklist</artifactId>-->
@@ -45,11 +45,11 @@
 <!--            <artifactId>dhp-broker-events</artifactId>-->
 <!--            <version>${project.version}</version>-->
 <!--        </dependency>-->
-        <dependency>
-            <groupId>eu.dnetlib.dhp</groupId>
-            <artifactId>dhp-dedup-openaire</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>eu.dnetlib.dhp</groupId>-->
+<!--            <artifactId>dhp-dedup-openaire</artifactId>-->
+<!--            <version>${project.version}</version>-->
+<!--        </dependency>-->
 <!--        <dependency>-->
 <!--            <groupId>eu.dnetlib.dhp</groupId>-->
 <!--            <artifactId>dhp-enrichment</artifactId>-->
@@ -57,7 +57,7 @@
 <!--        </dependency>-->
         <dependency>
             <groupId>eu.dnetlib.dhp</groupId>
-            <artifactId>dhp-graph-mapper</artifactId>
+            <artifactId>dhp-scholexplorer-provision</artifactId>
             <version>${project.version}</version>
         </dependency>
 <!--        <dependency>-->
