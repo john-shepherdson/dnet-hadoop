@@ -11,7 +11,7 @@ SELECT
     CONCAT(YEAR(date), '/', LPAD(MONTH(date), 2, '0')) AS date,
     s.count,
     0 AS openaire
-FROM ${usagerawdata_db}.sushilog s
+FROM ${usagestats_raw_db}.sushilog s
     JOIN ${stats_db}.datasource_oids d ON s.repository = d.oid
     JOIN ${stats_db}.result_oids ro ON s.rid = ro.oid
 WHERE s.metric_type = 'ft_total' AND s.source = 'IRUS-UK'; /*EOS*/
