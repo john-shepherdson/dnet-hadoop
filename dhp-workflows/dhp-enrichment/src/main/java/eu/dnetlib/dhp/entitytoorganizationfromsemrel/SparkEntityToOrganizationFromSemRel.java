@@ -130,7 +130,7 @@ public class SparkEntityToOrganizationFromSemRel implements Serializable {
 
 			doPropagate(
 				spark, leavesPath, childParentPath, resultOrganizationPath, projectOrganizationPath, graphPath,
-				workingPath, outputPath, propagationCounter);
+				workingPath, outputPath, propagationCounter, iterations);
 		}
 
 	}
@@ -157,7 +157,8 @@ public class SparkEntityToOrganizationFromSemRel implements Serializable {
 	private static void doPropagate(SparkSession spark, String leavesPath, String childParentPath,
 		String resultOrganizationPath, String projectOrganizationPath, String graphPath, String workingPath,
 		String outputPath,
-		PropagationCounter propagationCounter) {
+		PropagationCounter propagationCounter,
+									int iterations) {
 		int iteration = 0;
 		long leavesCount;
 
@@ -178,7 +179,7 @@ public class SparkEntityToOrganizationFromSemRel implements Serializable {
 					childParentPath, workingPath + "/leaves", workingPath + "/resOrg", workingPath + "/projOrg");
 			moveOutput(spark, workingPath, leavesPath, resultOrganizationPath, projectOrganizationPath);
 			leavesCount = readPath(spark, leavesPath, Leaves.class).count();
-		} while (leavesCount > 0 && iteration < MAX_ITERATION);
+		} while (leavesCount > 0 && iteration < iterations);
 
 		if (leavesCount == 0) {
 			switch (String.valueOf(iteration)) {
