@@ -234,7 +234,7 @@ CREATE TABLE IF NOT EXISTS ${usagestats_db}.lr_tbl_all_r5_metrics AS
     COALESCE(ds.unique_item_investigations, 0) AS unique_item_investigations,
     COALESCE(vs.unique_item_requests, 0) AS unique_item_requests
     FROM tmp1 ds
-    FULL OUTER JOIN usagestats.lr_tbl_unique_item_requests vs
+    FULL OUTER JOIN ${usagestats_db}.lr_tbl_unique_item_requests vs
     ON ds.repository_id = vs.repository_id AND ds.result_id = vs.result_id AND ds.date = vs.date
     )
 SELECT
