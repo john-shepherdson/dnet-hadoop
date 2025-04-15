@@ -123,7 +123,7 @@
     <action name="run-affro-on-crossref">
         <spark xmlns="uri:oozie:spark-action:0.2">
 
-            <master>yarn-cluster</master>
+            <master>yarn</master>
             <mode>cluster</mode>
             <name>Affiliations inference (Affro)</name>
             <jar>crossref.py</jar>
@@ -223,7 +223,7 @@
     <action name="run-affro-on-oalex">
         <spark xmlns="uri:oozie:spark-action:0.2">
 
-            <master>yarn-cluster</master>
+            <master>yarn</master>
             <mode>cluster</mode>
             <name>Affiliations inference (Affro)</name>
             <jar>oalex.py</jar>
