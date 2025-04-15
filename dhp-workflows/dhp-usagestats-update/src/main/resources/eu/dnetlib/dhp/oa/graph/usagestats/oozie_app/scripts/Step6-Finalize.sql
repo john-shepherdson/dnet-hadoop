@@ -6,7 +6,7 @@ CREATE TABLE ${usagestats_db}.views_stats
 AS
 SELECT * FROM ${usagestats_db}.openaire_views_stats_tmp; /*EOS*/
 
-INSERT INTO ${usagestats_db}.views_stats SELECT * FROM ${usagestats_db}.episciencesviews; /*EOS*/
+INSERT INTO ${usagestats_db}.views_stats SELECT * FROM ${usagestats_db}.episciences_views_stats; /*EOS*/
 INSERT INTO ${usagestats_db}.views_stats SELECT * FROM ${usagestats_db}.pedocs_views_stats_tmp; /*EOS*/
 INSERT INTO ${usagestats_db}.views_stats SELECT * FROM ${usagestats_db}.pangaea_views_stats_tmp; /*EOS*/
 INSERT INTO ${usagestats_db}.views_stats SELECT * FROM ${usagestats_db}.tudelft_views_stats_tmp; /*EOS*/
@@ -22,7 +22,7 @@ CREATE TABLE ${usagestats_db}.downloads_stats
 AS
 SELECT * FROM ${usagestats_db}.openaire_downloads_stats_tmp; /*EOS*/
 
-INSERT INTO ${usagestats_db}.downloads_stats SELECT * FROM ${usagestats_db}.episciencesdownloads; /*EOS*/
+INSERT INTO ${usagestats_db}.downloads_stats SELECT * FROM ${usagestats_db}.episciences_downloads_stats; /*EOS*/
 INSERT INTO ${usagestats_db}.downloads_stats SELECT * FROM ${usagestats_db}.pedocs_downloads_stats_tmp; /*EOS*/
 INSERT INTO ${usagestats_db}.downloads_stats SELECT * FROM ${usagestats_db}.pangaea_downloads_stats_tmp; /*EOS*/
 INSERT INTO ${usagestats_db}.downloads_stats SELECT * FROM ${usagestats_db}.tudelft_downloads_stats_tmp; /*EOS*/
