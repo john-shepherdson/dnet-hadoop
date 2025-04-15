@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>dhp-workflows</artifactId>
         <groupId>eu.dnetlib.dhp</groupId>
@@ -215,14 +214,13 @@
         <dependency>
             <groupId>eu.dnetlib.dhp</groupId>
             <artifactId>dhp-common</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
     </dependencies>
 
     <profiles>
         <profile>
-            <id>spark-24</id>
+            <id>spark24</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
@@ -252,8 +250,10 @@
         </profile>
 
         <profile>
-            <id>spark-34</id>
-
+            <id>spark34</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
             <build>
                 <plugins>
                     <plugin>
@@ -279,8 +279,10 @@
         </profile>
 
         <profile>
-            <id>spark-35</id>
-
+            <id>spark35</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
             <build>
                 <plugins>
                     <plugin>

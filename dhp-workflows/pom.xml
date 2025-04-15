@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -67,7 +66,7 @@
         <primed.dir>primed</primed.dir>
 
         <oozie.package.dependencies.include.scope>runtime</oozie.package.dependencies.include.scope>
-        <oozie.package.dependencies.exclude.scope />
+        <oozie.package.dependencies.exclude.scope/>
         <oozie.package.skip.test.jar>true</oozie.package.skip.test.jar>
 
         <dhpConnectionProperties>${user.home}/.dhp/application.properties</dhpConnectionProperties>
@@ -81,7 +80,7 @@
         <dependency>
             <groupId>eu.dnetlib.dhp</groupId>
             <artifactId>dhp-build-assembly-resources</artifactId>
-            <version>${project.version}</version>
+            <version>1.2.5-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.oozie</groupId>
@@ -95,17 +94,17 @@
     </dependencies>
     <profiles>
         <profile>
-            <id>spark-24</id>
+            <id>spark24</id>
             <modules>
                 <module>dhp-doiboost</module>
             </modules>
-        </profile>
+        <activation><activeByDefault>true</activeByDefault></activation></profile>
         <profile>
             <!-- This profile sets properties that are required for test oozie workflows To be used only with 'oozie-package' profile -->
             <id>attach-test-resources</id>
             <properties>
                 <!--overriding default scope (set to 'runtime') with the 'test' value. Test resources attached to oozie package requires all test dependencies. -->
-                <oozie.package.dependencies.include.scope />
+                <oozie.package.dependencies.include.scope/>
                 <oozie.package.dependencies.exclude.scope>provided</oozie.package.dependencies.exclude.scope>
                 <!-- Do not skip creation of test jar for priming (in oozie-package profile) -->
                 <oozie.package.skip.test.jar>false</oozie.package.skip.test.jar>
@@ -212,7 +211,7 @@
                             <dependency>
                                 <groupId>eu.dnetlib.dhp</groupId>
                                 <artifactId>dhp-build-assembly-resources</artifactId>
-                                <version>${project.version}</version>
+                                <version>1.2.5-SNAPSHOT</version>
                                 <!-- contains project-default.properties -->
                             </dependency>
                         </dependencies>
@@ -262,7 +261,7 @@
                     <plugin>
                         <groupId>eu.dnetlib.dhp</groupId>
                         <artifactId>dhp-build-properties-maven-plugin</artifactId>
-                        <version>${project.version}</version>
+                        <version>1.2.5-SNAPSHOT</version>
                         <executions>
                             <execution>
                                 <phase>validate</phase>
@@ -327,7 +326,7 @@
                             <dependency>
                                 <groupId>eu.dnetlib.dhp</groupId>
                                 <artifactId>dhp-build-assembly-resources</artifactId>
-                                <version>${project.version}</version>
+                                <version>1.2.5-SNAPSHOT</version>
                             </dependency>
                         </dependencies>
                         <executions>
@@ -363,8 +362,8 @@
                                 </goals>
                                 <configuration>
                                     <tasks>
-                                        <property name="assembly-resources.loc" value="${maven.dependency.eu.dnetlib.dhp.dhp-build-assembly-resources.jar.path}" />
-                                        <unjar src="${assembly-resources.loc}" dest="${project.build.directory}/assembly-resources" />
+                                        <property name="assembly-resources.loc" value="${maven.dependency.eu.dnetlib.dhp.dhp-build-assembly-resources.jar.path}"/>
+                                        <unjar dest="${project.build.directory}/assembly-resources" src="${assembly-resources.loc}"/>
                                     </tasks>
                                 </configuration>
                             </execution>
@@ -374,41 +373,41 @@
                                 <configuration>
                                     <tasks>
                                         <!-- copying workflow resources -->
-                                        <mkdir dir="target/${oozie.package.file.name}" />
-                                        <mkdir dir="target/${oozie.package.file.name}/${oozieAppDir}" />
+                                        <mkdir dir="target/${oozie.package.file.name}"/>
+                                        <mkdir dir="target/${oozie.package.file.name}/${oozieAppDir}"/>
                                         <copy todir="target/${oozie.package.file.name}/${oozieAppDir}">
                                             <!-- <fileset dir="${workflow.source.dir}/${oozieAppDir}" /> replacing with primed dir location -->
-                                            <fileset dir="target/${primed.dir}/${oozieAppDir}" />
+                                            <fileset dir="target/${primed.dir}/${oozieAppDir}"/>
                                         </copy>
                                         <!-- copying all jars to oozie lib directory -->
-                                        <mkdir dir="target/${oozie.package.file.name}/${oozieAppDir}/lib" />
+                                        <mkdir dir="target/${oozie.package.file.name}/${oozieAppDir}/lib"/>
                                         <copy todir="target/${oozie.package.file.name}/${oozieAppDir}/lib">
-                                            <fileset dir="${project.build.directory}/dependency" />
+                                            <fileset dir="${project.build.directory}/dependency"/>
                                         </copy>
                                         <!-- copying current module lib -->
                                         <copy todir="target/${oozie.package.file.name}/${oozieAppDir}/lib">
                                             <fileset dir="${project.build.directory}">
-                                                <include name="*.jar" />
+                                                <include name="*.jar"/>
                                             </fileset>
                                         </copy>
 
 
-                                        <fixcrlf srcdir="target/${oozie.package.file.name}/${oozieAppDir}/" encoding="UTF-8" outputencoding="UTF-8" includes="**/*.sh,**/*.json,**/*.py,**/*.sql" eol="lf" />
+                                        <fixcrlf encoding="UTF-8" eol="lf" includes="**/*.sh,**/*.json,**/*.py,**/*.sql" outputencoding="UTF-8" srcdir="target/${oozie.package.file.name}/${oozieAppDir}/"/>
 
 
                                         <!-- creating tar.gz package -->
-                                        <tar destfile="target/${oozie.package.file.name}.tar.gz" compression="gzip" longfile="gnu">
-                                            <tarfileset dir="target/${oozie.package.file.name}" />
+                                        <tar compression="gzip" destfile="target/${oozie.package.file.name}.tar.gz" longfile="gnu">
+                                            <tarfileset dir="target/${oozie.package.file.name}"/>
                                             <tarfileset dir="target/${oozie.package.file.name}_shell_scripts" filemode="0755">
-                                                <include name="**/*.sh" />
+                                                <include name="**/*.sh"/>
                                             </tarfileset>
                                             <tarfileset dir="target/${oozie.package.file.name}_shell_scripts" filemode="0644">
-                                                <exclude name="**/*.sh" />
+                                                <exclude name="**/*.sh"/>
                                             </tarfileset>
                                         </tar>
                                         <!-- cleanup -->
-                                        <delete dir="target/${oozie.package.file.name}" />
-                                        <delete dir="target/${oozie.package.file.name}_shell_scripts" />
+                                        <delete dir="target/${oozie.package.file.name}"/>
+                                        <delete dir="target/${oozie.package.file.name}_shell_scripts"/>
                                     </tasks>
                                 </configuration>
                                 <goals>
