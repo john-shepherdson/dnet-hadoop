@@ -139,3 +139,113 @@ SELECT
     WHERE ro.oid NOT IN ('200', '204', '400', '404', '503')
     AND d.id != 're3data_____::7b0ad08687b2c960d5aeef06f811d5e6'
     GROUP BY d.id, ro.id, month; /*EOS*/
+
+
+
+-- Create or replace view for unique item requests
+CREATE OR REPLACE TEMP VIEW lr_view_unique_item_requests AS
+SELECT
+    id_visit,
+    entity_id,
+    reflect('java.net.URLDecoder', 'decode', entity_id) AS id,
+    CASE WHEN COUNT(entity_id) > 1 THEN 1 ELSE 1 END AS unique_item_requests,
+    SUM(CASE WHEN referrer_name LIKE '%openaire%' THEN 1 ELSE 0 END) AS openaire_referrer,
+    CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')) AS month,
+  source
+FROM ${usagestats_db}.lareferencialogdistinct
+WHERE action = 'download'
+  AND (source_item_type = 'oaItem' OR source_item_type = 'repItem')
+  AND entity_id IS NOT NULL
+GROUP BY id_visit, entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')), source; /*EOS*/
+
+-- Drop and create the unique item requests summary table
+DROP TABLE IF EXISTS ${usagestats_db}.lr_tbl_unique_item_requests; /*EOS*/
+
+CREATE TABLE ${usagestats_db}.lr_tbl_unique_item_requests AS
+SELECT
+    'OpenAIRE' AS source,
+    d.id AS repository_id,
+    ro.id AS result_id,
+    month AS date,
+    SUM(unique_item_requests) AS unique_item_requests,
+    SUM(openaire_referrer) AS openaire
+    FROM ${usagestats_db}.lr_view_unique_item_requests p
+    JOIN ${stats_db}.datasource d ON p.source = d.piwik_id
+    JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
+    WHERE ro.oid NOT IN ('200', '204', '404', '400', '503')
+    AND d.id != 're3data_____::7b0ad08687b2c960d5aeef06f811d5e6'
+    GROUP BY d.id, ro.id, month; /*EOS*/
+
+-- Create or replace view for total item requests
+CREATE OR REPLACE TEMP VIEW lr_view_total_item_requests AS
+SELECT
+    id_visit,
+    entity_id,
+    reflect('java.net.URLDecoder', 'decode', entity_id) AS id,
+    COUNT(entity_id) AS total_item_requests,
+    SUM(CASE WHEN referrer_name LIKE '%openaire%' THEN 1 ELSE 0 END) AS openaire_referrer,
+    CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')) AS month,
+  source
+FROM ${usagestats_db}.lareferencialogdistinct
+WHERE action = 'download'
+  AND (source_item_type = 'oaItem' OR source_item_type = 'repItem')
+  AND entity_id IS NOT NULL
+GROUP BY id_visit, entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')), source; /*EOS*/
+
+-- Drop and create total item requests table
+DROP TABLE IF EXISTS ${usagestats_db}.lr_tbl_total_item_requests; /*EOS*/
+
+CREATE TABLE ${usagestats_db}.lr_tbl_total_item_requests AS
+SELECT
+    'OpenAIRE' AS source,
+    d.id AS repository_id,
+    ro.id AS result_id,
+    month AS date,
+    SUM(total_item_requests) AS total_item_requests,
+    SUM(openaire_referrer) AS openaire
+    FROM ${usagestats_db}.lr_view_total_item_requests p
+    JOIN ${stats_db}.datasource d ON p.source = d.piwik_id
+    JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
+    WHERE ro.oid NOT IN ('200', '204', '404', '400', '503')
+    AND d.id != 're3data_____::7b0ad08687b2c960d5aeef06f811d5e6'
+    GROUP BY d.id, ro.id, month; /*EOS*/
+
+-- Drop and create the final CoP R5 metrics table
+DROP TABLE IF EXISTS ${usagestats_db}.lr_tbl_all_r5_metrics; /*EOS*/
+
+CREATE TABLE IF NOT EXISTS ${usagestats_db}.lr_tbl_all_r5_metrics AS
+    WITH tmp1 AS (
+        SELECT
+        COALESCE(ds.repository_id, vs.repository_id) AS repository_id,
+    COALESCE(ds.result_id, vs.result_id) AS result_id,
+    COALESCE(ds.date, vs.date) AS date,
+    COALESCE(vs.unique_item_investigations, 0) AS unique_item_investigations,
+    COALESCE(ds.total_item_investigations, 0) AS total_item_investigations
+    FROM ${usagestats_db}.lr_tbl_unique_item_investigations vs
+    FULL OUTER JOIN ${usagestats_db}.lr_tbl_total_item_investigations ds
+    ON ds.source = vs.source AND ds.result_id = vs.result_id AND ds.date = vs.date
+    ),
+    tmp2 AS (
+                SELECT
+                COALESCE(ds.repository_id, vs.repository_id) AS repository_id,
+    COALESCE(ds.result_id, vs.result_id) AS result_id,
+    COALESCE(ds.date, vs.date) AS date,
+    COALESCE(ds.total_item_investigations, 0) AS total_item_investigations,
+    COALESCE(ds.unique_item_investigations, 0) AS unique_item_investigations,
+    COALESCE(vs.unique_item_requests, 0) AS unique_item_requests
+    FROM tmp1 ds
+    FULL OUTER JOIN usagestats.lr_tbl_unique_item_requests vs
+    ON ds.repository_id = vs.repository_id AND ds.result_id = vs.result_id AND ds.date = vs.date
+    )
+SELECT
+    'LaReferencia' AS source,
+    COALESCE(ds.repository_id, vs.repository_id) AS repository_id,
+    COALESCE(ds.result_id, vs.result_id) AS result_id,
+    COALESCE(ds.date, vs.date) AS date,
+  COALESCE(ds.unique_item_investigations, 0) AS unique_item_investigations,
+  COALESCE(ds.total_item_investigations, 0) AS total_item_investigations,
+  COALESCE(ds.unique_item_requests, 0) AS unique_item_requests,
+  COALESCE(vs.total_item_requests, 0) AS total_item_requests
+FROM tmp2 ds
+    FULL OUTER JOIN ${usagestats_db}.lr_tbl_total_item_requests vs
+ON ds.repository_id = vs.repository_id AND ds.result_id = vs.result_id AND ds.date = vs.date; /*EOS*/
