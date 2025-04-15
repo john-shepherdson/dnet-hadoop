@@ -169,7 +169,7 @@ SELECT
     month AS date,
     SUM(unique_item_requests) AS unique_item_requests,
     SUM(openaire_referrer) AS openaire
-    FROM ${usagestats_db}.lr_view_unique_item_requests p
+    FROM lr_view_unique_item_requests p
     JOIN ${stats_db}.datasource d ON p.source = d.piwik_id
     JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
     WHERE ro.oid NOT IN ('200', '204', '404', '400', '503')
@@ -203,7 +203,7 @@ SELECT
     month AS date,
     SUM(total_item_requests) AS total_item_requests,
     SUM(openaire_referrer) AS openaire
-    FROM ${usagestats_db}.lr_view_total_item_requests p
+    FROM lr_view_total_item_requests p
     JOIN ${stats_db}.datasource d ON p.source = d.piwik_id
     JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
     WHERE ro.oid NOT IN ('200', '204', '404', '400', '503')
