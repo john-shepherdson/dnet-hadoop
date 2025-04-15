@@ -226,7 +226,7 @@
             <master>yarn-cluster</master>
             <mode>cluster</mode>
             <name>Affiliations inference (Affro)</name>
-            <jar>strings.py</jar>
+            <jar>oalex.py</jar>
 
             <spark-opts>
                 ${sparkClusterOpts}
@@ -241,7 +241,7 @@
             <arg>${inputFolder}</arg>
             <arg>${outputFolder}</arg>
 
-            <file>${wfAppPath}/affRo/strings.py#strings.py</file>
+            <file>${wfAppPath}/affRo/oalex.py#oalex.py</file>
         </spark>
 
         <ok to="End" />
