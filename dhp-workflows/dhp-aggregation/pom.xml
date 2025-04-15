@@ -10,7 +10,7 @@
     <artifactId>dhp-aggregation</artifactId>
 
     <properties>
-        <affro.release.version>1.0.0</affro.release.version>
+        <affro.release.version>prod_2.0.0</affro.release.version>
     </properties>
 
     <scm>
@@ -78,6 +78,7 @@
                         </goals>
                     </execution>
                 </executions>
+
             </plugin>
 
         </plugins>
