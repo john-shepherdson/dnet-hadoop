@@ -227,7 +227,7 @@ public class PrepareAffiliationRelations implements Serializable {
 
 	private static String calculateOpenOrgsId(String pidvalue) {
 		if(pidvalue.contains(OPENORGS_NS_PREFIX)) {
-			pidvalue = StringUtils.substringAfter(pidvalue, ":");
+			pidvalue = StringUtils.substringAfter(pidvalue, "::");
 		}
 
 		return String.format("20|%s::%s", OPENORGS_NS_PREFIX, DHPUtils.md5(pidvalue));
