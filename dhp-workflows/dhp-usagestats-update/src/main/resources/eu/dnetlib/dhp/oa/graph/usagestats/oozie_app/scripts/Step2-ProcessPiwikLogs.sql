@@ -2,8 +2,7 @@
 DROP TABLE IF EXISTS ${usagestats_db}.piwiklogdistinct; /*EOS*/
 
 -- Create and populate piwiklogdistinct using Parquet format
-CREATE TABLE ${usagestats_db}.piwiklogdistinct
-    STORED AS PARQUET AS
+CREATE TABLE ${usagestats_db}.piwiklogdistinct STORED AS PARQUET AS
 SELECT DISTINCT
     source,
     id_visit,
@@ -21,7 +20,7 @@ WHERE entity_id IS NOT NULL
 
 
 
-CREATE OR REPLACE VIEW ${usagestats_db}.openaire_result_views_monthly_tmp AS
+CREATE OR REPLACE TEMP VIEW openaire_result_views_monthly_tmp AS
 SELECT
     entity_id,
     reflect('java.net.URLDecoder', 'decode', entity_id) AS id,
@@ -37,7 +36,7 @@ GROUP BY entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0'))
 -- Drop and create the temporary views stats table
 DROP TABLE IF EXISTS ${usagestats_db}.openaire_views_stats_tmp; /*EOS*/
 
-CREATE TABLE ${usagestats_db}.openaire_views_stats_tmp AS
+CREATE TABLE ${usagestats_db}.openaire_views_stats_tmp STORED AS PARQUET AS
 SELECT
     'OpenAIRE' AS source,
     d.id AS repository_id,
@@ -45,72 +44,63 @@ SELECT
     month AS date,
     MAX(views) AS count,
     MAX(openaire_referrer) AS openaire
-    FROM ${usagestats_db}.openaire_result_views_monthly_tmp p
-    JOIN ${stats_db}.datasource d ON p.source = d.piwik_id
-    JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
-    WHERE ro.oid NOT IN ('200', '204', '404', '400', '503')
+FROM openaire_result_views_monthly_tmp p
+JOIN ${stats_db}.datasource d ON p.source = d.piwik_id
+JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
+WHERE ro.oid NOT IN ('200', '204', '404', '400', '503')
     AND d.id != 're3data_____::7b0ad08687b2c960d5aeef06f811d5e6'
-    GROUP BY d.id, ro.id, month; /*EOS*/
-
--- Handle missing piwik_id mappings
--- 630
-INSERT INTO ${usagestats_db}.openaire_views_stats_tmp
+GROUP BY d.id, ro.id, month
+UNION ALL
+-- Handle missing piwik_id mappings -- 630
 SELECT 'OpenAIRE', 'opendoar____::cfa5301358b9fcbe7aa45b1ceea088c6', ro.id, month, MAX(views), MAX(openaire_referrer)
-FROM ${usagestats_db}.openaire_result_views_monthly_tmp p
-    JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
+FROM openaire_result_views_monthly_tmp p
+JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
 WHERE p.source = 630 AND ro.oid NOT IN ('200', '204', '404', '400', '503')
-GROUP BY ro.id, month; /*EOS*/
-
+GROUP BY ro.id, month
+UNION ALL
 -- 662
-INSERT INTO ${usagestats_db}.openaire_views_stats_tmp
 SELECT 'OpenAIRE', 'opendoar____::4e86eaf2685a67b743a475f86c7c0086', ro.id, month, MAX(views), MAX(openaire_referrer)
-FROM ${usagestats_db}.openaire_result_views_monthly_tmp p
-    JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
+FROM openaire_result_views_monthly_tmp p
+JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
 WHERE p.source = 662 AND ro.oid NOT IN ('200', '204', '404', '400', '503')
-GROUP BY ro.id, month; /*EOS*/
-
+GROUP BY ro.id, month
+UNION ALL
 -- 694
-INSERT INTO ${usagestats_db}.openaire_views_stats_tmp
 SELECT 'OpenAIRE', 'opendoar____::f35fd567065af297ae65b621e0a21ae9', ro.id, month, MAX(views), MAX(openaire_referrer)
-FROM ${usagestats_db}.openaire_result_views_monthly_tmp p
-    JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
+FROM openaire_result_views_monthly_tmp p
+JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
 WHERE p.source = 694 AND ro.oid NOT IN ('200', '204', '404', '400', '503')
-GROUP BY ro.id, month; /*EOS*/
-
+GROUP BY ro.id, month
+UNION ALL
 -- 725
-INSERT INTO ${usagestats_db}.openaire_views_stats_tmp
 SELECT 'OpenAIRE', 'opendoar____::7180cffd6a8e829dacfc2a31b3f72ece', ro.id, month, MAX(views), MAX(openaire_referrer)
-FROM ${usagestats_db}.openaire_result_views_monthly_tmp p
-    JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
+FROM openaire_result_views_monthly_tmp p
+JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
 WHERE p.source = 725 AND ro.oid NOT IN ('200', '204', '404', '400', '503')
-GROUP BY ro.id, month; /*EOS*/
-
+GROUP BY ro.id, month
+UNION ALL
 -- 728
-INSERT INTO ${usagestats_db}.openaire_views_stats_tmp
 SELECT 'OpenAIRE', 'opendoar____::8b3bac12926cc1d9fb5d68783376971d', ro.id, month, MAX(views), MAX(openaire_referrer)
-FROM ${usagestats_db}.openaire_result_views_monthly_tmp p
-    JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
+FROM openaire_result_views_monthly_tmp p
+JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
 WHERE p.source = 728 AND ro.oid NOT IN ('200', '204', '404', '400', '503')
 GROUP BY ro.id, month; /*EOS*/
 
 -- Create the pageviews stats table (for portal only)
-CREATE TABLE ${usagestats_db}.openaire_pageviews_stats_tmp AS
+CREATE TABLE ${usagestats_db}.openaire_pageviews_stats_tmp STORED AS PARQUET AS
 SELECT
     'OpenAIRE' AS source,
     d.id AS repository_id,
     ro.id AS result_id,
     month AS date,
     MAX(views) AS count
-    FROM ${usagestats_db}.openaire_result_views_monthly_tmp p
-    JOIN ${stats_db}.datasource d ON p.source = d.piwik_id
-    JOIN ${stats_db}.result_oids ro ON p.id = ro.id
-    WHERE p.source = ${portalMatomoID}
+FROM openaire_result_views_monthly_tmp p
+JOIN ${stats_db}.datasource d ON p.source = d.piwik_id
+JOIN ${stats_db}.result_oids ro ON p.id = ro.id
+WHERE p.source = ${portalMatomoID}
     AND ro.oid NOT IN ('200', '204', '404', '400', '503')
     AND d.id != 're3data_____::7b0ad08687b2c960d5aeef06f811d5e6'
-    GROUP BY d.id, ro.id, month; /*EOS*/
-
--- Cleanup
-DROP VIEW IF EXISTS ${usagestats_db}.openaire_result_views_monthly_tmp; /*EOS*/
+GROUP BY d.id, ro.id, month; /*EOS*/
 
 
 -- Drop and create openaire_result_downloads_monthly_tmp as TEMP VIEW
@@ -130,7 +120,7 @@ GROUP BY entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0'))
 -- Drop and create downloads stats table
 DROP TABLE IF EXISTS ${usagestats_db}.openaire_downloads_stats_tmp; /*EOS*/
 
-CREATE TABLE ${usagestats_db}.openaire_downloads_stats_tmp AS
+CREATE TABLE ${usagestats_db}.openaire_downloads_stats_tmp STORED AS PARQUET AS
 SELECT
     'OpenAIRE' AS source,
     d.id AS repository_id,
@@ -138,52 +128,43 @@ SELECT
     month AS date,
     MAX(downloads) AS count,
     MAX(openaire_referrer) AS openaire
-    FROM openaire_result_downloads_monthly_tmp p
-    JOIN ${stats_db}.datasource d ON p.source = d.piwik_id
-    JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
-    WHERE ro.oid NOT IN ('200', '204', '404', '400', '503')
+FROM openaire_result_downloads_monthly_tmp p
+JOIN ${stats_db}.datasource d ON p.source = d.piwik_id
+JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
+WHERE ro.oid NOT IN ('200', '204', '404', '400', '503')
     AND d.id != 're3data_____::7b0ad08687b2c960d5aeef06f811d5e6'
-    GROUP BY d.id, ro.id, month; /*EOS*/
-
+GROUP BY d.id, ro.id, month
+UNION ALL
 -- Insert missing piwik_id mappings
-INSERT INTO ${usagestats_db}.openaire_downloads_stats_tmp
 SELECT 'OpenAIRE', 'opendoar____::cfa5301358b9fcbe7aa45b1ceea088c6', ro.id, month, MAX(downloads), MAX(openaire_referrer)
 FROM openaire_result_downloads_monthly_tmp p
-    JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
+JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
 WHERE p.source = 630 AND ro.oid NOT IN ('200', '204', '404', '400', '503')
-GROUP BY ro.id, month; /*EOS*/
-
-INSERT INTO ${usagestats_db}.openaire_downloads_stats_tmp
+GROUP BY ro.id, month
+UNION ALL
 SELECT 'OpenAIRE', 'opendoar____::4e86eaf2685a67b743a475f86c7c0086', ro.id, month, MAX(downloads), MAX(openaire_referrer)
 FROM openaire_result_downloads_monthly_tmp p
-    JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
+JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
 WHERE p.source = 662 AND ro.oid NOT IN ('200', '204', '404', '400', '503')
-GROUP BY ro.id, month; /*EOS*/
-
-INSERT INTO ${usagestats_db}.openaire_downloads_stats_tmp
+GROUP BY ro.id, month
+UNION ALL
 SELECT 'OpenAIRE', 'opendoar____::f35fd567065af297ae65b621e0a21ae9', ro.id, month, MAX(downloads), MAX(openaire_referrer)
 FROM openaire_result_downloads_monthly_tmp p
-    JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
+JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
 WHERE p.source = 694 AND ro.oid NOT IN ('200', '204', '404', '400', '503')
-GROUP BY ro.id, month; /*EOS*/
-
-INSERT INTO ${usagestats_db}.openaire_downloads_stats_tmp
+GROUP BY ro.id, month
+UNION ALL
 SELECT 'OpenAIRE', 'opendoar____::7180cffd6a8e829dacfc2a31b3f72ece', ro.id, month, MAX(downloads), MAX(openaire_referrer)
 FROM openaire_result_downloads_monthly_tmp p
-    JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
+JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
 WHERE p.source = 725 AND ro.oid NOT IN ('200', '204', '404', '400', '503')
-GROUP BY ro.id, month; /*EOS*/
-
-INSERT INTO ${usagestats_db}.openaire_downloads_stats_tmp
+GROUP BY ro.id, month
+UNION ALL
 SELECT 'OpenAIRE', 'opendoar____::8b3bac12926cc1d9fb5d68783376971d', ro.id, month, MAX(downloads), MAX(openaire_referrer)
 FROM openaire_result_downloads_monthly_tmp p
-    JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
+JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
 WHERE p.source = 728 AND ro.oid NOT IN ('200', '204', '404', '400', '503')
 GROUP BY ro.id, month; /*EOS*/
-
--- Cleanup
-DROP VIEW IF EXISTS ${usagestats_db}.openaire_result_downloads_monthly_tmp; /*EOS*/
-
 
 
 
@@ -203,7 +184,7 @@ GROUP BY id_visit, entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp)
 
 DROP TABLE IF EXISTS ${usagestats_db}.tbl_unique_item_investigations; /*EOS*/
 
-CREATE TABLE ${usagestats_db}.tbl_unique_item_investigations AS
+CREATE TABLE ${usagestats_db}.tbl_unique_item_investigations STORED AS PARQUET AS
 SELECT
     'OpenAIRE' AS source,
     d.id AS repository_id,
@@ -211,12 +192,12 @@ SELECT
     month AS date,
     SUM(unique_item_investigations) AS unique_item_investigations,
     SUM(openaire_referrer) AS openaire
-    FROM view_unique_item_investigations p
-    JOIN ${stats_db}.datasource d ON p.source = d.piwik_id
-    JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
-    WHERE ro.oid NOT IN ('200', '204', '404', '400', '503')
+FROM view_unique_item_investigations p
+JOIN ${stats_db}.datasource d ON p.source = d.piwik_id
+JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
+WHERE ro.oid NOT IN ('200', '204', '404', '400', '503')
     AND d.id != 're3data_____::7b0ad08687b2c960d5aeef06f811d5e6'
-    GROUP BY d.id, ro.id, month; /*EOS*/
+GROUP BY d.id, ro.id, month; /*EOS*/
 
 -- Total Item Investigations
 CREATE OR REPLACE TEMP VIEW view_total_item_investigations AS
@@ -234,7 +215,7 @@ GROUP BY id_visit, entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp)
 
 DROP TABLE IF EXISTS ${usagestats_db}.tbl_total_item_investigations; /*EOS*/
 
-CREATE TABLE ${usagestats_db}.tbl_total_item_investigations AS
+CREATE TABLE ${usagestats_db}.tbl_total_item_investigations STORED AS PARQUET AS
 SELECT
     'OpenAIRE' AS source,
     d.id AS repository_id,
@@ -242,12 +223,12 @@ SELECT
     month AS date,
     SUM(total_item_investigations) AS total_item_investigations,
     SUM(openaire_referrer) AS openaire
-    FROM view_total_item_investigations p
-    JOIN ${stats_db}.datasource d ON p.source = d.piwik_id
-    JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
-    WHERE ro.oid NOT IN ('200', '204', '404', '400', '503')
+FROM view_total_item_investigations p
+JOIN ${stats_db}.datasource d ON p.source = d.piwik_id
+JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
+WHERE ro.oid NOT IN ('200', '204', '404', '400', '503')
     AND d.id != 're3data_____::7b0ad08687b2c960d5aeef06f811d5e6'
-    GROUP BY d.id, ro.id, month; /*EOS*/
+GROUP BY d.id, ro.id, month; /*EOS*/
 
 -- Unique Item Requests
 CREATE OR REPLACE TEMP VIEW view_unique_item_requests AS
@@ -265,7 +246,7 @@ GROUP BY id_visit, entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp)
 
 DROP TABLE IF EXISTS ${usagestats_db}.tbl_unique_item_requests; /*EOS*/
 
-CREATE TABLE ${usagestats_db}.tbl_unique_item_requests AS
+CREATE TABLE ${usagestats_db}.tbl_unique_item_requests STORED AS PARQUET AS
 SELECT
     'OpenAIRE' AS source,
     d.id AS repository_id,
@@ -273,12 +254,12 @@ SELECT
     month AS date,
     SUM(unique_item_requests) AS unique_item_requests,
     SUM(openaire_referrer) AS openaire
-    FROM view_unique_item_requests p
-    JOIN ${stats_db}.datasource d ON p.source = d.piwik_id
-    JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
-    WHERE ro.oid NOT IN ('200', '204', '404', '400', '503')
+FROM view_unique_item_requests p
+JOIN ${stats_db}.datasource d ON p.source = d.piwik_id
+JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
+WHERE ro.oid NOT IN ('200', '204', '404', '400', '503')
     AND d.id != 're3data_____::7b0ad08687b2c960d5aeef06f811d5e6'
-    GROUP BY d.id, ro.id, month; /*EOS*/
+GROUP BY d.id, ro.id, month; /*EOS*/
 
 -- Total Item Requests
 CREATE OR REPLACE TEMP VIEW view_total_item_requests AS
@@ -296,7 +277,7 @@ GROUP BY id_visit, entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp)
 
 DROP TABLE IF EXISTS ${usagestats_db}.tbl_total_item_requests; /*EOS*/
 
-CREATE TABLE ${usagestats_db}.tbl_total_item_requests AS
+CREATE TABLE ${usagestats_db}.tbl_total_item_requests STORED AS PARQUET AS
 SELECT
     'OpenAIRE' AS source,
     d.id AS repository_id,
@@ -304,40 +285,40 @@ SELECT
     month AS date,
     SUM(total_item_requests) AS total_item_requests,
     SUM(openaire_referrer) AS openaire
-    FROM view_total_item_requests p
-    JOIN ${stats_db}.datasource d ON p.source = d.piwik_id
-    JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
-    WHERE ro.oid NOT IN ('200', '204', '404', '400', '503')
+FROM view_total_item_requests p
+JOIN ${stats_db}.datasource d ON p.source = d.piwik_id
+JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
+WHERE ro.oid NOT IN ('200', '204', '404', '400', '503')
     AND d.id != 're3data_____::7b0ad08687b2c960d5aeef06f811d5e6'
-    GROUP BY d.id, ro.id, month; /*EOS*/
+GROUP BY d.id, ro.id, month; /*EOS*/
 
 -- Final CoP R5 metrics
 DROP TABLE IF EXISTS ${usagestats_db}.tbl_all_r5_metrics; /*EOS*/
 DROP TABLE IF EXISTS ${usagestats_db}.counter_r5_stats_with_metrics; /*EOS*/
 
-CREATE TABLE ${usagestats_db}.counter_r5_stats_with_metrics AS
+CREATE TABLE ${usagestats_db}.counter_r5_stats_with_metrics STORED AS PARQUET AS
 WITH tmp1 AS (
     SELECT
         COALESCE(ds.repository_id, vs.repository_id) AS repository_id,
         COALESCE(ds.result_id, vs.result_id) AS result_id,
         COALESCE(ds.date, vs.date) AS date,
-    COALESCE(vs.unique_item_investigations, 0) AS unique_item_investigations,
-    COALESCE(ds.total_item_investigations, 0) AS total_item_investigations
+        COALESCE(vs.unique_item_investigations, 0) AS unique_item_investigations,
+        COALESCE(ds.total_item_investigations, 0) AS total_item_investigations
     FROM ${usagestats_db}.tbl_unique_item_investigations vs
     FULL OUTER JOIN ${usagestats_db}.tbl_total_item_investigations ds
-    ON ds.source = vs.source AND ds.result_id = vs.result_id AND ds.date = vs.date
+        ON ds.source = vs.source AND ds.result_id = vs.result_id AND ds.date = vs.date
     ),
-    tmp2 AS (
-                SELECT
-                COALESCE(ds.repository_id, vs.repository_id) AS repository_id,
-    COALESCE(ds.result_id, vs.result_id) AS result_id,
-    COALESCE(ds.date, vs.date) AS date,
-    COALESCE(ds.total_item_investigations, 0) AS total_item_investigations,
-    COALESCE(ds.unique_item_investigations, 0) AS unique_item_investigations,
-    COALESCE(vs.unique_item_requests, 0) AS unique_item_requests
+tmp2 AS (
+    SELECT
+        COALESCE(ds.repository_id, vs.repository_id) AS repository_id,
+        COALESCE(ds.result_id, vs.result_id) AS result_id,
+        COALESCE(ds.date, vs.date) AS date,
+        COALESCE(ds.total_item_investigations, 0) AS total_item_investigations,
+        COALESCE(ds.unique_item_investigations, 0) AS unique_item_investigations,
+        COALESCE(vs.unique_item_requests, 0) AS unique_item_requests
     FROM tmp1 ds
     FULL OUTER JOIN ${usagestats_db}.tbl_unique_item_requests vs
-    ON ds.repository_id = vs.repository_id AND ds.result_id = vs.result_id AND ds.date = vs.date
+        ON ds.repository_id = vs.repository_id AND ds.result_id = vs.result_id AND ds.date = vs.date
     )
 SELECT
     'OpenAIRE' AS source,
@@ -349,16 +330,14 @@ SELECT
     COALESCE(ds.unique_item_requests, 0) AS unique_item_requests,
     COALESCE(vs.total_item_requests, 0) AS total_item_requests
 FROM tmp2 ds
-    FULL OUTER JOIN ${usagestats_db}.tbl_total_item_requests vs
-ON ds.repository_id = vs.repository_id AND ds.result_id = vs.result_id AND ds.date = vs.date; /*EOS*/
-
-
+FULL OUTER JOIN ${usagestats_db}.tbl_total_item_requests vs
+    ON ds.repository_id = vs.repository_id AND ds.result_id = vs.result_id AND ds.date = vs.date; /*EOS*/
 
 
 -- STEP 1: Create Episciences distinct table
 DROP TABLE IF EXISTS ${usagestats_db}.episcienceslogdistinct; /*EOS*/
 
-CREATE TABLE ${usagestats_db}.episcienceslogdistinct AS
+CREATE TABLE ${usagestats_db}.episcienceslogdistinct STORED AS PARQUET AS
 SELECT DISTINCT *
 FROM ${usagestats_raw_db}.episcienceslog
 WHERE entity_id IS NOT NULL; /*EOS*/
@@ -379,7 +358,7 @@ GROUP BY entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0'))
 
 DROP TABLE IF EXISTS ${usagestats_db}.episciences_views_stats; /*EOS*/
 
-CREATE TABLE ${usagestats_db}.episciences_views_stats AS
+CREATE TABLE ${usagestats_db}.episciences_views_stats STORED AS PARQUET AS
 SELECT
     'Episciences' AS source,
     d.id AS repository_id,
@@ -387,12 +366,12 @@ SELECT
     month AS date,
     MAX(views) AS count,
     MAX(openaire_referrer) AS openaire
-    FROM episciences_views_monthly_tmp p
-    JOIN ${stats_db}.datasource d ON p.source = d.piwik_id
-    JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
-    WHERE ro.oid NOT IN ('200', '204', '404', '400', '503')
+FROM episciences_views_monthly_tmp p
+JOIN ${stats_db}.datasource d ON p.source = d.piwik_id
+JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
+WHERE ro.oid NOT IN ('200', '204', '404', '400', '503')
     AND d.id != 're3data_____::7b0ad08687b2c960d5aeef06f811d5e6'
-    GROUP BY d.id, ro.id, month; /*EOS*/
+GROUP BY d.id, ro.id, month; /*EOS*/
 
 -- STEP 3: Downloads stats
 CREATE OR REPLACE TEMP VIEW episciences_downloads_monthly_tmp AS
@@ -410,7 +389,7 @@ GROUP BY entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0'))
 
 DROP TABLE IF EXISTS ${usagestats_db}.episciences_downloads_stats; /*EOS*/
 
-CREATE TABLE ${usagestats_db}.episciences_downloads_stats AS
+CREATE TABLE ${usagestats_db}.episciences_downloads_stats STORED AS PARQUET AS
 SELECT
     'Episciences' AS source,
     d.id AS repository_id,
@@ -418,24 +397,21 @@ SELECT
     month AS date,
     MAX(downloads) AS count,
     MAX(openaire_referrer) AS openaire
-    FROM episciences_downloads_monthly_tmp p
-    JOIN ${stats_db}.datasource d ON p.source = d.piwik_id
-    JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
-    WHERE ro.oid NOT IN ('200', '204', '404', '400', '503')
+FROM episciences_downloads_monthly_tmp p
+JOIN ${stats_db}.datasource d ON p.source = d.piwik_id
+JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
+WHERE ro.oid NOT IN ('200', '204', '404', '400', '503')
     AND d.id != 're3data_____::7b0ad08687b2c960d5aeef06f811d5e6'
-    GROUP BY d.id, ro.id, month; /*EOS*/
-
-
+GROUP BY d.id, ro.id, month; /*EOS*/
 
 
 -- Drop Pedocs views stats table
 DROP TABLE IF EXISTS ${usagestats_db}.pedocs_views_stats_tmp; /*EOS*/
-
 -- Drop Pedocs downloads stats table
 DROP TABLE IF EXISTS ${usagestats_db}.pedocs_downloads_stats_tmp; /*EOS*/
 
 -- Create Pedocs views stats table
-CREATE TABLE ${usagestats_db}.pedocs_views_stats_tmp AS
+CREATE TABLE ${usagestats_db}.pedocs_views_stats_tmp STORED AS PARQUET AS
 SELECT
     'OpenAIRE' AS source,
     'opendoar____::ab1a4d0dd4d48a2ba1077c4494791306' AS repository_id,
@@ -444,10 +420,10 @@ SELECT
     p.counter_abstract AS count,
     0 AS openaire
 FROM ${usagestats_raw_db}.pedocsoldviews p
-    JOIN ${stats_db}.result_oids r ON r.oid = p.identifier; /*EOS*/
+JOIN ${stats_db}.result_oids r ON r.oid = p.identifier; /*EOS*/
 
 -- Create Pedocs downloads stats table
-CREATE TABLE ${usagestats_db}.pedocs_downloads_stats_tmp AS
+CREATE TABLE ${usagestats_db}.pedocs_downloads_stats_tmp STORED AS PARQUET AS
 SELECT
     'OpenAIRE' AS source,
     'opendoar____::ab1a4d0dd4d48a2ba1077c4494791306' AS repository_id,
@@ -456,18 +432,17 @@ SELECT
     p.counter AS count,
     0 AS openaire
 FROM ${usagestats_raw_db}.pedocsolddownloads p
-    JOIN ${stats_db}.result_oids r ON r.oid = p.identifier; /*EOS*/
+JOIN ${stats_db}.result_oids r ON r.oid = p.identifier; /*EOS*/
 
 
 
 -- Drop Pangaea views stats table
 DROP TABLE IF EXISTS ${usagestats_db}.pangaea_views_stats_tmp; /*EOS*/
-
 -- Drop Pangaea downloads stats table
 DROP TABLE IF EXISTS ${usagestats_db}.pangaea_downloads_stats_tmp; /*EOS*/
 
 -- Create Pangaea views stats table
-CREATE TABLE ${usagestats_db}.pangaea_views_stats_tmp AS
+CREATE TABLE ${usagestats_db}.pangaea_views_stats_tmp STORED AS PARQUET AS
 SELECT
     'PANGAEA' AS source,
     're3data_____::9633d1e8c4309c833c2c442abeb0cfeb' AS repository_id,
@@ -479,7 +454,7 @@ FROM default.pangaeaviews p
 JOIN ${stats_db}.result_oids r ON r.oid = p.result_id; /*EOS*/
 
 -- Create Pangaea downloads stats table
-CREATE TABLE ${usagestats_db}.pangaea_downloads_stats_tmp AS
+CREATE TABLE ${usagestats_db}.pangaea_downloads_stats_tmp STORED AS PARQUET AS
 SELECT
     'PANGAEA' AS source,
     're3data_____::9633d1e8c4309c833c2c442abeb0cfeb' AS repository_id,
@@ -512,7 +487,7 @@ WHERE action = 'action'
 GROUP BY entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')), source; /*EOS*/
 
 -- Create TUDELFT views stats table
-CREATE TABLE ${usagestats_db}.tudelft_views_stats_tmp AS
+CREATE TABLE ${usagestats_db}.tudelft_views_stats_tmp STORED AS PARQUET AS
 SELECT
     'OpenAIRE' AS source,
     'opendoar____::c9892a989183de32e976c6f04e700201' AS repository_id,
@@ -520,12 +495,12 @@ SELECT
     month AS date,
     MAX(views) AS count,
     MAX(openaire_referrer) AS openaire
-    FROM tudelft_result_views_monthly_tmp p
-    JOIN ${stats_db}.result_oids ro ON CONCAT('tud:', p.id) = ro.oid
-    GROUP BY ro.id, month; /*EOS*/
+FROM tudelft_result_views_monthly_tmp p
+JOIN ${stats_db}.result_oids ro ON CONCAT('tud:', p.id) = ro.oid
+GROUP BY ro.id, month; /*EOS*/
 
 -- Create TUDELFT downloads monthly temp view
-CREATE OR REPLACE TEMP VIEW tudelft_result_downloads_monthly_tmp AS
+CREATE OR REPLACE TEMP VIEW tudelft_result_downloads_monthly_tmp STORED AS PARQUET AS
 SELECT
     entity_id,
     reflect('java.net.URLDecoder', 'decode', entity_id) AS id,
@@ -540,7 +515,7 @@ WHERE action = 'download'
 GROUP BY entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')), source; /*EOS*/
 
 -- Create TUDELFT downloads stats table
-CREATE TABLE ${usagestats_db}.tudelft_downloads_stats_tmp AS
+CREATE TABLE ${usagestats_db}.tudelft_downloads_stats_tmp STORED AS PARQUET AS
 SELECT
     'OpenAIRE' AS source,
     'opendoar____::c9892a989183de32e976c6f04e700201' AS repository_id,
@@ -548,9 +523,9 @@ SELECT
     month AS date,
     MAX(views) AS count,
     MAX(openaire_referrer) AS openaire
-    FROM tudelft_result_downloads_monthly_tmp p
-    JOIN ${stats_db}.result_oids ro ON CONCAT('tud:', p.id) = ro.oid
-    GROUP BY ro.id, month; /*EOS*/
+FROM tudelft_result_downloads_monthly_tmp p
+JOIN ${stats_db}.result_oids ro ON CONCAT('tud:', p.id) = ro.oid
+GROUP BY ro.id, month; /*EOS*/
 
 
 -- Drop stats tables if they exist
@@ -558,7 +533,7 @@ DROP TABLE IF EXISTS ${usagestats_db}.b2share_views_stats_tmp; /*EOS*/
 DROP TABLE IF EXISTS ${usagestats_db}.b2share_downloads_stats_tmp; /*EOS*/
 
 -- Create temp view for B2SHARE views
-CREATE OR REPLACE TEMP VIEW b2share_result_views_monthly_tmp AS
+CREATE OR REPLACE TEMP VIEW b2share_result_views_monthly_tmp STORED AS PARQUET AS
 SELECT
     entity_id,
     reflect('java.net.URLDecoder', 'decode', entity_id) AS id,
@@ -573,7 +548,7 @@ WHERE action = 'action'
 GROUP BY entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')), source; /*EOS*/
 
 -- Create stats table for B2SHARE views
-CREATE TABLE ${usagestats_db}.b2share_views_stats_tmp AS
+CREATE TABLE ${usagestats_db}.b2share_views_stats_tmp STORED AS PARQUET AS
 SELECT
     'B2SHARE' AS source,
     're3data_____::ad3609c351bd520edf6f10f5e0d9b877' AS repository_id,
@@ -581,9 +556,9 @@ SELECT
     month AS date,
     MAX(views) AS count,
     MAX(openaire_referrer) AS openaire
-    FROM b2share_result_views_monthly_tmp p
-    JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
-    GROUP BY ro.id, month; /*EOS*/
+FROM b2share_result_views_monthly_tmp p
+JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
+GROUP BY ro.id, month; /*EOS*/
 
 -- Create temp view for B2SHARE downloads
 CREATE OR REPLACE TEMP VIEW b2share_result_downloads_monthly_tmp AS
@@ -601,7 +576,7 @@ WHERE action = 'download'
 GROUP BY entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')), source; /*EOS*/
 
 -- Create stats table for B2SHARE downloads
-CREATE TABLE ${usagestats_db}.b2share_downloads_stats_tmp AS
+CREATE TABLE ${usagestats_db}.b2share_downloads_stats_tmp STORED AS PARQUET AS
 SELECT
     'B2SHARE' AS source,
     're3data_____::ad3609c351bd520edf6f10f5e0d9b877' AS repository_id,
@@ -609,6 +584,6 @@ SELECT
     month AS date,
     MAX(views) AS count,
     MAX(openaire_referrer) AS openaire
-    FROM b2share_result_downloads_monthly_tmp p
-    JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
-    GROUP BY ro.id, month; /*EOS*/
+FROM b2share_result_downloads_monthly_tmp p
+JOIN ${stats_db}.result_oids ro ON p.id = ro.oid
+GROUP BY ro.id, month; /*EOS*/
