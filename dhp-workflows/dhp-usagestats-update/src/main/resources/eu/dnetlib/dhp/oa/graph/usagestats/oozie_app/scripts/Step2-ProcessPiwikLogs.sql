@@ -500,7 +500,7 @@ JOIN ${stats_db}.result_oids ro ON CONCAT('tud:', p.id) = ro.oid
 GROUP BY ro.id, month; /*EOS*/
 
 -- Create TUDELFT downloads monthly temp view
-CREATE OR REPLACE TEMP VIEW tudelft_result_downloads_monthly_tmp STORED AS PARQUET AS
+CREATE OR REPLACE TEMP VIEW tudelft_result_downloads_monthly_tmp PARQUET AS
 SELECT
     entity_id,
     reflect('java.net.URLDecoder', 'decode', entity_id) AS id,
@@ -533,7 +533,7 @@ DROP TABLE IF EXISTS ${usagestats_db}.b2share_views_stats_tmp; /*EOS*/
 DROP TABLE IF EXISTS ${usagestats_db}.b2share_downloads_stats_tmp; /*EOS*/
 
 -- Create temp view for B2SHARE views
-CREATE OR REPLACE TEMP VIEW b2share_result_views_monthly_tmp STORED AS PARQUET AS
+CREATE OR REPLACE TEMP VIEW b2share_result_views_monthly_tmp AS
 SELECT
     entity_id,
     reflect('java.net.URLDecoder', 'decode', entity_id) AS id,
