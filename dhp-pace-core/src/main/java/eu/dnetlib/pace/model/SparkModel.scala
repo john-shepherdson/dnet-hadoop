@@ -105,7 +105,7 @@ case class SparkModel(conf: DedupConfig) {
                 MapDocumentUtil.truncateValue(
                   jpaths
                     .map(jpath => MapDocumentUtil.getJPathString(jpath, documentContext))
-                    .filter(!_.isBlank)
+                    .filter(s => StringUtils.isNotBlank(s))
                     .mkString(" "),
                   fdef.getLength
                 )
