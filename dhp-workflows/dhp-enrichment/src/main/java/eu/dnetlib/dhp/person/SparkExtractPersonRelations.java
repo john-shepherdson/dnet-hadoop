@@ -30,7 +30,7 @@ import scala.Tuple2;
 
 public class SparkExtractPersonRelations {
 
-	private static final Logger log = LoggerFactory.getLogger(SparkCountryPropagationJob.class);
+	private static final Logger log = LoggerFactory.getLogger(SparkExtractPersonRelations.class);
 	private static final String PERSON_PREFIX = ModelSupport.getIdPrefix(Person.class) + "|orcid_______";
 
 	public static final DataInfo DATAINFO = OafMapperUtils
@@ -51,7 +51,7 @@ public class SparkExtractPersonRelations {
 
 		String jsonConfiguration = IOUtils
 			.toString(
-				SparkCountryPropagationJob.class
+					SparkExtractPersonRelations.class
 					.getResourceAsStream(
 						"/eu/dnetlib/dhp/wf/subworkflows/person/input_personpropagation_parameters.json"));
 
