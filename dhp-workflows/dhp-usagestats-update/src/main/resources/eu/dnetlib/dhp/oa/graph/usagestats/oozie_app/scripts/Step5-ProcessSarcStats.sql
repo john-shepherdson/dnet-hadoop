@@ -1,4 +1,4 @@
-SET spark.sql.parquet.writer.version = v1;
+SET spark.sql.parquet.writer.version = v1; /*EOS*/
 
 DROP TABLE IF EXISTS ${usagestats_db}.sarc_downloads_stats_tmp; /*EOS*/
 

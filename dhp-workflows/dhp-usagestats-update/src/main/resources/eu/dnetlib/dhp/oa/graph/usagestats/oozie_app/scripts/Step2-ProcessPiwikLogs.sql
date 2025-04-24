@@ -1,4 +1,4 @@
-SET spark.sql.parquet.writer.version = v1;
+SET spark.sql.parquet.writer.version = v1; /*EOS*/
 
 -- Drop existing piwiklogdistinct table if it exists
 DROP TABLE IF EXISTS ${usagestats_db}.piwiklogdistinct; /*EOS*/

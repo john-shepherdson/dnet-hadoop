@@ -1,4 +1,4 @@
-SET spark.sql.parquet.writer.version = v1;
+SET spark.sql.parquet.writer.version = v1; /*EOS*/
 
 -- Drop and create views_stats table
 DROP TABLE IF EXISTS ${usagestats_db}.views_stats; /*EOS*/
