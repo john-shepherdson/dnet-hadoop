@@ -3,8 +3,9 @@ package eu.dnetlib.dhp.actionmanager.opencitations.model;
 
 import java.io.Serializable;
 
-import com.opencsv.bean.CsvBindByPosition;
 import org.apache.commons.lang3.StringUtils;
+
+import com.opencsv.bean.CsvBindByPosition;
 
 public class COCI implements Serializable {
 	private String oci;
@@ -29,7 +30,7 @@ public class COCI implements Serializable {
 
 	public void setCiting(String citing) {
 		if (citing != null && citing.startsWith("omid:"))
-			citing = StringUtils.substringAfter(citing,"/" );
+			citing = StringUtils.substringAfter(citing, "/");
 		this.citing = citing;
 	}
 
@@ -39,7 +40,7 @@ public class COCI implements Serializable {
 
 	public void setCited(String cited) {
 		if (cited != null && cited.startsWith("omid:"))
-			cited = StringUtils.substringAfter(cited,"/" );
+			cited = StringUtils.substringAfter(cited, "/");
 		this.cited = cited;
 	}
 
