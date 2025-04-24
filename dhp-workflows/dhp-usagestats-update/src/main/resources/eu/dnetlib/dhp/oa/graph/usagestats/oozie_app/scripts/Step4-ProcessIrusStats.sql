@@ -1,3 +1,5 @@
+SET spark.sql.parquet.writer.version = v1;
+
 -- IRUS Downloads Stats
 DROP TABLE IF EXISTS ${usagestats_db}.irus_downloads_stats_tmp; /*EOS*/
 

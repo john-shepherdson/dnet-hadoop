@@ -1,3 +1,5 @@
+SET spark.sql.parquet.writer.version = v1;
+
 -- Drop and create views_stats table
 DROP TABLE IF EXISTS ${usagestats_db}.views_stats; /*EOS*/
 
@@ -145,3 +147,37 @@ FROM ${usagestats_raw_db}.sushilog_cop_r5 s
     JOIN ${stats_db}.datasource_oids d ON s.repository = d.oid
     JOIN ${stats_db}.result_oids ro ON s.rid = ro.oid
 WHERE s.source = 'IRUS-UK'; /*EOS*/
+
+
+DROP TABLE IF EXISTS ${usagestats_db}.b2share_downloads_stats_tmp; /*EOS*/
+DROP TABLE IF EXISTS ${usagestats_db}.b2share_views_stats_tmp; /*EOS*/
+DROP TABLE IF EXISTS ${usagestats_db}.episciences_downloads_stats; /*EOS*/
+DROP TABLE IF EXISTS ${usagestats_db}.episciences_views_stats; /*EOS*/
+DROP TABLE IF EXISTS ${usagestats_db}.episcienceslogdistinct; /*EOS*/
+DROP TABLE IF EXISTS ${usagestats_db}.irus_downloads_stats_tmp; /*EOS*/
+DROP TABLE IF EXISTS ${usagestats_db}.irus_r5_stats_tmp; /*EOS*/
+DROP TABLE IF EXISTS ${usagestats_db}.la_downloads_stats_tmp; /*EOS*/
+DROP TABLE IF EXISTS ${usagestats_db}.la_views_stats_tmp; /*EOS*/
+DROP TABLE IF EXISTS ${usagestats_db}.lareferencialogdistinct; /*EOS*/
+DROP TABLE IF EXISTS ${usagestats_db}.lr_tbl_all_r5_metrics; /*EOS*/
+DROP TABLE IF EXISTS ${usagestats_db}.lr_tbl_total_item_investigations; /*EOS*/
+DROP TABLE IF EXISTS ${usagestats_db}.lr_tbl_total_item_requests; /*EOS*/
+DROP TABLE IF EXISTS ${usagestats_db}.lr_tbl_unique_item_investigations; /*EOS*/
+DROP TABLE IF EXISTS ${usagestats_db}.lr_tbl_unique_item_requests; /*EOS*/
+DROP TABLE IF EXISTS ${usagestats_db}.openaire_downloads_stats_tmp; /*EOS*/
+DROP TABLE IF EXISTS ${usagestats_db}.openaire_pageviews_stats_tmp; /*EOS*/
+DROP TABLE IF EXISTS ${usagestats_db}.openaire_views_stats_tmp; /*EOS*/
+DROP TABLE IF EXISTS ${usagestats_db}.pangaea_downloads_stats_tmp; /*EOS*/
+DROP TABLE IF EXISTS ${usagestats_db}.pangaea_views_stats_tmp; /*EOS*/
+DROP TABLE IF EXISTS ${usagestats_db}.pedocs_downloads_stats_tmp; /*EOS*/
+DROP TABLE IF EXISTS ${usagestats_db}.pedocs_views_stats_tmp; /*EOS*/
+DROP TABLE IF EXISTS ${usagestats_db}.piwiklogdistinct; /*EOS*/
+DROP VIEW IF EXISTS ${usagestats_db}.project_downloads; /*EOS*/
+DROP VIEW IF EXISTS ${usagestats_db}.project_views; /*EOS*/
+DROP TABLE IF EXISTS ${usagestats_db}.sarc_downloads_stats_tmp; /*EOS*/
+DROP TABLE IF EXISTS ${usagestats_db}.tbl_total_item_investigations; /*EOS*/
+DROP TABLE IF EXISTS ${usagestats_db}.tbl_total_item_requests; /*EOS*/
+DROP TABLE IF EXISTS ${usagestats_db}.tbl_unique_item_investigations; /*EOS*/
+DROP TABLE IF EXISTS ${usagestats_db}.tbl_unique_item_requests; /*EOS*/
+DROP TABLE IF EXISTS ${usagestats_db}.tudelft_downloads_stats_tmp; /*EOS*/
+DROP TABLE IF EXISTS ${usagestats_db}.tudelft_views_stats_tmp; /*EOS*/

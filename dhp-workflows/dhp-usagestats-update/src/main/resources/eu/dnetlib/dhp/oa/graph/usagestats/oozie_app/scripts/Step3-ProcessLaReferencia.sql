@@ -1,3 +1,5 @@
+SET spark.sql.parquet.writer.version = v1;
+
 DROP TABLE IF EXISTS ${usagestats_db}.lareferencialogdistinct; /*EOS*/
 
 -- Create and populate lareferencialogdistinct in one step

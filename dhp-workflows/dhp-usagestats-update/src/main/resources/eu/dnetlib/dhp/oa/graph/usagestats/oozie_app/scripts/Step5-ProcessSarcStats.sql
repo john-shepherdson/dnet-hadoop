@@ -1,3 +1,5 @@
+SET spark.sql.parquet.writer.version = v1;
+
 DROP TABLE IF EXISTS ${usagestats_db}.sarc_downloads_stats_tmp; /*EOS*/
 
 CREATE TABLE ${usagestats_db}.sarc_downloads_stats_tmp STORED AS PARQUET AS
