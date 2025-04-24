@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.collection.plugin.dblp;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -80,7 +81,8 @@ class DBLPCollectorPluginTest {
 
 			try {
 				final SAXReader reader = new SAXReader();
-				// reader.setEntityResolver((publicId, systemId) -> new InputSource(getClass().getResourceAsStream("dblp.dtd")));
+				// reader.setEntityResolver((publicId, systemId) -> new
+				// InputSource(getClass().getResourceAsStream("dblp.dtd")));
 
 				final Document doc = reader.read(new StringReader(s));
 

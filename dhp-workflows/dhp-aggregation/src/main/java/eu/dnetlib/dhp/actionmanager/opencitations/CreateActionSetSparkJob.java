@@ -141,6 +141,7 @@ public class CreateActionSetSparkJob implements Serializable {
 				break;
 			case "isbn":
 			case "issn":
+			case "openalex":
 				return relationList;
 
 			default:
@@ -170,6 +171,7 @@ public class CreateActionSetSparkJob implements Serializable {
 				break;
 			case "isbn":
 			case "issn":
+			case "openalex":
 				return relationList;
 			default:
 				throw new IllegalStateException("Invalid prefix: " + new ObjectMapper().writeValueAsString(value));

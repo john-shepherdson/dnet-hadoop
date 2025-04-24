@@ -16,8 +16,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Optional;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.IntWritable;
@@ -39,6 +37,9 @@ import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.mdstore.MDStoreVersion;
 import eu.dnetlib.dhp.schema.mdstore.MetadataRecord;
@@ -56,7 +57,7 @@ public class GenerateNativeStoreSparkJob {
 	private static final Logger log = LoggerFactory.getLogger(GenerateNativeStoreSparkJob.class);
 
 	private static final ObjectMapper MAPPER = new ObjectMapper()
-			.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
 	public static void main(final String[] args) throws Exception {
 
