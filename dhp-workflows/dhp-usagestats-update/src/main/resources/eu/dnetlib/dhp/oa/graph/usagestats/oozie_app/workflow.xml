@@ -274,6 +274,20 @@
             <arg>--stats_db</arg><arg>${stats_db}</arg>
             <arg>--portalMatomoID</arg><arg>${portalMatomoID}</arg>
         </spark>
+        <ok to="Step8-CopyDataToImpalaCluster"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="Step8-CopyDataToImpalaCluster">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>copyDataToImpalaCluster.sh</exec>
+            <argument>${usagestats_db}</argument>
+            <argument>${permanent_usagestats_db}</argument>
+            <argument>${hadoop_user_name}</argument>
+            <file>copyDataToImpalaCluster.sh</file>
+        </shell>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
