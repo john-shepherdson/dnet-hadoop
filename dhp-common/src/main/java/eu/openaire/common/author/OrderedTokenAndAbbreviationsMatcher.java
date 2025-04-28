@@ -40,10 +40,10 @@ public class OrderedTokenAndAbbreviationsMatcher {
 	 */
 	static private List<String> tokenize(String s) {
 		return Stream
-			.of(SPLIT_REGEX.split(Normalizer.normalize(s, Normalizer.Form.NFC).toLowerCase(Locale.ROOT)))
-			.filter(x -> !x.isEmpty())
-			.sorted()
-			.collect(Collectors.toList());
+				.of(SPLIT_REGEX.split(Normalizer.normalize(s, Normalizer.Form.NFC).toLowerCase(Locale.ROOT)))
+				.filter(x -> !x.isEmpty())
+				.sorted()
+				.collect(Collectors.toList());
 	}
 
 	/**
@@ -72,12 +72,15 @@ public class OrderedTokenAndAbbreviationsMatcher {
 		List<String> a1_tokens = tokenize(a1);
 		List<String> a2_tokens = tokenize(a2);
 
+		int a1_num_tokens = a1_tokens.size();
+		int a2_num_tokens = a2_tokens.size();
+
 		// both authors must be composed of at least 2 elements to be comparable with this method
-		if (a1_tokens.size() < 2 || a2_tokens.size() < 2)
+		if (a1_num_tokens < 2 || a2_num_tokens < 2)
 			return Optional.empty();
 
 		// both authors must not differ too much in number of elements to be comparable with this method
-		if (Math.abs(a1_tokens.size() - a2_tokens.size()) > NUM_TOKEN_MAX_DIFF)
+		if (Math.abs(a1_num_tokens - a2_num_tokens) > NUM_TOKEN_MAX_DIFF)
 			return Optional.empty(); // use alternative comparison algo
 
 		int a1_tokens_idx = 0;
@@ -87,61 +90,74 @@ public class OrderedTokenAndAbbreviationsMatcher {
 		int longMatches = 0;
 		int crossMatches = 0;
 
-		for (boolean onlyFullTokens : Arrays.asList(true, false)) {
-			while (a1_tokens_idx < a1_tokens.size() && a2_tokens_idx < a2_tokens.size()) {
-				String a1_curr_token = a1_tokens.get(a1_tokens_idx);
-				char a1_curr_token_initial = a1_curr_token.charAt(0);
+		// full tokens
+		while (a1_tokens_idx < a1_tokens.size() && a2_tokens_idx < a2_tokens.size()) {
+			String a1_curr_token = a1_tokens.get(a1_tokens_idx);
+			if (a1_curr_token.length() < 2) {
+				a1_tokens_idx++;
+				continue;
+			}
+			String a2_curr_token = a2_tokens.get(a2_tokens_idx);
+			if (a2_curr_token.length() < 2) {
+				a2_tokens_idx++;
+				continue;
+			}
 
-				String a2_curr_token = a2_tokens.get(a2_tokens_idx);
-				char a2_curr_token_initial = a2_curr_token.charAt(0);
+			int diff = a1_curr_token.compareTo(a2_curr_token);
+			if (diff > 0) {
+				a2_tokens_idx++;
+			} else if (diff < 0) {
+				a1_tokens_idx++;
+			} else {
+				longMatches++;
+				a1_tokens.remove(a1_tokens_idx);
+				a2_tokens.remove(a2_tokens_idx);
+			}
+		}
 
-				if (a1_curr_token_initial < a2_curr_token_initial) {
-					// move ahead on a1 tokens
-					a1_tokens_idx += 1;
-				} else if (a1_curr_token_initial > a2_curr_token_initial) {
-					// move ahead on a2 tokens
-					a2_tokens_idx += 1;
+		a1_tokens_idx = 0;
+		a2_tokens_idx = 0;
+
+		while (a1_tokens_idx < a1_tokens.size() && a2_tokens_idx < a2_tokens.size()) {
+			String a1_curr_token = a1_tokens.get(a1_tokens_idx);
+			char a1_curr_token_initial = a1_curr_token.charAt(0);
+
+			String a2_curr_token = a2_tokens.get(a2_tokens_idx);
+			char a2_curr_token_initial = a2_curr_token.charAt(0);
+
+			if (a1_curr_token_initial < a2_curr_token_initial) {
+				// move ahead on a1 tokens
+				a1_tokens_idx += 1;
+			} else if (a1_curr_token_initial > a2_curr_token_initial) {
+				// move ahead on a2 tokens
+				a2_tokens_idx += 1;
+			} else if (a1_curr_token.equals(a2_curr_token)) {
+				if (a1_curr_token.length() > 1) {
+					longMatches++;
 				} else {
-					if (onlyFullTokens) {
-						if (a1_curr_token.length() > 1 && a1_curr_token.equals(a2_curr_token)) {
-							longMatches++;
-							a1_tokens.remove(a1_tokens_idx);
-							a2_tokens.remove(a2_tokens_idx);
-						} else {
-							a1_tokens_idx++;
-							a2_tokens_idx++;
-						}
-					} else {
-						if (a1_curr_token.equals(a2_curr_token)) {
-							if (a1_curr_token.length() > 1) {
-								longMatches++;
-							} else {
-								shortMatches++;
-							}
-							a1_tokens_idx++;
-							a2_tokens_idx++;
-						} else if (a1_curr_token.length() == 1 || a2_curr_token.length() == 1) {
-							// If one token is an initial, count it as a cross match
-							crossMatches++;
-							a1_tokens_idx++;
-							a2_tokens_idx++;
-						} else {
-							// Move forward based on lexicographic order
-							if (a1_curr_token.compareTo(a2_curr_token) < 0) {
-								a1_tokens_idx++;
-							} else {
-								a2_tokens_idx++;
-							}
-						}
-					}
+					shortMatches++;
+				}
+				a1_tokens_idx++;
+				a2_tokens_idx++;
+			} else if (a1_curr_token.length() == 1 || a2_curr_token.length() == 1) {
+				// If one token is an initial, count it as a cross match
+				crossMatches++;
+				a1_tokens_idx++;
+				a2_tokens_idx++;
+			} else {
+				// Move forward based on lexicographic order
+				if (a1_curr_token.compareTo(a2_curr_token) < 0) {
+					a1_tokens_idx++;
+				} else {
+					a2_tokens_idx++;
 				}
 			}
 		}
 
 		if (longMatches > 0
-			&& (shortMatches + longMatches + crossMatches) == Math.min(a1_tokens.size(), a2_tokens.size())) {
+				&& (shortMatches + longMatches + crossMatches) == Math.min(a1_num_tokens, a2_num_tokens)) {
 			double matchScore = (longMatches * 1.0 + shortMatches * 0.75 + crossMatches * 0.5)
-				/ Math.max(a1_tokens.size(), a2_tokens.size());
+					/ Math.max(a1_num_tokens, a2_num_tokens);
 			return Optional.of(matchScore * 0.95);
 		}
 

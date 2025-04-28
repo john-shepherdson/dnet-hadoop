@@ -119,9 +119,10 @@ public class AuthorMatchers {
 			List<UA> unmatched_authors,
 			List<CA> candidate_authors,
 			AuthorMatcherStep<UA, CA> step) {
-		List<AuthorMatch<UA, CA>> result = new ArrayList<>();
+		List<AuthorMatch<UA, CA>> matches = new ArrayList<>();
+
 		if (unmatched_authors.isEmpty()) {
-			return result;
+			return new ArrayList<>();
 		}
 
 		Iterator<CA> oit = candidate_authors.iterator();
@@ -145,25 +146,28 @@ public class AuthorMatchers {
 					(potential_matches.size() > 1
 							&& (step.getExclusionPredicate() == null
 							|| !step.getExclusionPredicate().test(potential_matches)))) {
-				AuthorMatch<UA, CA> m = potential_matches.get(0);
-				Optional<AuthorMatch<UA, CA>> existing = result.stream().filter(
-						x -> x.getMatchedAuthor().equals(x)).findFirst();
-				if (existing.isPresent()) {
-					if (existing.get().getConfidence() < m.getConfidence()) {
-						result.remove(existing.get());
-						result.add(m);
-					}
-				} else {
-					result.add(m);
-				}
-
-				oit.remove();
+				matches.addAll(potential_matches);
 			}
-
 		}
 
-		unmatched_authors.removeAll(result.stream().map(AuthorMatch::getMatchedAuthor).collect(Collectors.toList()));
 
-		return result;
+		Set<UA> resultsByBase = new HashSet<>();
+		Set<CA> resultsByEnrichment = new HashSet<>();
+		List<AuthorMatch<UA, CA>> results = new ArrayList<>();
+		for (AuthorMatch<UA, CA> m : matches.stream().sorted((o1, o2) -> Double.compare(o1.getConfidence(), o2.getConfidence())).collect(Collectors.toList())) {
+
+			if (!resultsByBase.contains(m.getMatchedAuthor())
+					&& !resultsByEnrichment.contains(m.getMatchedCandidate())) {
+				resultsByBase.add(m.getMatchedAuthor());
+				resultsByEnrichment.add(m.getMatchedCandidate());
+				results.add(m);
+			}
+		}
+
+
+		unmatched_authors.removeAll(resultsByBase);
+		candidate_authors.removeAll(resultsByEnrichment);
+
+		return results;
 	}
 }
