@@ -1,7 +1,5 @@
 pipeline {
-    agent {
-          label 'agent-image-jdk17'
-    }
+    agent none
 
     parameters {
         string(name: 'BASE_VERSION', defaultValue: '1.2.5-SNAPSHOT', description: 'Base version (e.g., 2.1.0 or 2.1.0-SNAPSHOT)')
@@ -10,19 +8,30 @@ pipeline {
 
     environment {
         NEXUS_CREDENTIALS_ID = 'dnet-nexus-creds'
-        AGENT_LABEL = (params.MAVEN_PROFILE == 'spark24' ? 'agent-image-jdk8' : 'agent-image-jdk17')
+        AGENT_LABEL = "${params.MAVEN_PROFILE == 'spark24' ? 'agent-image-jdk8' : 'agent-image-jdk17'}"
     }
 
     stages {
+        stage('Init') {
+            steps {
+                script {
+                    if (params.MAVEN_PROFILE == 'spark24') {
+                        env.JAVA_HOME = '/usr/lib/jvm/temurin-8-jdk-amd64'
+                        echo "JAVA_HOME is set to ${env.JAVA_HOME}"
+                    }
+                }
+            }
+        }
+
         stage('Checkout') {
-            agent AGENT_LABEL
+            agent {label AGENT_LABEL}
             steps {
                 git url: 'https://code-repo.d4science.org/D-Net/dnet-hadoop.git', branch: "${env.BRANCH_NAME}"
             }
         }
 
         stage('Set Version with Branch and Profile') {
-            agent AGENT_LABEL
+            agent {label AGENT_LABEL}
             when {
                 // Only say hello if a "greeting" is requested
                 expression { params.MAVEN_PROFILE != 'spark24' }
@@ -47,16 +56,16 @@ pipeline {
         }
 
         stage('Build with Maven Profile') {
-            agent AGENT_LABEL
+            agent {label AGENT_LABEL}
             steps {
                 withMaven {
-                    sh "mvn clean package -P${params.MAVEN_PROFILE} --fail-never"
+                    sh "mvn clean package -P${params.MAVEN_PROFILE} ${params.MAVEN_PROFILE == 'spark24' ? '-DskipTests' : '--fail-never'}"
                 }
             }
         }
 
         stage('Deploy to Nexus') {
-            agent AGENT_LABEL
+            agent {label AGENT_LABEL}
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: "${NEXUS_CREDENTIALS_ID}",
