@@ -142,7 +142,7 @@ public class OrderedTokenAndAbbreviationsMatcher {
 			&& (shortMatches + longMatches + crossMatches) == Math.min(a1_tokens.size(), a2_tokens.size())) {
 			double matchScore = (longMatches * 1.0 + shortMatches * 0.75 + crossMatches * 0.5)
 				/ Math.max(a1_tokens.size(), a2_tokens.size());
-			return Optional.of(matchScore);
+			return Optional.of(matchScore * 0.95);
 		}
 
 		return Optional.empty();
