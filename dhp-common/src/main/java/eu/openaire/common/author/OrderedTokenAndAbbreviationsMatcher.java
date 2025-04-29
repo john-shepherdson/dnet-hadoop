@@ -1,14 +1,13 @@
 
 package eu.openaire.common.author;
 
-import java.text.Normalizer;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Utility class for comparing author names using token-based matching and abbreviation handling.
@@ -24,7 +23,7 @@ public class OrderedTokenAndAbbreviationsMatcher {
 	 * <p>The pattern matches spaces, punctuation symbols, and dashes, ensuring
 	 * that names are split into meaningful components.</p>
 	 */
-	static public Pattern SPLIT_REGEX = Pattern.compile("[\\s\\p{Punct}\\p{Pd}]+");
+	static public final Pattern SPLIT_REGEX = Pattern.compile("[\\s\\p{Punct}\\p{Pd}]+");
 
 	/**
 	 * Maximum allowed difference in the number of tokens between two names for them to be comparable.
@@ -32,15 +31,14 @@ public class OrderedTokenAndAbbreviationsMatcher {
 	static public int NUM_TOKEN_MAX_DIFF = 2;
 
 	/*
-	 * Tokenizes a given name by splitting it using {@link #SPLIT_REGEX}, normalizing it, and sorting the tokens. <p>The
-	 * normalization ensures consistent representation of characters, and sorting helps in comparing tokens
-	 * efficiently.</p>
+	 * Tokenizes a given name by splitting it using {@link #SPLIT_REGEX}, cleaning it, and sorting the tokens. <p>The
+	 * cleaning ensures consistent representation of characters, and sorting helps in comparing tokens efficiently.</p>
 	 * @param s The input string (author name).
 	 * @return A sorted list of lowercase tokens derived from the input string.
 	 */
 	static private List<String> tokenize(String s) {
 		return Stream
-			.of(SPLIT_REGEX.split(Normalizer.normalize(s, Normalizer.Form.NFC).toLowerCase(Locale.ROOT)))
+			.of(SPLIT_REGEX.split(StringUtils.stripAccents(s)))
 			.filter(x -> !x.isEmpty())
 			.sorted()
 			.collect(Collectors.toList());

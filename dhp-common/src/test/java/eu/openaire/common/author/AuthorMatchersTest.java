@@ -78,18 +78,15 @@ public class AuthorMatchersTest {
 	}
 
 	@Test
-	void homonomyTest2() {
-		// Data for DOI https://doi.org/10.57805/revstat.v20i4.382
+	void accentInsensitiveTest() {
+		// Data for DOI 10.48550/arxiv.1210.5363
 		List<TestAuthor> authors = TestAuthor
 			.of(
-				"Otto, Philipp",
-				"Otto, P.");
+				"Michal Pilipczuk");
 
 		List<TestORCIDAuthor> candidates = Arrays
 			.asList(
-				new TestORCIDAuthor("Philipp", "Otto", "", "0000-0001-8630-108X"),
-				new TestORCIDAuthor("Philipp", "Otto", "", "0000-0002-9796-6682"));
-
+				new TestORCIDAuthor("Michał", "Pilipczuk", "", "0000-0001-7891-1988"));
 		List<AuthorMatch<TestAuthor, TestORCIDAuthor>> result = getMatches(authors, candidates);
 
 		for (AuthorMatch<TestAuthor, TestORCIDAuthor> match : result) {
