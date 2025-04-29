@@ -57,10 +57,9 @@ object ORCIDAuthorEnricher extends Serializable {
     val hasAffiliations = new Predicate[util.List[AuthorMatch[Author, OrcidAuthor]]] {
       override def test(t: util.List[AuthorMatch[Author, OrcidAuthor]]): Boolean = {
         val baseAffiliations = t.get(0).getBaseAuthor.getRawAffiliationString
-        t.asScala.exists(
-          m =>
-            m.getBaseAuthor.getRawAffiliationString.size() != baseAffiliations.size()
-            || !baseAffiliations.containsAll(m.getBaseAuthor.getRawAffiliationString)
+        t.asScala.exists(m =>
+          m.getBaseAuthor.getRawAffiliationString.size() != baseAffiliations.size()
+          || !baseAffiliations.containsAll(m.getBaseAuthor.getRawAffiliationString)
         )
 
       }
@@ -125,8 +124,10 @@ object ORCIDAuthorEnricher extends Serializable {
           .name("otherNames")
           .matchingFunc(new BiFunction[Author, OrcidAuthor, Optional[AuthorMatch[Author, OrcidAuthor]]] {
             override def apply(author: Author, orcid: OrcidAuthor): Optional[AuthorMatch[Author, OrcidAuthor]] = {
-              if (orcid.otherNames != null && orcid.otherNames.asScala
-                    .exists(otherName => AuthorMatchers.matchEqualsIgnoreCase(author.getFullname, otherName)))
+              if (
+                orcid.otherNames != null && orcid.otherNames.asScala
+                  .exists(otherName => AuthorMatchers.matchEqualsIgnoreCase(author.getFullname, otherName))
+              )
                 Optional.of(AuthorMatch.of(author, orcid, 1))
               else
                 Optional.empty()

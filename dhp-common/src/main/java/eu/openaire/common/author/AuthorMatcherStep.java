@@ -27,7 +27,7 @@ public class AuthorMatcherStep<BA, EA> {
 	private final String name;
 
 	private AuthorMatcherStep(BiFunction<BA, EA, Optional<AuthorMatch<BA, EA>>> matchingFunc,
-							  Predicate<List<AuthorMatch<BA, EA>>> exclusionPredicate, String name) {
+		Predicate<List<AuthorMatch<BA, EA>>> exclusionPredicate, String name) {
 		this.matchingFunc = matchingFunc;
 		this.exclusionPredicate = exclusionPredicate;
 		this.name = name;

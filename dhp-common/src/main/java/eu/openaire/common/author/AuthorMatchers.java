@@ -51,9 +51,9 @@ public class AuthorMatchers {
 	 * @return A list containing matched base-enriching authors pairs.
 	 */
 	static public List<String> removeMatches(
-			List<String> base_authors,
-			List<String> enriching_authors,
-			BiFunction<String, String, Boolean> matchingFunc) {
+		List<String> base_authors,
+		List<String> enriching_authors,
+		BiFunction<String, String, Boolean> matchingFunc) {
 		List<String> matched = new ArrayList<>();
 
 		if (base_authors != null && !base_authors.isEmpty()) {
@@ -97,28 +97,28 @@ public class AuthorMatchers {
 	 * @return A list of {@link AuthorMatch} objects representing the matches found.
 	 */
 	static public <BA, EA> List<AuthorMatch<BA, EA>> findMatches(
-			List<BA> base_authors,
-			List<EA> enrichment_authors,
-			List<AuthorMatcherStep<BA, EA>> steps) {
+		List<BA> base_authors,
+		List<EA> enrichment_authors,
+		List<AuthorMatcherStep<BA, EA>> steps) {
 		List<AuthorMatch<BA, EA>> result = new ArrayList<>();
 		List<BA> unmatched_base_authors = new ArrayList<>(base_authors);
 		List<EA> unmatched_enrichment_authors = new ArrayList<>(enrichment_authors);
 
 		for (AuthorMatcherStep<BA, EA> s : steps) {
 			result
-					.addAll(
-							evaluateStep(
-									unmatched_base_authors,
-									unmatched_enrichment_authors,
-									s));
+				.addAll(
+					evaluateStep(
+						unmatched_base_authors,
+						unmatched_enrichment_authors,
+						s));
 		}
 		return result;
 	}
 
 	static private <BA, EA> List<AuthorMatch<BA, EA>> evaluateStep(
-			List<BA> unmatched_base_authors,
-			List<EA> unmatched_enriching_authors,
-			AuthorMatcherStep<BA, EA> step) {
+		List<BA> unmatched_base_authors,
+		List<EA> unmatched_enriching_authors,
+		AuthorMatcherStep<BA, EA> step) {
 		List<AuthorMatch<BA, EA>> matches = new ArrayList<>();
 
 		if (unmatched_base_authors.isEmpty()) {
@@ -127,31 +127,31 @@ public class AuthorMatchers {
 
 		for (EA enriching_author : unmatched_enriching_authors) {
 			List<AuthorMatch<BA, EA>> potential_matches = unmatched_base_authors
-					.stream()
-					.map(x -> step.getMatchingFunc().apply(x, enriching_author))
-					.filter(Optional::isPresent)
-					.map(Optional::get)
-					.sorted(Comparator.comparingDouble(AuthorMatch::getConfidence))
-					.collect(Collectors.toList());
+				.stream()
+				.map(x -> step.getMatchingFunc().apply(x, enriching_author))
+				.filter(Optional::isPresent)
+				.map(Optional::get)
+				.sorted(Comparator.comparingDouble(AuthorMatch::getConfidence))
+				.collect(Collectors.toList());
 
 			if (potential_matches.size() == 1 ||
-					(potential_matches.size() > 1
-							&& (step.getExclusionPredicate() == null
-							|| !step.getExclusionPredicate().test(potential_matches)))) {
+				(potential_matches.size() > 1
+					&& (step.getExclusionPredicate() == null
+						|| !step.getExclusionPredicate().test(potential_matches)))) {
 				matches.addAll(potential_matches);
 			}
 		}
 
-
 		Set<BA> matched_base_authors = new HashSet<>();
 		Set<EA> matched_enrichment_authors = new HashSet<>();
 		List<AuthorMatch<BA, EA>> results = new ArrayList<>();
-		for (AuthorMatch<BA, EA> m : matches.stream()
-				.sorted(Comparator.comparingDouble(AuthorMatch::getConfidence))
-				.collect(Collectors.toList())) {
+		for (AuthorMatch<BA, EA> m : matches
+			.stream()
+			.sorted(Comparator.comparingDouble(AuthorMatch::getConfidence))
+			.collect(Collectors.toList())) {
 
 			if (!matched_base_authors.contains(m.getBaseAuthor())
-					&& !matched_enrichment_authors.contains(m.getEnrichingAuthor())) {
+				&& !matched_enrichment_authors.contains(m.getEnrichingAuthor())) {
 				matched_base_authors.add(m.getBaseAuthor());
 				matched_enrichment_authors.add(m.getEnrichingAuthor());
 				results.add(m);

@@ -112,10 +112,10 @@ public class AuthorMatch<BA, EA> {
 	@Override
 	public String toString() {
 		return new ToStringBuilder(this, NO_CLASS_NAME_STYLE)
-				.append("baseAuthor", baseAuthor)
-				.append("enrichingAuthor", enrichingAuthor)
-				.append("confidence", confidence)
-				.append("stepName", stepName)
-				.toString();
+			.append("baseAuthor", baseAuthor)
+			.append("enrichingAuthor", enrichingAuthor)
+			.append("confidence", confidence)
+			.append("stepName", stepName)
+			.toString();
 	}
 }

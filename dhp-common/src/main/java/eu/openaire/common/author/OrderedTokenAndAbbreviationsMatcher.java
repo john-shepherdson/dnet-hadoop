@@ -40,10 +40,10 @@ public class OrderedTokenAndAbbreviationsMatcher {
 	 */
 	static private List<String> tokenize(String s) {
 		return Stream
-				.of(SPLIT_REGEX.split(Normalizer.normalize(s, Normalizer.Form.NFC).toLowerCase(Locale.ROOT)))
-				.filter(x -> !x.isEmpty())
-				.sorted()
-				.collect(Collectors.toList());
+			.of(SPLIT_REGEX.split(Normalizer.normalize(s, Normalizer.Form.NFC).toLowerCase(Locale.ROOT)))
+			.filter(x -> !x.isEmpty())
+			.sorted()
+			.collect(Collectors.toList());
 	}
 
 	/**
@@ -63,7 +63,7 @@ public class OrderedTokenAndAbbreviationsMatcher {
 	 * @param a2 The second author name.
 	 * @return An {@code Optional<Double>} with a confidence score (1.0 if a match is found), or empty if no match.
 	 */
-	//TODO: cercare prima i fulltokens e poi gli altri
+	// TODO: cercare prima i fulltokens e poi gli altri
 	public static Optional<Double> compare(String a1, String a2) {
 		if (a1 == null || a2 == null) {
 			return Optional.empty();
@@ -155,9 +155,9 @@ public class OrderedTokenAndAbbreviationsMatcher {
 		}
 
 		if (longMatches > 0
-				&& (shortMatches + longMatches + crossMatches) == Math.min(a1_num_tokens, a2_num_tokens)) {
+			&& (shortMatches + longMatches + crossMatches) == Math.min(a1_num_tokens, a2_num_tokens)) {
 			double matchScore = (longMatches * 1.0 + shortMatches * 0.75 + crossMatches * 0.5)
-					/ Math.max(a1_num_tokens, a2_num_tokens);
+				/ Math.max(a1_num_tokens, a2_num_tokens);
 			return Optional.of(matchScore * 0.95);
 		}
 
