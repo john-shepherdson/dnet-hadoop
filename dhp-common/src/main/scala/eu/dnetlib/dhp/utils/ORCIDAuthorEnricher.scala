@@ -56,7 +56,13 @@ object ORCIDAuthorEnricher extends Serializable {
     // At the end unmatched_authors will contain authors not matched with any of the matching algos
     val hasAffiliations = new Predicate[util.List[AuthorMatch[Author, OrcidAuthor]]] {
       override def test(t: util.List[AuthorMatch[Author, OrcidAuthor]]): Boolean = {
-        t.asScala.exists(m => !m.getMatchedAuthor.getRawAffiliationString.isEmpty)
+        val baseAffiliations = t.get(0).getBaseAuthor.getRawAffiliationString
+        t.asScala.exists(
+          m =>
+            m.getBaseAuthor.getRawAffiliationString.size() != baseAffiliations.size()
+            || !baseAffiliations.containsAll(m.getBaseAuthor.getRawAffiliationString)
+        )
+
       }
     }
 
@@ -119,10 +125,8 @@ object ORCIDAuthorEnricher extends Serializable {
           .name("otherNames")
           .matchingFunc(new BiFunction[Author, OrcidAuthor, Optional[AuthorMatch[Author, OrcidAuthor]]] {
             override def apply(author: Author, orcid: OrcidAuthor): Optional[AuthorMatch[Author, OrcidAuthor]] = {
-              if (
-                orcid.otherNames != null && orcid.otherNames.asScala
-                  .exists(otherName => AuthorMatchers.matchEqualsIgnoreCase(author.getFullname, otherName))
-              )
+              if (orcid.otherNames != null && orcid.otherNames.asScala
+                    .exists(otherName => AuthorMatchers.matchEqualsIgnoreCase(author.getFullname, otherName)))
                 Optional.of(AuthorMatch.of(author, orcid, 1))
               else
                 Optional.empty()
@@ -138,15 +142,15 @@ object ORCIDAuthorEnricher extends Serializable {
 
     // enrichment
     result.asScala.foreach(m => {
-      unmatched_authors.remove(m.getMatchedAuthor)
-      unmatched_orcid.remove(m.getMatchedCandidate)
+      unmatched_authors.remove(m.getBaseAuthor)
+      unmatched_orcid.remove(m.getEnrichingAuthor)
 
       // Propagate ORCID ID from ORCID record to graph author
-      if (m.getMatchedAuthor.getPid == null) {
-        m.getMatchedAuthor.setPid(new util.ArrayList[StructuredProperty]())
+      if (m.getBaseAuthor.getPid == null) {
+        m.getBaseAuthor.setPid(new util.ArrayList[StructuredProperty]())
       }
 
-      val orcidPID = OafUtils.createSP(m.getMatchedCandidate.orcid, classid, classid)
+      val orcidPID = OafUtils.createSP(m.getEnrichingAuthor.orcid, classid, classid)
       orcidPID.setDataInfo(OafUtils.generateDataInfo())
       if (provenance.equalsIgnoreCase(PROPAGATION_DATA_INFO_TYPE)) {
         orcidPID.getDataInfo.setInferenceprovenance(PROPAGATION_DATA_INFO_TYPE);
@@ -162,7 +166,7 @@ object ORCIDAuthorEnricher extends Serializable {
           OafUtils.createQualifier(provenance, provenance)
         )
 
-      m.getMatchedAuthor.getPid.add(orcidPID)
+      m.getBaseAuthor.getPid.add(orcidPID)
     })
 
     ORCIDAuthorEnricherResult(
