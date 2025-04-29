@@ -12,22 +12,22 @@ import java.util.function.Predicate;
 
 /**
  * Represents a step in the author matching process, which applies a specific matching logic
- * between an unmatched author (UA) and a candidate author (CA).
+ * between a base author (BA) and an enriching author (EA).
  *
  * <p>This class encapsulates a matching function, an exclusion predicate, and a name for the
  * matching step. It allows defining different strategies for comparing authors, such as full name
  * matching and abbreviation-based matching.</p>
  *
- * @param <UA> The type representing the unmatched author.
- * @param <CA> The type representing the candidate author.
+ * @param <BA> The type containing the base author data.
+ * @param <EA> The type containing the enriching author data.
  */
-public class AuthorMatcherStep<UA, CA> {
-	private final BiFunction<UA, CA, Optional<AuthorMatch<UA, CA>>> matchingFunc;
-	private final Predicate<List<AuthorMatch<UA, CA>>> exclusionPredicate;
+public class AuthorMatcherStep<BA, EA> {
+	private final BiFunction<BA, EA, Optional<AuthorMatch<BA, EA>>> matchingFunc;
+	private final Predicate<List<AuthorMatch<BA, EA>>> exclusionPredicate;
 	private final String name;
 
-	private AuthorMatcherStep(BiFunction<UA, CA, Optional<AuthorMatch<UA, CA>>> matchingFunc,
-		Predicate<List<AuthorMatch<UA, CA>>> exclusionPredicate, String name) {
+	private AuthorMatcherStep(BiFunction<BA, EA, Optional<AuthorMatch<BA, EA>>> matchingFunc,
+							  Predicate<List<AuthorMatch<BA, EA>>> exclusionPredicate, String name) {
 		this.matchingFunc = matchingFunc;
 		this.exclusionPredicate = exclusionPredicate;
 		this.name = name;
@@ -36,21 +36,21 @@ public class AuthorMatcherStep<UA, CA> {
 	/**
 	 * Creates a builder for a matching step that compares strings ignoring case.
 	 *
-	 * @param ex1  Function to extract the string from an unmatched author.
-	 * @param ex2  Function to extract the string from a candidate author.
-	 * @param <UA> The type of the unmatched author.
-	 * @param <CA> The type of the candidate author.
+	 * @param ex1  Function to extract the string from a base author.
+	 * @param ex2  Function to extract the string from an enriching author.
+	 * @param <BA> The type of the base author.
+	 * @param <EA> The type of the enriching author.
 	 * @return A builder to further configure the matching step.
 	 */
-	public static <UA, CA> Builder<UA, CA> stringIgnoreCaseMatcher(Function<UA, String> ex1, Function<CA, String> ex2) {
-		return new Builder<UA, CA>()
+	public static <BA, EA> Builder<BA, EA> stringIgnoreCaseMatcher(Function<BA, String> ex1, Function<EA, String> ex2) {
+		return new Builder<BA, EA>()
 			.matchingFunc((ua, ca) -> {
-				String author = ex1.apply(ua);
-				String candidate = ex2.apply(ca);
+				String base = ex1.apply(ua);
+				String enriching = ex2.apply(ca);
 
-				if (author == null || candidate == null)
+				if (base == null || enriching == null)
 					return Optional.empty();
-				else if (author.toLowerCase(Locale.ROOT).equals(candidate.toLowerCase(Locale.ROOT))) {
+				else if (base.toLowerCase(Locale.ROOT).equals(enriching.toLowerCase(Locale.ROOT))) {
 					return Optional.of(new AuthorMatch<>(ua, ca, "", 1));
 				}
 				return Optional.empty();
@@ -60,20 +60,20 @@ public class AuthorMatcherStep<UA, CA> {
 	/**
 	 * Creates a builder for a matching step that compares names based on abbreviations.
 	 *
-	 * @param ex1  Function to extract the author name from an unmatched author.
-	 * @param ex2  Function to extract the author name from a candidate author.
-	 * @param <UA> The type of the unmatched author.
-	 * @param <CA> The type of the candidate author.
+	 * @param ex1  Function to extract the author name from a base author.
+	 * @param ex2  Function to extract the author name from an enriching author.
+	 * @param <BA> The type of the base author.
+	 * @param <EA> The type of the enriching author.
 	 * @return A builder to further configure the matching step.
 	 */
-	public static <UA, CA> Builder<UA, CA> abbreviationsMatcher(Function<UA, String> ex1, Function<CA, String> ex2) {
-		return new Builder<UA, CA>()
+	public static <BA, EA> Builder<BA, EA> abbreviationsMatcher(Function<BA, String> ex1, Function<EA, String> ex2) {
+		return new Builder<BA, EA>()
 			.name("abbreviations")
 			.matchingFunc((ua, ca) -> {
-				String author = ex1.apply(ua);
-				String candidate = ex2.apply(ca);
+				String base = ex1.apply(ua);
+				String enriching = ex2.apply(ca);
 
-				return matchOrderedTokenAndAbbreviations(author, candidate)
+				return matchOrderedTokenAndAbbreviations(base, enriching)
 					.map(confidence -> new AuthorMatch<>(ua, ca, "", confidence));
 			});
 	}
@@ -83,7 +83,7 @@ public class AuthorMatcherStep<UA, CA> {
 	 *
 	 * @return The matching function.
 	 */
-	public BiFunction<UA, CA, Optional<AuthorMatch<UA, CA>>> getMatchingFunc() {
+	public BiFunction<BA, EA, Optional<AuthorMatch<BA, EA>>> getMatchingFunc() {
 		return matchingFunc;
 	}
 
@@ -92,7 +92,7 @@ public class AuthorMatcherStep<UA, CA> {
 	 *
 	 * @return The exclusion predicate.
 	 */
-	public Predicate<List<AuthorMatch<UA, CA>>> getExclusionPredicate() {
+	public Predicate<List<AuthorMatch<BA, EA>>> getExclusionPredicate() {
 		return exclusionPredicate;
 	}
 
@@ -108,12 +108,12 @@ public class AuthorMatcherStep<UA, CA> {
 	/**
 	 * Builder class for constructing an {@link AuthorMatcherStep}.
 	 *
-	 * @param <UA> The type of the unmatched author.
-	 * @param <CA> The type of the candidate author.
+	 * @param <BA> The type of the base author.
+	 * @param <EA> The type of the enriching author.
 	 */
-	public static class Builder<UA, CA> {
-		private BiFunction<UA, CA, Optional<AuthorMatch<UA, CA>>> matchingFunc;
-		private Predicate<List<AuthorMatch<UA, CA>>> exclusionPredicate;
+	public static class Builder<BA, EA> {
+		private BiFunction<BA, EA, Optional<AuthorMatch<BA, EA>>> matchingFunc;
+		private Predicate<List<AuthorMatch<BA, EA>>> exclusionPredicate;
 		private String name;
 
 		/**
@@ -122,7 +122,7 @@ public class AuthorMatcherStep<UA, CA> {
 		 * @param matchingFunc The matching function to use.
 		 * @return This builder instance.
 		 */
-		public Builder<UA, CA> matchingFunc(BiFunction<UA, CA, Optional<AuthorMatch<UA, CA>>> matchingFunc) {
+		public Builder<BA, EA> matchingFunc(BiFunction<BA, EA, Optional<AuthorMatch<BA, EA>>> matchingFunc) {
 			this.matchingFunc = matchingFunc;
 			return this;
 		}
@@ -133,7 +133,7 @@ public class AuthorMatcherStep<UA, CA> {
 		 * @param exclusionPredicate The exclusion predicate to use.
 		 * @return This builder instance.
 		 */
-		public Builder<UA, CA> exclusionPredicate(Predicate<List<AuthorMatch<UA, CA>>> exclusionPredicate) {
+		public Builder<BA, EA> exclusionPredicate(Predicate<List<AuthorMatch<BA, EA>>> exclusionPredicate) {
 			this.exclusionPredicate = exclusionPredicate;
 			return this;
 		}
@@ -144,7 +144,7 @@ public class AuthorMatcherStep<UA, CA> {
 		 * @param name The name of the matching step.
 		 * @return This builder instance.
 		 */
-		public Builder<UA, CA> name(String name) {
+		public Builder<BA, EA> name(String name) {
 			this.name = name;
 			return this;
 		}
@@ -154,13 +154,13 @@ public class AuthorMatcherStep<UA, CA> {
 		 *
 		 * @return A new instance of {@link AuthorMatcherStep}.
 		 */
-		public AuthorMatcherStep<UA, CA> build() {
-			final BiFunction<UA, CA, Optional<AuthorMatch<UA, CA>>> matchingF = this.matchingFunc;
+		public AuthorMatcherStep<BA, EA> build() {
+			final BiFunction<BA, EA, Optional<AuthorMatch<BA, EA>>> matchingF = this.matchingFunc;
 			final String stepName = name;
 
-			return new AuthorMatcherStep<UA, CA>(
+			return new AuthorMatcherStep<BA, EA>(
 				(ua, ca) -> {
-					AuthorMatch<UA, CA> res = matchingF.apply(ua, ca).orElse(null);
+					AuthorMatch<BA, EA> res = matchingF.apply(ua, ca).orElse(null);
 					if (res != null) {
 						return Optional.of(res.withStepName(stepName));
 					}

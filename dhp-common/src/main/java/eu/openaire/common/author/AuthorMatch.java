@@ -6,34 +6,34 @@ import static org.apache.commons.lang3.builder.ToStringStyle.NO_CLASS_NAME_STYLE
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
- * A class representing the successful match between an unmatched author and a candidate author.
+ * A class representing the successful match between a base author and an enriching author.
  *
- * <p>This class is designed to facilitate the comparison and potential matching of an
- * unmatched author (UA) with one of many candidate authors (CA). It provides a structured
+ * <p>This class is designed to facilitate the comparison and potential matching of a
+ * base author (UA) with one of many enriching authors (CA). It provides a structured
  * way to store and process author matching data.</p>
  *
- * @param <UA> The type representing the unmatched author. This class contains relevant data
+ * @param <BA> The type representing the base author. This class contains relevant data
  *             about an author whose identity needs to be matched with potential candidates.
- * @param <CA> The type representing the candidate author. This class contains relevant data
- *             about author who is potential match for the unmatched author.
+ * @param <EA> The type representing the enriching author. This class contains relevant data
+ *             about author who is potential match for the base author.
  */
-public class AuthorMatch<UA, CA> {
-	private UA matchedAuthor; // The matched author
-	private CA matchedCandidate; // The matched candidate
+public class AuthorMatch<BA, EA> {
+	private BA baseAuthor; // The base author
+	private EA enrichingAuthor; // The enriching author
 	private String stepName; // The step name associated with the match
 	private double confidence; // Confidence score of the match
 
 	/**
-	 * Constructs an AuthorMatch object with specified author, candidate, step name, and confidence score.
+	 * Constructs an AuthorMatch object with specified base author, enriching author, step name, and confidence score.
 	 *
-	 * @param matchedAuthor    The matched author
-	 * @param matchedCandidate The matched candidate
-	 * @param stepName         The step in which this match occurred
-	 * @param confidence       The confidence score of the match
+	 * @param baseAuthor      The base author
+	 * @param enrichingAuthor The enriching author
+	 * @param stepName        The step in which this match occurred
+	 * @param confidence      The confidence score of the match
 	 */
-	public AuthorMatch(UA matchedAuthor, CA matchedCandidate, String stepName, double confidence) {
-		this.matchedAuthor = matchedAuthor;
-		this.matchedCandidate = matchedCandidate;
+	public AuthorMatch(BA baseAuthor, EA enrichingAuthor, String stepName, double confidence) {
+		this.baseAuthor = baseAuthor;
+		this.enrichingAuthor = enrichingAuthor;
 		this.stepName = stepName;
 		this.confidence = confidence;
 	}
@@ -44,38 +44,38 @@ public class AuthorMatch<UA, CA> {
 	 * @param stepName The new step name
 	 * @return A new AuthorMatch instance with the updated step name
 	 */
-	public AuthorMatch<UA, CA> withStepName(String stepName) {
-		return new AuthorMatch<>(this.matchedAuthor, this.matchedCandidate, stepName, this.confidence);
+	public AuthorMatch<BA, EA> withStepName(String stepName) {
+		return new AuthorMatch<>(this.baseAuthor, this.enrichingAuthor, stepName, this.confidence);
 	}
 
-	static public <UA, CA> AuthorMatch<UA, CA> of(UA matchedAuthor, CA matchedCandidate, double confidence) {
-		return new AuthorMatch<>(matchedAuthor, matchedCandidate, "", confidence);
-	}
-
-	/**
-	 * Gets the matched author.
-	 *
-	 * @return The matched author
-	 */
-	public UA getMatchedAuthor() {
-		return matchedAuthor;
-	}
-
-	public void setMatchedAuthor(UA matchedAuthor) {
-		this.matchedAuthor = matchedAuthor;
+	static public <UA, CA> AuthorMatch<UA, CA> of(UA baseAuthor, CA enrichingAuthor, double confidence) {
+		return new AuthorMatch<>(baseAuthor, enrichingAuthor, "", confidence);
 	}
 
 	/**
-	 * Gets the matched candidate.
+	 * Gets the base author.
 	 *
-	 * @return The matched candidate
+	 * @return The base author
 	 */
-	public CA getMatchedCandidate() {
-		return matchedCandidate;
+	public BA getBaseAuthor() {
+		return baseAuthor;
 	}
 
-	public void setMatchedCandidate(CA matchedCandidate) {
-		this.matchedCandidate = matchedCandidate;
+	public void setBaseAuthor(BA baseAuthor) {
+		this.baseAuthor = baseAuthor;
+	}
+
+	/**
+	 * Gets the enriching author.
+	 *
+	 * @return The enriching author
+	 */
+	public EA getEnrichingAuthor() {
+		return enrichingAuthor;
+	}
+
+	public void setEnrichingAuthor(EA enrichingAuthor) {
+		this.enrichingAuthor = enrichingAuthor;
 	}
 
 	/**
@@ -112,10 +112,10 @@ public class AuthorMatch<UA, CA> {
 	@Override
 	public String toString() {
 		return new ToStringBuilder(this, NO_CLASS_NAME_STYLE)
-			.append("matchedAuthor", matchedAuthor)
-			.append("matchedCandidate", matchedCandidate)
-			.append("confidence", confidence)
-			.append("stepName", stepName)
-			.toString();
+				.append("baseAuthor", baseAuthor)
+				.append("enrichingAuthor", enrichingAuthor)
+				.append("confidence", confidence)
+				.append("stepName", stepName)
+				.toString();
 	}
 }
