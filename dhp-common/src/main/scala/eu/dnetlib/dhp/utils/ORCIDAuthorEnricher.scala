@@ -57,10 +57,15 @@ object ORCIDAuthorEnricher extends Serializable {
     val hasAffiliations = new Predicate[util.List[AuthorMatch[Author, OrcidAuthor]]] {
       override def test(t: util.List[AuthorMatch[Author, OrcidAuthor]]): Boolean = {
         val baseAffiliations = t.get(0).getBaseAuthor.getRawAffiliationString
-        t.asScala.exists(m =>
-          m.getBaseAuthor.getRawAffiliationString.size() != baseAffiliations.size()
-          || !baseAffiliations.containsAll(m.getBaseAuthor.getRawAffiliationString)
-        )
+
+        if (baseAffiliations == null || baseAffiliations.isEmpty)
+          t.asScala.exists(m => m.getBaseAuthor.getRawAffiliationString != null && !m.getBaseAuthor.getRawAffiliationString.isEmpty)
+        else
+          t.asScala.exists(m =>
+            m.getBaseAuthor.getRawAffiliationString == null ||
+            m.getBaseAuthor.getRawAffiliationString.size() != baseAffiliations.size()
+            || !baseAffiliations.containsAll(m.getBaseAuthor.getRawAffiliationString)
+          )
 
       }
     }
