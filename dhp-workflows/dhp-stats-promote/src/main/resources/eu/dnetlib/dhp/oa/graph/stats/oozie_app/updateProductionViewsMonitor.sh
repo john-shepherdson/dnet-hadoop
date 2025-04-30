@@ -42,3 +42,35 @@ do
   impala-shell -i impala-cluster-dn1.openaire.eu -d ${SOURCE}_${tmp} -q "show tables" --delimited | sed "s/\(.*\)/create view ${PRODUCTION}_${tmp}.\1 as select * from ${SOURCE}_${tmp}.\1;/" | impala-shell -i impala-cluster-dn1.openaire.eu -c -f -
   echo "Production ${tmp} db ready!"
 done
+
+echo "Updating ${PRODUCTION}_monitor_ie database"
+impala-shell -i impala-cluster-dn1.openaire.eu -q "create database if not exists ${PRODUCTION}_monitor_ie"
+impala-shell -i impala-cluster-dn1.openaire.eu -d ${PRODUCTION}_monitor_ie -q "show tables" --delimited | sed "s/^/drop view if exists ${PRODUCTION}_monitor_ie./" | sed "s/$/;/" | impala-shell -i impala-cluster-dn1.openaire.eu -c -f -
+impala-shell -i impala-cluster-dn1.openaire.eu -d ${SOURCE}_monitor_ie -q "show tables" --delimited | sed "s/\(.*\)/create view ${PRODUCTION}_monitor_ie.\1 as select * from ${SOURCE}_monitor_ie.\1;/" | impala-shell -i impala-cluster-dn1.openaire.eu -c -f -
+echo "Production irish monitor db ready!"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
