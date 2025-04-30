@@ -59,7 +59,9 @@ object ORCIDAuthorEnricher extends Serializable {
         val baseAffiliations = t.get(0).getBaseAuthor.getRawAffiliationString
 
         if (baseAffiliations == null || baseAffiliations.isEmpty)
-          t.asScala.exists(m => m.getBaseAuthor.getRawAffiliationString != null && !m.getBaseAuthor.getRawAffiliationString.isEmpty)
+          t.asScala.exists(m =>
+            m.getBaseAuthor.getRawAffiliationString != null && !m.getBaseAuthor.getRawAffiliationString.isEmpty
+          )
         else
           t.asScala.exists(m =>
             m.getBaseAuthor.getRawAffiliationString == null ||
@@ -180,7 +182,7 @@ object ORCIDAuthorEnricher extends Serializable {
       graph_authors,
       result,
       unmatched_authors,
-      orcid_authors
+      unmatched_orcid
     )
   }
 }

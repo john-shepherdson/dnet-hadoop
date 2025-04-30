@@ -93,4 +93,36 @@ public class AuthorMatchersTest {
 			System.out.println(match);
 		}
 	}
+
+	@Test
+	void fullNamesTest() {
+		// Data for DOI  10.1145/3618260.3649791
+		List<TestAuthor> authors = TestAuthor
+				.of(
+						"Peter Gartland",
+						"Daniel Lokshtanov",
+						"Tomáš Masařík",
+						"Marcin Pilipczuk",
+						"Michał Pilipczuk",
+						"Paweł Rzążewski"
+				);
+
+		List<TestORCIDAuthor> candidates = Arrays
+				.asList(
+						new TestORCIDAuthor("Tomáš", "Masařík", "", "0000-0001-8524-4036"),
+						new TestORCIDAuthor("Daniel", "Lokshtanov", "", "0000-0002-3166-9212"),
+						new TestORCIDAuthor("Paweł", "Rzążewski", "", "0000-0001-7696-3848"),
+						new TestORCIDAuthor("Marcin", "Pilipczuk", "", "0000-0001-5680-7397"),
+						new TestORCIDAuthor("Michał", "Pilipczuk", "", "0000-0001-7891-1988")
+
+
+
+				);
+		List<AuthorMatch<TestAuthor, TestORCIDAuthor>> result = getMatches(authors, candidates);
+
+		for (AuthorMatch<TestAuthor, TestORCIDAuthor> match : result) {
+			System.out.println(match);
+		}
+	}
+
 }
