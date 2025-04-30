@@ -2,6 +2,7 @@
 package eu.openaire.common.author;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -38,7 +39,7 @@ public class OrderedTokenAndAbbreviationsMatcher {
 	 */
 	static private List<String> tokenize(String s) {
 		return Stream
-			.of(SPLIT_REGEX.split(StringUtils.stripAccents(s)))
+			.of(SPLIT_REGEX.split(StringUtils.stripAccents(s).toLowerCase(Locale.ROOT)))
 			.filter(x -> !x.isEmpty())
 			.sorted()
 			.collect(Collectors.toList());
