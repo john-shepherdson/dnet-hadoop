@@ -234,12 +234,14 @@ public class SparkExtractPersonRelations {
 							.getPid()
 							.stream()
 							.anyMatch(
-								p -> Arrays.asList("orcid", "orcid_pending").contains(p.getQualifier().getClassid())))
+								p -> Arrays
+									.asList("eu/dnetlib/dhp/enrich/orcid", "orcid_pending")
+									.contains(p.getQualifier().getClassid())))
 					.map(a -> {
 						Optional<StructuredProperty> tmp = a
 							.getPid()
 							.stream()
-							.filter(p -> p.getQualifier().getClassid().equalsIgnoreCase("orcid"))
+							.filter(p -> p.getQualifier().getClassid().equalsIgnoreCase("eu/dnetlib/dhp/enrich/orcid"))
 							.findFirst();
 						if (tmp.isPresent())
 							return tmp.get().getValue();

@@ -42,6 +42,14 @@
             <description>the path to store the bulktagging configuration</description>
         </property>
         <property>
+            <name>publisherPath</name>
+            <description>path to the autput from affro of the publishers pages</description>
+        </property>
+        <property>
+            <name>orcidPath</name>
+            <description>the path to the orcid information extracted from the orcid profiles</description>
+        </property>
+        <property>
             <name>hiveDbName</name>
             <description>the target hive database name</description>
         </property>
@@ -117,6 +125,7 @@
 
     <decision name="resumeFrom">
         <switch>
+            <case to="orcid_propagation">${wf:conf('resumeFrom') eq 'OrcidPropagation'}</case>
             <case to="bulk_tagging">${wf:conf('resumeFrom') eq 'BulkTagging'}</case>
             <case to="affiliation_inst_repo">${wf:conf('resumeFrom') eq 'AffiliationInstitutionalRepository'}</case>
             <case to="entity_semantic_relation">${wf:conf('resumeFrom') eq 'AffiliationSemanticRelation'}</case>
@@ -126,10 +135,34 @@
             <case to="community_sem_rel">${wf:conf('resumeFrom') eq 'CommunitySemanticRelation'}</case>
             <case to="country_propagation">${wf:conf('resumeFrom') eq 'CountryPropagation'}</case>
             <case to="person_propagation">${wf:conf('resumeFrom') eq 'PersonPropagation'}</case>
-            <default to="orcid_propagation"/>
+            <case to="publisher_propagation">${wf:conf('resumeFrom') eq 'PublisherPropagation'}</case>
+            <default to="orcid_enrich"/>
         </switch>
     </decision>
 
+    <action name="orcid_enrich">
+        <sub-workflow>
+            <app-path>${wf:appPath()}/orcid_enrich
+            </app-path>
+            <propagate-configuration/>
+            <configuration>
+                <property>
+                    <name>graphPath</name>
+                    <value>${sourcePath}</value>
+                </property>
+                <property>
+                    <name>orcidPath</name>
+                    <value>${orcidPath}</value>
+                </property>
+                <property>
+                    <name>targetPath</name>
+                    <value>${outputPath}</value>
+                </property>
+            </configuration>
+        </sub-workflow>
+        <ok to="orcid_propagation" />
+        <error to="Kill" />
+    </action>
 
     <action name="orcid_propagation">
         <sub-workflow>
@@ -139,16 +172,13 @@
             <configuration>
                 <property>
                     <name>sourcePath</name>
-                    <value>${sourcePath}</value>
+                    <value>${outputPath}</value>
                 </property>
                 <property>
                     <name>allowedsemrels</name>
                     <value>${allowedsemrelsorcidprop}</value>
                 </property>
-                <property>
-                    <name>outputPath</name>
-                    <value>${outputPath}</value>
-                </property>
+
             </configuration>
         </sub-workflow>
         <ok to="bulk_tagging" />
@@ -323,6 +353,25 @@
                 <property>
                     <name>sourcePath</name>
                     <value>${outputPath}</value>
+                </property>
+            </configuration>
+        </sub-workflow>
+        <ok to="publisher_propagation" />
+        <error to="Kill" />
+    </action>
+    <action name="publisher_propagation">
+        <sub-workflow>
+            <app-path>${wf:appPath()}/person_propagation
+            </app-path>
+            <propagate-configuration/>
+            <configuration>
+                <property>
+                    <name>sourcePath</name>
+                    <value>${outputPath}</value>
+                </property>
+                <property>
+                    <name>graphPath</name>
+                    <value>${publisherPath}</value>
                 </property>
             </configuration>
         </sub-workflow>
