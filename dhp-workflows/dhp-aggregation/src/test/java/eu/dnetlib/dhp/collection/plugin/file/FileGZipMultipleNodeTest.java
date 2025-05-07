@@ -56,7 +56,7 @@ public class FileGZipMultipleNodeTest {
 
 		final Stream<String> stream = plugin.collect(api, new AggregatorReport());
 
-		stream.limit(10).forEach(s -> {
+		stream.forEach(s -> {
 			Assertions.assertTrue(s.length() > 0);
 			log.info(s);
 		});

@@ -114,6 +114,16 @@ public class SparkExtractPersonRelations {
 
 	private static void extractRelations(SparkSession spark, String sourcePath, String workingPath) {
 
+		Dataset<Tuple2<String, Relation>> relationDataset = spark
+			.read()
+			.schema(Encoders.bean(Relation.class).schema())
+			.json(sourcePath + "relation")
+			.as(Encoders.bean(Relation.class))
+			.map(
+				(MapFunction<Relation, Tuple2<String, Relation>>) r -> new Tuple2<>(
+					r.getSource() + r.getRelClass() + r.getTarget(), r),
+				Encoders.tuple(Encoders.STRING(), Encoders.bean(Relation.class)));
+
 		ModelSupport.entityTypes
 			.keySet()
 			.stream()
@@ -175,27 +185,15 @@ public class SparkExtractPersonRelations {
 						.option("compression", "gzip")
 						.json(workingPath + "/coauthorshipNew");
 				});
-		Dataset<Tuple2<String, Relation>> relationDataset = spark
-			.read()
-			.schema(Encoders.bean(Relation.class).schema())
-			.json(sourcePath + "relation")
-			.as(Encoders.bean(Relation.class))
-			.map(
-				(MapFunction<Relation, Tuple2<String, Relation>>) r -> new Tuple2<>(
-					r.getSource() + r.getRelClass() + r.getTarget(), r),
-				Encoders.tuple(Encoders.STRING(), Encoders.bean(Relation.class)));
 
 		Dataset<Tuple2<String, Relation>> newRelations = getRelationMap(spark, workingPath + "/authorshipNew")
 			.union(getRelationMap(spark, workingPath + "/coauthorshipNew"));
 
 		newRelations
-			.joinWith(relationDataset, newRelations.col("_1").equalTo(relationDataset.col("_1")), "left")
-			.map((MapFunction<Tuple2<Tuple2<String, Relation>, Tuple2<String, Relation>>, Relation>) t2 -> {
-				if (t2._2() == null)
-					return t2._1()._2();
-				return null;
-			}, Encoders.bean(Relation.class))
-			.filter((FilterFunction<Relation>) r -> r != null)
+			.joinWith(relationDataset, newRelations.col("_1").equalTo(relationDataset.col("_1")), "left_anti")
+			.map(
+				(MapFunction<Tuple2<Tuple2<String, Relation>, Tuple2<String, Relation>>, Relation>) t2 -> t2._1()._2(),
+				Encoders.bean(Relation.class))
 			.write()
 			.mode(SaveMode.Append)
 			.option("compression", "gzip")
