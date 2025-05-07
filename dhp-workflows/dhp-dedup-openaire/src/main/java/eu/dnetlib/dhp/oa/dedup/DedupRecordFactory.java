@@ -10,14 +10,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.api.java.function.FlatMapGroupsFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.*;
+import org.apache.spark.sql.Dataset;
 
 import eu.dnetlib.dhp.oa.dedup.model.Identifier;
 import eu.dnetlib.dhp.oa.merge.AuthorMerger;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.Author;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
-import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.MergeUtils;
 import scala.Tuple2;
 import scala.Tuple3;
@@ -119,7 +117,7 @@ public class DedupRecordFactory {
 							cliques.add(entity);
 
 							if (acceptanceDate.size() < MAX_ACCEPTANCE_DATE) {
-								if (Result.class.isAssignableFrom(entity.getClass())) {
+								if (Publication.class.isAssignableFrom(entity.getClass())) {
 									Result result = (Result) entity;
 									if (result.getDateofacceptance() != null
 										&& StringUtils.isNotBlank(result.getDateofacceptance().getValue())) {

@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.projecttoresult;
 
 import static eu.dnetlib.dhp.PropagationConstant.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+import static eu.dnetlib.dhp.common.enrichment.Constants.PROPAGATION_DATA_INFO_TYPE;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -57,8 +57,8 @@ public class GenerateBlacklistSparkJob {
 	public void run(Boolean isSparkSessionManaged)
 		throws ISLookUpException, ClassNotFoundException {
 
-		String inputGraph = parser.get("inputGraph");
-		log.info("inputGraph: {}", inputGraph);
+		String inputPath = parser.get("inputPath");
+		log.info("inputPath: {}", inputPath);
 
 		String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
@@ -82,7 +82,7 @@ public class GenerateBlacklistSparkJob {
 						spark
 							.read()
 							.schema(Encoders.bean(Result.class).schema())
-							.json(inputGraph + "/" + e.getKey())
+							.json(inputPath + "/" + e.getKey())
 							.where("array_contains(instance.hostedby.value, 'ZENODO')")
 							.selectExpr("id", "explode(instance) as instance")
 							.selectExpr("id", "explode(instance.pid) as pid")

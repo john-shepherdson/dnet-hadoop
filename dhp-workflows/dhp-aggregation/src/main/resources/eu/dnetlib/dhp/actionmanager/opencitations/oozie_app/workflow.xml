@@ -24,12 +24,12 @@
 
     <decision name="resume_from">
         <switch>
-            <case to="download">${wf:conf('resumeFrom') eq 'DownloadDump'}</case>
+            <case to="deleteoutputpath">${wf:conf('resumeFrom') eq 'DownloadDump'}</case>
             <case to="extract">${wf:conf('resumeFrom') eq 'ExtractContent'}</case>
             <case to="read">${wf:conf('resumeFrom') eq 'ReadContent'}</case>
             <case to="remap">${wf:conf('resumeFrom') eq 'MapContent'}</case>
             <case to="create_actionset">${wf:conf('resumeFrom') eq 'CreateAS'}</case>
-            <default to="deleteoutputpath"/> <!-- first action to be done when downloadDump is to be performed -->
+            <default to="deleteoutputpath"/> <!-- first action to be done when downloadDump is to be performed the old association are preserved on another folder. the new will be considered only-->
         </switch>
     </decision>
 

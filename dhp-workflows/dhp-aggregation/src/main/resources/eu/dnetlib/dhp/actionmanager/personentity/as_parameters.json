@@ -45,6 +45,11 @@
   "paramLongName": "hdfsNameNode",
   "paramDescription": "the hdfs name node",
   "paramRequired": false
+},{
+  "paramName": "pip",
+  "paramLongName": "publisherInputPath",
+  "paramDescription": "the hdfs name node",
+  "paramRequired": false
 }
 
 ]

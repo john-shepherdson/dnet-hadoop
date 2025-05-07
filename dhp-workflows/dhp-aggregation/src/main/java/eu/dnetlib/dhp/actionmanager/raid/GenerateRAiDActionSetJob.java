@@ -1,17 +1,15 @@
 
 package eu.dnetlib.dhp.actionmanager.raid;
 
-import static eu.dnetlib.dhp.actionmanager.personentity.ExtractPerson.OPENAIRE_DATASOURCE_ID;
-import static eu.dnetlib.dhp.actionmanager.personentity.ExtractPerson.OPENAIRE_DATASOURCE_NAME;
+import static eu.dnetlib.dhp.actionmanager.personentity.ASConstants.OPENAIRE_DATASOURCE_ID;
+import static eu.dnetlib.dhp.actionmanager.personentity.ASConstants.OPENAIRE_DATASOURCE_NAME;
 import static eu.dnetlib.dhp.common.Constants.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
-import org.apache.avro.generic.GenericData;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
@@ -45,7 +43,7 @@ public class GenerateRAiDActionSetJob {
 		OPENAIRE_DATASOURCE_ID, OPENAIRE_DATASOURCE_NAME);
 
 	private static final Qualifier RAID_QUALIFIER = qualifier(
-		"0049", "Research Activity Identifier", DNET_PUBLICATION_RESOURCE, DNET_PUBLICATION_RESOURCE);
+		"0049", "Research Activity", DNET_PUBLICATION_RESOURCE, DNET_PUBLICATION_RESOURCE);
 
 	private static final Qualifier RAID_INFERENCE_QUALIFIER = qualifier(
 		"raid:openaireinference", "Inferred by OpenAIRE", DNET_PROVENANCE_ACTIONS, DNET_PROVENANCE_ACTIONS);
@@ -80,11 +78,14 @@ public class GenerateRAiDActionSetJob {
 		final String baseUrl = parser.get("baseUrl");
 		log.info("baseUrl: {}", baseUrl);
 
+		final String graphBasePath = parser.get("graphBasePath");
+		log.info("graphBasePath: {}", graphBasePath);
+
 		final SparkConf conf = new SparkConf();
 
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
 			removeOutputDir(spark, outputPath);
-			processRAiDEntities(spark, inputPath, outputPath, baseUrl);
+			saveActionSet(spark, inputPath, outputPath, baseUrl, graphBasePath);
 		});
 	}
 
@@ -92,27 +93,105 @@ public class GenerateRAiDActionSetJob {
 		HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
 	}
 
-	static void processRAiDEntities(final SparkSession spark,
-		final String inputPath,
-		final String outputPath,
-		final String baseUrl) {
-		readInputPath(spark, inputPath)
-			.map(r -> prepareRAiD(r, baseUrl))
-			.flatMap(List::iterator)
+	static void saveActionSet(final SparkSession spark, final String inputPath, final String outputPath,
+		final String baseUrl, final String graphBasePath) {
+		// save result in the action set
+		raidEntitiesToAtomicActions(spark, inputPath, baseUrl, graphBasePath)
 			.mapToPair(
 				aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
 					new Text(OBJECT_MAPPER.writeValueAsString(aa))))
 			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class);
+	}
+
+	static JavaRDD<AtomicAction<? extends Oaf>> raidEntitiesToAtomicActions(final SparkSession spark,
+		final String inputPath, final String baseUrl, final String graphBasePath) {
+
+		// prepare RAiD entities as ORP and their relations with result entities
+		JavaRDD<? extends Oaf> graphEntities = readInputPath(spark, inputPath)
+			.map(r -> rawRAiDtoGraphEntities(r, baseUrl))
+			.flatMap(List::iterator);
+
+		// collect relations between RAiD entity and result entities
+		JavaRDD<Relation> raidToResultRels = graphEntities
+			.filter(e -> e instanceof Relation)
+			.map(e -> (Relation) e)
+			.filter(rel -> rel.getRelClass().equals(HAS_PART));
+
+		// collect relations between result entities and projects/organizations/merged
+		JavaRDD<Relation> relevantRels = readRelevantRelations(spark, graphBasePath);
+
+		// redirect relations to create new relations to be added to the action set
+		JavaRDD<Relation> newRels = relevantRels
+			.mapToPair(rel -> new Tuple2<>(rel.getSource(), rel))
+			.join(raidToResultRels.mapToPair(rel -> new Tuple2<>(rel.getTarget(), rel)))
+			.flatMap(x -> {
+				Relation leftRel = x._2()._1();
+				String entityId = leftRel.getTarget();
+				String relType = leftRel.getRelType();
+				Relation raidRel = x._2()._2();
+				String raidId = x._2()._2().getSource();
+
+				List<Relation> res = new ArrayList<>();
+
+				Relation rel1 = getRelation(
+					raidId,
+					entityId,
+					relType,
+					PART,
+					HAS_PART,
+					raidRel.getCollectedfrom(),
+					raidRel.getDataInfo(),
+					raidRel.getLastupdatetimestamp());
+
+				Relation rel2 = getRelation(
+					entityId,
+					raidId,
+					relType,
+					PART,
+					IS_PART_OF,
+					raidRel.getCollectedfrom(),
+					raidRel.getDataInfo(),
+					raidRel.getLastupdatetimestamp());
+
+				res.add(rel1);
+				res.add(rel2);
+				return res.iterator();
+			})
+			.distinct();
+
+		// create actions
+		return graphEntities
+			.map(
+				e -> (e instanceof Relation) ? new AtomicAction<>(Relation.class, (Relation) e)
+					: new AtomicAction<>(OtherResearchProduct.class, (OtherResearchProduct) e))
+			.union(newRels.map(rel -> new AtomicAction<>(Relation.class, rel))); // actions for new relations
 
 	}
 
-	protected static List<AtomicAction<? extends Oaf>> prepareRAiD(final RAiDEntity r, final String baseUrl) {
+	private static JavaRDD<Relation> readRelevantRelations(final SparkSession spark, final String graphBasePath) {
+		// take only relations between results and projects/organizations/merged
+		return spark
+			.read()
+			.schema(Encoders.bean(Relation.class).schema())
+			.json(graphBasePath + "/relation")
+			.as(Encoders.bean(Relation.class))
+			.toJavaRDD()
+			.filter(rel -> !rel.getDataInfo().getDeletedbyinference())
+			.filter(
+				rel -> rel.getRelType().equals(RESULT_PROJECT) || rel.getRelType().equals(RESULT_ORGANIZATION)
+					|| rel.getRelType().equals(RESULT_RESULT))
+			.filter(
+				rel -> rel.getRelClass().equals(IS_PRODUCED_BY) || rel.getRelClass().equals(HAS_AUTHOR_INSTITUTION)
+					|| rel.getRelClass().equals(MERGES));
+	}
 
+	protected static List<Oaf> rawRAiDtoGraphEntities(final RAiDEntity r, final String baseUrl) {
 		final Date now = new Date();
-		final OtherResearchProduct orp = new OtherResearchProduct();
-		final List<AtomicAction<? extends Oaf>> res = new ArrayList<>();
-		String raidId = calculateOpenaireId(r.getRaid());
+		final OtherResearchProduct orp = new OtherResearchProduct(); // ORP to contain the RAiD entity in the graph
+		final List<Oaf> res = new ArrayList<>();
 
+		// populate the ORP
+		String raidId = calculateOpenaireId(r.getId());
 		orp.setId(raidId);
 		orp.setCollectedfrom(RAID_COLLECTED_FROM);
 		orp.setDataInfo(RAID_DATA_INFO);
@@ -124,25 +203,25 @@ public class GenerateRAiDActionSetJob {
 							r.getTitle(),
 							qualifier("main title", "main title", DNET_DATACITE_TITLE, DNET_DATACITE_TITLE),
 							RAID_DATA_INFO)));
-		orp.setDescription(listFields(RAID_DATA_INFO, r.getSummary()));
+		orp.setDescription(listFields(RAID_DATA_INFO, r.getDescription()));
 
 		Instance instance = new Instance();
 		instance.setInstancetype(RAID_QUALIFIER);
 		instance.setUrl(Collections.singletonList(baseUrl + raidId.split("\\|")[1]));
 		orp.setInstance(Collections.singletonList(instance));
-		orp
-			.setSubject(
-				r
-					.getSubjects()
-					.stream()
-					.map(
-						s -> subject(
-							s,
-							qualifier(
-								DNET_SUBJECT_KEYWORD, DNET_SUBJECT_KEYWORD, DNET_SUBJECT_TYPOLOGIES,
-								DNET_SUBJECT_TYPOLOGIES),
-							RAID_DATA_INFO))
-					.collect(Collectors.toList()));
+//		orp
+//				.setSubject(
+//						r
+//								.getSubjects()
+//								.stream()
+//								.map(
+//										s -> subject(
+//												s,
+//												qualifier(
+//														DNET_SUBJECT_KEYWORD, DNET_SUBJECT_KEYWORD, DNET_SUBJECT_TYPOLOGIES,
+//														DNET_SUBJECT_TYPOLOGIES),
+//												RAID_DATA_INFO))
+//								.collect(Collectors.toList()));
 		orp
 			.setRelevantdate(
 				Arrays
@@ -157,8 +236,9 @@ public class GenerateRAiDActionSetJob {
 		orp.setLastupdatetimestamp(now.getTime());
 		orp.setDateofacceptance(field(r.getStartDate(), RAID_DATA_INFO));
 
-		res.add(new AtomicAction<>(OtherResearchProduct.class, orp));
+		res.add(orp);
 
+		// create relations between the ORP RAiD entity and its research products
 		for (String resultId : r.getIds()) {
 			Relation rel1 = OafMapperUtils
 				.getRelation(
@@ -176,8 +256,8 @@ public class GenerateRAiDActionSetJob {
 					PART,
 					IS_PART_OF,
 					orp);
-			res.add(new AtomicAction<>(Relation.class, rel1));
-			res.add(new AtomicAction<>(Relation.class, rel2));
+			res.add(rel1);
+			res.add(rel2);
 		}
 
 		return res;
@@ -185,14 +265,6 @@ public class GenerateRAiDActionSetJob {
 
 	public static String calculateOpenaireId(final String raid) {
 		return String.format("50|%s::%s", RAID_NS_PREFIX, DHPUtils.md5(raid));
-	}
-
-	public static List<Author> createAuthors(final List<String> author) {
-		return author.stream().map(s -> {
-			Author a = new Author();
-			a.setFullname(s);
-			return a;
-		}).collect(Collectors.toList());
 	}
 
 	private static JavaRDD<RAiDEntity> readInputPath(

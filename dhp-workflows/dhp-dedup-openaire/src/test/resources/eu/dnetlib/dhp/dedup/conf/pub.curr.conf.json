@@ -154,6 +154,13 @@
     ],
     "blacklists": {
       "title": [
+        "^editorial$",
+        "^Editorial$",
+        "^Score Correlation$",
+        "^Score correlation$",
+        "^score correlation$",
+        "^Table of Contents / Table des matières$",
+        "(?i)^Data Management Plan",
         "^Inside Front Cover$",
         "(?i)^Poster presentations$",
         "^THE ASSOCIATION AND THE GENERAL MEDICAL COUNCIL$",
@@ -206,7 +213,7 @@
         "(?i)^St\\. Patrick's Cathedral, Dublin, County Dublin - Bases?$",
         "(?i)^PUBLIC HEALTH VERSUS THE STATE$",
         "^Viñetas de Cortázar$",
-        "(?i)^Search for heavy neutrinos and W(\\[|_|\\(|_\\{|-)?R(\\]|\\)|\\})? bosons with right-handed couplings in a left-right symmetric model in pp collisions at.*TeV(\\.)?$",
+        "(?i)^Search for heavy neutrinos and W(\\[|<\\(>\\{|-)?R(\\]|\\)|\\})? bosons with right-handed couplings in a left-right symmetric model in pp collisions at.*TeV(\\.)?$",
         "(?i)^Measurement of the pseudorapidity and centrality dependence of the transverse energy density in Pb(-?)Pb collisions at.*tev(\\.?)$",
         "(?i)^Search for resonances decaying into top-quark pairs using fully hadronic decays in pp collisions with ATLAS at.*TeV$",
         "(?i)^Search for neutral minimal supersymmetric standard model Higgs bosons decaying to tau pairs in pp collisions at.*tev$",
@@ -379,7 +386,10 @@
         "^(Measurement of the top quark\\-pair production cross section with ATLAS in pp collisions at).*$",
         "^(Measurement of the spin\\-dependent structure function).*",
         "(?i)^.*authors['’′]? reply\\.?$",
-        "(?i)^.*authors['’′]? response\\.?$"
+        "(?i)^.*authors['’′]? response\\.?$",
+        "^Data [mM]anagement [sS]ervices\\.$",
+        "Research and Advanced Technology for Digital Libraries",
+        "^Bibliography$"
       ]
     },
     "synonyms": {}
