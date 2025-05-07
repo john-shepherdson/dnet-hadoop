@@ -16,19 +16,19 @@
     "paramLongName": "isSparkSessionManaged",
     "paramDescription": "the hdfs name node",
     "paramRequired": false
-  },
-  {
-    "paramName": "wd",
-    "paramLongName": "workingDir",
-    "paramDescription": "the hdfs name node",
-    "paramRequired": false
-  },
+  }, {
+  "paramName": "wd",
+  "paramLongName": "workingDir",
+  "paramDescription": "the hdfs name node",
+  "paramRequired": false
+},
   {
     "paramName": "pu",
     "paramLongName": "postgresUrl",
     "paramDescription": "the hdfs name node",
     "paramRequired": false
   },
+
   {
     "paramName": "ps",
     "paramLongName": "postgresUser",
@@ -36,21 +36,20 @@
     "paramRequired": false
   },
   {
-    "paramName": "pp",
-    "paramLongName": "postgresPassword",
-    "paramDescription": "the hdfs name node",
-    "paramRequired": false
-  },
-  {
-    "paramName": "nn",
-    "paramLongName": "hdfsNameNode",
-    "paramDescription": "the hdfs name node",
-    "paramRequired": false
-  },
-  {
-    "paramName": "pip",
-    "paramLongName": "publisherInputPath",
-    "paramDescription": "the hdfs name node",
-    "paramRequired": false
-  }
+  "paramName": "pp",
+  "paramLongName": "postgresPassword",
+  "paramDescription": "the hdfs name node",
+  "paramRequired": false
+},{
+  "paramName": "nn",
+  "paramLongName": "hdfsNameNode",
+  "paramDescription": "the hdfs name node",
+  "paramRequired": false
+},{
+  "paramName": "pip",
+  "paramLongName": "publisherInputPath",
+  "paramDescription": "the hdfs name node",
+  "paramRequired": false
+}
+
 ]
