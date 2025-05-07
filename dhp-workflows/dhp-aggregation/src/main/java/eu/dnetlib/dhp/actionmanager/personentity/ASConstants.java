@@ -4,11 +4,17 @@ package eu.dnetlib.dhp.actionmanager.personentity;
 import java.util.List;
 
 import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.KeyValue;
+import eu.dnetlib.dhp.schema.oaf.Person;
+import eu.dnetlib.dhp.schema.oaf.Project;
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 
 public class ASConstants {
+
+	public static final String QUERY = "SELECT * FROM project_person WHERE pid_type = 'ORCID'";
 
 	public static final String DOI_PREFIX = "50|doi_________::";
 
@@ -24,9 +30,6 @@ public class ASConstants {
 	public static final String OPENAIRE_DATASOURCE_ID = "10|infrastruct_::f66f1bd369679b5b077dcdf006089556";
 	public static final String OPENAIRE_DATASOURCE_NAME = "OpenAIRE";
 
-	public static List<KeyValue> collectedfromOpenAIRE = OafMapperUtils
-		.listKeyValues(OPENAIRE_DATASOURCE_ID, OPENAIRE_DATASOURCE_NAME);
-
 	public static final DataInfo FUNDERDATAINFO = OafMapperUtils
 		.dataInfo(
 			false,
@@ -40,4 +43,8 @@ public class ASConstants {
 					ModelConstants.DNET_PROVENANCE_ACTIONS,
 					ModelConstants.DNET_PROVENANCE_ACTIONS),
 			"0.91");
+
+	public static List<KeyValue> collectedfromOpenAIRE = OafMapperUtils
+		.listKeyValues(OPENAIRE_DATASOURCE_ID, OPENAIRE_DATASOURCE_NAME);
+
 }

@@ -38,13 +38,17 @@
             <description>list of datasources in blacklist for the affiliation from instrepo propagation</description>
         </property>
         <property>
+            <name>bulkTaggingConfigurationPath</name>
+            <description>the path to store the bulktagging configuration</description>
+        </property>
+        <property>
             <name>publisherPath</name>
             <description>path to the autput from affro of the publishers pages</description>
         </property>
-<property>
-    <name>orcidPath</name>
-    <description>the path to the orcid information extracted from the orcid profiles</description>
-</property>
+        <property>
+            <name>orcidPath</name>
+            <description>the path to the orcid information extracted from the orcid profiles</description>
+        </property>
         <property>
             <name>hiveDbName</name>
             <description>the target hive database name</description>
@@ -210,6 +214,10 @@
                 <property>
                     <name>dbPassword</name>
                     <value>${dbPassword}</value>
+                </property>
+                <property>
+                    <name>bulkTaggingConfigurationPath</name>
+                    <value>${bulkTaggingConfigurationPath}</value>
                 </property>
             </configuration>
         </sub-workflow>

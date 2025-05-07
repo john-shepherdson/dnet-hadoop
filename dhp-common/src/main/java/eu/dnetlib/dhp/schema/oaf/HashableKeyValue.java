@@ -6,14 +6,14 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class HashableKeyValue extends KeyValue {
 
-	public static HashableKeyValue newInstance(String key, String value, DataInfo datainfo) {
+	public static HashableKeyValue newInstance(String key, String value, DataInfo dataInfo) {
 		if (value == null) {
 			return null;
 		}
 		final HashableKeyValue kv = new HashableKeyValue();
 		kv.setValue(value);
 		kv.setKey(key);
-		kv.setDataInfo(datainfo);
+		kv.setDataInfo(dataInfo);
 		return kv;
 	}
 
@@ -22,7 +22,6 @@ public class HashableKeyValue extends KeyValue {
 		hkv.setKey(kv.getKey());
 		hkv.setValue(kv.getValue());
 		hkv.setDataInfo(kv.getDataInfo());
-
 		return hkv;
 	}
 
