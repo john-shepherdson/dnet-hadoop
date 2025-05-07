@@ -30,7 +30,7 @@ select /*+ COALESCE(100) */
     soft.publisher.value                                                     as publisher,
     cast(null as string)                                                     as journal,
     soft.dateofacceptance.value                                              as date,
-    cast(date_format(soft.dateofacceptance.value, 'yyyy') as year)           as year,
+    cast(date_format(soft.dateofacceptance.value, 'yyyy') as int)            as year,
     soft.bestaccessright.classname                                           as bestlicence,
     soft.embargoenddate.value                                                as embargo_end_date,
     coalesce(soft_delayed.delayed, false)                                    as delayed, -- It's delayed, when the software was published after the end of the project.

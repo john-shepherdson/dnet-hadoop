@@ -30,7 +30,7 @@ select /*+ COALESCE(100) */
     other.publisher.value                                           as publisher,
     cast(null as string)                                            as journal,
     other.dateofacceptance.value                                    as date,
-    cast(date_format(other.dateofacceptance.value, 'yyyy') as year) as year,
+    cast(date_format(other.dateofacceptance.value, 'yyyy') as int)  as year,
     other.bestaccessright.classname                                 as bestlicence,
     other.embargoenddate.value                                      as embargo_end_date,
     false                                                           as delayed,

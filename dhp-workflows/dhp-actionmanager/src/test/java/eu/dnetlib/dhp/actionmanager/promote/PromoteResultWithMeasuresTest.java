@@ -139,6 +139,7 @@ public class PromoteResultWithMeasuresTest {
 			.as(Encoders.bean(Result.class));
 
 		final MergeAndGet.Strategy mergeFromAndGet = MergeAndGet.Strategy.MERGE_FROM_AND_GET;
+		final PromoteAction.Strategy enrich = PromoteAction.Strategy.ENRICH;
 
 		final SerializableSupplier<Function<Publication, String>> rowIdFn = ModelSupport::idFn;
 		final SerializableSupplier<BiFunction<Publication, Result, Publication>> mergeAndGetFn = MergeAndGet

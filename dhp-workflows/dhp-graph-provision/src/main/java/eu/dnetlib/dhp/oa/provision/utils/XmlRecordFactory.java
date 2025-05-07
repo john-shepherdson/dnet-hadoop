@@ -1587,6 +1587,7 @@ public class XmlRecordFactory implements Serializable {
 					.stream()
 					.map(Pair::getValue)
 					.map(Instance::getAccessright)
+					.filter(Objects::nonNull)
 					.min(new AccessRightComparator<AccessRight>())
 					.orElse(XmlInstance.UNKNOWN_ACCESS_RIGHT));
 		instance

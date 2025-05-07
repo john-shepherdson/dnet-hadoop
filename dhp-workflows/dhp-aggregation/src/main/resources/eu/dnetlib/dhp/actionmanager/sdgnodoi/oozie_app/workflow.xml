@@ -1,5 +1,4 @@
-
-<workflow-app name="SDG no doi" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="SDG actionset" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>sdgPath</name>
@@ -89,13 +88,10 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sdgPath}</arg>
             <arg>--outputPath</arg><arg>${workingDir}/prepared</arg>
-            <arg>--distributeDoi</arg><arg>false</arg>
         </spark>
         <ok to="produceActionSet"/>
         <error to="Kill"/>
     </action>
-
-
 
     <action name="produceActionSet">
         <spark xmlns="uri:oozie:spark-action:0.2">

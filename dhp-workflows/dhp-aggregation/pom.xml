@@ -122,6 +122,10 @@
             <artifactId>mongo-java-driver</artifactId>
         </dependency>
 
+		 <dependency>
+           <groupId>eu.dnetlib</groupId>
+           <artifactId>uoa-validator-engine2</artifactId>
+         </dependency>
     </dependencies>
 
 </project>
