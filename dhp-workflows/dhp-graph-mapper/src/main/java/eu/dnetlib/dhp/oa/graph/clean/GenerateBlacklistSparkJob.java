@@ -74,7 +74,8 @@ public class GenerateBlacklistSparkJob {
 			spark -> {
 				HdfsSupport.remove(outputPath, spark.sparkContext().hadoopConfiguration());
 
-				Dataset<Row> zenodo_withdrawn_dois = spark.read().load(zenodoWithdrawn);
+				Dataset<Row> zenodo_withdrawn_dois = spark.read().option("header", true).csv(zenodoWithdrawn)
+						.selectExpr("explode(array(doi,parent_doi)) as doi");
 
 				for (Map.Entry<String, Class> e : ModelSupport.oafTypes.entrySet()) {
 					Class<?> clazz = e.getValue();
