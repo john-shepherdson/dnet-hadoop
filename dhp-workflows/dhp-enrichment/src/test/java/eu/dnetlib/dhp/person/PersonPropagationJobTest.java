@@ -7,7 +7,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.logging.Filter;
 
-import eu.dnetlib.dhp.utils.DHPUtils;
+import javax.validation.constraints.AssertTrue;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -29,8 +30,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.schema.oaf.*;
-
-import javax.validation.constraints.AssertTrue;
+import eu.dnetlib.dhp.utils.DHPUtils;
 
 public class PersonPropagationJobTest {
 
@@ -76,24 +76,36 @@ public class PersonPropagationJobTest {
 			.getResource("/eu/dnetlib/dhp/person/graph")
 			.getPath();
 
-		spark.read().json(sourcePath + "/publication")
-						.write()
-								.json(workingDir.toString() + "/graph/publication");
-		spark.read().json(sourcePath + "/dataset")
-				.write()
-				.json(workingDir.toString() + "/graph/dataset");
-		spark.read().json(sourcePath + "/software")
-				.write()
-				.json(workingDir.toString() + "/graph/software");
-		spark.read().json(sourcePath + "/otherresearchproduct")
-				.write()
-				.json(workingDir.toString() + "/graph/otherresearchproduct");
-		spark.read().json(sourcePath + "/person")
-				.write()
-				.json(workingDir.toString() + "/graph/person");
-		spark.read().json(sourcePath + "/relation")
-				.write()
-				.json(workingDir.toString() + "/graph/relation");
+		spark
+			.read()
+			.json(sourcePath + "/publication")
+			.write()
+			.json(workingDir.toString() + "/graph/publication");
+		spark
+			.read()
+			.json(sourcePath + "/dataset")
+			.write()
+			.json(workingDir.toString() + "/graph/dataset");
+		spark
+			.read()
+			.json(sourcePath + "/software")
+			.write()
+			.json(workingDir.toString() + "/graph/software");
+		spark
+			.read()
+			.json(sourcePath + "/otherresearchproduct")
+			.write()
+			.json(workingDir.toString() + "/graph/otherresearchproduct");
+		spark
+			.read()
+			.json(sourcePath + "/person")
+			.write()
+			.json(workingDir.toString() + "/graph/person");
+		spark
+			.read()
+			.json(sourcePath + "/relation")
+			.write()
+			.json(workingDir.toString() + "/graph/relation");
 		SparkExtractPersonRelationsAndAddIndicators
 			.main(
 				new String[] {
@@ -102,10 +114,11 @@ public class PersonPropagationJobTest {
 					"--outputPath", workingDir.toString() + "/working"
 				});
 
-		Dataset<Relation> relations = spark.read().schema(Encoders.bean(Relation.class).schema())
-				.json(workingDir.toString() + "/graph/relation")
-				.as(Encoders.bean(Relation.class));
-
+		Dataset<Relation> relations = spark
+			.read()
+			.schema(Encoders.bean(Relation.class).schema())
+			.json(workingDir.toString() + "/graph/relation")
+			.as(Encoders.bean(Relation.class));
 
 //		"50|doi_________::4892912a1a2c54a98fa85bb08afc2a32","0000-0001-8255-3618","0000-0001-8255-3618"
 //		"50|doi_________::6ad85dd3c2dcc551912362b6e6c6c87a","0000-0001-8255-3619","0000-0001-8255-3618"
@@ -116,51 +129,110 @@ public class PersonPropagationJobTest {
 //		hasAuthored = 9
 //		hasCoAuthor = 8
 
-
 //50|doi_________::fa6db8629c4a8d13ec21e445b309d1c8",0000-0001-7605-9058,0000-0002-0447-8613,0000-0001-5491-7568
-	//	hasAuthored = 3 hasCoAuthor = 6
-
+		// hasAuthored = 3 hasCoAuthor = 6
 
 		Assertions.assertEquals(44, relations.count());
-		Assertions.assertEquals(12, relations.filter((FilterFunction<Relation>) r -> r.getRelClass().equalsIgnoreCase("hasAuthored")).count());
-		relations.filter((FilterFunction<Relation>) r -> r.getRelClass().equalsIgnoreCase("hasAuthored")).foreach((ForeachFunction<Relation>) r -> Assertions.assertTrue(r.getSource().startsWith("30|orcid")));
-		relations.filter((FilterFunction<Relation>) r -> r.getRelClass().equalsIgnoreCase("hasAuthored")).foreach((ForeachFunction<Relation>) r -> Assertions.assertTrue(r.getTarget().startsWith("50|")));
-		Assertions.assertEquals(1, relations.filter((FilterFunction<Relation>) r -> r.getRelClass().equalsIgnoreCase("hasAuthored") && r.getTarget().equalsIgnoreCase("50|doi_________::4892912a1a2c54a98fa85bb08afc2a32")).count());
-		Assertions.assertEquals(2, relations.filter((FilterFunction<Relation>) r -> r.getRelClass().equalsIgnoreCase("hasAuthored") && r.getTarget().equalsIgnoreCase("50|doi_________::6ad85dd3c2dcc551912362b6e6c6c87a")).count());
+		Assertions
+			.assertEquals(
+				12,
+				relations
+					.filter((FilterFunction<Relation>) r -> r.getRelClass().equalsIgnoreCase("hasAuthored"))
+					.count());
+		relations
+			.filter((FilterFunction<Relation>) r -> r.getRelClass().equalsIgnoreCase("hasAuthored"))
+			.foreach((ForeachFunction<Relation>) r -> Assertions.assertTrue(r.getSource().startsWith("30|orcid")));
+		relations
+			.filter((FilterFunction<Relation>) r -> r.getRelClass().equalsIgnoreCase("hasAuthored"))
+			.foreach((ForeachFunction<Relation>) r -> Assertions.assertTrue(r.getTarget().startsWith("50|")));
+		Assertions
+			.assertEquals(
+				1,
+				relations
+					.filter(
+						(FilterFunction<Relation>) r -> r.getRelClass().equalsIgnoreCase("hasAuthored")
+							&& r.getTarget().equalsIgnoreCase("50|doi_________::4892912a1a2c54a98fa85bb08afc2a32"))
+					.count());
+		Assertions
+			.assertEquals(
+				2,
+				relations
+					.filter(
+						(FilterFunction<Relation>) r -> r.getRelClass().equalsIgnoreCase("hasAuthored")
+							&& r.getTarget().equalsIgnoreCase("50|doi_________::6ad85dd3c2dcc551912362b6e6c6c87a"))
+					.count());
 
-		Assertions.assertEquals(4, relations.filter((FilterFunction<Relation>) r -> r.getRelClass().equalsIgnoreCase("hascoauthor") && r.getSource().equalsIgnoreCase("30|orcid_______::" + DHPUtils.md5("0000-0001-8255-3618"))).count());
-		Assertions.assertEquals(4, relations.filter((FilterFunction<Relation>) r -> r.getRelClass().equalsIgnoreCase("hascoauthor") && r.getTarget().equalsIgnoreCase("30|orcid_______::" + DHPUtils.md5("0000-0001-8255-3618"))).count());
+		Assertions
+			.assertEquals(
+				4,
+				relations
+					.filter(
+						(FilterFunction<Relation>) r -> r.getRelClass().equalsIgnoreCase("hascoauthor") && r
+							.getSource()
+							.equalsIgnoreCase("30|orcid_______::" + DHPUtils.md5("0000-0001-8255-3618")))
+					.count());
+		Assertions
+			.assertEquals(
+				4,
+				relations
+					.filter(
+						(FilterFunction<Relation>) r -> r.getRelClass().equalsIgnoreCase("hascoauthor") && r
+							.getTarget()
+							.equalsIgnoreCase("30|orcid_______::" + DHPUtils.md5("0000-0001-8255-3618")))
+					.count());
 
-		Dataset<Person> person = spark.read().schema(Encoders.bean(Person.class).schema())
-				.json(workingDir.toString() + "/graph/person")
-				.as(Encoders.bean(Person.class));
+		Dataset<Person> person = spark
+			.read()
+			.schema(Encoders.bean(Person.class).schema())
+			.json(workingDir.toString() + "/graph/person")
+			.as(Encoders.bean(Person.class));
 
 		Assertions.assertEquals(8, person.count());
-		Assertions.assertEquals(3, person.filter((FilterFunction<Person>) p -> p.getMeasures()!= null && !p.getMeasures().isEmpty()).count());
+		Assertions
+			.assertEquals(
+				3,
+				person
+					.filter((FilterFunction<Person>) p -> p.getMeasures() != null && !p.getMeasures().isEmpty())
+					.count());
 
-
-		List<Measure> measures = person.filter((FilterFunction<Person>) p -> p.getId().equals("30|orcid_______::" + DHPUtils.md5("0000-0001-8255-3618"))).first().getMeasures();
+		List<Measure> measures = person
+			.filter(
+				(FilterFunction<Person>) p -> p
+					.getId()
+					.equals("30|orcid_______::" + DHPUtils.md5("0000-0001-8255-3618")))
+			.first()
+			.getMeasures();
 		measures.forEach(m -> {
 			if (m.getId().equalsIgnoreCase("downloads"))
-				Assertions.assertEquals("30",m.getUnit().get(0).getValue());
+				Assertions.assertEquals("30", m.getUnit().get(0).getValue());
 			else
 				Assertions.assertEquals("9", m.getUnit().get(0).getValue());
 		});
 
-
-		measures = person.filter((FilterFunction<Person>) p -> p.getId().equals("30|orcid_______::" + DHPUtils.md5("0000-0001-8255-3619"))).first().getMeasures();
+		measures = person
+			.filter(
+				(FilterFunction<Person>) p -> p
+					.getId()
+					.equals("30|orcid_______::" + DHPUtils.md5("0000-0001-8255-3619")))
+			.first()
+			.getMeasures();
 		measures.forEach(m -> {
 			if (m.getId().equalsIgnoreCase("downloads"))
-				Assertions.assertEquals("10",m.getUnit().get(0).getValue());
+				Assertions.assertEquals("10", m.getUnit().get(0).getValue());
 			else
 				Assertions.assertEquals("3", m.getUnit().get(0).getValue());
 		});
 
-
-		measures = person.filter((FilterFunction<Person>) p -> p.getId().equals("30|orcid_______::" + DHPUtils.md5("0000-0001-8255-3620"))).first().getMeasures();
+		measures = person
+			.filter(
+				(FilterFunction<Person>) p -> p
+					.getId()
+					.equals("30|orcid_______::" + DHPUtils.md5("0000-0001-8255-3620")))
+			.first()
+			.getMeasures();
 		measures.forEach(m -> {
 			if (m.getId().equalsIgnoreCase("downloads"))
-				Assertions.assertEquals("10",m.getUnit().get(0).getValue());
+				Assertions.assertEquals("10", m.getUnit().get(0).getValue());
 			else
 				Assertions.assertEquals("3", m.getUnit().get(0).getValue());
 		});

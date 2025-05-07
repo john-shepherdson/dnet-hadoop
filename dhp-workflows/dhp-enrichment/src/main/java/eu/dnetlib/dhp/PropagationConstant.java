@@ -79,7 +79,6 @@ public class PropagationConstant {
 	public static final String PROPAGATION_AUTHORSHIP_CLASS_ID = "person:relations:publisher";
 	public static final String PROPAGATION_AUTHORSHIP_CLASS_NAME = "Extraction of authors relations from publishers data enriched with graph orcid";
 
-
 	public static final String ITERATION_ONE = "ExitAtFirstIteration";
 	public static final String ITERATION_TWO = "ExitAtSecondIteration";
 	public static final String ITERATION_THREE = "ExitAtThirdIteration";

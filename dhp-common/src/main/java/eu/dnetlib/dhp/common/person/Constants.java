@@ -30,10 +30,11 @@ public class Constants {
 	public static final String OPENAIRE_PREFIX = "openaire____";
 	public static final String SEPARATOR = "::";
 	public static final String ORCID_KEY = ModelSupport.getIdPrefix(Datasource.class) +
-			IdentifierFactory.ID_PREFIX_SEPARATOR + OPENAIRE_PREFIX + SEPARATOR
+		IdentifierFactory.ID_PREFIX_SEPARATOR + OPENAIRE_PREFIX + SEPARATOR
 		+ DHPUtils.md5(ModelConstants.ORCID.toLowerCase());
-	public static final String PERSON_PREFIX = ModelSupport.getIdPrefix(Person.class) + IdentifierFactory.ID_PREFIX_SEPARATOR +
-			"orcid_______";
+	public static final String PERSON_PREFIX = ModelSupport.getIdPrefix(Person.class)
+		+ IdentifierFactory.ID_PREFIX_SEPARATOR +
+		"orcid_______";
 	public static final String PROJECT_ID_PREFIX = ModelSupport.getIdPrefix(Project.class)
 		+ IdentifierFactory.ID_PREFIX_SEPARATOR;
 }

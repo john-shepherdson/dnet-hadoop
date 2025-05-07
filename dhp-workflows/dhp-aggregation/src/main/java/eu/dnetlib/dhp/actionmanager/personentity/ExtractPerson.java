@@ -356,8 +356,8 @@ public class ExtractPerson implements Serializable {
 	// ORCID
 	private static void extractInfoForActionSetFromORCID(SparkSession spark, String inputPath, String workingDir) {
 		writePerson(spark, inputPath, workingDir);
-		//writeAuthorship(spark, inputPath, workingDir);
-		//writeCoAuthorship(spark, inputPath, workingDir);
+		// writeAuthorship(spark, inputPath, workingDir);
+		// writeCoAuthorship(spark, inputPath, workingDir);
 		writeAffiliations(spark, inputPath, workingDir);
 	}
 
@@ -659,16 +659,15 @@ public class ExtractPerson implements Serializable {
 					.readValue(value, Person.class),
 				Encoders.bean(Person.class));
 
-		Dataset<Relation> relations = //getRelations(spark, workingDir + "/coauthorship")
-			//.union(
-			//	getRelations(spark, workingDir + "/authorship"))
-			//.union(
-				getRelations(spark, workingDir + "/affiliation")//)
-			.union(
-				getRelations(spark, workingDir + "/project"))
-			.union(
-				getRelations(spark, workingDir + "/publishers"));
-
+		Dataset<Relation> relations = // getRelations(spark, workingDir + "/coauthorship")
+			// .union(
+			// getRelations(spark, workingDir + "/authorship"))
+			// .union(
+			getRelations(spark, workingDir + "/affiliation")// )
+				.union(
+					getRelations(spark, workingDir + "/project"))
+				.union(
+					getRelations(spark, workingDir + "/publishers"));
 
 		people
 			.toJavaRDD()
