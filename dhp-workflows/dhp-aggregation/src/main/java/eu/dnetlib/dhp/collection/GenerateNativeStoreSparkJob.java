@@ -228,7 +228,10 @@ public class GenerateNativeStoreSparkJob {
 		});
 
 		final Dataset<MetadataRecord> validated = toSaveRecords
-			.map(mdr -> addValidationReport(mdr, validator, validationErrors, validationWarnings), encoder);
+			.map(
+				(MapFunction<MetadataRecord, MetadataRecord>) mdr -> addValidationReport(
+					mdr, validator, validationErrors, validationWarnings),
+				encoder);
 
 		saveDataset(validated, targetPath);
 

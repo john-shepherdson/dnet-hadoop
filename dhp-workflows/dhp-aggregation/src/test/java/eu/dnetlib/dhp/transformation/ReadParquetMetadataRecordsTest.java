@@ -8,6 +8,7 @@ import java.util.Arrays;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.ForeachFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
@@ -73,7 +74,7 @@ public class ReadParquetMetadataRecordsTest {
 
 			final Dataset<MetadataRecord> records = records1.union(records2);
 
-			records.foreach(r -> System.out.println(r.getId()));
+			records.foreach((ForeachFunction<MetadataRecord>) r -> System.out.println(r.getId()));
 
 			assertTrue(records.count() > 0);
 		}
@@ -89,7 +90,7 @@ public class ReadParquetMetadataRecordsTest {
 				.parquet(VALIDATED_PARQUET_ROOT_DIR)
 				.as(Encoders.bean(MetadataRecord.class));
 
-			records.foreach(r -> System.out.println(r.getId()));
+			records.foreach((ForeachFunction<MetadataRecord>) r -> System.out.println(r.getId()));
 
 			assertTrue(records.count() > 0);
 		}
