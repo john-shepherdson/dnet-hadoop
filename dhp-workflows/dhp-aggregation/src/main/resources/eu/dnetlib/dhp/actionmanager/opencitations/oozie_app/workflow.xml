@@ -77,7 +77,7 @@
                     <value>${queueName}</value>
                 </property>
             </configuration>
-            <exec>download_corr.sh</exec>
+            <exec>download.sh</exec>
             <argument>${filecorrespondence}</argument>
             <argument>${inputPath}/correspondence</argument>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
