@@ -4,6 +4,9 @@ package eu.dnetlib.dhp.collection.plugin.dblp;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.io.StringReader;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -27,7 +30,7 @@ class DBLPCollectorPluginTest {
 
 	private ApiDescriptor api;
 
-	private static final String baseURL = "file:///Users/michele/Downloads/dblp.xml.gz";
+	private static final String baseURL = "/Users/miriam/Develop/python/dblp/dblp.xml.gz";
 
 	@BeforeEach
 	void setUp() throws Exception {
@@ -41,7 +44,7 @@ class DBLPCollectorPluginTest {
 	}
 
 	@Test
-	@Disabled
+	//@Disabled
 	public void testOne() throws Exception {
 		System.out.println("one publication");
 
@@ -51,19 +54,22 @@ class DBLPCollectorPluginTest {
 			final String res = iterator.next();
 			assertNotNull(res);
 			System.out.println(res);
+
 		}
 	}
 
 	@Test
-	@Disabled
+	//@Disabled
 	public void testCompleteHarvesting() throws Exception {
 		System.out.println("testing complete harvesting");
 		final Iterator<String> iterator = this.plugin.collect(this.api, null).iterator();
 		int i = 0;
+		PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("/tmp/bdlpSplit.txt")));
 		while (iterator.hasNext()) {
+
 			final String res = iterator.next();
-			assertNotNull(res);
-			// System.out.println(res);
+			pw.println(res);
+
 			i++;
 
 		}

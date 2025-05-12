@@ -104,7 +104,6 @@ public class ReadCOCITest {
 
 		Assertions.assertEquals(72, tmp.count());
 
-
 	}
 
 }
