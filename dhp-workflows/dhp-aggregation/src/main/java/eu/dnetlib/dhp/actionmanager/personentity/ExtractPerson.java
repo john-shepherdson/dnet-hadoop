@@ -119,18 +119,20 @@ public class ExtractPerson implements Serializable {
 					"`Contributor_roles` : ARRAY<STRUCT<`Schema`:STRING, `Value`:STRING>> ," +
 					"`Name` : STRUCT<`Full`:STRING, `First` : STRING, `Last`: STRING>,  " +
 					"`Matchings`: ARRAY<STRUCT<`PID`:STRING, `Value`:STRING,`Confidence`:DOUBLE, `Status`:STRING>>, " +
-					"`PIDs` : STRUCT<`Schema`:STRING , `Value`: STRING>>>")
+					"`PIDs` : ARRAY<STRUCT<`Schema`:STRING , `Value`: STRING>>>>")
 			.json(inputPath)
-			.where("DOI is not null");
+				.where("DOI is not null");
 
 //Select the relevant information
-		Dataset<Row> authors = df
+		Dataset<Row> allAuthors = df
 			.selectExpr("DOI", "explode(Authors) as author")
 			.selectExpr(
 				"DOI", "author.Contributor_roles as roles",
 				"author.Corresponding as corresponding", "author.Matchings as affs",
-				"author.PIDs as pid")
-			.where("pid.Schema = 'ORCID'")
+				"explode(author.PIDs) as pid")
+				.where("pid.Schema = 'ORCID'");
+
+		Dataset<Row> authors = allAuthors
 			.selectExpr("explode (affs) as affiliation", "DOI", "corresponding", "roles", "pid.Value as orcid")
 			.where("affiliation.Status = 'active'")
 			.selectExpr(
@@ -156,10 +158,8 @@ public class ExtractPerson implements Serializable {
 					.iterator(),
 				Encoders.bean(Relation.class))
 			.unionAll(
-				df
-					.selectExpr("DOI", "explode (Authors) as author")
-					.where("author.PIDs.Schema = 'ORCID'")
-					.selectExpr("DOI", "author.PIDs.Value as orcid")
+				allAuthors
+					.selectExpr("DOI", "pid.Value as orcid")
 					.groupByKey((MapFunction<Row, String>) r -> r.getAs("DOI"), Encoders.STRING())
 
 					.mapGroups(
