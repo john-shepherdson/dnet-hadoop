@@ -648,6 +648,7 @@
             <argument>${wf:appPath()}/scripts/step20-createMonitorDB_RIs.sql</argument>
             <argument>${wf:appPath()}/scripts/step20-createMonitorDB_RIs_tail.sql</argument>
             <argument>${wf:appPath()}/scripts/step20-createMonitorDBAll.sql</argument>
+            <argument>${wf:appPath()}/scripts/step20-createIrishDB.sql</argument>
             <file>monitor.sh</file>
         </shell>
         <ok to="step21-createObservatoryDB-pre"/>

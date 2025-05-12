@@ -1,15 +1,14 @@
 
 package eu.dnetlib.dhp.actionmanager.raid;
 
-import static eu.dnetlib.dhp.actionmanager.personentity.ExtractPerson.OPENAIRE_DATASOURCE_ID;
-import static eu.dnetlib.dhp.actionmanager.personentity.ExtractPerson.OPENAIRE_DATASOURCE_NAME;
+import static eu.dnetlib.dhp.actionmanager.personentity.ASConstants.OPENAIRE_DATASOURCE_ID;
+import static eu.dnetlib.dhp.actionmanager.personentity.ASConstants.OPENAIRE_DATASOURCE_NAME;
 import static eu.dnetlib.dhp.common.Constants.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;

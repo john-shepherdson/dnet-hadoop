@@ -4,6 +4,7 @@ package eu.dnetlib.dhp.actionmanager.person;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.io.Text;
@@ -18,11 +19,14 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.esotericsoftware.kryo.util.ObjectMap;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.actionmanager.personentity.ExtractPerson;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.oaf.Person;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.utils.DHPUtils;
@@ -75,6 +79,12 @@ public class CreatePersonAS {
 				"/eu/dnetlib/dhp/actionmanager/person/")
 			.getPath();
 
+//		spark.read()
+//				.parquet("/Users/miriam/Downloads/part-00000-761dbe11-9f51-4275-a8fd-592649f334ef-c000.snappy.parquet")
+//						.write()
+//								.json("/tmp/part-00000.json");
+
+//
 //		spark
 //				.read()
 //				.parquet(inputPath + "Authors")
@@ -95,7 +105,14 @@ public class CreatePersonAS {
 					"-outputPath",
 					workingDir.toString() + "/actionSet1",
 					"-workingDir",
-					workingDir.toString() + "/working"
+					workingDir.toString() + "/working",
+					"-postgresUrl", "noneed",
+					"-postgresUser", "noneed",
+					"-postgresPassword", "noneed",
+					"-publisherInputPath", getClass()
+						.getResource("/eu/dnetlib/dhp/actionmanager/personpublisher/")
+						.getPath()
+
 				});
 
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
@@ -111,66 +128,69 @@ public class CreatePersonAS {
 			.filter(v -> "eu.dnetlib.dhp.schema.oaf.Person".equalsIgnoreCase(v._1().toString()))
 			.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
 			.map(aa -> ((Person) aa.getPayload()));
-//
-		Assertions.assertEquals(7, people.count());
+
+		Assertions.assertEquals(8, people.count());
 		Assertions
 			.assertEquals(
-				"Paulo",
+				"Seda",
 				people
 					.filter(
-						p -> p.getPid().stream().anyMatch(id -> id.getValue().equalsIgnoreCase("0000-0002-3210-3034")))
+						p -> p.getPid().stream().anyMatch(id -> id.getValue().equalsIgnoreCase("0000-0001-6544-2588")))
 					.first()
 					.getGivenName());
 		Assertions
 			.assertEquals(
-				"Tavares",
+				"Ardahan Sevgili",
 				people
 					.filter(
-						p -> p.getPid().stream().anyMatch(id -> id.getValue().equalsIgnoreCase("0000-0002-3210-3034")))
+						p -> p.getPid().stream().anyMatch(id -> id.getValue().equalsIgnoreCase("0000-0001-6544-2588")))
 					.first()
 					.getFamilyName());
 		Assertions
 			.assertEquals(
-				4,
+				0,
 				people
 					.filter(
-						p -> p.getPid().stream().anyMatch(id -> id.getValue().equalsIgnoreCase("0000-0002-3210-3034")))
+						p -> p.getPid().stream().anyMatch(id -> id.getValue().equalsIgnoreCase("0000-0001-6544-2588")))
 					.first()
 					.getAlternativeNames()
 					.size());
 		Assertions
 			.assertEquals(
-				4,
+				2,
 				people
 					.filter(
-						p -> p.getPid().stream().anyMatch(id -> id.getValue().equalsIgnoreCase("0000-0002-3210-3034")))
+						p -> p.getPid().stream().anyMatch(id -> id.getValue().equalsIgnoreCase("0000-0001-6544-2588")))
 					.first()
 					.getPid()
 					.size());
+
 		Assertions
 			.assertTrue(
 				people
 					.filter(
-						p -> p.getPid().stream().anyMatch(id -> id.getValue().equalsIgnoreCase("0000-0002-3210-3034")))
+						p -> p.getPid().stream().anyMatch(id -> id.getValue().equalsIgnoreCase("0000-0001-6544-2588")))
 					.first()
 					.getPid()
 					.stream()
 					.anyMatch(
-						p -> p.getQualifier().getSchemename().equalsIgnoreCase("Scopus Author ID")
-							&& p.getValue().equalsIgnoreCase("15119405200")));
+						p -> p.getQualifier().getClassname().equalsIgnoreCase("Scopus Author ID")
+							&& p.getValue().equalsIgnoreCase("57203318816")));
 
 		Assertions
 			.assertEquals(
-				16,
+				18,
 				relations
 					.filter(r -> r.getRelClass().equalsIgnoreCase(ModelConstants.RESULT_PERSON_HASAUTHORED))
 					.count());
 		Assertions
 			.assertEquals(
-				14,
+				16,
 				relations
 					.filter(r -> r.getRelClass().equalsIgnoreCase(ModelConstants.PERSON_PERSON_HASCOAUTHORED))
 					.count());
+		// four relations are expected: one from publisher, three from works. the same work has two valid pids so two
+		// results produce three relations
 		Assertions
 			.assertEquals(
 				3,
@@ -179,6 +199,7 @@ public class CreatePersonAS {
 						r -> r.getSource().equalsIgnoreCase("30|orcid_______::" + DHPUtils.md5("0000-0001-6291-9619"))
 							&& r.getRelClass().equalsIgnoreCase(ModelConstants.RESULT_PERSON_HASAUTHORED))
 					.count());
+
 		Assertions
 			.assertEquals(
 				2,
@@ -200,13 +221,81 @@ public class CreatePersonAS {
 
 		Assertions
 			.assertEquals(
-				1,
+				2,
 				relations
 					.filter(
 						r -> r.getSource().equalsIgnoreCase("30|orcid_______::" + DHPUtils.md5("0000-0001-6291-9619"))
 							&& r.getRelClass().equalsIgnoreCase(ModelConstants.PERSON_PERSON_HASCOAUTHORED))
 					.count());
-		Assertions.assertEquals(33, relations.count());
+		Assertions.assertEquals(38, relations.count());
+
+		relations
+			.foreach(
+				r -> Assertions
+					.assertTrue(
+						r.getSource().startsWith("30|orcid_______::") ||
+							r.getTarget().startsWith("30|orcid_______::")
+							|| r.getTarget().startsWith("50|doi_________::")
+							|| r.getTarget().startsWith("50|arXiv_______::")
+							|| r.getTarget().startsWith("50|pmc_________::")
+							|| r.getTarget().startsWith("50|pmid________::")
+							|| r.getTarget().startsWith("20|ror_________::")
+							|| r.getTarget().startsWith("40|")));
+
+		// check contribution from publisher papers
+		// the relation was merged with the other one already extracted from orcid
+		JavaRDD<Relation> filterRelations = relations
+			.filter(
+				r -> r.getSource().equalsIgnoreCase("30|orcid_______::4e3bfd34079624f293a03e03c243b96b")
+					&& r.getRelClass().equalsIgnoreCase(ModelConstants.RESULT_PERSON_HASAUTHORED)
+					&& r.getTarget().startsWith("50|doi_________::a69682d48d289d8b5d735a70a5ef00ec"));
+		Assertions.assertEquals(1, filterRelations.count());
+
+		List<KeyValue> properties = filterRelations.first().getProperties();
+		Assertions.assertFalse(properties.isEmpty());
+		Assertions.assertEquals(4, properties.size());
+
+		Assertions
+			.assertEquals(1, properties.stream().filter(p -> p.getKey().equalsIgnoreCase("corresponding")).count());
+		Assertions
+			.assertEquals(
+				1, properties
+					.stream()
+					.filter(
+						p -> p.getKey().equalsIgnoreCase("corresponding") &&
+							p.getValue().equalsIgnoreCase("true"))
+					.count());
+		Assertions
+			.assertEquals(
+				1, properties.stream().filter(p -> p.getKey().equalsIgnoreCase("declared_affiliation")).count());
+		Assertions
+			.assertEquals(
+				1, properties
+					.stream()
+					.filter(
+						p -> p.getKey().equalsIgnoreCase("declared_affiliation") &&
+							p.getValue().equalsIgnoreCase("https://ror.org/05582kr93") &&
+							p.getDataInfo() != null && p.getDataInfo().getTrust().equalsIgnoreCase("1.0"))
+					.count());
+		Assertions.assertEquals(2, properties.stream().filter(p -> p.getKey().equalsIgnoreCase("role")).count());
+
+		JavaRDD<Relation> filterAffiliation = relations
+			.filter(r -> r.getRelClass().equalsIgnoreCase(ModelConstants.ORG_PERSON_PARTICIPATES));
+		JavaRDD<Relation> rels = filterAffiliation;
+		relations.foreach(r -> System.out.println(new ObjectMapper().writeValueAsString(r)));
+		Assertions.assertEquals(4, filterAffiliation.count());
+		Assertions
+			.assertEquals(
+				3,
+				filterAffiliation
+					.filter(r -> r.getCollectedfrom().get(0).getValue().equalsIgnoreCase("OpenAIRE"))
+					.count());
+		Assertions
+			.assertEquals(
+				1,
+				filterAffiliation
+					.filter(r -> r.getCollectedfrom().get(0).getValue().equalsIgnoreCase("ORCID"))
+					.count());
 
 	}
 

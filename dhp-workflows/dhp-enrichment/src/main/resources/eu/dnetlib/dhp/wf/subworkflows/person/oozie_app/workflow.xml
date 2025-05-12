@@ -39,7 +39,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>personPropagation</name>
-            <class>eu.dnetlib.dhp.person.SparkExtractPersonRelations</class>
+            <class>eu.dnetlib.dhp.person.SparkExtractPersonRelationsAndAddIndicators</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
