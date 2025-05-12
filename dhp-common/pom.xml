@@ -61,6 +61,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>eu.openaire</groupId>
+			<artifactId>author-identifier-reconciler</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>edu.cmu</groupId>
 			<artifactId>secondstring</artifactId>
 		</dependency>
