@@ -262,7 +262,7 @@ public class PiwikStatsDB {
 
 	public void removeDoubleClicks() throws Exception {
 		Statement stmt = ConnectDB.getHiveConnection().createStatement();
-		ConnectDB.getHiveConnection().setAutoCommit(false);
+		// ConnectDB.getHiveConnection().setAutoCommit(false);
 
 		logger.info("Cleaning download double clicks");
 		// clean download double clicks

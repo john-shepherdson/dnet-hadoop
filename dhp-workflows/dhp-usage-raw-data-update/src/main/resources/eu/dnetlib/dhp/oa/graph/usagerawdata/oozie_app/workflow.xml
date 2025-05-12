@@ -82,6 +82,7 @@
             <arg>--sarcNumberOfIssnToDownload</arg><arg>${sarcNumberOfIssnToDownload}</arg>
             <arg>--finalizeStats</arg><arg>${finalizeStats}</arg>
             <arg>--numberOfDownloadThreads</arg><arg>${numberOfDownloadThreads}</arg>
+            <arg>--numberOfDaysToProcess</arg><arg>${numberOfDaysToProcess}</arg>
             <capture-output/>
         </java>
         <ok to="End" />

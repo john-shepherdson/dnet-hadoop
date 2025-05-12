@@ -2,7 +2,6 @@
 package eu.dnetlib.oa.graph.usagerawdata.export;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.apache.hadoop.conf.Configuration;
@@ -53,8 +52,8 @@ public class UsageStatsExporter {
 
 		PiwikStatsDB piwikstatsdb = new PiwikStatsDB(ExecuteWorkflow.repoLogPath, ExecuteWorkflow.portalLogPath);
 
-		logger.info("Re-creating database and tables");
 		if (ExecuteWorkflow.recreateDbAndTables) {
+			logger.info("Re-creating database and tables");
 			piwikstatsdb.recreateDBAndTables();
 			logger.info("DB-Tables-TmpTables are created ");
 		}
@@ -71,7 +70,7 @@ public class UsageStatsExporter {
 		if (ExecuteWorkflow.downloadPiwikLogs) {
 			logger.info("Downloading piwik logs");
 			piwd
-				.GetOpenAIRELogs(
+				.getOpenAIRELogs(
 					ExecuteWorkflow.repoLogPath,
 					ExecuteWorkflow.portalLogPath, ExecuteWorkflow.portalMatomoID);
 		}

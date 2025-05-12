@@ -6,9 +6,9 @@
 
 package eu.dnetlib.oa.graph.usagerawdata.export;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.BasicConfigurator;
@@ -42,8 +42,8 @@ public class ExecuteWorkflow {
 	static boolean downloadPiwikLogs;
 	static boolean processPiwikLogs;
 
-	static Calendar startingLogPeriod;
-	static Calendar endingLogPeriod;
+	static LocalDate startingLogPeriod;
+	static LocalDate endingLogPeriod;
 	static int numberOfPiwikIdsToDownload;
 	static int numberOfSiteIdsToDownload;
 
@@ -60,10 +60,9 @@ public class ExecuteWorkflow {
 	static boolean sarcDownloadReports;
 	static boolean sarcProcessStats;
 	static int sarcNumberOfIssnToDownload;
-
 	static boolean finalizeStats;
-
 	static int numberOfDownloadThreads;
+	static int numberOfDaysToProcess;
 
 	public static void main(String args[]) throws Exception {
 
@@ -96,6 +95,7 @@ public class ExecuteWorkflow {
 		dbImpalaUrl = parser.get("dbImpalaUrl");
 		usageStatsDBSchema = parser.get("usageStatsDBSchema");
 		statsDBSchema = parser.get("statsDBSchema");
+		numberOfDaysToProcess = Integer.parseInt(parser.get("numberOfDaysToProcess"));
 
 		if (parser.get("recreateDbAndTables").toLowerCase().equals("true")) {
 			recreateDbAndTables = true;
@@ -121,13 +121,10 @@ public class ExecuteWorkflow {
 			processPiwikLogs = false;
 		}
 
-		String startingLogPeriodStr = parser.get("startingLogPeriod");
-		Date startingLogPeriodDate = new SimpleDateFormat("MM/yyyy").parse(startingLogPeriodStr);
-		startingLogPeriod = startingLogPeriodStr(startingLogPeriodDate);
-
-//		String endingLogPeriodStr = parser.get("endingLogPeriod");
-//		Date endingLogPeriodDate = new SimpleDateFormat("MM/yyyy").parse(endingLogPeriodStr);
-//		endingLogPeriod = startingLogPeriodStr(endingLogPeriodDate);
+		// Parse LocalDate from MM/yyyy format by assuming first day of the month
+		String startingLogPeriodStr = parser.get("startingLogPeriod"); // e.g., "02/2024"
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/yyyy");
+		startingLogPeriod = YearMonth.parse(startingLogPeriodStr, formatter).atDay(1);
 
 		numberOfPiwikIdsToDownload = Integer.parseInt(parser.get("numberOfPiwikIdsToDownload"));
 		numberOfSiteIdsToDownload = Integer.parseInt(parser.get("numberOfSiteIdsToDownload"));
@@ -198,14 +195,5 @@ public class ExecuteWorkflow {
 
 		UsageStatsExporter usagestatsExport = new UsageStatsExporter();
 		usagestatsExport.export();
-		// usagestatsExport.createdDBWithTablesOnly();
-	}
-
-	private static Calendar startingLogPeriodStr(Date date) {
-
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(date);
-		return calendar;
-
 	}
 }

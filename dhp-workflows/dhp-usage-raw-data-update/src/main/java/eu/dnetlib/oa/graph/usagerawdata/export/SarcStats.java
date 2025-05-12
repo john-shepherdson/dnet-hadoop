@@ -1,19 +1,18 @@
 
 package eu.dnetlib.oa.graph.usagerawdata.export;
 
-import java.io.*;
-// import java.io.BufferedReader;
-// import java.io.InputStreamReader;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,7 +20,9 @@ import java.util.Set;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.LocalFileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -29,29 +30,31 @@ import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @author D. Pierrakos, S. Zoupanos
- */
 public class SarcStats {
 
 	private Statement stmtHive = null;
 	private Statement stmtImpala = null;
 
+	private static final DateTimeFormatter YYYY_MM_DD_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+	private static final DateTimeFormatter YYYY_MM = DateTimeFormatter.ofPattern("yyyy-MM");
+
+	// Get start/end period
+	private LocalDate start;
+	private LocalDate end;
+
 	private static final Logger logger = LoggerFactory.getLogger(SarcStats.class);
 
-	public SarcStats() throws Exception {
-//		createTables();
+	private static final int NUM_OF_DAYS = 15; // number of days to process since the start date
+
+	public SarcStats() {
 	}
 
 	private void createTables() throws Exception {
 		try {
-
 			stmtHive = ConnectDB.getHiveConnection().createStatement();
 			String sqlCreateTableSushiLog = "CREATE TABLE IF NOT EXISTS sushilog(source TEXT, repository TEXT, rid TEXT, date TEXT, metric_type TEXT, count INT, PRIMARY KEY(source, repository, rid, date, metric_type));";
 			stmtHive.executeUpdate(sqlCreateTableSushiLog);
 
-			// String sqlCopyPublicSushiLog="INSERT INTO sushilog SELECT * FROM public.sushilog;";
-			// stmt.executeUpdate(sqlCopyPublicSushiLog);
 			String sqlcreateRuleSushiLog = "CREATE OR REPLACE RULE ignore_duplicate_inserts AS "
 				+ " ON INSERT TO sushilog "
 				+ " WHERE (EXISTS ( SELECT sushilog.source, sushilog.repository,"
@@ -66,7 +69,7 @@ public class SarcStats {
 			ConnectDB.getHiveConnection().close();
 			logger.info("Sushi Tables Created");
 		} catch (Exception e) {
-			logger.error("Failed to create tables: " + e);
+			logger.error("Failed to create tables: {}", e.toString());
 			throw new Exception("Failed to create tables: " + e.toString(), e);
 		}
 	}
@@ -74,16 +77,16 @@ public class SarcStats {
 	public void reCreateLogDirs() throws IOException {
 		FileSystem dfs = FileSystem.get(new Configuration());
 
-		logger.info("Deleting sarcsReport (Array) directory: " + ExecuteWorkflow.sarcsReportPathArray);
+		logger.info("Deleting sarcsReport (Array) directory: {}", ExecuteWorkflow.sarcsReportPathArray);
 		dfs.delete(new Path(ExecuteWorkflow.sarcsReportPathArray), true);
 
-		logger.info("Deleting sarcsReport (NonArray) directory: " + ExecuteWorkflow.sarcsReportPathNonArray);
+		logger.info("Deleting sarcsReport (NonArray) directory: {}", ExecuteWorkflow.sarcsReportPathNonArray);
 		dfs.delete(new Path(ExecuteWorkflow.sarcsReportPathNonArray), true);
 
-		logger.info("Creating sarcsReport (Array) directory: " + ExecuteWorkflow.sarcsReportPathArray);
+		logger.info("Creating sarcsReport (Array) directory: {}", ExecuteWorkflow.sarcsReportPathArray);
 		dfs.mkdirs(new Path(ExecuteWorkflow.sarcsReportPathArray));
 
-		logger.info("Creating sarcsReport (NonArray) directory: " + ExecuteWorkflow.sarcsReportPathNonArray);
+		logger.info("Creating sarcsReport (NonArray) directory: {}", ExecuteWorkflow.sarcsReportPathNonArray);
 		dfs.mkdirs(new Path(ExecuteWorkflow.sarcsReportPathNonArray));
 	}
 
@@ -215,68 +218,68 @@ public class SarcStats {
 		ConnectDB.getHiveConnection().close();
 
 		List<String[]> issnAndUrls = new ArrayList<String[]>();
-		issnAndUrls.add(new String[] {
-			"https://revistas.rcaap.pt/motricidade/sushiLite/v1_7/", "1646-107X"
-		});
-		issnAndUrls.add(new String[] {
-			"https://revistas.rcaap.pt/antropologicas/sushiLite/v1_7/", "0873-819X"
-		});
-		issnAndUrls.add(new String[] {
-			"https://revistas.rcaap.pt/interaccoes/sushiLite/v1_7/", "1646-2335"
-		});
-		issnAndUrls.add(new String[] {
-			"https://revistas.rcaap.pt/cct/sushiLite/v1_7/", "2182-3030"
-		});
-		issnAndUrls.add(new String[] {
-			"https://actapediatrica.spp.pt/sushiLite/v1_7/", "0873-9781"
-		});
-		issnAndUrls.add(new String[] {
-			"https://revistas.rcaap.pt/sociologiapp/sushiLite/v1_7/", "0873-6529"
-		});
-		issnAndUrls.add(new String[] {
-			"https://revistas.rcaap.pt/finisterra/sushiLite/v1_7/", "0430-5027"
-		});
-		issnAndUrls.add(new String[] {
-			"https://revistas.rcaap.pt/sisyphus/sushiLite/v1_7/", "2182-8474"
-		});
-		issnAndUrls.add(new String[] {
-			"https://revistas.rcaap.pt/anestesiologia/sushiLite/v1_7/", "0871-6099"
-		});
-		issnAndUrls.add(new String[] {
-			"https://revistas.rcaap.pt/rpe/sushiLite/v1_7/", "0871-9187"
-		});
-		issnAndUrls.add(new String[] {
-			"https://revistas.rcaap.pt/psilogos/sushiLite/v1_7/", "1646-091X"
-		});
-		issnAndUrls.add(new String[] {
-			"https://revistas.rcaap.pt/juridica/sushiLite/v1_7/", "2183-5799"
-		});
-		issnAndUrls.add(new String[] {
-			"https://revistas.rcaap.pt/ecr/sushiLite/v1_7/", "1647-2098"
-		});
-		issnAndUrls.add(new String[] {
-			"https://revistas.rcaap.pt/nascercrescer/sushiLite/v1_7/", "0872-0754"
-		});
-		issnAndUrls.add(new String[] {
-			"https://revistas.rcaap.pt/cea/sushiLite/v1_7/", "1645-3794"
-		});
-		issnAndUrls.add(new String[] {
-			"https://revistas.rcaap.pt/proelium/sushiLite/v1_7/", "1645-8826"
-		});
-		issnAndUrls.add(new String[] {
-			"https://revistas.rcaap.pt/millenium/sushiLite/v1_7/", "0873-3015"
-		});
+//		issnAndUrls.add(new String[] {
+//			"https://revistas.rcaap.pt/motricidade/sushiLite/v1_7/", "1646-107X"
+//		});
+//		issnAndUrls.add(new String[] {
+//			"https://revistas.rcaap.pt/antropologicas/sushiLite/v1_7/", "0873-819X"
+//		});
+//		issnAndUrls.add(new String[] {
+//			"https://revistas.rcaap.pt/interaccoes/sushiLite/v1_7/", "1646-2335"
+//		});
+//		issnAndUrls.add(new String[] {
+//			"https://revistas.rcaap.pt/cct/sushiLite/v1_7/", "2182-3030"
+//		});
+//		issnAndUrls.add(new String[] {
+//			"https://actapediatrica.spp.pt/sushiLite/v1_7/", "0873-9781"
+//		});
+//		issnAndUrls.add(new String[] {
+//			"https://revistas.rcaap.pt/sociologiapp/sushiLite/v1_7/", "0873-6529"
+//		});
+//		issnAndUrls.add(new String[] {
+//			"https://revistas.rcaap.pt/finisterra/sushiLite/v1_7/", "0430-5027"
+//		});
+//		issnAndUrls.add(new String[] {
+//			"https://revistas.rcaap.pt/sisyphus/sushiLite/v1_7/", "2182-8474"
+//		});
+//		issnAndUrls.add(new String[] {
+//			"https://revistas.rcaap.pt/anestesiologia/sushiLite/v1_7/", "0871-6099"
+//		});
+//		issnAndUrls.add(new String[] {
+//			"https://revistas.rcaap.pt/rpe/sushiLite/v1_7/", "0871-9187"
+//		});
+//		issnAndUrls.add(new String[] {
+//			"https://revistas.rcaap.pt/psilogos/sushiLite/v1_7/", "1646-091X"
+//		});
+//		issnAndUrls.add(new String[] {
+//			"https://revistas.rcaap.pt/juridica/sushiLite/v1_7/", "2183-5799"
+//		});
+//		issnAndUrls.add(new String[] {
+//			"https://revistas.rcaap.pt/ecr/sushiLite/v1_7/", "1647-2098"
+//		});
+//		issnAndUrls.add(new String[] {
+//			"https://revistas.rcaap.pt/nascercrescer/sushiLite/v1_7/", "0872-0754"
+//		});
+//		issnAndUrls.add(new String[] {
+//			"https://revistas.rcaap.pt/cea/sushiLite/v1_7/", "1645-3794"
+//		});
+//		issnAndUrls.add(new String[] {
+//			"https://revistas.rcaap.pt/proelium/sushiLite/v1_7/", "1645-8826"
+//		});
+//		issnAndUrls.add(new String[] {
+//			"https://revistas.rcaap.pt/millenium/sushiLite/v1_7/", "0873-3015"
+//		});
 
 		if (ExecuteWorkflow.sarcNumberOfIssnToDownload > 0
 			&& ExecuteWorkflow.sarcNumberOfIssnToDownload <= issnAndUrls.size()) {
-			logger.info("Trimming siteIds list to the size of: " + ExecuteWorkflow.sarcNumberOfIssnToDownload);
+			logger.info("Trimming siteIds list to the size of: {}", ExecuteWorkflow.sarcNumberOfIssnToDownload);
 			issnAndUrls = issnAndUrls.subList(0, ExecuteWorkflow.sarcNumberOfIssnToDownload);
 		}
 
-		logger.info("(getAndProcessSarc) Downloading the followins opendoars: " + issnAndUrls);
+		logger.info("(getAndProcessSarc) Downloading the followins opendoars: {}", issnAndUrls);
 
 		for (String[] issnAndUrl : issnAndUrls) {
-			logger.info("Now working on ISSN: " + issnAndUrl[1]);
+			logger.info("Now working on ISSN: {}", issnAndUrl[1]);
 			getARReport(sarcsReportPathArray, sarcsReportPathNonArray, issnAndUrl[0], issnAndUrl[1]);
 		}
 
@@ -303,36 +306,31 @@ public class SarcStats {
 		logger.info("Processing SARC! issn: " + issn + " with url: " + url);
 		ConnectDB.getHiveConnection().setAutoCommit(false);
 
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYY-MM");
-		// Setting the starting period
-		Calendar start = (Calendar) ExecuteWorkflow.startingLogPeriod.clone();
-		logger.info("(getARReport) Starting period for log download: " + simpleDateFormat.format(start.getTime()));
+//		// Setting the starting period
+//		start = ExecuteWorkflow.startingLogPeriod;
+//		logger.info("(getARReport) Starting period for log download: {}", start.format(YYYY_MM));
+//
+//		// Setting the ending period (last day of the month)
+//		end = LocalDate.now().minusDays(1);
+//		logger.info("(getARReport) Ending period for log download: " + end.format(YYYY_MM));
 
-		// Setting the ending period (last day of the month)
-//		Calendar end = (Calendar) ExecuteWorkflow.endingLogPeriod.clone();
-//		end.add(Calendar.MONTH, +1);
-//		end.add(Calendar.DAY_OF_MONTH, -1);
-		Calendar end = Calendar.getInstance();
-		end.add(Calendar.DAY_OF_MONTH, -1);
-
-		logger.info("(getARReport) Ending period for log download: " + simpleDateFormat.format(end.getTime()));
-
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		PreparedStatement st = ConnectDB
 			.getHiveConnection()
 			.prepareStatement(
 				"SELECT max(date) FROM " + ConnectDB.getUsageStatsDBSchema() + ".sushilog WHERE repository=?");
 		st.setString(1, issn);
 		ResultSet rs_date = st.executeQuery();
-		Date dateMax = null;
+
+		LocalDate dateMax = null;
 		while (rs_date.next()) {
-			if (rs_date.getString(1) != null && !rs_date.getString(1).equals("null")
-				&& !rs_date.getString(1).equals("")) {
-				start.setTime(sdf.parse(rs_date.getString(1)));
-				dateMax = sdf.parse(rs_date.getString(1));
+			String maxDateStr = rs_date.getString(1);
+			if (maxDateStr != null && !maxDateStr.equals("null") && !maxDateStr.isEmpty()) {
+				dateMax = LocalDate.parse(maxDateStr, YYYY_MM_DD_FORMATTER);
 			}
 		}
 		rs_date.close();
+
+		initializeDateRange(dateMax);
 
 		// Creating the needed configuration for the correct storing of data
 		Configuration config = new Configuration();
@@ -341,30 +339,29 @@ public class SarcStats {
 		config
 			.set(
 				"fs.hdfs.impl",
-				org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
+				DistributedFileSystem.class.getName());
 		config
 			.set(
 				"fs.file.impl",
-				org.apache.hadoop.fs.LocalFileSystem.class.getName());
+				LocalFileSystem.class.getName());
 		FileSystem dfs = FileSystem.get(config);
 
-		if (dateMax != null && end.getTime().compareTo(dateMax) <= 0) {
-			logger.info("Date found in logs " + dateMax + " and not downloanding logs for " + issn);
+		if (dateMax != null && !end.isAfter(dateMax)) {
+			logger.info("Date found in logs " + dateMax + " and not downloading logs for " + issn);
 		} else {
-			start.add(Calendar.MONTH, 1);
-			while (start.before(end)) {
-				String reportUrl = url + "GetReport/?Report=AR1&Format=json&BeginDate="
-					+ simpleDateFormat.format(start.getTime()) + "&EndDate=" + simpleDateFormat.format(start.getTime());
-				start.add(Calendar.MONTH, 1);
+			while (start.isBefore(end) || start.equals(end)) {
+				String reportUrl = url + "GetReport/?Report=AR1&Format=json&BeginDate=" + YYYY_MM.format(start)
+					+ "&EndDate=" + YYYY_MM.format(start.plusMonths(1));
 
-				logger.info("(getARReport) Getting report: " + reportUrl);
+				logger.info("(getARReport) Getting report: {}", reportUrl);
 				String text = getJson(reportUrl);
 				if (text == null) {
+					logger.info("(getARReport) - text is: {}", text);
 					continue;
 				}
 
 				JSONParser parser = new JSONParser();
-				JSONObject jsonObject = null;
+				JSONObject jsonObject;
 				try {
 					jsonObject = (JSONObject) parser.parse(text);
 				} // if there is a parsing error continue with the next url
@@ -393,18 +390,17 @@ public class SarcStats {
 
 				// Creating the file in the filesystem for the ItemIdentifier as array object
 				String filePathArray = sarcsReportPathArray + "/SarcsARReport_" + issn + "_"
-					+ simpleDateFormat.format(start.getTime()) + ".json";
+					+ YYYY_MM.format(start) + ".json";
 				logger.info("Storing to file: " + filePathArray);
 				FSDataOutputStream finArray = dfs.create(new Path(filePathArray), true);
 
 				// Creating the file in the filesystem for the ItemIdentifier as array object
 				String filePathNonArray = sarcsReportPathNonArray + "/SarcsARReport_" + issn + "_"
-					+ simpleDateFormat.format(start.getTime()) + ".json";
+					+ YYYY_MM.format(start) + ".json";
 				logger.info("Storing to file: " + filePathNonArray);
 				FSDataOutputStream finNonArray = dfs.create(new Path(filePathNonArray), true);
 
 				for (Object aJsonArray : jsonArray) {
-
 					JSONObject jsonObjectRow = (JSONObject) aJsonArray;
 					renameKeysRecursively(":", jsonObjectRow);
 
@@ -430,11 +426,31 @@ public class SarcStats {
 					fileNonArray.delete();
 				}
 
+				start = start.plusMonths(1);
 			}
 
 			dfs.close();
 		}
-		// ConnectDB.getHiveConnection().close();
+	}
+
+	private void initializeDateRange(LocalDate maxDate) {
+		if (maxDate != null) {
+			start = maxDate.plusDays(1); // start from the next day, because maxDate has been already processed
+		} else {
+			start = ExecuteWorkflow.startingLogPeriod; // no maxDate? then get the start date from config
+		}
+
+		// Add number of days
+		end = start.plusDays(NUM_OF_DAYS);
+
+		// Ensure end date is not after yesterday
+		LocalDate yesterday = LocalDate.now().minusDays(1);
+		if (end.isAfter(yesterday)) {
+			end = yesterday;
+		}
+
+		logger.info("Starting period for log download: {}", YYYY_MM.format(start));
+		logger.info("Ending period for log download ({} days or yesterday): {}", NUM_OF_DAYS, YYYY_MM.format(end));
 	}
 
 	private void renameKeysRecursively(String delimiter, JSONArray givenJsonObj) throws Exception {
@@ -470,7 +486,7 @@ public class SarcStats {
 		}
 	}
 
-	private String getJson(String url) throws Exception {
+	private String getJson(String url) {
 		// String cred=username+":"+password;
 		// String encoded = new sun.misc.BASE64Encoder().encode (cred.getBytes());
 		try {
@@ -491,9 +507,6 @@ public class SarcStats {
 
 			// Logging error and silently continuing
 			logger.error("Failed to get URL: " + e);
-			System.out.println("Failed to get URL: " + e);
-//			return null;
-//			throw new Exception("Failed to get URL: " + e.toString(), e);
 		}
 		return "";
 	}
