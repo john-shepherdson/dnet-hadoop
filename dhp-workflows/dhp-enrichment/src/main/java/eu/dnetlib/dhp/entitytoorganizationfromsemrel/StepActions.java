@@ -142,7 +142,8 @@ public class StepActions implements Serializable {
 				if (relationList
 					.stream()
 					.filter(
-						rel -> !rel
+						rel -> rel.getDataInfo().getProvenanceaction() != null
+							&& !rel
 							.getDataInfo()
 							.getProvenanceaction()
 							.getClassid()
