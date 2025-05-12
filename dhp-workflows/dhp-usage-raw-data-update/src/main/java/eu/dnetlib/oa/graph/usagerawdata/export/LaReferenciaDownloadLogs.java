@@ -7,10 +7,10 @@ import java.net.URLConnection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
@@ -23,29 +23,30 @@ import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @author D. Pierrakos, S. Zoupanos
- */
 public class LaReferenciaDownloadLogs {
 
 	private final String piwikUrl;
-	private Date startDate;
 	private final String tokenAuth;
 
-	/*
-	 * The Piwik's API method
-	 */
 	private final String APImethod = "?module=API&method=Live.getLastVisitsDetails";
 	private final String format = "&format=json";
 	private final String ApimethodGetAllSites = "?module=API&method=SitesManager.getSitesWithViewAccess";
 
+	private static final DateTimeFormatter YYYY_MM_DD_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+	private static final DateTimeFormatter YYYY_MM_DD_HH_mm_ss = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
 	private static final Logger logger = LoggerFactory.getLogger(LaReferenciaDownloadLogs.class);
+
+	// Get start/end period
+	private LocalDate start;
+	private LocalDate end;
+
+	private static final int NUM_OF_DAYS = 30; // number of days to process since the start date
 
 	public LaReferenciaDownloadLogs(String piwikUrl, String tokenAuth) throws Exception {
 		this.piwikUrl = piwikUrl;
 		this.tokenAuth = tokenAuth;
 		this.createTables();
-//        this.createTmpTables();
 	}
 
 	public void reCreateLogDirs() throws IllegalArgumentException, IOException {
@@ -64,22 +65,13 @@ public class LaReferenciaDownloadLogs {
 
 			logger.info("Creating LaReferencia tables");
 			String sqlCreateTableLareferenciaLog = "CREATE TABLE IF NOT EXISTS "
-				+ ConnectDB.getUsageStatsDBSchema() + ".lareferencialog(matomoid INT, "
-				+ "source STRING, id_visit STRING, country STRING, action STRING, url STRING, entity_id STRING, "
-				+ "source_item_type STRING, timestamp STRING, referrer_name STRING, agent STRING) "
-				+ "clustered by (source, id_visit, action, timestamp, entity_id) into 100 buckets "
-				+ "stored as orc tblproperties('transactional'='true')";
+					+ ConnectDB.getUsageStatsDBSchema() + ".lareferencialog(matomoid INT, "
+					+ "source STRING, id_visit STRING, country STRING, action STRING, url STRING, entity_id STRING, "
+					+ "source_item_type STRING, timestamp STRING, referrer_name STRING, agent STRING) "
+					+ "clustered by (source, id_visit, action, timestamp, entity_id) into 100 buckets "
+					+ "stored as orc tblproperties('transactional'='true')";
 			stmt.executeUpdate(sqlCreateTableLareferenciaLog);
 			logger.info("Created LaReferencia tables");
-//            String sqlcreateRuleLaReferenciaLog = "CREATE OR REPLACE RULE ignore_duplicate_inserts AS "
-//                    + " ON INSERT TO lareferencialog "
-//                    + " WHERE (EXISTS ( SELECT lareferencialog.matomoid, lareferencialog.source, lareferencialog.id_visit,"
-//                    + "lareferencialog.action, lareferencialog.\"timestamp\", lareferencialog.entity_id "
-//                    + "FROM lareferencialog "
-//                    + "WHERE lareferencialog.matomoid=new.matomoid AND lareferencialog.source = new.source AND lareferencialog.id_visit = new.id_visit AND lareferencialog.action = new.action AND lareferencialog.entity_id = new.entity_id AND lareferencialog.\"timestamp\" = new.\"timestamp\")) DO INSTEAD NOTHING;";
-//            String sqlCreateRuleIndexLaReferenciaLog = "create index if not exists lareferencialog_rule on lareferencialog(matomoid, source, id_visit, action, entity_id, \"timestamp\");";
-//            stmt.executeUpdate(sqlcreateRuleLaReferenciaLog);
-//            stmt.executeUpdate(sqlCreateRuleIndexLaReferenciaLog);
 
 			stmt.close();
 			ConnectDB.getHiveConnection().close();
@@ -88,33 +80,9 @@ public class LaReferenciaDownloadLogs {
 		} catch (Exception e) {
 			logger.error("Failed to create tables: " + e);
 			throw new Exception("Failed to create tables: " + e.toString(), e);
-			// System.exit(0);
 		}
 	}
 
-//	private void createTmpTables() throws Exception {
-//
-//		try {
-//			Statement stmt = ConnectDB.getConnection().createStatement();
-//			String sqlCreateTmpTableLaReferenciaLog = "CREATE TABLE IF NOT EXISTS lareferencialogtmp(matomoid INTEGER, source TEXT, id_visit TEXT, country TEXT, action TEXT, url TEXT, entity_id TEXT, source_item_type TEXT, timestamp TEXT, referrer_name TEXT, agent TEXT, PRIMARY KEY(source, id_visit, action, timestamp, entity_id));";
-//			String sqlcreateTmpRuleLaReferenciaLog = "CREATE OR REPLACE RULE ignore_duplicate_inserts AS "
-//				+ " ON INSERT TO lareferencialogtmp "
-//				+ " WHERE (EXISTS ( SELECT lareferencialogtmp.matomoid, lareferencialogtmp.source, lareferencialogtmp.id_visit,"
-//				+ "lareferencialogtmp.action, lareferencialogtmp.\"timestamp\", lareferencialogtmp.entity_id "
-//				+ "FROM lareferencialogtmp "
-//				+ "WHERE lareferencialogtmp.matomoid=new.matomoid AND lareferencialogtmp.source = new.source AND lareferencialogtmp.id_visit = new.id_visit AND lareferencialogtmp.action = new.action AND lareferencialogtmp.entity_id = new.entity_id AND lareferencialogtmp.\"timestamp\" = new.\"timestamp\")) DO INSTEAD NOTHING;";
-//			stmt.executeUpdate(sqlCreateTmpTableLaReferenciaLog);
-//			stmt.executeUpdate(sqlcreateTmpRuleLaReferenciaLog);
-//
-//			stmt.close();
-//			log.info("Lareferencia Tmp Tables Created");
-//
-//		} catch (Exception e) {
-//			log.error("Failed to create tmptables: " + e);
-//			throw new Exception("Failed to create tmp tables: " + e.toString(), e);
-//			// System.exit(0);
-//		}
-//	}
 	private String getPiwikLogUrl() {
 		return piwikUrl + "/";
 	}
@@ -124,6 +92,7 @@ public class LaReferenciaDownloadLogs {
 			URL website = new URL(url);
 			URLConnection connection = website.openConnection();
 
+			logger.info("### getJson for: {}", url);
 			StringBuilder response;
 			try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
 				response = new StringBuilder();
@@ -142,7 +111,6 @@ public class LaReferenciaDownloadLogs {
 	}
 
 	public void GetLaReferenciaRepos(String repoLogsPath) throws Exception {
-
 		String baseApiUrl = getPiwikLogUrl() + ApimethodGetAllSites + format + "&token_auth=" + this.tokenAuth;
 		String content = "";
 
@@ -160,7 +128,7 @@ public class LaReferenciaDownloadLogs {
 		logger.info("Found the following siteIds for download: " + siteIdsToVisit);
 
 		if (ExecuteWorkflow.numberOfPiwikIdsToDownload > 0
-			&& ExecuteWorkflow.numberOfPiwikIdsToDownload <= siteIdsToVisit.size()) {
+				&& ExecuteWorkflow.numberOfPiwikIdsToDownload <= siteIdsToVisit.size()) {
 			logger.info("Trimming siteIds list to the size of: " + ExecuteWorkflow.numberOfPiwikIdsToDownload);
 			siteIdsToVisit = siteIdsToVisit.subList(0, ExecuteWorkflow.numberOfPiwikIdsToDownload);
 		}
@@ -169,105 +137,114 @@ public class LaReferenciaDownloadLogs {
 
 		for (int siteId : siteIdsToVisit) {
 			logger.info("Now working on LaReferencia MatomoId: " + siteId);
-			this.GetLaReFerenciaLogs(repoLogsPath, siteId);
+			this.getLaReFerenciaLogs(repoLogsPath, siteId);
 		}
 	}
 
-	public void GetLaReFerenciaLogs(String repoLogsPath,
-		int laReferencialMatomoID) throws Exception {
+	public void getLaReFerenciaLogs(String repoLogsPath, int laReferencialMatomoID) throws Exception {
+		logger.info("Downloading logs for LaReferencia repoid {}", laReferencialMatomoID);
 
-		logger.info("Downloading logs for LaReferencia repoid " + laReferencialMatomoID);
-
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		// Setting the starting period
-		Calendar start = (Calendar) ExecuteWorkflow.startingLogPeriod.clone();
-		logger.info("Starting period for log download: " + sdf.format(start.getTime()));
-
-		// Setting the ending period (last day of the month)
-//		Calendar end = (Calendar) ExecuteWorkflow.endingLogPeriod.clone();
-//		end.add(Calendar.MONTH, +1);
-//		end.add(Calendar.DAY_OF_MONTH, -1);
-		Calendar end = Calendar.getInstance();
-		end.add(Calendar.DAY_OF_MONTH, -1);
-
-		logger.info("Ending period for log download: " + sdf.format(end.getTime()));
-
+		// Get the latest timestamp from the logs
 		PreparedStatement st = ConnectDB
-			.getHiveConnection()
-			.prepareStatement(
-				"SELECT max(timestamp) FROM " + ConnectDB.getUsageStatsDBSchema()
-					+ ".lareferencialog WHERE matomoid=?");
+				.getHiveConnection()
+				.prepareStatement(
+						"SELECT max(timestamp) FROM " + ConnectDB.getUsageStatsDBSchema()
+								+ ".lareferencialog WHERE matomoid=?");
 		st.setInt(1, laReferencialMatomoID);
-		Date dateMax = null;
-
 		ResultSet rs_date = st.executeQuery();
+
+		LocalDate dateMax = null;
 		while (rs_date.next()) {
-			if (rs_date.getString(1) != null && !rs_date.getString(1).equals("null")
-				&& !rs_date.getString(1).equals("")) {
-				start.setTime(sdf.parse(rs_date.getString(1)));
-				dateMax = sdf.parse(rs_date.getString(1));
+			String dateStr = rs_date.getString(1);
+			logger.info("### dateStr: {}", dateStr);
+
+			if (dateStr != null && !"null".equals(dateStr) && !dateStr.isEmpty()) {
+				dateMax = LocalDateTime.parse(dateStr, YYYY_MM_DD_HH_mm_ss).toLocalDate();
+				start = dateMax;
 			}
 		}
 		rs_date.close();
 
-		for (Calendar currDay = (Calendar) start.clone(); currDay.before(end); currDay.add(Calendar.DATE, 1)) {
-			Date date = currDay.getTime();
-			if (dateMax != null && currDay.getTime().compareTo(dateMax) <= 0) {
+		initializeDateRange(dateMax);
+		for (LocalDate currentDay = start; !currentDay.isAfter(end); currentDay = currentDay.plusDays(1)) {
+			if (dateMax != null && !currentDay.isAfter(dateMax)) {
 				logger
-					.info(
-						"Date found in logs " + dateMax + " and not downloanding Matomo logs for "
-							+ laReferencialMatomoID);
-			} else {
-				logger
-					.info(
-						"Downloading logs for LaReferencia repoid " + laReferencialMatomoID + " and for "
-							+ sdf.format(date));
-
-				String period = "&period=day&date=" + sdf.format(date);
-				String outFolder = "";
-				outFolder = repoLogsPath;
-
-				FileSystem fs = FileSystem.get(new Configuration());
-				FSDataOutputStream fin = fs
-					.create(
-						new Path(
-							outFolder + "/" + laReferencialMatomoID + "_LaRefPiwiklog" + sdf.format((date)) + ".json"),
-						true);
-
-				String baseApiUrl = getPiwikLogUrl() + APImethod + "&idSite=" + laReferencialMatomoID + period + format
-					+ "&expanded=5&filter_limit=1000&token_auth=" + tokenAuth;
-				String content = "";
-				int i = 0;
-
-				JSONParser parser = new JSONParser();
-				do {
-					String apiUrl = baseApiUrl;
-
-					if (i > 0) {
-						apiUrl += "&filter_offset=" + (i * 1000);
-					}
-
-					content = getJson(apiUrl);
-					if (content.length() == 0 || content.equals("[]")) {
-						break;
-					}
-
-					JSONArray jsonArray = (JSONArray) parser.parse(content);
-					for (Object aJsonArray : jsonArray) {
-						JSONObject jsonObjectRaw = (JSONObject) aJsonArray;
-						fin.write(jsonObjectRaw.toJSONString().getBytes());
-						fin.writeChar('\n');
-					}
-
-					logger
 						.info(
-							"Downloaded part " + i + " of logs for LaReferencia repoid " + laReferencialMatomoID
-								+ " and for "
-								+ sdf.format(date));
-					i++;
-				} while (true);
-				fin.close();
+								"Date found in logs " + dateMax + " and not downloading Matomo logs for "
+										+ laReferencialMatomoID);
+				continue;
 			}
+
+			logger
+					.info(
+							"Downloading logs for LaReferencia repoid {} and for {}", laReferencialMatomoID,
+							currentDay.format(YYYY_MM_DD_FORMAT));
+
+			String period = "&period=day&date=" + currentDay.format(YYYY_MM_DD_FORMAT);
+			String outFolder = repoLogsPath;
+
+			FileSystem fs = FileSystem.get(new Configuration());
+			String filename = outFolder + "/" + laReferencialMatomoID + "_LaRefPiwiklog"
+					+ currentDay.format(YYYY_MM_DD_FORMAT) + ".json";
+			FSDataOutputStream fin = fs.create(new Path(filename), true);
+
+			String baseApiUrl = getPiwikLogUrl() + APImethod + "&idSite=" + laReferencialMatomoID + period + format
+					+ "&expanded=5&filter_limit=10&token_auth=" + tokenAuth;
+
+			int i = 0;
+			String content;
+			JSONParser parser = new JSONParser();
+
+			do {
+				String apiUrl = baseApiUrl;
+				if (i > 0) {
+					apiUrl += "&filter_offset=" + (i * 1000);
+				}
+
+				content = getJson(apiUrl);
+				if (content.isEmpty() || content.equals("[]") || content.contains("\"result\":\"error\"")) {
+					break;
+				}
+
+				JSONArray jsonArray = (JSONArray) parser.parse(content);
+				for (Object aJsonArray : jsonArray) {
+					JSONObject jsonObjectRaw = (JSONObject) aJsonArray;
+					fin.write(jsonObjectRaw.toJSONString().getBytes());
+					fin.writeChar('\n');
+				}
+
+				logger
+						.info(
+								"Downloaded part " + i + " of logs for LaReferencia repoid " + laReferencialMatomoID
+										+ " and for " + currentDay.format(YYYY_MM_DD_FORMAT));
+				i++;
+			} while (true);
+
+			fin.close();
 		}
 	}
+
+	private void initializeDateRange(LocalDate maxDate) {
+		if (maxDate != null) {
+			start = maxDate.plusDays(1); // start from the next day, because maxDate has been already processed
+		} else {
+			start = ExecuteWorkflow.startingLogPeriod; // no maxDate? then get the start date from config
+		}
+
+		// Add number of days
+		end = start.plusDays(NUM_OF_DAYS);
+
+		// Ensure end date is not after yesterday
+		LocalDate yesterday = LocalDate.now().minusDays(1);
+		if (end.isAfter(yesterday)) {
+			end = yesterday;
+		}
+
+		logger.info("Starting period for log download: {}", YYYY_MM_DD_FORMAT.format(start));
+		logger
+				.info(
+						"Ending period for log download ({} days or yesterday): {}", NUM_OF_DAYS,
+						YYYY_MM_DD_FORMAT.format(end));
+	}
+
 }

@@ -2,7 +2,6 @@
 package eu.dnetlib.oa.graph.usagerawdata.export;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.apache.hadoop.conf.Configuration;
@@ -53,8 +52,8 @@ public class UsageStatsExporter {
 
 		PiwikStatsDB piwikstatsdb = new PiwikStatsDB(ExecuteWorkflow.repoLogPath, ExecuteWorkflow.portalLogPath);
 
-		logger.info("Re-creating database and tables");
 		if (ExecuteWorkflow.recreateDbAndTables) {
+			logger.info("Re-creating database and tables");
 			piwikstatsdb.recreateDBAndTables();
 			logger.info("DB-Tables-TmpTables are created ");
 		}
@@ -71,9 +70,9 @@ public class UsageStatsExporter {
 		if (ExecuteWorkflow.downloadPiwikLogs) {
 			logger.info("Downloading piwik logs");
 			piwd
-				.GetOpenAIRELogs(
-					ExecuteWorkflow.repoLogPath,
-					ExecuteWorkflow.portalLogPath, ExecuteWorkflow.portalMatomoID);
+					.getOpenAIRELogs(
+							ExecuteWorkflow.repoLogPath,
+							ExecuteWorkflow.portalLogPath, ExecuteWorkflow.portalMatomoID);
 		}
 		logger.info("Downloaded piwik logs");
 
@@ -88,7 +87,7 @@ public class UsageStatsExporter {
 
 		logger.info("Creating LaReferencia tables");
 		LaReferenciaDownloadLogs lrf = new LaReferenciaDownloadLogs(ExecuteWorkflow.lareferenciaBaseURL,
-			ExecuteWorkflow.lareferenciaAuthToken);
+				ExecuteWorkflow.lareferenciaAuthToken);
 
 		if (ExecuteWorkflow.laReferenciaEmptyDirs) {
 			logger.info("Recreating LaReferencia log directories");
@@ -165,36 +164,36 @@ public class UsageStatsExporter {
 
 		logger.info("Creating LaReferencia tables");
 		String sqlCreateTableLareferenciaLog = "CREATE TABLE IF NOT EXISTS "
-			+ ConnectDB.getUsageStatsDBSchema() + ".lareferencialog(matomoid INT, "
-			+ "source STRING, id_visit STRING, country STRING, action STRING, url STRING, entity_id STRING, "
-			+ "source_item_type STRING, timestamp STRING, referrer_name STRING, agent STRING) "
-			+ "clustered by (source, id_visit, action, timestamp, entity_id) into 100 buckets "
-			+ "stored as orc tblproperties('transactional'='true')";
+				+ ConnectDB.getUsageStatsDBSchema() + ".lareferencialog(matomoid INT, "
+				+ "source STRING, id_visit STRING, country STRING, action STRING, url STRING, entity_id STRING, "
+				+ "source_item_type STRING, timestamp STRING, referrer_name STRING, agent STRING) "
+				+ "clustered by (source, id_visit, action, timestamp, entity_id) into 100 buckets "
+				+ "stored as orc tblproperties('transactional'='true')";
 		stmt.executeUpdate(sqlCreateTableLareferenciaLog);
 		logger.info("Created LaReferencia tables");
 
 		logger.info("Creating sushilog");
 
 		String sqlCreateTableSushiLog = "CREATE TABLE IF NOT EXISTS " + ConnectDB.getUsageStatsDBSchema()
-			+ ".sushilog(source STRING, "
-			+ "repository STRING, rid STRING, date STRING, metric_type STRING, count INT)  clustered by (source, "
-			+ "repository, rid, date, metric_type) into 100 buckets stored as orc tblproperties('transactional'='true')";
+				+ ".sushilog(source STRING, "
+				+ "repository STRING, rid STRING, date STRING, metric_type STRING, count INT)  clustered by (source, "
+				+ "repository, rid, date, metric_type) into 100 buckets stored as orc tblproperties('transactional'='true')";
 		stmt.executeUpdate(sqlCreateTableSushiLog);
 		logger.info("Created sushilog");
 
 		logger.info("Updating piwiklog");
 		String sql = "insert into " + ConnectDB.getUsageStatsDBSchema()
-			+ ".piwiklog select * from openaire_prod_usage_raw.piwiklog";
+				+ ".piwiklog select * from openaire_prod_usage_raw.piwiklog";
 		stmt.executeUpdate(sql);
 
 		logger.info("Updating lareferencialog");
 		sql = "insert into " + ConnectDB.getUsageStatsDBSchema()
-			+ ".lareferencialog select * from openaire_prod_usage_raw.lareferencialog";
+				+ ".lareferencialog select * from openaire_prod_usage_raw.lareferencialog";
 		stmt.executeUpdate(sql);
 
 		logger.info("Updating sushilog");
 		sql = "insert into " + ConnectDB.getUsageStatsDBSchema()
-			+ ".sushilog select * from openaire_prod_usage_raw.sushilog";
+				+ ".sushilog select * from openaire_prod_usage_raw.sushilog";
 		stmt.executeUpdate(sql);
 
 		stmt.close();
