@@ -79,22 +79,6 @@ public class CreatePersonAS {
 				"/eu/dnetlib/dhp/actionmanager/person/")
 			.getPath();
 
-//		spark.read()
-//				.parquet("/Users/miriam/Downloads/part-00000-761dbe11-9f51-4275-a8fd-592649f334ef-c000.snappy.parquet")
-//						.write()
-//								.json("/tmp/part-00000.json");
-
-//
-//		spark
-//				.read()
-//				.parquet(inputPath + "Authors")
-//				.as(Encoders.bean(Author.class))
-//						.filter((FilterFunction<Author>) a -> Optional.ofNullable(a.getOtherNames()).isPresent() &&
-//								Optional.ofNullable(a.getBiography()).isPresent())
-//								.write()
-//										.mode(SaveMode.Overwrite)
-//												.parquet(workingDir.toString() + "AuthorsSubset");
-
 		ExtractPerson
 			.main(
 				new String[] {
@@ -110,7 +94,7 @@ public class CreatePersonAS {
 					"-postgresUser", "noneed",
 					"-postgresPassword", "noneed",
 					"-publisherInputPath", getClass()
-						.getResource("/eu/dnetlib/dhp/actionmanager/personpublisher/")
+						.getResource("/eu/dnetlib/dhp/actionmanager/personpublisher/ieee.json")
 						.getPath()
 
 				});
@@ -179,21 +163,20 @@ public class CreatePersonAS {
 
 		Assertions
 			.assertEquals(
-				18,
+				3,
 				relations
 					.filter(r -> r.getRelClass().equalsIgnoreCase(ModelConstants.RESULT_PERSON_HASAUTHORED))
 					.count());
 		Assertions
 			.assertEquals(
-				16,
+				2,
 				relations
 					.filter(r -> r.getRelClass().equalsIgnoreCase(ModelConstants.PERSON_PERSON_HASCOAUTHORED))
 					.count());
-		// four relations are expected: one from publisher, three from works. the same work has two valid pids so two
-		// results produce three relations
+		// relations are expected only from publisher
 		Assertions
 			.assertEquals(
-				3,
+				1,
 				relations
 					.filter(
 						r -> r.getSource().equalsIgnoreCase("30|orcid_______::" + DHPUtils.md5("0000-0001-6291-9619"))
@@ -202,7 +185,7 @@ public class CreatePersonAS {
 
 		Assertions
 			.assertEquals(
-				2,
+				1,
 				relations
 					.filter(
 						r -> r.getSource().equalsIgnoreCase("30|orcid_______::" + DHPUtils.md5("0000-0001-6291-9619"))
@@ -211,7 +194,7 @@ public class CreatePersonAS {
 					.count());
 		Assertions
 			.assertEquals(
-				1,
+				0,
 				relations
 					.filter(
 						r -> r.getSource().equalsIgnoreCase("30|orcid_______::" + DHPUtils.md5("0000-0001-6291-9619"))
@@ -221,26 +204,12 @@ public class CreatePersonAS {
 
 		Assertions
 			.assertEquals(
-				2,
+				1,
 				relations
 					.filter(
 						r -> r.getSource().equalsIgnoreCase("30|orcid_______::" + DHPUtils.md5("0000-0001-6291-9619"))
 							&& r.getRelClass().equalsIgnoreCase(ModelConstants.PERSON_PERSON_HASCOAUTHORED))
 					.count());
-		Assertions.assertEquals(38, relations.count());
-
-		relations
-			.foreach(
-				r -> Assertions
-					.assertTrue(
-						r.getSource().startsWith("30|orcid_______::") ||
-							r.getTarget().startsWith("30|orcid_______::")
-							|| r.getTarget().startsWith("50|doi_________::")
-							|| r.getTarget().startsWith("50|arXiv_______::")
-							|| r.getTarget().startsWith("50|pmc_________::")
-							|| r.getTarget().startsWith("50|pmid________::")
-							|| r.getTarget().startsWith("20|ror_________::")
-							|| r.getTarget().startsWith("40|")));
 
 		// check contribution from publisher papers
 		// the relation was merged with the other one already extracted from orcid
@@ -299,4 +268,200 @@ public class CreatePersonAS {
 
 	}
 
+	@Test
+	void testAuthors2() throws Exception {
+
+		String inputPath = getClass()
+				.getResource(
+						"/eu/dnetlib/dhp/actionmanager/person/")
+				.getPath();
+
+//		spark.read()
+//				.parquet("/Users/miriam/Downloads/part-00000-761dbe11-9f51-4275-a8fd-592649f334ef-c000.snappy.parquet")
+//						.write()
+//								.json("/tmp/part-00000.json");
+
+//
+//		spark
+//				.read()
+//				.parquet(inputPath + "Authors")
+//				.as(Encoders.bean(Author.class))
+//						.filter((FilterFunction<Author>) a -> Optional.ofNullable(a.getOtherNames()).isPresent() &&
+//								Optional.ofNullable(a.getBiography()).isPresent())
+//								.write()
+//										.mode(SaveMode.Overwrite)
+//												.parquet(workingDir.toString() + "AuthorsSubset");
+
+		ExtractPerson
+				.main(
+						new String[] {
+								"-isSparkSessionManaged",
+								Boolean.FALSE.toString(),
+								"-inputPath",
+								inputPath,
+								"-outputPath",
+								workingDir.toString() + "/actionSet1",
+								"-workingDir",
+								workingDir.toString() + "/working",
+								"-postgresUrl", "noneed",
+								"-postgresUser", "noneed",
+								"-postgresPassword", "noneed",
+								"-publisherInputPath", getClass()
+								.getResource("/eu/dnetlib/dhp/actionmanager/personpublisher/noloaded.json")
+								.getPath()
+
+						});
+
+		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
+
+		JavaRDD<Relation> relations = sc
+				.sequenceFile(workingDir.toString() + "/actionSet1", Text.class, Text.class)
+				.filter(v -> "eu.dnetlib.dhp.schema.oaf.Relation".equalsIgnoreCase(v._1().toString()))
+				.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
+				.map(aa -> ((Relation) aa.getPayload()));
+//
+		JavaRDD<Person> people = sc
+				.sequenceFile(workingDir.toString() + "/actionSet1", Text.class, Text.class)
+				.filter(v -> "eu.dnetlib.dhp.schema.oaf.Person".equalsIgnoreCase(v._1().toString()))
+				.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
+				.map(aa -> ((Person) aa.getPayload()));
+
+		Assertions.assertEquals(8, people.count());
+		Assertions
+				.assertEquals(
+						"Seda",
+						people
+								.filter(
+										p -> p.getPid().stream().anyMatch(id -> id.getValue().equalsIgnoreCase("0000-0001-6544-2588")))
+								.first()
+								.getGivenName());
+		Assertions
+				.assertEquals(
+						"Ardahan Sevgili",
+						people
+								.filter(
+										p -> p.getPid().stream().anyMatch(id -> id.getValue().equalsIgnoreCase("0000-0001-6544-2588")))
+								.first()
+								.getFamilyName());
+		Assertions
+				.assertEquals(
+						0,
+						people
+								.filter(
+										p -> p.getPid().stream().anyMatch(id -> id.getValue().equalsIgnoreCase("0000-0001-6544-2588")))
+								.first()
+								.getAlternativeNames()
+								.size());
+		Assertions
+				.assertEquals(
+						2,
+						people
+								.filter(
+										p -> p.getPid().stream().anyMatch(id -> id.getValue().equalsIgnoreCase("0000-0001-6544-2588")))
+								.first()
+								.getPid()
+								.size());
+
+		Assertions
+				.assertTrue(
+						people
+								.filter(
+										p -> p.getPid().stream().anyMatch(id -> id.getValue().equalsIgnoreCase("0000-0001-6544-2588")))
+								.first()
+								.getPid()
+								.stream()
+								.anyMatch(
+										p -> p.getQualifier().getClassname().equalsIgnoreCase("Scopus Author ID")
+												&& p.getValue().equalsIgnoreCase("57203318816")));
+
+		Assertions
+				.assertEquals(
+						1,
+						relations
+								.filter(r -> r.getRelClass().equalsIgnoreCase(ModelConstants.RESULT_PERSON_HASAUTHORED))
+								.count());
+		Assertions
+				.assertEquals(
+						0,
+						relations
+								.filter(r -> r.getRelClass().equalsIgnoreCase(ModelConstants.PERSON_PERSON_HASCOAUTHORED))
+								.count());
+		// four relations are expected: one from publisher, three from works. the same work has two valid pids so two
+		// results produce three relations
+		Assertions
+				.assertEquals(
+						1,
+						relations
+								.filter(
+										r -> r.getSource().equalsIgnoreCase("30|orcid_______::" + DHPUtils.md5("0000-0003-4414-9432"))
+												&& r.getRelClass().equalsIgnoreCase(ModelConstants.RESULT_PERSON_HASAUTHORED))
+								.count());
+
+		Assertions
+				.assertEquals(
+						1,
+						relations
+								.filter(
+										r -> r.getSource().equalsIgnoreCase("30|orcid_______::" + DHPUtils.md5("0000-0003-4414-9432"))
+												&& r.getRelClass().equalsIgnoreCase(ModelConstants.RESULT_PERSON_HASAUTHORED)
+												&& r.getTarget().startsWith("50|doi"))
+								.count());
+
+
+		// check contribution from publisher papers
+		// the relation was merged with the other one already extracted from orcid
+		JavaRDD<Relation> filterRelations = relations
+				.filter(
+						r ->
+								 r.getRelClass().equalsIgnoreCase(ModelConstants.RESULT_PERSON_HASAUTHORED)
+								);
+		Assertions.assertEquals(1, filterRelations.count());
+
+		List<KeyValue> properties = filterRelations.first().getProperties();
+		Assertions.assertFalse(properties.isEmpty());
+		Assertions.assertEquals(2, properties.size());
+
+		Assertions
+				.assertEquals(1, properties.stream().filter(p -> p.getKey().equalsIgnoreCase("corresponding")).count());
+		Assertions
+				.assertEquals(
+						1, properties
+								.stream()
+								.filter(
+										p -> p.getKey().equalsIgnoreCase("corresponding") &&
+												p.getValue().equalsIgnoreCase("true"))
+								.count());
+		Assertions
+				.assertEquals(
+						1, properties.stream().filter(p -> p.getKey().equalsIgnoreCase("declared_affiliation")).count());
+		Assertions
+				.assertEquals(
+						1, properties
+								.stream()
+								.filter(
+										p -> p.getKey().equalsIgnoreCase("declared_affiliation") &&
+												p.getValue().equalsIgnoreCase("https://ror.org/00py81415") &&
+												p.getDataInfo() != null && p.getDataInfo().getTrust().equalsIgnoreCase("1.0"))
+								.count());
+
+
+		JavaRDD<Relation> filterAffiliation = relations
+				.filter(r -> r.getRelClass().equalsIgnoreCase(ModelConstants.ORG_PERSON_PARTICIPATES));
+		JavaRDD<Relation> rels = filterAffiliation;
+		relations.foreach(r -> System.out.println(new ObjectMapper().writeValueAsString(r)));
+		Assertions.assertEquals(2, filterAffiliation.count());
+		Assertions
+				.assertEquals(
+						1,
+						filterAffiliation
+								.filter(r -> r.getCollectedfrom().get(0).getValue().equalsIgnoreCase("OpenAIRE"))
+								.count());
+		Assertions
+				.assertEquals(
+						1,
+						filterAffiliation
+								.filter(r -> r.getCollectedfrom().get(0).getValue().equalsIgnoreCase("ORCID"))
+								.count());
+
+	}
 }
