@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.collection.plugin.omicsdi;
 
 import org.junit.jupiter.api.BeforeEach;
