@@ -142,7 +142,8 @@ public class GenerateNativeStoreSparkJob {
 			case "fair_literature_v4":
 				return Pair.of(ValidationType.fair_literature_v4, new FAIR_Literature_GuidelinesV4Profile());
 			default:
-				throw new IllegalArgumentException("Unknown compatibility level: " + compatibilityLevel);
+				log.warn("Invalid compatibility level for validation: " + compatibilityLevel);
+				return null;
 		}
 	}
 
@@ -214,23 +215,29 @@ public class GenerateNativeStoreSparkJob {
 			toSaveRecords = newRecords;
 		}
 
-		// ADD THE VALIDATION REPORTS TO ALL THE MDSTORE RECORDS
-		final Map<String, LongAccumulator> validationErrors = new LinkedHashMap<>();
-		final Map<String, LongAccumulator> validationWarnings = new LinkedHashMap<>();
+		if (validator != null) {
+			// ADD THE VALIDATION REPORTS TO ALL THE MDSTORE RECORDS
+			final Map<String, LongAccumulator> validationErrors = new LinkedHashMap<>();
+			final Map<String, LongAccumulator> validationWarnings = new LinkedHashMap<>();
 
-		validator.getValue().guidelines().forEach(gdl -> {
-			validationErrors
-				.put(gdl.getName(), sc.sc().longAccumulator(gdl.getName().toLowerCase().replace(' ', '_') + "_errors"));
-			validationWarnings
-				.put(
-					gdl.getName(),
-					sc.sc().longAccumulator(gdl.getName().toLowerCase().replace(' ', '_') + "_warnings"));
-		});
+			validator.getValue().guidelines().forEach(gdl -> {
+				validationErrors
+					.put(
+						gdl.getName(),
+						sc.sc().longAccumulator(gdl.getName().toLowerCase().replace(' ', '_') + "_errors"));
+				validationWarnings
+					.put(
+						gdl.getName(),
+						sc.sc().longAccumulator(gdl.getName().toLowerCase().replace(' ', '_') + "_warnings"));
+			});
 
-		final Dataset<MetadataRecord> validated = toSaveRecords
-			.map(mdr -> addValidationReport(mdr, validator, validationErrors, validationWarnings), encoder);
+			final Dataset<MetadataRecord> validated = toSaveRecords
+				.map(mdr -> addValidationReport(mdr, validator, validationErrors, validationWarnings), encoder);
 
-		saveDataset(validated, targetPath);
+			saveDataset(validated, targetPath);
+		} else {
+			saveDataset(toSaveRecords, targetPath);
+		}
 
 		final Long total = spark.read().load(targetPath).count();
 		log.info("collected {} records for datasource '{}'", total, provenance.getDatasourceName());
