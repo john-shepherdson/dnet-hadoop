@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.collection.plugin.sftp;
 
 import java.util.Set;
@@ -14,9 +15,10 @@ public class SftpIteratorWithAuthenticationKey extends AbstractSftpIterator {
 	private static final Logger log = LoggerFactory.getLogger(SftpIteratorWithAuthenticationKey.class);
 	private final String privateKeyPath;
 
-	public SftpIteratorWithAuthenticationKey(final String baseUrl, final int port, final String username, final boolean isRecursive,
-			final Set<String> extensionsSet,
-			final String fromDate, final String privateKeyPath) {
+	public SftpIteratorWithAuthenticationKey(final String baseUrl, final int port, final String username,
+		final boolean isRecursive,
+		final Set<String> extensionsSet,
+		final String fromDate, final String privateKeyPath) {
 
 		super(baseUrl, port, username, isRecursive, extensionsSet, fromDate);
 

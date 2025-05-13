@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.collection.plugin.sftp;
 
 import java.io.OutputStream;
@@ -50,8 +51,9 @@ public abstract class AbstractSftpIterator implements Iterator<String> {
 
 	private static String EMPTY_RECORD = "<record/>";
 
-	public AbstractSftpIterator(final String baseUrl, final int port, final String username, final boolean isRecursive, final Set<String> extensionsSet,
-			final String fromDate) {
+	public AbstractSftpIterator(final String baseUrl, final int port, final String username, final boolean isRecursive,
+		final Set<String> extensionsSet,
+		final String fromDate) {
 
 		this.isRecursive = isRecursive;
 		this.extensionsSet = extensionsSet;
@@ -106,8 +108,12 @@ public abstract class AbstractSftpIterator implements Iterator<String> {
 
 	private void initializeQueue() {
 		this.queue = new LinkedList<>();
-		log.info(String
-				.format("SFTP collector plugin collecting from %s with recursion = %s, incremental = %s with fromDate=%s", this.remoteSftpBasePath, this.isRecursive, this.incremental, this.fromDate));
+		log
+			.info(
+				String
+					.format(
+						"SFTP collector plugin collecting from %s with recursion = %s, incremental = %s with fromDate=%s",
+						this.remoteSftpBasePath, this.isRecursive, this.incremental, this.fromDate));
 		listDirectoryRecursive(".", "");
 	}
 
@@ -186,12 +192,19 @@ public abstract class AbstractSftpIterator implements Iterator<String> {
 					log.debug(String.format("Collected file from SFTP: %s%s", this.sftpServerAddress, fullPathFile));
 				}
 				final String doc = baos.toString();
-				if (StringUtils.isNotBlank(doc)) { return doc; }
+				if (StringUtils.isNotBlank(doc)) {
+					return doc;
+				}
 				return EMPTY_RECORD;
 			} catch (final SftpException e) {
 				nRepeat++;
-				log.warn(String.format("An error occurred [%s] for %s%s, retrying.. [retried %s time(s)]", e
-						.getMessage(), this.sftpServerAddress, fullPathFile, nRepeat));
+				log
+					.warn(
+						String
+							.format(
+								"An error occurred [%s] for %s%s, retrying.. [retried %s time(s)]", e
+									.getMessage(),
+								this.sftpServerAddress, fullPathFile, nRepeat));
 				// disconnectFromSftpServer();
 				try {
 					Thread.sleep(BACKOFF_MILLIS);
@@ -201,7 +214,10 @@ public abstract class AbstractSftpIterator implements Iterator<String> {
 			}
 		}
 		throw new RuntimeException(
-				String.format("Impossible to retrieve FTP file %s after %s retries. Aborting FTP collection.", fullPathFile, nRepeat));
+			String
+				.format(
+					"Impossible to retrieve FTP file %s after %s retries. Aborting FTP collection.", fullPathFile,
+					nRepeat));
 	}
 
 	@Override

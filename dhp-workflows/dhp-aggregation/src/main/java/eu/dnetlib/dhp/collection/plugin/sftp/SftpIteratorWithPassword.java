@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.collection.plugin.sftp;
 
 import java.util.Set;
@@ -15,8 +16,9 @@ public class SftpIteratorWithPassword extends AbstractSftpIterator {
 
 	private final String password;
 
-	public SftpIteratorWithPassword(final String baseUrl, final int port, final String username, final boolean isRecursive, final Set<String> extensionsSet,
-			final String fromDate, final String password) {
+	public SftpIteratorWithPassword(final String baseUrl, final int port, final String username,
+		final boolean isRecursive, final Set<String> extensionsSet,
+		final String fromDate, final String password) {
 
 		super(baseUrl, port, username, isRecursive, extensionsSet, fromDate);
 

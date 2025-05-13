@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.collection.plugin.sftp;
 
 import java.util.Set;
@@ -19,12 +20,13 @@ class SftpIteratorWithPasswordTest {
 	private static final Set<String> extensions = Sets.newHashSet("xml");
 
 	@BeforeEach
-	void setUp() throws Exception {}
+	void setUp() throws Exception {
+	}
 
 	@Test
 	public void test() {
-		final SftpIteratorWithPassword iterator =
-				new SftpIteratorWithPassword(baseUrl, port, username, isRecursive, extensions, null, password);
+		final SftpIteratorWithPassword iterator = new SftpIteratorWithPassword(baseUrl, port, username, isRecursive,
+			extensions, null, password);
 
 		while (iterator.hasNext()) {
 			final String remotePath = iterator.next();
