@@ -179,6 +179,7 @@
     <action name="produceHBM">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
+            <mode>cluster</mode>
             <name>Produce the new HostedByMap</name>
             <class>eu.dnetlib.dhp.oa.graph.hostedbymap.SparkProduceHostedByMap</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
@@ -199,6 +200,7 @@
     <action name="prepareInfo">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
+            <mode>cluster</mode>
             <name>Prepare info to apply the hbm</name>
             <class>eu.dnetlib.dhp.oa.graph.hostedbymap.SparkPrepareHostedByInfoToApply</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
@@ -224,6 +226,7 @@
     <action name="apply_result">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
+            <mode>cluster</mode>
             <name>Apply hbm to result</name>
             <class>eu.dnetlib.dhp.oa.graph.hostedbymap.SparkApplyHostedByMapToResult</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
@@ -244,6 +247,7 @@
     <action name="apply_datasource">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
+            <mode>cluster</mode>
             <name>Apply hbm to datasource</name>
             <class>eu.dnetlib.dhp.oa.graph.hostedbymap.SparkApplyHostedByMapToDatasource</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
