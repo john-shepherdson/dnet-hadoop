@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.collection.plugin.omicsdi;
 
 import java.util.ArrayList;
@@ -34,7 +35,8 @@ public class OmicsDIDatabaseIterator implements Iterator<String> {
 
 	private static final Logger log = LoggerFactory.getLogger(OmicsDIDatabaseIterator.class);
 
-	public OmicsDIDatabaseIterator(final String baseUrl, final String repo, final int pageSize, final HttpClientParams clientParams) {
+	public OmicsDIDatabaseIterator(final String baseUrl, final String repo, final int pageSize,
+		final HttpClientParams clientParams) {
 		this.baseUrl = baseUrl;
 		this.repo = repo;
 		this.pageSize = pageSize;
@@ -103,7 +105,9 @@ public class OmicsDIDatabaseIterator implements Iterator<String> {
 		final String escapedRepo = this.repo.contains(" ") ? "%22" + this.repo.replace(" ", "%20") + "%22" : this.repo;
 
 		return String
-				.format("%s/dataset/search?sort_field=id&query=repository:%s&size=%d&start=%d&format=json", this.baseUrl, escapedRepo, this.pageSize, startPage);
+			.format(
+				"%s/dataset/search?sort_field=id&query=repository:%s&size=%d&start=%d&format=json", this.baseUrl,
+				escapedRepo, this.pageSize, startPage);
 	}
 
 }

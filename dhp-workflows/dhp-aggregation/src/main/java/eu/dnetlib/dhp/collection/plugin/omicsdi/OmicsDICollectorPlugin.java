@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.collection.plugin.omicsdi;
 
 import java.util.Arrays;
@@ -41,21 +42,23 @@ public class OmicsDICollectorPlugin implements CollectorPlugin {
 		final String baseUrl = api.getBaseUrl();
 
 		final int pageSize = Optional
-				.ofNullable(api.getParams().get("pageSize"))
-				.filter(StringUtils::isNotBlank)
-				.map(s -> NumberUtils.toInt(s, PAGE_SIZE_VALUE_DEFAULT))
-				.orElse(PAGE_SIZE_VALUE_DEFAULT);
+			.ofNullable(api.getParams().get("pageSize"))
+			.filter(StringUtils::isNotBlank)
+			.map(s -> NumberUtils.toInt(s, PAGE_SIZE_VALUE_DEFAULT))
+			.orElse(PAGE_SIZE_VALUE_DEFAULT);
 
 		try {
 			final HttpConnector2 connector = new HttpConnector2(this.clientParams);
-			final OmicsDIDatabase[] dbs = new ObjectMapper().readValue(connector.getInputSource(baseUrl + "/database/all"), OmicsDIDatabase[].class);
+			final OmicsDIDatabase[] dbs = new ObjectMapper()
+				.readValue(connector.getInputSource(baseUrl + "/database/all"), OmicsDIDatabase[].class);
 
-			return Arrays.stream(dbs)
-					.map(OmicsDIDatabase::getRepository)
-					.filter(StringUtils::isNotBlank)
-					.map(repo -> new OmicsDIDatabaseIterator(baseUrl, repo, pageSize, this.clientParams))
-					.map(it -> StreamSupport.stream(Spliterators.spliteratorUnknownSize(it, Spliterator.ORDERED), false))
-					.flatMap(s -> s);
+			return Arrays
+				.stream(dbs)
+				.map(OmicsDIDatabase::getRepository)
+				.filter(StringUtils::isNotBlank)
+				.map(repo -> new OmicsDIDatabaseIterator(baseUrl, repo, pageSize, this.clientParams))
+				.map(it -> StreamSupport.stream(Spliterators.spliteratorUnknownSize(it, Spliterator.ORDERED), false))
+				.flatMap(s -> s);
 		} catch (final Throwable e) {
 			log.error("Collection failed", e);
 			throw new CollectorException("Collection failed", e);
