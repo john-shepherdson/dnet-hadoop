@@ -6,7 +6,6 @@ import static eu.dnetlib.dhp.common.Constants.SEQUENCE_FILE_NAME;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Stream;
 
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -28,6 +27,7 @@ import eu.dnetlib.dhp.collection.plugin.gtr2.Gtr2PublicationsCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.mongodb.MDStoreCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.mongodb.MongoDbDumpCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.oai.OaiCollectorPlugin;
+import eu.dnetlib.dhp.collection.plugin.omicsdi.OmicsDICollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.osf.OsfPreprintsCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.researchfi.ResearchFiCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.rest.RestCollectorPlugin;
@@ -139,6 +139,8 @@ public class CollectorWorker extends ReportingJob {
 				return new DBLPCollectorPlugin(this.fileSystem);
 			case research_fi:
 				return new ResearchFiCollectorPlugin();
+			case omicsdi:
+				return new OmicsDICollectorPlugin(this.clientParams);
 			case other:
 				final CollectorPlugin.NAME.OTHER_NAME plugin = Optional
 					.ofNullable(this.api.getParams().get("other_plugin_type"))
