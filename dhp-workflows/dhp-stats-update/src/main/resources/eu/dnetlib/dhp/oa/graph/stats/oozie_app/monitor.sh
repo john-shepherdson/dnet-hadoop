@@ -67,9 +67,9 @@ cat step20-createMonitorDB.sql | sed "s/SOURCE/$SOURCE/g" | sed "s/TARGET/${TARG
 hive $HIVE_OPTS -f foo
 
 
-cat step20-createIrishDB.sql | sed "s/SOURCE/$SOURCE/g" | sed "s/TARGET/${TARGET}_monitor_ie/g1" > foo
+cat step20-createIrishDB.sql | sed "s/SOURCE/$SOURCE/g" | sed "s/TARGET/${TARGET}_ie/g1" > foo
 hive $HIVE_OPTS -f foo
-cat step20-createMonitorDB.sql | sed "s/SOURCE/$SOURCE/g" | sed "s/TARGET/${TARGET}_monitor_ie/g1" > foo
+cat step20-createMonitorDB.sql | sed "s/SOURCE/$SOURCE/g" | sed "s/TARGET/${TARGET}_ie/g1" > foo
 hive $HIVE_OPTS -f foo
 
 echo "Hive shell finished"
@@ -114,8 +114,8 @@ hive -f foo
 echo "Shadow db monitor RIs tail ready!"
 
 echo "Updating shadow irish monitor database"
-hive -e "drop database if exists ${SHADOW}_monitor_ie cascade"
-hive -e "create database if not exists ${SHADOW}_monitor_ie"
-hive $HIVE_OPTS --database ${TARGET}_monitor_ie -e "show tables" | grep -v WARN | sed "s/\(.*\)/create view ${SHADOW}_monitor_ie.\1 as select * from ${TARGET}_monitor_ie.\1;/" > foo
+hive -e "drop database if exists ${SHADOW}_ie cascade"
+hive -e "create database if not exists ${SHADOW}_ie"
+hive $HIVE_OPTS --database ${TARGET}_ie -e "show tables" | grep -v WARN | sed "s/\(.*\)/create view ${SHADOW}_ie.\1 as select * from ${TARGET}_ie.\1;/" > foo
 hive -f foo
 echo "Shadow db irish monitor ready!"
