@@ -172,7 +172,7 @@ ANALYZE TABLE ${stats_db_name}.result_projects COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.result_coar purge; /*EOS*/
 create table ${stats_db_name}.result_coar stored as parquet as
-SELECT t.id, typeMapping.typeLabel as  type
+SELECT substr(t.id, 4) as id, typeMapping.typeLabel as  type
 FROM ${openaire_db_name}.result t
     LATERAL VIEW OUTER EXPLODE(t.instance) instance_table AS instance_element
     LATERAL VIEW OUTER EXPLODE(instance_element.instanceTypeMapping) type_mapping_table AS typeMapping
