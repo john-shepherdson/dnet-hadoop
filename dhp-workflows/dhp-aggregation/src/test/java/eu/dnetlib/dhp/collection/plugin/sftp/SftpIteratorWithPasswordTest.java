@@ -12,9 +12,9 @@ import com.google.common.collect.Sets;
 @Disabled
 class SftpIteratorWithPasswordTest {
 
-	private static final String baseUrl = "sftp://.../XXXX";
-	private static final String username = "openaire";
-	private static final String password = "XXXXX";
+	private static final String baseUrl = "sftp://sftp.medra.org";
+	private static final String username = "";
+	private static final String password = "";
 	private static final int port = 22;
 	private static final boolean isRecursive = true;
 	private static final Set<String> extensions = Sets.newHashSet("xml");
@@ -28,10 +28,13 @@ class SftpIteratorWithPasswordTest {
 		final SftpIteratorWithPassword iterator = new SftpIteratorWithPassword(baseUrl, port, username, isRecursive,
 			extensions, null, password);
 
+		int count = 0;
 		while (iterator.hasNext()) {
-			final String remotePath = iterator.next();
-			System.out.println(remotePath);
+			final String s = iterator.next();
+			System.out.println(s);
+			count++;
 		}
+		System.out.println("TOTAL: " + count);
 	}
 
 }

@@ -23,6 +23,9 @@ public class SftpIteratorWithAuthenticationKey extends AbstractSftpIterator {
 		super(baseUrl, port, username, isRecursive, extensionsSet, fromDate);
 
 		this.privateKeyPath = privateKeyPath;
+
+		connectToSftpServer();
+		initializeQueue();
 	}
 
 	@Override

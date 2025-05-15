@@ -23,6 +23,9 @@ public class SftpIteratorWithPassword extends AbstractSftpIterator {
 		super(baseUrl, port, username, isRecursive, extensionsSet, fromDate);
 
 		this.password = password;
+
+		connectToSftpServer();
+		initializeQueue();
 	}
 
 	@Override

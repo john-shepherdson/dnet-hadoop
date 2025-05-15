@@ -37,6 +37,8 @@ public abstract class AbstractSftpIterator implements Iterator<String> {
 	private String sftpURIScheme;
 	private String sftpServerAddress;
 	private String remoteSftpBasePath;
+	private final int port;
+	private final String username;
 	private final boolean isRecursive;
 	private final Set<String> extensionsSet;
 	private final boolean incremental;
@@ -55,6 +57,8 @@ public abstract class AbstractSftpIterator implements Iterator<String> {
 		final Set<String> extensionsSet,
 		final String fromDate) {
 
+		this.port = port;
+		this.username = username;
 		this.isRecursive = isRecursive;
 		this.extensionsSet = extensionsSet;
 		this.incremental = StringUtils.isNotBlank(fromDate);
@@ -72,16 +76,15 @@ public abstract class AbstractSftpIterator implements Iterator<String> {
 		} catch (final URISyntaxException e) {
 			throw new RuntimeException("Bad syntax in the URL " + baseUrl);
 		}
-
-		connectToSftpServer(this.sftpServerAddress, port, username);
-		initializeQueue();
 	}
 
-	private void connectToSftpServer(final String address, final int port, final String username) {
+	protected void connectToSftpServer() {
 
 		try {
-			this.sftpSession = createSession(address, port, username);
+			this.sftpSession = createSession(this.sftpServerAddress, this.port, this.username);
+
 			this.sftpSession.connect();
+
 			log.debug("SFTP session connected");
 			final Channel channel = this.sftpSession.openChannel(this.sftpURIScheme);
 			channel.connect();
@@ -93,8 +96,10 @@ public abstract class AbstractSftpIterator implements Iterator<String> {
 			log.debug("PWD from server 2 after 'cd " + fullPath + "' : " + this.sftpChannel.pwd());
 			log.info("Connected to SFTP server " + this.sftpServerAddress);
 		} catch (final JSchException e) {
+			log.error("Unable to connect to remote SFTP server.", e);
 			throw new RuntimeException("Unable to connect to remote SFTP server.", e);
 		} catch (final SftpException e) {
+			log.error("Unable to access the base remote path on the SFTP server.", e);
 			throw new RuntimeException("Unable to access the base remote path on the SFTP server.", e);
 		}
 	}
@@ -106,7 +111,7 @@ public abstract class AbstractSftpIterator implements Iterator<String> {
 		this.sftpSession.disconnect();
 	}
 
-	private void initializeQueue() {
+	protected void initializeQueue() {
 		this.queue = new LinkedList<>();
 		log
 			.info(
