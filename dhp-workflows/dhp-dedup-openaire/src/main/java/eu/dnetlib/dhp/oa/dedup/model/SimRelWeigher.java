@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.oa.dedup.maxclique.support;
+package eu.dnetlib.dhp.oa.dedup.model;
 
 import eu.dnetlib.dhp.oa.dedup.maxclique.Weigher;
 import eu.dnetlib.pace.config.DedupConfig;
