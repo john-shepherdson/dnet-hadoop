@@ -201,6 +201,32 @@
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
             <arg>--pivotHistoryDatabase</arg><arg>${pivotHistoryDatabase}</arg>
         </spark>
+        <ok to="RefineMergeRels"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="RefineMergeRels">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Create Refined MergeRels</name>
+            <class>eu.dnetlib.dhp.oa.dedup.SparkRefineMergeRels</class>
+            <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=3840
+            </spark-opts>
+            <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
+            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
+            <arg>--actionSetId</arg><arg>${actionSetId}</arg>
+        </spark>
         <ok to="PrepareOrgRels"/>
         <error to="Kill"/>
     </action>
@@ -227,7 +253,8 @@
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
             <arg>--actionSetId</arg><arg>${actionSetId}</arg>
             <arg>--dbUrl</arg><arg>${dbUrl}</arg>
-            <arg>--dbTable</arg><arg>${dbTable}</arg>
+            <arg>--dedupEventsTable</arg><arg>${dedupEventsTable}</arg>
+            <arg>--parentChildTable</arg><arg>${parentChildTable}</arg>
             <arg>--dbUser</arg><arg>${dbUser}</arg>
             <arg>--dbPwd</arg><arg>${dbPwd}</arg>
             <arg>--numConnections</arg><arg>${dbConnections}</arg>

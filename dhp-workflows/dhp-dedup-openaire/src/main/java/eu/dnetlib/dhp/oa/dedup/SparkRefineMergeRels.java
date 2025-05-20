@@ -3,11 +3,10 @@ package eu.dnetlib.dhp.oa.dedup;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.dedup.maxclique.AllMaxCliqueFinder;
 import eu.dnetlib.dhp.oa.dedup.maxclique.MaxCliqueFinderFacade;
-import eu.dnetlib.dhp.oa.dedup.maxclique.support.SimRelWeigher;
+import eu.dnetlib.dhp.oa.dedup.model.SimRelWeigher;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
@@ -15,7 +14,6 @@ import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import eu.dnetlib.pace.config.DedupConfig;
 import eu.dnetlib.pace.model.SparkDeduper;
-import eu.dnetlib.pace.model.SparkModel;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FlatMapFunction;
@@ -31,29 +29,23 @@ import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
-import scala.Tuple2;
-import scala.Tuple3;
 
 import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_PROVENANCE_ACTIONS;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.PROVENANCE_DEDUP;
 import static org.apache.spark.sql.functions.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.*;
 
-public class SparkSplitGroups extends AbstractSparkAction {
+public class SparkRefineMergeRels extends AbstractSparkAction {
 
-    private static final Logger log = LoggerFactory.getLogger(SparkSplitGroups.class);
+    private static final Logger log = LoggerFactory.getLogger(SparkRefineMergeRels.class);
     private static final StructType rowSchema = new StructType(new StructField[]{
         new StructField("source", DataTypes.StringType, false, Metadata.empty()),
                 new StructField("target", DataTypes.StringType, false, Metadata.empty())
     });
 
-    public SparkSplitGroups(ArgumentApplicationParser parser, SparkSession spark) {
+    public SparkRefineMergeRels(ArgumentApplicationParser parser, SparkSession spark) {
         super(parser, spark);
     }
 
@@ -63,7 +55,7 @@ public class SparkSplitGroups extends AbstractSparkAction {
                         .toString(
                                 SparkCreateMergeRels.class
                                         .getResourceAsStream(
-                                                "/eu/dnetlib/dhp/oa/dedup/splitGroups_parameters.json")));
+                                                "/eu/dnetlib/dhp/oa/dedup/refineMergeRels_parameters.json")));
         parser.parseArgument(args);
 
         final String isLookUpUrl = parser.get("isLookUpUrl");
@@ -75,7 +67,7 @@ public class SparkSplitGroups extends AbstractSparkAction {
 
         conf.registerKryoClasses(ModelSupport.getOafModelClasses());
 
-        new SparkSplitGroups(parser, getSparkWithHiveSession(conf))
+        new SparkRefineMergeRels(parser, getSparkWithHiveSession(conf))
                 .run(ISLookupClientFactory.getLookUpService(isLookUpUrl));
     }
 
@@ -124,45 +116,18 @@ public class SparkSplitGroups extends AbstractSparkAction {
                     .join(entities, col("target").equalTo(entities.col("identifier")))
                     .withColumnRenamed("source", "groupId");
 
-            // compute the list of conflictual ids (groups containing conflicts)
-            Dataset<Row> conflictualIds = rawMergeRels
-                    .select("groupId", "negativeConstraints")
-                    .groupBy("groupId")
-                    .agg(flatten(collect_list(col("negativeConstraints"))).alias("allConstraints"))
-                    .where(size(col("allConstraints")).notEqual(size(array_distinct(col("allConstraints")))))
-                    .select("groupId");
+            Dataset<Row> conflictualIds = getConflictualIds(rawMergeRels);
 
-            Dataset<Row> cleanMergeRels = rawMergeRels.join(conflictualIds, rawMergeRels.col("groupId").equalTo(conflictualIds.col("groupId")), "left_anti")
-                    .select(col("groupId").as("source"), col("target"));
             Dataset<Row> conflictualMergeRels = rawMergeRels.join(conflictualIds, rawMergeRels.col("groupId").equalTo(conflictualIds.col("groupId")), "left_semi");
 
             Dataset<Row> splitMergeRels = conflictualMergeRels
                     .groupByKey((MapFunction<Row, String>) t -> t.getAs("groupId"), Encoders.STRING())
-                    .flatMapGroups((FlatMapGroupsFunction<String, Row, Row>) (key, values) -> {
-                                String prefix = key.split("::")[0];
-                                String md5 = key.split("::")[1];
+                    .flatMapGroups((FlatMapGroupsFunction<String, Row, Row>) (key, values) ->
+                                    splitGroup(values, dedupConf), RowEncoder.apply(rowSchema))
+                    .persist();
 
-                                List<Row> mergeRels = new ArrayList<>();
-                                AllMaxCliqueFinder<Row> finder = new AllMaxCliqueFinder<>(
-                                        () -> values,
-                                        MaxCliqueFinderFacade.getInstance(),
-                                        new SimRelWeigher(dedupConf)
-                                );
-
-                                AtomicInteger index = new AtomicInteger(0);
-                                finder.iterator().forEachRemaining(row -> {
-                                    if (!row.isEmpty() || !row.isSingleMember()) {
-                                        for (Row r : row.members()) {
-                                            mergeRels.add(RowFactory.create(prefix.substring(0, prefix.length() - 1) + index + "::" + md5, r.getAs("identifier")));
-                                        }
-                                        index.addAndGet(1);
-                                    }
-                                });
-
-                                return mergeRels.iterator();
-                            },
-                            RowEncoder.apply(rowSchema)
-                    );
+            Dataset<Row> cleanMergeRels = rawMergeRels.join(conflictualIds, rawMergeRels.col("groupId").equalTo(conflictualIds.col("groupId")), "left_anti")
+                    .select(col("groupId").as("source"), col("target"));
 
             Dataset<Relation> output = cleanMergeRels
                     .union(splitMergeRels)
@@ -181,32 +146,41 @@ public class SparkSplitGroups extends AbstractSparkAction {
 
             saveParquet(output, mergeRelPath + "_tmp", SaveMode.Overwrite);
             renameParquet(spark, mergeRelPath + "_tmp", mergeRelPath);
+            splitMergeRels.unpersist();
         }
     }
 
-    // <raw_id, labels>: when the label is the same, two entities cannot be together
+    // append a negativeConstraints column to the dataset to be used by the clique finder
     public static Dataset<Row> appendNegativeConstraints(SparkSession spark, Dataset<Row> entities, String graphBasePath, String subEntity) {
 
         switch (subEntity) {
             case "organization":
                 Dataset<Row> families = OpenorgsUtility.createFamilies(spark, graphBasePath + "/relation", ModelConstants.IS_PARENT_OF);
 
-                // add nwo label to negative constraints
-                entities = entities.withColumn(
-                                "negativeConstraints",
-                                when(col("identifier").contains("nwo"), array(lit("nwo"))).otherwise(array()));
+                // construct labels for negative constraints
+                Column negativeConstraints = array_union(
+                    when(col("identifier").contains("nwo"), array(lit("nwo"))).otherwise(array()),
+                    when(families.col("groupId").isNotNull(), array(families.col("groupId").cast("string"))).otherwise(array())
+                );
+
                 return entities
                         .join(families, entities.col("identifier").equalTo(families.col("id")), "left")
-                        .withColumn("negativeConstraints",
-                                when(families.col("groupId").isNotNull(),
-                                        array_union(col("negativeConstraints"), array(families.col("groupId").cast("string"))))
-                                        .otherwise(col("negativeConstraints")))
+                        .withColumn("negativeConstraints", negativeConstraints)
                         .drop("id", "groupId");
-
             default:
                 return spark.emptyDataFrame();
         }
+    }
 
+    // compute the list of conflictual ids (groups containing conflicts)
+    private static Dataset<Row> getConflictualIds(Dataset<Row> rawMergeRels) {
+
+        return rawMergeRels
+                .select("groupId", "negativeConstraints")
+                .groupBy("groupId")
+                .agg(flatten(collect_list(col("negativeConstraints"))).alias("allConstraints"))
+                .where(size(col("allConstraints")).notEqual(size(array_distinct(col("allConstraints")))))
+                .select("groupId");
     }
 
     private static Relation rel(String source, String target, String relClass, DedupConfig dedupConf) {
@@ -234,6 +208,27 @@ public class SparkSplitGroups extends AbstractSparkAction {
 
         r.setDataInfo(info);
         return r;
+    }
+
+    public static Iterator<Row> splitGroup(Iterator<Row> values, DedupConfig dedupConf) {
+        List<Row> mergeRels = new ArrayList<>();
+        AllMaxCliqueFinder<Row> finder = new AllMaxCliqueFinder<>(
+                () -> values,
+                MaxCliqueFinderFacade.getInstance(),
+                new SimRelWeigher(dedupConf)
+        );
+
+        finder.iterator().forEachRemaining(clique -> {
+            if (clique.size() > 1) {
+                String newDedupId = IdGenerator.generate(clique.iterator().next().getAs("identifier"));
+
+                for (Row r : clique.members()) {
+                    mergeRels.add(RowFactory.create(newDedupId, r.getAs("identifier")));
+                }
+            }
+        });
+
+        return mergeRels.iterator();
     }
 
 }

@@ -2,12 +2,15 @@
 package eu.dnetlib.dhp.oa.dedup;
 
 import java.io.IOException;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
@@ -29,6 +32,7 @@ import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import scala.Tuple2;
+import scala.Tuple3;
 
 public class SparkPrepareNewOrgs extends AbstractSparkAction {
 
@@ -68,7 +72,7 @@ public class SparkPrepareNewOrgs extends AbstractSparkAction {
 			.orElse(NUM_CONNECTIONS);
 
 		final String dbUrl = parser.get("dbUrl");
-		final String dbTable = parser.get("dbTable");
+		final String dedupEventsTable = parser.get("dedupEventsTable");
 		final String dbUser = parser.get("dbUser");
 		final String dbPwd = parser.get("dbPwd");
 
@@ -79,7 +83,7 @@ public class SparkPrepareNewOrgs extends AbstractSparkAction {
 		log.info("numPartitions: '{}'", numConnections);
 		log.info("dbUrl:         '{}'", dbUrl);
 		log.info("dbUser:        '{}'", dbUser);
-		log.info("table:         '{}'", dbTable);
+		log.info("table:         '{}'", dedupEventsTable);
 		log.info("dbPwd:         '{}'", "xxx");
 
 		final String organizazion = ModelSupport.getMainType(EntityType.organization);
@@ -99,7 +103,7 @@ public class SparkPrepareNewOrgs extends AbstractSparkAction {
 			.repartition(numConnections)
 			.write()
 			.mode(SaveMode.Append)
-			.jdbc(dbUrl, dbTable, connectionProperties);
+			.jdbc(dbUrl, dedupEventsTable, connectionProperties);
 	}
 
 	public static Dataset<OrgSimRel> createNewOrgs(
@@ -108,24 +112,13 @@ public class SparkPrepareNewOrgs extends AbstractSparkAction {
 		final String relationPath,
 		final String entitiesPath) {
 
-		// collect diffrels from the raw graph relations: <other id, "diffRel">
-		JavaPairRDD<String, String> diffRels = spark
-			.read()
-			.schema(Encoders.bean(Relation.class).schema())
-			.json(relationPath)
-			.as(Encoders.bean(Relation.class))
-			.map(patchRelFn(), Encoders.bean(Relation.class))
-			.toJavaRDD()
-			.filter(r -> filterRels(r, ModelSupport.getMainType(EntityType.organization)))
-			// take the worst id of the diffrel: <other id, "diffRel">
-			.mapToPair(rel -> {
-				if (DedupUtility.compareOpenOrgIds(rel.getSource(), rel.getTarget()) > 0)
-					return new Tuple2<>(rel.getSource(), "diffRel");
-				else
-					return new Tuple2<>(rel.getTarget(), "diffRel");
-			})
-			.distinct();
-		log.info("Number of DiffRels collected: '{}'", diffRels.count());
+		// collect DiffRels from the raw graph relations: <<best id, other id>, "diffRel">
+		JavaRDD<Tuple2<Tuple2<String, String>, String>> diffRels = OpenorgsUtility.collectRels(spark, relationPath, ModelConstants.IS_DIFFERENT_FROM, ModelConstants.ORG_ORG_RELTYPE, ModelConstants.DEDUP, true);
+		log.info("Number of DiffRels collected: {}", diffRels.count());
+
+		// collect ParentChildRels from the raw graph relations: <<best id, other id>, "parentChildRel">
+		JavaRDD<Tuple2<Tuple2<String, String>, String>> parentChildRels = OpenorgsUtility.collectRels(spark, relationPath, ModelConstants.IS_PARENT_OF, ModelConstants.ORG_ORG_RELTYPE, ModelConstants.DEDUP, false);
+		log.info("Number of Parent/Child Rels collected: {}", parentChildRels.count());
 
 		// collect entities: <id, json_entity>
 		Dataset<Tuple2<String, Organization>> entities = spark
@@ -141,22 +134,12 @@ public class SparkPrepareNewOrgs extends AbstractSparkAction {
 		// collect mergerels and remove ids in the diffrels
 		Dataset<Tuple2<String, String>> openorgsRels = spark
 			.createDataset(
-				spark
-					.read()
-					.load(mergeRelsPath)
-					.as(Encoders.bean(Relation.class))
-					.where("relClass == 'isMergedIn'")
-					.toJavaRDD()
-					.mapToPair(r -> new Tuple2<>(r.getSource(), r.getTarget())) // <id, dedup_id>
-					.leftOuterJoin(diffRels) // <target, "diffRel">
-					.filter(rel -> !rel._2()._2().isPresent())
-					.mapToPair(rel -> new Tuple2<>(rel._1(), rel._2()._1()))
-					.rdd(),
+				OpenorgsUtility.processMergeRels(spark, mergeRelsPath, diffRels, parentChildRels).mapToPair(r -> new Tuple2<>(r._1(), r._2())).rdd(),
 				Encoders.tuple(Encoders.STRING(), Encoders.STRING()));
 		log.info("Number of Openorgs Relations loaded: '{}'", openorgsRels.count());
 
 		return entities
-			.joinWith(openorgsRels, entities.col("_1").equalTo(openorgsRels.col("_1")), "left")
+			.joinWith(openorgsRels, entities.col("_1").equalTo(openorgsRels.col("_2")), "left")
 			.filter((FilterFunction<Tuple2<Tuple2<String, Organization>, Tuple2<String, String>>>) t -> t._2() == null)
 			// take entities not in mergerels (they are single entities, therefore are new orgs)
 			.filter(
@@ -188,27 +171,6 @@ public class SparkPrepareNewOrgs extends AbstractSparkAction {
 					parseECField(r._1()._2().getEcnutscode())),
 				Encoders.bean(OrgSimRel.class));
 
-	}
-
-	private static boolean filterRels(Relation rel, String entityType) {
-
-		switch (entityType) {
-			case "result":
-				if (rel.getRelClass().equals(ModelConstants.IS_DIFFERENT_FROM)
-					&& rel.getRelType().equals(ModelConstants.RESULT_RESULT)
-					&& rel.getSubRelType().equals(ModelConstants.DEDUP))
-					return true;
-				break;
-			case "organization":
-				if (rel.getRelClass().equals(ModelConstants.IS_DIFFERENT_FROM)
-					&& rel.getRelType().equals(ModelConstants.ORG_ORG_RELTYPE)
-					&& rel.getSubRelType().equals(ModelConstants.DEDUP))
-					return true;
-				break;
-			default:
-				return false;
-		}
-		return false;
 	}
 
 }
