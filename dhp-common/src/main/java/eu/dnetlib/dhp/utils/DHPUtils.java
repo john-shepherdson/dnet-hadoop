@@ -103,12 +103,12 @@ public class DHPUtils {
 		return String.format("%s::%s", nsPrefix, DHPUtils.md5(originalId));
 	}
 
-	public static String generateUnresolvedIdentifier(final String pid, final String pidType) {
-
-		final String cleanedPid = PidCleaner.normalizePidValue(pidType, pid);
-
-		return String.format("unresolved::%s::%s", cleanedPid, pidType.toLowerCase().trim());
-	}
+//	public static String generateUnresolvedIdentifier(final String pid, final String pidType) {
+//
+//		final String cleanedPid = PidCleaner.normalizePidValue(pidType, pid);
+//
+//		return String.format("unresolved::%s::%s", cleanedPid, pidType.toLowerCase().trim());
+//	}
 
 	public static String getJPathString(final String jsonPath, final String json) {
 		try {

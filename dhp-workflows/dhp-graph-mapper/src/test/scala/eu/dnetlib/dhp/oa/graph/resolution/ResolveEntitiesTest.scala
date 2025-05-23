@@ -135,11 +135,11 @@ class ResolveEntitiesTest extends Serializable {
         .text(s"$workingDir/graph/$e")
       println(s"Created Dataset $e")
     }
-    SparkResolveRelation.extractPidResolvedTableFromJsonRDD(
-      spark,
-      s"$workingDir/graph",
-      s"$workingDir/work"
-    )
+//    SparkResolveRelation.extractPidResolvedTableFromJsonRDD(
+//      spark,
+//      s"$workingDir/graph",
+//      s"$workingDir/work"
+//    )
 
   }
 
