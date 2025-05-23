@@ -4,16 +4,18 @@ package eu.dnetlib.dhp.collection.plugin.sftp;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
+import java.util.TimeZone;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,8 +50,8 @@ public abstract class AbstractSftpIterator implements Iterator<String> {
 
 	private Queue<String> queue;
 
-	private DateTime fromDate = null;
-	private final DateTimeFormatter simpleDateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
+	private LocalDate fromDate = null;
+	private final DateTimeFormatter simpleDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 	private static String EMPTY_RECORD = "<record/>";
 
@@ -65,7 +67,7 @@ public abstract class AbstractSftpIterator implements Iterator<String> {
 		if (this.incremental) {
 			// I expect fromDate in the format 'yyyy-MM-dd'. See class
 			// eu.dnetlib.msro.workflows.nodes.collect.FindDateRangeForIncrementalHarvestingJobNode .
-			this.fromDate = DateTime.parse(fromDate, this.simpleDateTimeFormatter);
+			this.fromDate = LocalDate.parse(fromDate, this.simpleDateTimeFormatter);
 			log.debug("fromDate string: " + fromDate + " -- parsed: " + this.fromDate.toString());
 		}
 		try {
@@ -154,8 +156,9 @@ public abstract class AbstractSftpIterator implements Iterator<String> {
 							if (this.incremental) {
 								final int mTime = attrs.getMTime();
 								// int times are values reduced by the milliseconds, hence we multiply per 1000L
-								final DateTime dt = new DateTime(mTime * 1000L);
-								if (dt.isAfter(this.fromDate)) {
+								final LocalDateTime dt = LocalDateTime
+									.ofInstant(Instant.ofEpochMilli(mTime * 1000L), TimeZone.getDefault().toZoneId());
+								if (dt.isAfter(this.fromDate.atStartOfDay())) {
 									this.queue.add(currentFileName);
 									log.debug(currentFileName + " has changed and must be re-collected");
 								} else if (log.isDebugEnabled()) {

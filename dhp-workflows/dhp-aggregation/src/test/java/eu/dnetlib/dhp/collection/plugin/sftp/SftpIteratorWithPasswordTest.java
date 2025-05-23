@@ -37,4 +37,19 @@ class SftpIteratorWithPasswordTest {
 		System.out.println("TOTAL: " + count);
 	}
 
+	@Test
+	public void testWithStartDate() {
+		final String startDate = "2025-03-01";
+
+		final SftpIteratorWithPassword iterator = new SftpIteratorWithPassword(baseUrl, port, username, isRecursive,
+			extensions, startDate, password);
+
+		int count = 0;
+		while (iterator.hasNext()) {
+			final String s = iterator.next();
+			System.out.println(s);
+			count++;
+		}
+		System.out.println("TOTAL: " + count);
+	}
 }
