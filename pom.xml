@@ -180,7 +180,7 @@
             <dependency>
                 <groupId>eu.dnetlib</groupId>
                 <artifactId>uoa-validator-engine2</artifactId>
-                <version>2.0.0</version>
+                <version>2.0.1</version>
                 <exclusions>
                     <exclusion>
                         <artifactId>logback-classic</artifactId>
@@ -461,6 +461,12 @@
                 <groupId>eu.dnetlib</groupId>
                 <artifactId>cnr-rmi-api</artifactId>
                 <version>${rmi-api.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>eu.openaire</groupId>
+                <artifactId>author-identifier-reconciler</artifactId>
+                <version>${aider.version}</version>
             </dependency>
 
             <dependency>
@@ -961,6 +967,7 @@
 
         <!-- dependency versions -->
         <apache.poi.version>4.1.2</apache.poi.version>
+        <aider.version>0.1.0</aider.version>
         <rmi-api.version>2.6.1</rmi-api.version>
         <common.compress.version>1.20</common.compress.version>
         <common.csv.version>1.8</common.csv.version>
@@ -973,7 +980,7 @@
         <commons-validator.version>1.7</commons-validator.version>
         <cxf.version>3.5.10</cxf.version>
         <dateparser.version>1.0.7</dateparser.version>
-        <dhp-schemas.version>[10.1.4]</dhp-schemas.version>
+        <dhp-schemas.version>[10.3.0]</dhp-schemas.version>
         <dhp.cdh.version>cdh5.9.2</dhp.cdh.version>
         <dhp.commons.lang.version>3.5</dhp.commons.lang.version>
         <dhp.guava.version>11.0.2</dhp.guava.version>

@@ -275,3 +275,5 @@ for i in ${contexts}; do
   tmp=`echo "$i" | sed 's/'-'/'_'/g' | sed 's/'::'/'_'/g'`
   copydb ${MONITOR_DB}'_'${tmp}
 done
+
+copydb $MONITOR_DB'_monitor_ie'

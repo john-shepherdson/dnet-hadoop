@@ -13,10 +13,8 @@ import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.MapGroupsFunction;
+import org.apache.spark.sql.*;
 import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.SaveMode;
-import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,15 +26,13 @@ import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.common.action.model.MasterDuplicate;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
-import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.GraphCleaningFunctions;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import scala.Tuple2;
+import scala.collection.JavaConversions;
 
 public class CleanGraphSparkJob {
 
@@ -109,6 +105,11 @@ public class CleanGraphSparkJob {
 		String dsMasterDuplicatePath = parser.get("masterDuplicatePath");
 		log.info("masterDuplicatePath: {}", dsMasterDuplicatePath);
 
+		String blacklistPath = Optional
+			.ofNullable(parser.get("blacklist"))
+			.orElse("");
+		log.info("blacklist: {}", blacklistPath);
+
 		Boolean deepClean = Optional
 			.ofNullable(parser.get("deepClean"))
 			.map(Boolean::valueOf)
@@ -128,7 +129,7 @@ public class CleanGraphSparkJob {
 				HdfsSupport.remove(outputPath, spark.sparkContext().hadoopConfiguration());
 				cleanGraphTable(
 					spark, vocs, inputPath, entityClazz, outputPath, contextId, verifyParam, datasourcePath, country,
-					verifyCountryParam, collectedfrom, dsMasterDuplicatePath, deepClean);
+					verifyCountryParam, collectedfrom, dsMasterDuplicatePath, deepClean, blacklistPath);
 			});
 	}
 
@@ -139,11 +140,11 @@ public class CleanGraphSparkJob {
 		Class<T> clazz,
 		String outputPath, String contextId, String verifyParam, String datasourcePath, String country,
 		String[] verifyCountryParam, String collectedfrom, String dsMasterDuplicatePath,
-		Boolean deepClean) {
+		Boolean deepClean, String blacklistPath) {
 
 		final CleaningRuleMap mapping = CleaningRuleMap.create(vocs);
 
-		final Dataset<T> cleaned_basic = readTableFromPath(spark, inputPath, clazz)
+		final Dataset<T> cleaned_basic = readFilteredTableFromPath(spark, inputPath, clazz, blacklistPath)
 			.map((MapFunction<T, T>) GraphCleaningFunctions::fixVocabularyNames, Encoders.bean(clazz))
 			.map((MapFunction<T, T>) value -> OafCleaner.apply(value, mapping), Encoders.bean(clazz))
 			.map((MapFunction<T, T>) value -> GraphCleaningFunctions.cleanup(value, vocs), Encoders.bean(clazz))
@@ -219,14 +220,22 @@ public class CleanGraphSparkJob {
 			.mapGroups(getMapGroupsFunction(), Encoders.bean(clazz));
 	}
 
-	private static <T extends Oaf> Dataset<T> readTableFromPath(
-		SparkSession spark, String inputEntityPath, Class<T> clazz) {
+	private static <T extends Oaf> Dataset<T> readFilteredTableFromPath(
+		SparkSession spark, String inputEntityPath, Class<T> clazz, String blacklistPath) {
 
 		log.info("Reading Graph table from: {}", inputEntityPath);
-		return spark
+		Dataset<T> res = spark
 			.read()
 			.textFile(inputEntityPath)
 			.map(as(clazz), Encoders.bean(clazz));
+
+		if (Relation.class.isAssignableFrom(clazz) || blacklistPath.isEmpty())
+			return res;
+
+		Dataset<Row> blacklist = spark.read().load(blacklistPath);
+		return res
+			.join(blacklist, JavaConversions.asScalaBuffer(Collections.singletonList("id")), "left_anti")
+			.as(Encoders.bean(clazz));
 	}
 
 	private static <R> MapFunction<String, R> as(Class<R> clazz) {

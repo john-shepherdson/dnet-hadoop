@@ -1,9 +1,16 @@
 
 package eu.dnetlib.dhp.transformation;
 
-import static eu.dnetlib.dhp.common.Constants.*;
+import static eu.dnetlib.dhp.common.Constants.CONTENT_INVALIDRECORDS;
+import static eu.dnetlib.dhp.common.Constants.CONTENT_TOTALITEMS;
+import static eu.dnetlib.dhp.common.Constants.CONTENT_TRANSFORMEDRECORDS;
+import static eu.dnetlib.dhp.common.Constants.DNET_MESSAGE_MGR_URL;
+import static eu.dnetlib.dhp.common.Constants.MDSTORE_DATA_PATH;
+import static eu.dnetlib.dhp.common.Constants.MDSTORE_SIZE_PATH;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
-import static eu.dnetlib.dhp.utils.DHPUtils.*;
+import static eu.dnetlib.dhp.utils.DHPUtils.MAPPER;
+import static eu.dnetlib.dhp.utils.DHPUtils.saveDataset;
+import static eu.dnetlib.dhp.utils.DHPUtils.writeHdfsFile;
 
 import java.io.IOException;
 import java.util.Map;
@@ -11,6 +18,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
@@ -18,7 +26,9 @@ import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoder;
 import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.functions;
 import org.apache.spark.util.LongAccumulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,18 +49,17 @@ public class TransformSparkJobNode {
 
 	private static final int RECORDS_PER_TASK = 200;
 
-	public static void main(String[] args) throws Exception {
+	public static void main(final String[] args) throws Exception {
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
 					TransformSparkJobNode.class
-						.getResourceAsStream(
-							"/eu/dnetlib/dhp/transformation/transformation_input_parameters.json")));
+						.getResourceAsStream("/eu/dnetlib/dhp/transformation/transformation_input_parameters.json")));
 
 		parser.parseArgument(args);
 
-		Boolean isSparkSessionManaged = Optional
+		final Boolean isSparkSessionManaged = Optional
 			.ofNullable(parser.get("isSparkSessionManaged"))
 			.map(Boolean::valueOf)
 			.orElse(Boolean.TRUE);
@@ -84,18 +93,18 @@ public class TransformSparkJobNode {
 
 		log.info("Retrieved {} vocabularies", vocabularies.vocabularyNames().size());
 
-		SparkConf conf = new SparkConf();
-		runWithSparkSession(
-			conf,
-			isSparkSessionManaged,
-			spark -> {
-				transformRecords(
-					parser.getObjectMap(), isLookupService, spark, inputPath, outputBasePath, rpt);
-			});
+		final SparkConf conf = new SparkConf();
+		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
+			transformRecords(parser.getObjectMap(), isLookupService, spark, inputPath, outputBasePath, rpt);
+		});
 	}
 
-	public static void transformRecords(final Map<String, String> args, final ISLookUpService isLookUpService,
-		final SparkSession spark, final String inputPath, final String outputBasePath, final Integer rpt)
+	public static void transformRecords(final Map<String, String> args,
+		final ISLookUpService isLookUpService,
+		final SparkSession spark,
+		final String inputPath,
+		final String outputBasePath,
+		final Integer rpt)
 		throws DnetTransformationException, IOException {
 
 		final LongAccumulator totalItems = spark.sparkContext().longAccumulator(CONTENT_TOTALITEMS);
@@ -110,21 +119,25 @@ public class TransformSparkJobNode {
 		final String workflowId = args.get("workflowId");
 		log.info("workflowId is {}", workflowId);
 
-		MapFunction<MetadataRecord, MetadataRecord> x = TransformationFactory
+		final MapFunction<MetadataRecord, MetadataRecord> x = TransformationFactory
 			.getTransformationPlugin(args, ct, isLookUpService);
 
-		final Dataset<MetadataRecord> inputMDStore = spark
-			.read()
-			.format("parquet")
-			.load(inputPath)
-			.as(encoder);
+		final Dataset<Row> rows = spark.read().parquet(inputPath);
+
+		// Make compatible the old mdstores with the evolution of the model class
+		// ie: the addiction of the new field (validationResults)
+		final Dataset<Row> rowsWithNewField = ArrayUtils.contains(rows.schema().fieldNames(), "validationResults")
+			? rows
+			: rows.withColumn("validationResults", functions.map());
+
+		final Dataset<MetadataRecord> inputMDStore = rowsWithNewField.as(encoder);
 
 		final long totalInput = inputMDStore.count();
 
 		final MessageSender messageSender = new MessageSender(dnetMessageManagerURL, workflowId);
 		try (AggregatorReport report = new AggregatorReport(messageSender)) {
 			try {
-				JavaRDD<MetadataRecord> mdstore = inputMDStore
+				final JavaRDD<MetadataRecord> mdstore = inputMDStore
 					.javaRDD()
 					.repartition(getRepartitionNumber(totalInput, rpt))
 					.map((Function<MetadataRecord, MetadataRecord>) x::call)
@@ -137,9 +150,8 @@ public class TransformSparkJobNode {
 
 				final long mdStoreSize = spark.read().load(outputBasePath + MDSTORE_DATA_PATH).count();
 				writeHdfsFile(
-					spark.sparkContext().hadoopConfiguration(),
-					"" + mdStoreSize, outputBasePath + MDSTORE_SIZE_PATH);
-			} catch (Throwable e) {
+					spark.sparkContext().hadoopConfiguration(), "" + mdStoreSize, outputBasePath + MDSTORE_SIZE_PATH);
+			} catch (final Throwable e) {
 				log.error("error during record transformation", e);
 				report.put(TransformSparkJobNode.class.getSimpleName(), e.getMessage());
 				report.put(CONTENT_TOTALITEMS, ct.getTotalItems().value().toString());
@@ -152,11 +164,12 @@ public class TransformSparkJobNode {
 
 	/**
 	 * Calculates the number of partitions allocating at most @rpt records for a single transformation task.
+	 *
 	 * @param totalInput
 	 * @param rpt
 	 * @return
 	 */
-	private static int getRepartitionNumber(long totalInput, Integer rpt) {
+	private static int getRepartitionNumber(final long totalInput, final Integer rpt) {
 		return Math.max(1, (int) (totalInput / rpt));
 	}
 
