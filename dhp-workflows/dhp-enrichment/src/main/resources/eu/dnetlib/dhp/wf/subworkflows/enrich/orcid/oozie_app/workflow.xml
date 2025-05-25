@@ -31,8 +31,6 @@
         </property>
     </parameters>
 
-    <start to="EnrichGraph"/>
-
     <global>
         <job-tracker>${jobTracker}</job-tracker>
         <name-node>${nameNode}</name-node>
@@ -43,6 +41,8 @@
             </property>
         </configuration>
     </global>
+
+    <start to="EnrichGraph"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
