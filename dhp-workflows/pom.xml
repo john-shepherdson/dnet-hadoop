@@ -154,6 +154,7 @@
                                     <goal>copy-dependencies</goal>
                                 </goals>
                                 <configuration>
+
                                     <includeScope>${oozie.package.dependencies.include.scope}</includeScope>
                                     <excludeScope>${oozie.package.dependencies.exclude.scope}</excludeScope>
                                     <silent>true</silent>
