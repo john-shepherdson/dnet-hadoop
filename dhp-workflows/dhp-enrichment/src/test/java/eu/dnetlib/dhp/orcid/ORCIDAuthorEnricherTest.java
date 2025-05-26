@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.enrich.orcid;
+package eu.dnetlib.dhp.orcid;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

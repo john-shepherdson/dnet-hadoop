@@ -17,25 +17,24 @@ class SparkEnrichGraphWithOrcidAuthors(propertyPath: String, args: Array[String]
     orcidPath: String,
     targetPath: String
   ): Unit = {
+
     val orcidAuthors =
-      spark.read
-        .load(s"$orcidPath/Authors")
-        .select("eu/dnetlib/dhp/enrich/orcid", "familyName", "givenName", "creditName", "otherNames")
+      spark.read.load(s"$orcidPath/Authors").select("orcid", "familyName", "givenName", "creditName", "otherNames")
 
     val orcidWorks = spark.read
       .load(s"$orcidPath/Works")
-      .select(col("eu/dnetlib/dhp/enrich/orcid"), explode(col("pids")).alias("identifier"))
+      .select(col("orcid"), explode(col("pids")).alias("identifier"))
       .where(
         "identifier.schema IN('doi','pmid','pmc','arxiv','handle')" // scopus eid ?
       )
 
     val orcidWorksWithAuthors = orcidAuthors
-      .join(orcidWorks, Seq("eu/dnetlib/dhp/enrich/orcid"))
+      .join(orcidWorks, Seq("orcid"))
       .select(
         lower(col("identifier.schema")).alias("pid_schema"),
         lower(col("identifier.value")).alias("pid_value"),
         struct(
-          col("eu/dnetlib/dhp/enrich/orcid"),
+          col("orcid"),
           col("givenName"),
           col("familyName"),
           col("creditName"),
