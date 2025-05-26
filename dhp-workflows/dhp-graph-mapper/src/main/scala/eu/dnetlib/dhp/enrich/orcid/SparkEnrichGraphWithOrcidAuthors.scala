@@ -93,7 +93,7 @@ object SparkEnrichGraphWithOrcidAuthors {
   val log: Logger = LoggerFactory.getLogger(SparkEnrichGraphWithOrcidAuthors.getClass)
 
   def main(args: Array[String]): Unit = {
-    new SparkEnrichGraphWithOrcidAuthors("/eu/dnetlib/dhp/enrich/orcid/enrich_graph_orcid_parameters.json", args, log)
+    new SparkEnrichGraphWithOrcidAuthors("/eu/dnetlib/dhp/wf/subworkflows/enrich/orcid/enrich_graph_orcid_parameters.json", args, log)
       .initialize()
       .run()
   }
