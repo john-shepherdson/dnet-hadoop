@@ -792,7 +792,7 @@
                 </plugin>
                 <plugin>
                     <groupId>org.antipathy</groupId>
-                    <artifactId>mvn-scalafmt_${scala.binary.version}</artifactId>
+                    <artifactId>mvn-scalafmt_2.12</artifactId>
                     <version>1.0.1640073709.733712b</version>
                     <dependencies>
                         <dependency>
@@ -831,6 +831,13 @@
                 <groupId>net.revelc.code</groupId>
                 <artifactId>impsort-maven-plugin</artifactId>
                 <version>1.6.2</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.codehaus.plexus</groupId>
+                        <artifactId>plexus-utils</artifactId>
+                        <version>3.3.0</version>
+                    </dependency>
+                </dependencies>
                 <configuration>
                     <groups>java.,javax.,org.,com.</groups>
                     <staticGroups>java,*</staticGroups>
@@ -849,7 +856,7 @@
             </plugin>
             <plugin>
                 <groupId>org.antipathy</groupId>
-                <artifactId>mvn-scalafmt_${scala.binary.version}</artifactId>
+                <artifactId>mvn-scalafmt_2.12</artifactId>
                 <configuration>
                     <configLocation>
                         https://code-repo.d4science.org/D-Net/dnet-hadoop/raw/branch/beta/dhp-build/dhp-code-style/src/main/resources/scalafmt/scalafmt.conf
