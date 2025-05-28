@@ -5,7 +5,7 @@ import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
 import eu.dnetlib.dhp.datacite.DataciteModelConstants._
 import eu.dnetlib.dhp.schema.action.AtomicAction
 import eu.dnetlib.dhp.schema.common.ModelConstants
-import eu.dnetlib.dhp.schema.oaf.utils.{IdentifierFactory, OafMapperUtils}
+import eu.dnetlib.dhp.schema.oaf.utils.{IdentifierFactory, OafMapperUtils, PidCleaner}
 import eu.dnetlib.dhp.schema.oaf.{Dataset => OafDataset, _}
 import eu.dnetlib.dhp.utils.DHPUtils
 import org.apache.commons.lang3.StringUtils
@@ -22,6 +22,8 @@ import scala.collection.JavaConverters._
 import scala.io.Source
 
 object DataciteToOAFTransformation {
+
+  val DOI_PREFIX = "50|doi_________::"
 
   case class HostedByMapType(
     openaire_id: String,
@@ -656,30 +658,27 @@ object DataciteToOAFTransformation {
     val bidirectionalRels: List[Relation] = rels
       .filter(r =>
         subRelTypeMapping
-          .contains(r.relationType) && (r.relatedIdentifierType.equalsIgnoreCase("doi") ||
-        r.relatedIdentifierType.equalsIgnoreCase("pmid") ||
-        r.relatedIdentifierType.equalsIgnoreCase("arxiv"))
+          .contains(r.relationType) && (r.relatedIdentifierType.equalsIgnoreCase("doi"))
       )
       .map(r => {
         val subRelType = subRelTypeMapping(r.relationType).relType
-        val target = DHPUtils.generateUnresolvedIdentifier(r.relatedIdentifier, r.relatedIdentifierType)
+        val targetPid = PidCleaner.normalizePidValue(r.relatedIdentifierType, r.relatedIdentifier)
+        val target = DHPUtils.generateIdentifier(targetPid, DOI_PREFIX)
         relation(id, target, subRelType, r.relationType, date)
       })
     val citationRels: List[Relation] = rels
       .filter(r =>
-        (r.relatedIdentifierType.equalsIgnoreCase("doi") ||
-        r.relatedIdentifierType.equalsIgnoreCase("pmid") ||
-        r.relatedIdentifierType.equalsIgnoreCase("arxiv")) &&
+        (r.relatedIdentifierType.equalsIgnoreCase("doi")) &&
         (r.relationType.toLowerCase.contains("cite") || r.relationType.toLowerCase.contains("reference"))
       )
       .map(r => {
+        val targetPid = PidCleaner.normalizePidValue(r.relatedIdentifierType, r.relatedIdentifier)
+        val relatedID = DHPUtils.generateIdentifier(targetPid, DOI_PREFIX)
         r.relationType match {
           case ModelConstants.CITES | ModelConstants.REFERENCES =>
-            val target = DHPUtils.generateUnresolvedIdentifier(r.relatedIdentifier, r.relatedIdentifierType)
-            relation(id, target, ModelConstants.CITATION, ModelConstants.CITES, date)
+            relation(id, relatedID, ModelConstants.CITATION, ModelConstants.CITES, date)
           case ModelConstants.IS_CITED_BY | ModelConstants.IS_REFERENCED_BY =>
-            val source = DHPUtils.generateUnresolvedIdentifier(r.relatedIdentifier, r.relatedIdentifierType)
-            relation(source, id, ModelConstants.CITATION, ModelConstants.CITES, date)
+            relation(relatedID, id, ModelConstants.CITATION, ModelConstants.CITES, date)
         }
       })
 
