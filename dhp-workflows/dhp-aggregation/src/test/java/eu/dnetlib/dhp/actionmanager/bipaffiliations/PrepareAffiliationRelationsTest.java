@@ -302,4 +302,133 @@ public class PrepareAffiliationRelationsTest {
 //								.count());
 
 	}
+
+	@Test
+	void testGraphMatch() throws Exception {
+
+		String crossrefAffiliationRelationPath = getClass()
+				.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/newTest/crossref")
+				.getPath();
+
+		String dataciteAffiliationRelationPath = getClass()
+				.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/newTest/datacite")
+				.getPath();
+
+		String publisherAffiliationRelationPath = getClass()
+				.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/newTest/publishers")
+				.getPath();
+
+		String pubmedAffiliationRelationPath = getClass()
+				.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/newTest/pubmed")
+				.getPath();
+		String webcrawlAffiliationRelationPath = getClass()
+				.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/newTest/webCrawl_IE")
+				.getPath();
+		String openapsAffiliationRelationPath = getClass()
+				.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/newTest/openapc.json")
+				.getPath();
+		String graphAffiliationRelationPath = getClass()
+				.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/newTest/graph")
+				.getPath();
+		String outputPath = workingDir.toString() + "/actionSet";
+
+		PrepareAffiliationRelations
+				.main(
+						new String[] {
+								"-isSparkSessionManaged", Boolean.FALSE.toString(),
+								"-crossrefInputPath", crossrefAffiliationRelationPath,
+								"-pubmedInputPath", pubmedAffiliationRelationPath,
+								"-openapcInputPath", openapsAffiliationRelationPath,
+								"-dataciteInputPath", dataciteAffiliationRelationPath,
+								"-webCrawlInputPath", webcrawlAffiliationRelationPath,
+								"-publisherInputPath", publisherAffiliationRelationPath,
+								"-graphInputPath",graphAffiliationRelationPath,
+								"-outputPath", outputPath
+						});
+
+		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
+
+		JavaRDD<Relation> tmp = sc
+				.sequenceFile(outputPath, Text.class, Text.class)
+				.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
+				.map(aa -> ((Relation) aa.getPayload()));
+
+		//tmp.foreach(r -> System.out.println(new ObjectMapper().writeValueAsString(r)));
+
+		Assertions.assertEquals(100, tmp.count());
+		Assertions.assertEquals(3, tmp.filter(r -> r.getSource().startsWith("50|06cdd3ff4700")).count());
+		Assertions.assertEquals(12, tmp.filter(r -> r.getSource().startsWith("50|475c1990cbb2")).count());
+
+		// count the number of relations
+//		assertEquals(70, tmp.count());// 18 + 24 + 30 * 4 =
+//
+//		Dataset<Relation> dataset = spark.createDataset(tmp.rdd(), Encoders.bean(Relation.class));
+//		dataset.createOrReplaceTempView("result");
+//
+//		Dataset<Row> execVerification = spark
+//				.sql("select r.relType, r.relClass, r.source, r.target, r.dataInfo.trust from result r");
+//
+//		// verify that we have equal number of bi-directional relations
+//		Assertions
+//				.assertEquals(
+//						35, execVerification
+//								.filter(
+//										"relClass='" + ModelConstants.HAS_AUTHOR_INSTITUTION + "'")
+//								.collectAsList()
+//								.size());
+//
+//		Assertions
+//				.assertEquals(
+//						35, execVerification
+//								.filter(
+//										"relClass='" + ModelConstants.IS_AUTHOR_INSTITUTION_OF + "'")
+//								.collectAsList()
+//								.size());
+
+//		// check confidence value of a specific relation
+//		String sourceDOI = "10.1089/10872910260066679";
+//
+//		final String sourceOpenaireId = ID_PREFIX
+//				+ IdentifierFactory.md5(PidCleaner.normalizePidValue("doi", sourceDOI));
+//
+//		Assertions
+//				.assertEquals(
+//						"1.0", execVerification
+//								.filter(
+//										"source='" + sourceOpenaireId + "'")
+//								.collectAsList()
+//								.get(0)
+//								.getString(4));
+//
+//		final String publisherid = ID_PREFIX
+//				+ IdentifierFactory.md5(PidCleaner.normalizePidValue("doi", "10.1089/10872910260066679"));
+//		final String rorId = "20|ror_________::" + IdentifierFactory.md5("https://ror.org/05cf8a891");
+//
+//		Assertions
+//				.assertEquals(
+//						4, execVerification.filter("source = '" + publisherid + "' and target = '" + rorId + "'").count());
+//
+//		Assertions
+//				.assertEquals(
+//						1, execVerification
+//								.filter(
+//										"source = '" + ID_PREFIX
+//												+ IdentifierFactory
+//												.md5(PidCleaner.normalizePidValue("doi", "10.1007/s00217-010-1268-9"))
+//												+ "' and target = '" + "20|ror_________::"
+//												+ IdentifierFactory.md5("https://ror.org/03265fv13") + "'")
+//								.count());
+//
+//		Assertions
+//				.assertEquals(
+//						1, execVerification
+//								.filter(
+//										"source = '" + ID_PREFIX
+//												+ IdentifierFactory
+//												.md5(PidCleaner.normalizePidValue("doi", "10.1007/3-540-47984-8_14"))
+//												+ "' and target = '" + "20|ror_________::"
+//												+ IdentifierFactory.md5("https://ror.org/00a0n9e72") + "'")
+//								.count());
+
+	}
 }
