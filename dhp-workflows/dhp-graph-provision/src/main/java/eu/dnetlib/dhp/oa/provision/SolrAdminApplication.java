@@ -37,9 +37,6 @@ public class SolrAdminApplication implements Closeable {
 						.getResourceAsStream("/eu/dnetlib/dhp/oa/provision/input_solradmin_parameters.json")));
 		parser.parseArgument(args);
 
-		final String isLookupUrl = parser.get("isLookupUrl");
-		log.info("isLookupUrl: {}", isLookupUrl);
-
 		final Action action = Action.valueOf(parser.get("action"));
 		log.info("action: {}", action);
 
@@ -52,22 +49,13 @@ public class SolrAdminApplication implements Closeable {
 			.orElse(false);
 		log.info("commit: {}", commit);
 
-		final ISLookupClient isLookup = new ISLookupClient(ISLookupClientFactory.getLookUpService(isLookupUrl));
-
-		final String zkHost = isLookup.getZkHost();
+		final String zkHost = parser.get("zkHost");
 		log.info("zkHost: {}", zkHost);
 
-		final String publicFormat = parser.get("publicFormat");
-		log.info("publicFormat: {}", publicFormat);
-
-		final String shadowFormat = parser.get("shadowFormat");
-		log.info("shadowFormat: {}", shadowFormat);
-
-		// get collection names from metadata format profiles names
-		final String publicCollection = ProvisionConstants.getCollectionName(publicFormat);
+		final String publicCollection = parser.get("publicCollection");
 		log.info("publicCollection: {}", publicCollection);
 
-		final String shadowCollection = ProvisionConstants.getCollectionName(shadowFormat);
+		final String shadowCollection = parser.get("shadowCollection");
 		log.info("shadowCollection: {}", shadowCollection);
 
 		try (SolrAdminApplication app = new SolrAdminApplication(zkHost)) {

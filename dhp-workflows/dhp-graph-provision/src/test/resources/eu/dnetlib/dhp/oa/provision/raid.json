@@ -1,0 +1,416 @@
+{
+  "collectedfrom": [
+    {
+      "key": "10|infrastruct_::f66f1bd369679b5b077dcdf006089556",
+      "value": "OpenAIRE",
+      "dataInfo": null
+    }
+  ],
+  "dataInfo": {
+    "invisible": false,
+    "inferred": true,
+    "deletedbyinference": false,
+    "trust": "0.92",
+    "inferenceprovenance": "OpenAIRE",
+    "provenanceaction": {
+      "classid": "raid:openaireinference",
+      "classname": "Inferred by OpenAIRE",
+      "schemeid": "dnet:provenanceActions",
+      "schemename": "dnet:provenanceActions"
+    }
+  },
+  "lastupdatetimestamp": 1733476505043,
+  "id": "50|raid________::1e666e9ff653cb894932195edfb5358a",
+  "mergedIds": null,
+  "originalId": null,
+  "pid": null,
+  "dateofcollection": null,
+  "dateoftransformation": null,
+  "extraInfo": null,
+  "oaiprovenance": null,
+  "measures": null,
+  "context": null,
+  "processingchargeamount": null,
+  "processingchargecurrency": null,
+  "author": null,
+  "resulttype": {
+    "classid": "other",
+    "classname": "other",
+    "schemeid": "dnet:result_typologies",
+    "schemename": "dnet:result_typologies"
+  },
+  "metaResourceType": null,
+  "language": null,
+  "country": null,
+  "subject": [
+    {
+      "value": "Begamganj",
+      "qualifier": {
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "dataInfo": {
+        "invisible": false,
+        "inferred": true,
+        "deletedbyinference": false,
+        "trust": "0.92",
+        "inferenceprovenance": "OpenAIRE",
+        "provenanceaction": {
+          "classid": "raid:openaireinference",
+          "classname": "Inferred by OpenAIRE",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        }
+      }
+    },
+    {
+      "value": "Raisen",
+      "qualifier": {
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "dataInfo": {
+        "invisible": false,
+        "inferred": true,
+        "deletedbyinference": false,
+        "trust": "0.92",
+        "inferenceprovenance": "OpenAIRE",
+        "provenanceaction": {
+          "classid": "raid:openaireinference",
+          "classname": "Inferred by OpenAIRE",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        }
+      }
+    },
+    {
+      "value": "Bhopal",
+      "qualifier": {
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "dataInfo": {
+        "invisible": false,
+        "inferred": true,
+        "deletedbyinference": false,
+        "trust": "0.92",
+        "inferenceprovenance": "OpenAIRE",
+        "provenanceaction": {
+          "classid": "raid:openaireinference",
+          "classname": "Inferred by OpenAIRE",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        }
+      }
+    },
+    {
+      "value": "Budhni",
+      "qualifier": {
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "dataInfo": {
+        "invisible": false,
+        "inferred": true,
+        "deletedbyinference": false,
+        "trust": "0.92",
+        "inferenceprovenance": "OpenAIRE",
+        "provenanceaction": {
+          "classid": "raid:openaireinference",
+          "classname": "Inferred by OpenAIRE",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        }
+      }
+    },
+    {
+      "value": "Malwa site survey",
+      "qualifier": {
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "dataInfo": {
+        "invisible": false,
+        "inferred": true,
+        "deletedbyinference": false,
+        "trust": "0.92",
+        "inferenceprovenance": "OpenAIRE",
+        "provenanceaction": {
+          "classid": "raid:openaireinference",
+          "classname": "Inferred by OpenAIRE",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        }
+      }
+    },
+    {
+      "value": "सीहोर",
+      "qualifier": {
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "dataInfo": {
+        "invisible": false,
+        "inferred": true,
+        "deletedbyinference": false,
+        "trust": "0.92",
+        "inferenceprovenance": "OpenAIRE",
+        "provenanceaction": {
+          "classid": "raid:openaireinference",
+          "classname": "Inferred by OpenAIRE",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        }
+      }
+    },
+    {
+      "value": "Gauharganj",
+      "qualifier": {
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "dataInfo": {
+        "invisible": false,
+        "inferred": true,
+        "deletedbyinference": false,
+        "trust": "0.92",
+        "inferenceprovenance": "OpenAIRE",
+        "provenanceaction": {
+          "classid": "raid:openaireinference",
+          "classname": "Inferred by OpenAIRE",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        }
+      }
+    },
+    {
+      "value": "बुधनी",
+      "qualifier": {
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "dataInfo": {
+        "invisible": false,
+        "inferred": true,
+        "deletedbyinference": false,
+        "trust": "0.92",
+        "inferenceprovenance": "OpenAIRE",
+        "provenanceaction": {
+          "classid": "raid:openaireinference",
+          "classname": "Inferred by OpenAIRE",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        }
+      }
+    },
+    {
+      "value": "Budni",
+      "qualifier": {
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "dataInfo": {
+        "invisible": false,
+        "inferred": true,
+        "deletedbyinference": false,
+        "trust": "0.92",
+        "inferenceprovenance": "OpenAIRE",
+        "provenanceaction": {
+          "classid": "raid:openaireinference",
+          "classname": "Inferred by OpenAIRE",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        }
+      }
+    },
+    {
+      "value": "Berasia",
+      "qualifier": {
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "dataInfo": {
+        "invisible": false,
+        "inferred": true,
+        "deletedbyinference": false,
+        "trust": "0.92",
+        "inferenceprovenance": "OpenAIRE",
+        "provenanceaction": {
+          "classid": "raid:openaireinference",
+          "classname": "Inferred by OpenAIRE",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        }
+      }
+    }
+  ],
+  "title": [
+    {
+      "value": "Documentation of Malwa Region",
+      "qualifier": {
+        "classid": "main title",
+        "classname": "main title",
+        "schemeid": "dnet:dataCite_title",
+        "schemename": "dnet:dataCite_title"
+      },
+      "dataInfo": {
+        "invisible": false,
+        "inferred": true,
+        "deletedbyinference": false,
+        "trust": "0.92",
+        "inferenceprovenance": "OpenAIRE",
+        "provenanceaction": {
+          "classid": "raid:openaireinference",
+          "classname": "Inferred by OpenAIRE",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        }
+      }
+    }
+  ],
+  "relevantdate": [
+    {
+      "value": "2019-03-08",
+      "qualifier": {
+        "classid": "endDate",
+        "classname": "endDate",
+        "schemeid": "dnet:dataCite_date",
+        "schemename": "dnet:dataCite_date"
+      },
+      "dataInfo": {
+        "invisible": false,
+        "inferred": true,
+        "deletedbyinference": false,
+        "trust": "0.92",
+        "inferenceprovenance": "OpenAIRE",
+        "provenanceaction": {
+          "classid": "raid:openaireinference",
+          "classname": "Inferred by OpenAIRE",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        }
+      }
+    },
+    {
+      "value": "2019-03-06",
+      "qualifier": {
+        "classid": "startDate",
+        "classname": "startDate",
+        "schemeid": "dnet:dataCite_date",
+        "schemename": "dnet:dataCite_date"
+      },
+      "dataInfo": {
+        "invisible": false,
+        "inferred": true,
+        "deletedbyinference": false,
+        "trust": "0.92",
+        "inferenceprovenance": "OpenAIRE",
+        "provenanceaction": {
+          "classid": "raid:openaireinference",
+          "classname": "Inferred by OpenAIRE",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        }
+      }
+    }
+  ],
+  "description": [
+    {
+      "value": "This project involves the documentation of the Malwa region through photographic surveys. The surveys were conducted by the Department of Archaeology and Museums, Madhya Pradesh, and cover various districts and tahsils. The documentation includes photographic records of sites, villages, and other relevant features. The project aims to provide a comprehensive understanding of the region's cultural and historical significance.",
+      "dataInfo": {
+        "invisible": false,
+        "inferred": true,
+        "deletedbyinference": false,
+        "trust": "0.92",
+        "inferenceprovenance": "OpenAIRE",
+        "provenanceaction": {
+          "classid": "raid:openaireinference",
+          "classname": "Inferred by OpenAIRE",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        }
+      }
+    }
+  ],
+  "dateofacceptance": {
+    "value": "2019-03-06",
+    "dataInfo": {
+      "invisible": false,
+      "inferred": true,
+      "deletedbyinference": false,
+      "trust": "0.92",
+      "inferenceprovenance": "OpenAIRE",
+      "provenanceaction": {
+        "classid": "raid:openaireinference",
+        "classname": "Inferred by OpenAIRE",
+        "schemeid": "dnet:provenanceActions",
+        "schemename": "dnet:provenanceActions"
+      }
+    }
+  },
+  "publisher": null,
+  "embargoenddate": null,
+  "source": null,
+  "fulltext": null,
+  "format": null,
+  "contributor": null,
+  "resourcetype": null,
+  "coverage": null,
+  "bestaccessright": null,
+  "externalReference": null,
+  "bestInstancetype": null,
+  "instance": [
+    {
+      "license": null,
+      "accessright": null,
+      "instancetype": {
+        "classid": "0049",
+        "classname": "Research Activity Identifier",
+        "schemeid": "dnet:publication_resource",
+        "schemename": "dnet:publication_resource"
+      },
+      "instanceTypeMapping": null,
+      "hostedby": null,
+      "url": null,
+      "distributionlocation": null,
+      "collectedfrom": null,
+      "pid": null,
+      "alternateIdentifier": null,
+      "dateofacceptance": null,
+      "processingchargeamount": null,
+      "processingchargecurrency": null,
+      "refereed": null,
+      "measures": null,
+      "fulltext": null
+    }
+  ],
+  "eoscifguidelines": null,
+  "openAccessColor": null,
+  "publiclyFunded": null,
+  "transformativeAgreement": null,
+  "contactperson": null,
+  "contactgroup": null,
+  "tool": null,
+  "isGreen": null,
+  "isInDiamondJournal": null
+}

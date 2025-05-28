@@ -1,11 +1,5 @@
 [
   {
-    "paramName": "isu",
-    "paramLongName": "isLookupUrl",
-    "paramDescription": "the URL to the ISLookUp Service",
-    "paramRequired": true
-  },
-  {
     "paramName": "a",
     "paramLongName": "action",
     "paramDescription": "the action to be performed by the application",
@@ -24,16 +18,21 @@
     "paramRequired": false
   },
   {
-    "paramName": "pf",
-    "paramLongName": "publicFormat",
-    "paramDescription": "the name of the public metadata format profile - used to create an alias",
+    "paramName": "pc",
+    "paramLongName": "publicCollection",
+    "paramDescription": "the name of the public collection - used to create an alias",
     "paramRequired": false
   },
   {
-    "paramName": "sf",
-    "paramLongName": "shadowFormat",
-    "paramDescription": "the name of the shadow metadata format profile - used to create an alias",
+    "paramName": "sc",
+    "paramLongName": "shadowCollection",
+    "paramDescription": "the name of the shadow collection - used to create an alias",
     "paramRequired": false
+  },
+  {
+    "paramName": "z",
+    "paramLongName": "zkHost",
+    "paramDescription": "the Zookeeper host list",
+    "paramRequired": true
   }
-
 ]
