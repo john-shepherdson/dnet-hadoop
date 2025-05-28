@@ -44,7 +44,7 @@ class DBLPCollectorPluginTest {
 	}
 
 	@Test
-	//@Disabled
+	// @Disabled
 	public void testOne() throws Exception {
 		System.out.println("one publication");
 
@@ -59,7 +59,7 @@ class DBLPCollectorPluginTest {
 	}
 
 	@Test
-	//@Disabled
+	// @Disabled
 	public void testCompleteHarvesting() throws Exception {
 		System.out.println("testing complete harvesting");
 		final Iterator<String> iterator = this.plugin.collect(this.api, null).iterator();

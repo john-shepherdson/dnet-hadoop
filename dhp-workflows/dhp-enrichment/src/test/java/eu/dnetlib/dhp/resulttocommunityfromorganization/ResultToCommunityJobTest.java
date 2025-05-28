@@ -6,6 +6,8 @@ import static org.apache.spark.sql.functions.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
@@ -21,9 +23,13 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 
+import eu.dnetlib.dhp.api.Utils;
+import eu.dnetlib.dhp.api.model.CommunityEntityMap;
 import eu.dnetlib.dhp.orcidtoresultfromsemrel.OrcidPropagationJobTest;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
 
@@ -319,5 +325,30 @@ public class ResultToCommunityJobTest {
 					.collectAsList()
 					.get(0)
 					.getString(0));
+	}
+
+	@Test
+	void testCommunityOrganizationAPIs() throws IOException {
+		final CommunityEntityMap organizationMap = Utils
+			.getCommunityOrganization("https://beta.services.openaire.eu/openaire/community/");
+		// final CommunityEntityMap organizationMap = Utils.getOrganizationCommunityMap(baseURL);
+		List<String> beopenOrgs = Arrays.asList("20|openorgs____::9dd5545aacd3d8019e00c3f837269746",
+				"20|openorgs____::11f6b2617abf37fe7193557d77d8cd00",
+				"20|openorgs____::9cb5ffc315d7bf0f97b2f0fdc37612aa",
+				"20|openorgs____::72162cfc2e7edaf7515c778e04d1952b",
+				"20|openorgs____::a86e8b969264b4c92cbf79c289a3f61a",
+				"20|openorgs____::600c7afdde615a68e45cfceaf684782d",
+				"20|openorgs____::b79247e30e30a8f8532a30e3b816cda9",
+				"20|openorgs____::90a0f7c99fb72cd0e014fcdd38c08719",
+				"20|openorgs____::581dcea989b861fa0106d4874ecf2d66",
+				"20|openorgs____::ad863df6deda1619a25e7fad4a534891",
+				"20|openorgs____::9e29fb5b85151a6810ce7256b08475e4",
+				"20|openorgs____::ca4e3e4e6767e05b0828ef5f0cdc7292",
+				"20|openorgs____::d6b4b35b44951f55747a7139446d21a8",
+				"20|openorgs____::8ec069b683b9e9387492ea0c6b88a806");
+
+		beopenOrgs.forEach(org -> Assertions.assertTrue(organizationMap.get(org).contains("beopen")));
+
+
 	}
 }

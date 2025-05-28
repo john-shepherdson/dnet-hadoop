@@ -8,9 +8,9 @@ import java.util.ArrayList;
  * @author miriam.baglioni
  * @Date 09/10/23
  */
-public class EntityIdentifierList extends ArrayList<String> implements Serializable {
+public class EntityList extends ArrayList<OrganizationAPIModel> implements Serializable {
 
-	public EntityIdentifierList() {
+	public EntityList() {
 		super();
 	}
 }

@@ -8,12 +8,8 @@
         <value>hdfs://nameservice1</value>
     </property>
     <property>
-        <name>oozie.use.system.libpath</name>
-        <value>true</value>
-    </property>
-    <property>
         <name>oozie.action.sharelib.for.spark</name>
-        <value>spark2</value>
+        <value>spark344</value>
     </property>
     <property>
         <name>spark2YarnHistoryServerAddress</name>

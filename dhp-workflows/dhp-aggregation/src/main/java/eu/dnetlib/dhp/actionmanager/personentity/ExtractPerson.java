@@ -121,7 +121,7 @@ public class ExtractPerson implements Serializable {
 					"`Matchings`: ARRAY<STRUCT<`PID`:STRING, `Value`:STRING,`Confidence`:DOUBLE, `Status`:STRING>>, " +
 					"`PIDs` : ARRAY<STRUCT<`Schema`:STRING , `Value`: STRING>>>>")
 			.json(inputPath)
-				.where("DOI is not null");
+			.where("DOI is not null");
 
 //Select the relevant information
 		Dataset<Row> allAuthors = df
@@ -130,7 +130,7 @@ public class ExtractPerson implements Serializable {
 				"DOI", "author.Contributor_roles as roles",
 				"author.Corresponding as corresponding", "author.Matchings as affs",
 				"explode(author.PIDs) as pid")
-				.where("pid.Schema = 'ORCID'");
+			.where("pid.Schema = 'ORCID'");
 
 		Dataset<Row> authors = allAuthors
 			.selectExpr("explode (affs) as affiliation", "DOI", "corresponding", "roles", "pid.Value as orcid")
