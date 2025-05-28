@@ -263,7 +263,6 @@ public class Utils implements Serializable {
 		return new CommunityConfiguration(communities);
 	}
 
-
 	/**
 	 * filles the common fields in the community model for both the communityconfiguration and the subcommunityconfiguration
 	 * @param input

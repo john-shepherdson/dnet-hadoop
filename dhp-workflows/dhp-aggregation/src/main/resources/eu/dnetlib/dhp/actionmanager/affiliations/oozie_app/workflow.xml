@@ -238,11 +238,11 @@
                 ${sparkClusterOpts}
                 ${sparkResourceOpts}
                 ${sparkApplicationOpts}
-                --executor-cores=6
-                --executor-memory=6G
+                --executor-cores=5
+                --executor-memory=7G
                 --driver-memory=4G
-                --conf spark.dynamicAllocation.maxExecutors=27
-                --conf spark.executor.memoryOverhead=6G
+<!--                &#45;&#45;conf spark.dynamicAllocation.maxExecutors=27-->
+                --conf spark.executor.memoryOverhead=7G
                 --conf spark.sql.shuffle.partitions=20000
                 --conf spark.yarn.appMasterEnv.PYSPARK_PYTHON=python3
                 --conf spark.executorEnv.PYSPARK_PYTHON=python3
@@ -253,7 +253,7 @@
             <arg>${inputFolder}</arg>
             <arg>${alreadyMatchedFolder}</arg>
             <arg>${outputFolder}</arg>
-
+            <arg>${matchingDone}</arg>
             <file>${wfAppPath}/affRo/graph.py#graph.py</file>
         </spark>
 
