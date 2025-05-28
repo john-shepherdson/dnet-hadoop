@@ -42,6 +42,12 @@
     "paramRequired": true
   },
   {
+    "paramName": "gip",
+    "paramLongName": "graphInputPath",
+    "paramDescription": "the path to get the input data from the graph",
+    "paramRequired": true
+  },
+  {
     "paramName": "o",
     "paramLongName": "outputPath",
     "paramDescription": "the path of the new ActionSet",
