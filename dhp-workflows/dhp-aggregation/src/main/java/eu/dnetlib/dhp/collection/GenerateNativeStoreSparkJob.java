@@ -58,7 +58,6 @@ import eu.dnetlib.dhp.schema.mdstore.MetadataRecord;
 import eu.dnetlib.dhp.schema.mdstore.Provenance;
 import eu.dnetlib.dhp.schema.mdstore.ValidationType;
 import eu.dnetlib.validator2.validation.StandardValidationResult;
-import eu.dnetlib.validator2.validation.XMLApplicationProfile.ValidationResult;
 import eu.dnetlib.validator2.validation.guideline.openaire.AbstractOpenAireProfile;
 import eu.dnetlib.validator2.validation.guideline.openaire.DataArchiveGuidelinesV2Profile;
 import eu.dnetlib.validator2.validation.guideline.openaire.FAIR_Data_GuidelinesProfile;
@@ -347,19 +346,17 @@ public class GenerateNativeStoreSparkJob {
 
 		try (final ByteArrayInputStream is = new ByteArrayInputStream(mdr.getBody().getBytes(StandardCharsets.UTF_8))) {
 			final org.w3c.dom.Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
-			final ValidationResult report = profile.validate(mdr.getId(), doc);
-			if (report instanceof StandardValidationResult) {
-				mdr.getValidationResults().put(validationType, (StandardValidationResult) report);
-				report.getResults().forEach((name, result) -> {
-					if (errors.containsKey(name) && (result.getErrors().size() > 0)) {
-						errors.get(name).add(result.getErrors().size()); // TODO discuss if to add the list size or 1
-					}
-					if (warnings.containsKey(name) && (result.getWarnings().size() > 0)) {
-						warnings.get(name).add(result.getWarnings().size()); // TODO discuss if to add the list size or
-																				// 1
-					}
-				});
-			}
+			final StandardValidationResult report = profile.validate(mdr.getId(), doc);
+			mdr.getValidationResults().put(validationType, report);
+			report.getResults().forEach((name, result) -> {
+				if (errors.containsKey(name) && (result.getErrors().size() > 0)) {
+					errors.get(name).add(result.getErrors().size()); // TODO discuss if to add the list size or 1
+				}
+				if (warnings.containsKey(name) && (result.getWarnings().size() > 0)) {
+					warnings.get(name).add(result.getWarnings().size()); // TODO discuss if to add the list size or
+																			// 1
+				}
+			});
 		} catch (final Throwable e) {
 			log
 				.warn(
