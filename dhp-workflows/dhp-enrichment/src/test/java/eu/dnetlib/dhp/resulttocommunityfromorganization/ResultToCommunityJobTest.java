@@ -332,7 +332,9 @@ public class ResultToCommunityJobTest {
 		final CommunityEntityMap organizationMap = Utils
 			.getCommunityOrganization("https://beta.services.openaire.eu/openaire/community/");
 		// final CommunityEntityMap organizationMap = Utils.getOrganizationCommunityMap(baseURL);
-		List<String> beopenOrgs = Arrays.asList("20|openorgs____::9dd5545aacd3d8019e00c3f837269746",
+		List<String> beopenOrgs = Arrays
+			.asList(
+				"20|openorgs____::9dd5545aacd3d8019e00c3f837269746",
 				"20|openorgs____::11f6b2617abf37fe7193557d77d8cd00",
 				"20|openorgs____::9cb5ffc315d7bf0f97b2f0fdc37612aa",
 				"20|openorgs____::72162cfc2e7edaf7515c778e04d1952b",
@@ -348,7 +350,6 @@ public class ResultToCommunityJobTest {
 				"20|openorgs____::8ec069b683b9e9387492ea0c6b88a806");
 
 		beopenOrgs.forEach(org -> Assertions.assertTrue(organizationMap.get(org).contains("beopen")));
-
 
 	}
 }

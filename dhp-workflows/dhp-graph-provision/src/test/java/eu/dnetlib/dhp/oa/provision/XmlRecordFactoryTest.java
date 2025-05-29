@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
 
-import eu.dnetlib.dhp.oa.provision.model.ProvisionModelSupport;
-import eu.dnetlib.dhp.schema.solr.SolrRecord;
 import org.apache.commons.io.IOUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -21,12 +19,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.oa.provision.model.JoinedEntity;
+import eu.dnetlib.dhp.oa.provision.model.ProvisionModelSupport;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntity;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
 import eu.dnetlib.dhp.oa.provision.utils.ContextDef;
 import eu.dnetlib.dhp.oa.provision.utils.ContextMapper;
 import eu.dnetlib.dhp.oa.provision.utils.XmlRecordFactory;
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.solr.SolrRecord;
 
 public class XmlRecordFactoryTest {
 
@@ -230,12 +230,12 @@ public class XmlRecordFactoryTest {
 		final ContextMapper contextMapper = new ContextMapper();
 
 		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
-				PayloadConverterJob.schemaLocation);
+			PayloadConverterJob.schemaLocation);
 
 		final OtherResearchProduct p = OBJECT_MAPPER
-				.readValue(
-						IOUtils.toString(getClass().getResourceAsStream("raid.json")),
-						OtherResearchProduct.class);
+			.readValue(
+				IOUtils.toString(getClass().getResourceAsStream("raid.json")),
+				OtherResearchProduct.class);
 
 		final JoinedEntity je = new JoinedEntity(p);
 		final String xml = xmlRecordFactory.build(je);
