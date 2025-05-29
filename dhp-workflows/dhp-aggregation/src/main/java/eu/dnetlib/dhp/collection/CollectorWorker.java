@@ -31,6 +31,7 @@ import eu.dnetlib.dhp.collection.plugin.omicsdi.OmicsDICollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.osf.OsfPreprintsCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.researchfi.ResearchFiCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.rest.RestCollectorPlugin;
+import eu.dnetlib.dhp.collection.plugin.sftp.SftpCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.zenodo.CollectZenodoDumpCollectorPlugin;
 import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
 import eu.dnetlib.dhp.common.collection.CollectorException;
@@ -141,6 +142,8 @@ public class CollectorWorker extends ReportingJob {
 				return new ResearchFiCollectorPlugin();
 			case omicsdi:
 				return new OmicsDICollectorPlugin(this.clientParams);
+			case sftp:
+				return new SftpCollectorPlugin();
 			case other:
 				final CollectorPlugin.NAME.OTHER_NAME plugin = Optional
 					.ofNullable(this.api.getParams().get("other_plugin_type"))
