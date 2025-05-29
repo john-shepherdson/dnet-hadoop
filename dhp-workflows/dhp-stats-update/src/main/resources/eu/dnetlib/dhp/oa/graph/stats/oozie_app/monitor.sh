@@ -55,7 +55,7 @@ for i in ${contexts}
 do
   tmp=`echo "$i"  | sed 's/'-'/'_'/g' | sed 's/'::'/'_'/g'`
   tmp2=`echo "$i" |sed 's/:.*//' `
-  cat step20-createMonitorDB_RIs.sql | sed "s/SOURCE/$SOURCE/g" | sed "s/TARGET/${TARGET}_${tmp}/g1" | sed "s/CONTEXT/\'%${tmp}2%\'/g" > foo
+  cat step20-createMonitorDB_RIs.sql | sed "s/SOURCE/$SOURCE/g" | sed "s/TARGET/${TARGET}_${tmp}/g1" | sed "s/CONTEXT/\'%${tmp2}%\'/g" > foo
   hive $HIVE_OPTS -f foo
   cat step20-createMonitorDB.sql | sed "s/SOURCE/$SOURCE/g" | sed "s/TARGET/${TARGET}_${tmp}/g1" > foo
   hive $HIVE_OPTS -f foo
