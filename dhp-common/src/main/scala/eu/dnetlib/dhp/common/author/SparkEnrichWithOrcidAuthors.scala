@@ -64,6 +64,14 @@ abstract class SparkEnrichWithOrcidAuthors(propertyPath: String, args: Array[Str
           .write
           .mode(SaveMode.Overwrite)
           .option("compression", "gzip")
+          .json(s"${workingDir}/tograph/${resultType}")
+
+        spark.read
+          .schema(enc.schema)
+          .json(s"${workingDir}/tograph/${resultType}")
+          .write
+          .mode(SaveMode.Overwrite)
+          .option("compression", "gzip")
           .json(s"${targetPath}/${resultType}")
 
       })
@@ -99,4 +107,3 @@ abstract class SparkEnrichWithOrcidAuthors(propertyPath: String, args: Array[Str
       })
   }
 }
-

@@ -156,23 +156,28 @@ public class SparkExtractPersonRelationsAndAddIndicators {
 							.collect(Collectors.toList());
 						if (!orcid.isEmpty())
 							oi.add(OrcidIndicators.newInstance(r.getId(), orcid.get(0).getValue(), r.getMeasures()));
-						else
-							oi
-								.add(
-									OrcidIndicators
-										.newInstance(
-											r.getId(), a
-												.getPid()
-												.stream()
-												.filter(
-													p -> p
-														.getQualifier()
-														.getClassid()
-														.equalsIgnoreCase("orcid_pending"))
-												.collect(Collectors.toList())
-												.get(0)
-												.getValue(),
-											r.getMeasures()));
+						else{
+							orcid = a
+									.getPid()
+									.stream()
+									.filter(
+											p -> p
+													.getQualifier()
+													.getClassid()
+													.equalsIgnoreCase("orcid_pending"))
+									.collect(Collectors.toList());
+							if (!orcid.isEmpty())
+								oi
+										.add(
+												OrcidIndicators
+														.newInstance(
+																r.getId(),
+														orcid.get(0)
+														.getValue(),
+												r.getMeasures()));
+
+						}
+
 					});
 				return oi.iterator();
 			}, Encoders.bean(OrcidIndicators.class))

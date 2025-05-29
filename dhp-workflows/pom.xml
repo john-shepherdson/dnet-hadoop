@@ -154,6 +154,7 @@
                                     <goal>copy-dependencies</goal>
                                 </goals>
                                 <configuration>
+
                                     <includeScope>${oozie.package.dependencies.include.scope}</includeScope>
                                     <excludeScope>${oozie.package.dependencies.exclude.scope}</excludeScope>
                                     <silent>true</silent>
@@ -585,6 +586,21 @@
                 </file>
             </activation>
         </profile>
+        <profile>
+            <id>spark-34</id>
+            <modules>
+                <module>dhp-graph-provision</module>
+            </modules>
+        </profile>
+
+        <profile>
+            <id>spark-35</id>
+            <modules>
+                <module>dhp-graph-provision</module>
+            </modules>
+        </profile>
+
+
     </profiles>
 
 </project>
