@@ -93,7 +93,7 @@ ANALYZE TABLE ${stats_db_name}.result_orcid COMPUTE STATISTICS; /*EOS*/
 DROP TABLE IF EXISTS ${stats_db_name}.result_result purge; /*EOS*/
 
 CREATE TABLE IF NOT EXISTS ${stats_db_name}.result_result stored as parquet as
-select /*+ COALESCE(100) */ substr(rel.source, 4) as source, substr(rel.target, 4) as target, relclass, subreltype
+select /*+ COALESCE(100) */ substr(rel.source, 4) as source, substr(rel.target, 4) as target, relclass, subreltype, r1.type as sourcet_type, r2.type as target_type
 from ${openaire_db_name}.relation rel
 join ${openaire_db_name}.result r1 on rel.source=r1.id
 join ${openaire_db_name}.result r2 on r2.id=rel.target
