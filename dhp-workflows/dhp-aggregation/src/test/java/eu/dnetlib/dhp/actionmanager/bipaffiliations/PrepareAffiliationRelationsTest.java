@@ -307,53 +307,53 @@ public class PrepareAffiliationRelationsTest {
 	void testGraphMatch() throws Exception {
 
 		String crossrefAffiliationRelationPath = getClass()
-				.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/newTest/crossref")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/newTest/crossref")
+			.getPath();
 
 		String dataciteAffiliationRelationPath = getClass()
-				.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/newTest/datacite")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/newTest/datacite")
+			.getPath();
 
 		String publisherAffiliationRelationPath = getClass()
-				.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/newTest/publishers")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/newTest/publishers")
+			.getPath();
 
 		String pubmedAffiliationRelationPath = getClass()
-				.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/newTest/pubmed")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/newTest/pubmed")
+			.getPath();
 		String webcrawlAffiliationRelationPath = getClass()
-				.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/newTest/webCrawl_IE")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/newTest/webCrawl_IE")
+			.getPath();
 		String openapsAffiliationRelationPath = getClass()
-				.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/newTest/openapc.json")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/newTest/openapc.json")
+			.getPath();
 		String graphAffiliationRelationPath = getClass()
-				.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/newTest/graph")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/newTest/graph")
+			.getPath();
 		String outputPath = workingDir.toString() + "/actionSet";
 
 		PrepareAffiliationRelations
-				.main(
-						new String[] {
-								"-isSparkSessionManaged", Boolean.FALSE.toString(),
-								"-crossrefInputPath", crossrefAffiliationRelationPath,
-								"-pubmedInputPath", pubmedAffiliationRelationPath,
-								"-openapcInputPath", openapsAffiliationRelationPath,
-								"-dataciteInputPath", dataciteAffiliationRelationPath,
-								"-webCrawlInputPath", webcrawlAffiliationRelationPath,
-								"-publisherInputPath", publisherAffiliationRelationPath,
-								"-graphInputPath",graphAffiliationRelationPath,
-								"-outputPath", outputPath
-						});
+			.main(
+				new String[] {
+					"-isSparkSessionManaged", Boolean.FALSE.toString(),
+					"-crossrefInputPath", crossrefAffiliationRelationPath,
+					"-pubmedInputPath", pubmedAffiliationRelationPath,
+					"-openapcInputPath", openapsAffiliationRelationPath,
+					"-dataciteInputPath", dataciteAffiliationRelationPath,
+					"-webCrawlInputPath", webcrawlAffiliationRelationPath,
+					"-publisherInputPath", publisherAffiliationRelationPath,
+					"-graphInputPath", graphAffiliationRelationPath,
+					"-outputPath", outputPath
+				});
 
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
 		JavaRDD<Relation> tmp = sc
-				.sequenceFile(outputPath, Text.class, Text.class)
-				.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
-				.map(aa -> ((Relation) aa.getPayload()));
+			.sequenceFile(outputPath, Text.class, Text.class)
+			.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
+			.map(aa -> ((Relation) aa.getPayload()));
 
-		//tmp.foreach(r -> System.out.println(new ObjectMapper().writeValueAsString(r)));
+		// tmp.foreach(r -> System.out.println(new ObjectMapper().writeValueAsString(r)));
 
 		Assertions.assertEquals(100, tmp.count());
 		Assertions.assertEquals(3, tmp.filter(r -> r.getSource().startsWith("50|06cdd3ff4700")).count());
