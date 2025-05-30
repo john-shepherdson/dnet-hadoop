@@ -158,7 +158,7 @@ public class SparkEntityToOrganizationFromSemRel implements Serializable {
 		String resultOrganizationPath, String projectOrganizationPath, String graphPath, String workingPath,
 		String outputPath,
 		PropagationCounter propagationCounter,
-									int iterations) {
+		int iterations) {
 		int iteration = 0;
 		long leavesCount;
 
