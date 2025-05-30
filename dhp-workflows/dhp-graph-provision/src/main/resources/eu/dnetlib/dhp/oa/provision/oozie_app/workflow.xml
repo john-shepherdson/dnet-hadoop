@@ -570,6 +570,8 @@
             <arg>--path</arg><arg>${workingDir}/xml_json</arg>
             <arg>--collection</arg><arg>${collection}</arg>
             <arg>--zkHost</arg><arg>${zkHost}</arg>
+            <arg>--maxConnTotal</arg><arg>12</arg>
+            <arg>--maxConnPerRoute</arg><arg>3</arg>
             <arg>--batchSize</arg><arg>${batchSize}</arg>
             <arg>--shouldCommit</arg><arg>false</arg>
             <arg>--shouldFilterXmlPayload</arg><arg>${shouldFilterXmlPayload}</arg>
