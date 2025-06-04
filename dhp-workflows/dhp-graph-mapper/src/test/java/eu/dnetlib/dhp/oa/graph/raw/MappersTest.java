@@ -1064,6 +1064,16 @@ class MappersTest {
 		assertFalse(StringUtils.isBlank(author.getName()));
 		assertFalse(StringUtils.isBlank(author.getFullname()));
 
+		List<Instance> instances = p.getInstance();
+		assertNotNull(instances);
+		assertFalse(instances.isEmpty());
+		Instance i = instances.get(0);
+		assertNotNull(i);
+		List<String> urls = i.getUrl();
+		assertNotNull(urls);
+		assertFalse(urls.isEmpty());
+		assertTrue(urls.stream().anyMatch("http://dx.doi.org/10.5281/zenodo.3406824"::equals));
+		assertTrue(urls.stream().anyMatch("https://zenodo.org/records/274730"::equals));
 	}
 
 	@Test

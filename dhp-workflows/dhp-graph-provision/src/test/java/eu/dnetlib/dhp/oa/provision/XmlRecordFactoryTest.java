@@ -19,12 +19,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.oa.provision.model.JoinedEntity;
+import eu.dnetlib.dhp.oa.provision.model.ProvisionModelSupport;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntity;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
 import eu.dnetlib.dhp.oa.provision.utils.ContextDef;
 import eu.dnetlib.dhp.oa.provision.utils.ContextMapper;
 import eu.dnetlib.dhp.oa.provision.utils.XmlRecordFactory;
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.solr.SolrRecord;
 
 public class XmlRecordFactoryTest {
 
@@ -221,6 +223,33 @@ public class XmlRecordFactoryTest {
 		assertNotNull(doc);
 		System.out.println(doc.asXML());
 
+	}
+
+	@Test
+	void testRaid() throws DocumentException, IOException {
+		final ContextMapper contextMapper = new ContextMapper();
+
+		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
+			PayloadConverterJob.schemaLocation);
+
+		final OtherResearchProduct p = OBJECT_MAPPER
+			.readValue(
+				IOUtils.toString(getClass().getResourceAsStream("raid.json")),
+				OtherResearchProduct.class);
+
+		final JoinedEntity je = new JoinedEntity(p);
+		final String xml = xmlRecordFactory.build(je);
+
+		assertNotNull(xml);
+
+		final Document doc = new SAXReader().read(new StringReader(xml));
+
+		assertNotNull(doc);
+		System.out.println(doc.asXML());
+
+		SolrRecord sr = ProvisionModelSupport.transform(je, contextMapper, null);
+
+		System.out.println(OBJECT_MAPPER.writeValueAsString(sr));
 	}
 
 	@Test
