@@ -60,7 +60,7 @@ public class SparkExec {
 		String sourcePath = parser.get("sourcePath");
 		log.info("sourcePath: {}", sourcePath);
 
-		final String workingPath = parser.get("outputPath");
+		final String workingPath = parser.get("workingPath");
 		log.info("workingPath: {}", workingPath);
 
 		SparkConf conf = new SparkConf();
@@ -69,15 +69,14 @@ public class SparkExec {
 			isSparkSessionManaged,
 			spark -> {
 
-				extractRelations(
+				exec(
 					spark,
 					sourcePath,
-					workingPath);
-				removeIsolatedPerson(spark, sourcePath, workingPath);
+						workingPath);
 			});
 	}
 
-	private static void exec(SparkSession spark, String sourcePath, String workingPath, String outputPath){
+	private static void exec(SparkSession spark, String sourcePath,  String workingPath){
 
 		//Project deliverable
 
@@ -86,6 +85,7 @@ public class SparkExec {
 				.filter(functions.col("instance.instancetype.classname").contains("Project deliverable"))
 				.select("id","author","instance")
 				;
+		//Project reports not clear the classid to be included
 		Dataset<Row> relations = spark.read().schema(Encoders.bean(Relation.class).schema())
 				.json(sourcePath + "/relation")
 				.filter("subRelType = 'outcome'")
@@ -101,7 +101,18 @@ public class SparkExec {
 							relationList.add(getRelation(a, t2._2().getAs("source")));
 					});
 					return relationList.iterator();
-				} , Encoders.bean(Relation.class));
+				} , Encoders.bean(Relation.class))
+				.write()
+				.mode(SaveMode.Overwrite)
+				.option("compression","gzip")
+				.json(workingPath + "/relation");
+
+		spark.read().schema(Encoders.bean(Relation.class).schema())
+				.json(workingPath + "/relation")
+				.write()
+				.mode(SaveMode.Append)
+				.option("compression","gzip")
+				.json(sourcePath + "/relation");
 
 
 	}
