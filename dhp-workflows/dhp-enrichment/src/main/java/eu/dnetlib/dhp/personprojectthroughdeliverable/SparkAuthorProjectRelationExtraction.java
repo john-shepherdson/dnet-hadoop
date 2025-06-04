@@ -8,7 +8,6 @@ import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.sql.*;
@@ -18,13 +17,15 @@ import org.slf4j.LoggerFactory;
 import scala.Tuple2;
 
 import java.util.*;
+import scala.collection.JavaConverters;
+import scala.collection.Seq;
 
 import static eu.dnetlib.dhp.PropagationConstant.isSparkSessionManaged;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-public class SparkExec {
+public class SparkAuthorProjectRelationExtraction {
 
-	private static final Logger log = LoggerFactory.getLogger(SparkExec.class);
+	private static final Logger log = LoggerFactory.getLogger(SparkAuthorProjectRelationExtraction.class);
 	private static final String PERSON_PREFIX = ModelSupport.getIdPrefix(Person.class) + "|orcid_______";
 	private static final String PROJECT_ID_PREFIX = ModelSupport.getIdPrefix(Project.class)
 			+ IdentifierFactory.ID_PREFIX_SEPARATOR;
@@ -46,7 +47,7 @@ public class SparkExec {
 
 		String jsonConfiguration = IOUtils
 			.toString(
-					SparkExec.class
+					SparkAuthorProjectRelationExtraction.class
 					.getResourceAsStream(
 						"/eu/dnetlib/dhp/wf/subworkflows/person/input_personpropagation_parameters.json"));
 
@@ -60,7 +61,7 @@ public class SparkExec {
 		String sourcePath = parser.get("sourcePath");
 		log.info("sourcePath: {}", sourcePath);
 
-		final String workingPath = parser.get("workingPath");
+		final String workingPath = parser.get("outputPath");
 		log.info("workingPath: {}", workingPath);
 
 		SparkConf conf = new SparkConf();
@@ -82,23 +83,39 @@ public class SparkExec {
 
 		Dataset<Row> deliverables = spark.read().schema(Encoders.bean(Publication.class).schema())
 				.json(sourcePath + "/publication")
-				.filter(functions.col("instance.instancetype.classname").contains("Project deliverable"))
+				.filter(functions.array_contains(functions.col("instance.instancetype.classid"), "0034"))
 				.select("id","author","instance")
 				;
+
+		deliverables.show(false);
 		//Project reports not clear the classid to be included
 		Dataset<Row> relations = spark.read().schema(Encoders.bean(Relation.class).schema())
 				.json(sourcePath + "/relation")
 				.filter("subRelType = 'outcome'")
 				.select("source","target");
 
+		relations.show(false);
 		deliverables.joinWith(relations, deliverables.col("id").equalTo(relations.col("target")))
 				.flatMap((FlatMapFunction<Tuple2<Row, Row>,  Relation>) t2 -> {
-					List<Author> authors = t2._1().getAs("author");
+					Seq<Row> scalaSeq = t2._1().getAs("author");
+					List<Row> authors = JavaConverters.seqAsJavaListConverter(scalaSeq).asJava();
 					List<Relation> relationList = new ArrayList<>();
 					authors.forEach(a -> {
-						if(a.getPid().stream().anyMatch(p -> p.getQualifier().getClassid().equalsIgnoreCase("orcid") ||
-								p.getQualifier().getClassid().equalsIgnoreCase("orcid_pending")))
-							relationList.add(getRelation(a, t2._2().getAs("source")));
+						Seq<Row> scalaSeqPid = a.getAs("pid");
+						List<Row> pids = JavaConverters.seqAsJavaListConverter(scalaSeqPid).asJava();
+						if(Optional.ofNullable(pids).isPresent()){
+							if(pids.stream().anyMatch(p -> {
+								Row qualifier = p.getAs("qualifier");
+								String classid = qualifier.getAs("classid");
+								if(classid.equalsIgnoreCase("orcid") ||
+										classid.equalsIgnoreCase("orcid_pending"))
+									return true;
+								else
+									return false;
+							}))
+								relationList.add(getRelation(a, t2._2().getAs("source")));
+						}
+
 					});
 					return relationList.iterator();
 				} , Encoders.bean(Relation.class))
@@ -117,13 +134,30 @@ public class SparkExec {
 
 	}
 
-	private static Relation getRelation(Author a, String projectId){
-		Optional<StructuredProperty> authorPid = a.getPid().stream().filter(pid -> pid.getQualifier().getClassid().equalsIgnoreCase("orcid")).findFirst();
+	private static Relation getRelation(Row a, String projectId){
+		Seq<Row> scalaSeqPid = a.getAs("pid");
+		List<Row> pids = JavaConverters.seqAsJavaListConverter(scalaSeqPid).asJava();
+
+		Optional<Row> authorPid = pids.stream().filter(pid -> {
+			Row qualifier = pid.getAs("qualifier");
+			String classid = qualifier.getAs("classid");
+			if(classid.equalsIgnoreCase("orcid") )
+				return true;
+			else
+				return false;
+		}).findFirst();
 		String orcid = null;
 		if(authorPid.isPresent())
-			orcid = authorPid.get().getValue();
+			orcid = authorPid.get().getAs("value");
 		else
-			orcid = a.getPid().stream().filter(pid -> pid.getQualifier().getClassid().equalsIgnoreCase("orcid_pending")).findFirst().get().getValue();
+			orcid = pids.stream().filter(pid -> {
+				Row qualifier = pid.getAs("qualifier");
+				String classid = qualifier.getAs("classid");
+				if(classid.equalsIgnoreCase("orcid_pending") )
+					return true;
+				else
+					return false;
+			}).findFirst().get().getAs("value");
 
 		String source = PERSON_PREFIX + "::" + IdentifierFactory.md5(orcid);
 
