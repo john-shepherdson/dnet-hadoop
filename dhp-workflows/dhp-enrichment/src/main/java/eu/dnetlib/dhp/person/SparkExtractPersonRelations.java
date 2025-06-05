@@ -51,7 +51,7 @@ public class SparkExtractPersonRelations {
 
 		String jsonConfiguration = IOUtils
 			.toString(
-					SparkExtractPersonRelations.class
+				SparkExtractPersonRelations.class
 					.getResourceAsStream(
 						"/eu/dnetlib/dhp/wf/subworkflows/person/input_personpropagation_parameters.json"));
 
