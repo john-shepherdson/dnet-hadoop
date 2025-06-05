@@ -23,6 +23,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.github.sisyphsu.dateparser.DateParserUtils;
 import com.google.common.base.Joiner;
 
+import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.oa.merge.AuthorMerger;
 import eu.dnetlib.dhp.schema.common.AccessRightComparator;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
@@ -30,16 +31,21 @@ import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 
 public class MergeUtils {
-	public static <T extends Oaf> T mergeById(String s, Iterator<T> oafEntityIterator) {
-		return mergeGroup(s, oafEntityIterator, true);
+
+	public static <T extends Oaf> T mergeById(Iterator<T> oafEntityIterator, VocabularyGroup vocs) {
+		return mergeGroup(oafEntityIterator, true, vocs);
 	}
 
-	public static <T extends Oaf> T mergeGroup(String s, Iterator<T> oafEntityIterator) {
-		return mergeGroup(s, oafEntityIterator, false);
+	public static <T extends Oaf> T mergeGroup(Iterator<T> oafEntityIterator) {
+		return mergeGroup(oafEntityIterator, false);
 	}
 
-	public static <T extends Oaf> T mergeGroup(String s, Iterator<T> oafEntityIterator,
-		boolean checkDelegateAuthority) {
+	public static <T extends Oaf> T mergeGroup(Iterator<T> oafEntityIterator, boolean checkDelegateAuthority) {
+		return mergeGroup(oafEntityIterator, checkDelegateAuthority, null);
+	}
+
+	public static <T extends Oaf> T mergeGroup(Iterator<T> oafEntityIterator,
+		boolean checkDelegateAuthority, VocabularyGroup vocs) {
 
 		ArrayList<T> sortedEntities = new ArrayList<>();
 		oafEntityIterator.forEachRemaining(sortedEntities::add);
@@ -48,11 +54,53 @@ public class MergeUtils {
 		Iterator<T> it = sortedEntities.iterator();
 		T merged = it.next();
 
-		while (it.hasNext()) {
-			merged = checkedMerge(merged, it.next(), checkDelegateAuthority);
+		if (!it.hasNext() && merged instanceof Result && vocs != null) {
+			return enforceResultType(vocs, (Result) merged);
+		} else {
+			while (it.hasNext()) {
+				merged = checkedMerge(merged, it.next(), checkDelegateAuthority);
+			}
 		}
-
 		return merged;
+	}
+
+	private static <T extends Oaf> T enforceResultType(VocabularyGroup vocs, Result mergedResult) {
+		if (Optional.ofNullable(mergedResult.getInstance()).map(List::isEmpty).orElse(true)) {
+			return (T) mergedResult;
+		} else {
+			final Instance i = mergedResult.getInstance().get(0);
+
+			if (!vocs.vocabularyExists(ModelConstants.DNET_RESULT_TYPOLOGIES)) {
+				return (T) mergedResult;
+			} else {
+				final String expectedResultType = Optional
+					.ofNullable(
+						vocs
+							.lookupTermBySynonym(
+								ModelConstants.DNET_RESULT_TYPOLOGIES, i.getInstancetype().getClassid()))
+					.orElse(ModelConstants.ORP_DEFAULT_RESULTTYPE)
+					.getClassid();
+
+				// there is a clash among the result types
+				if (!expectedResultType.equals(mergedResult.getResulttype().getClassid())) {
+
+					Result result = (Result) Optional
+						.ofNullable(ModelSupport.oafTypes.get(expectedResultType))
+						.map(r -> {
+							try {
+								return r.newInstance();
+							} catch (InstantiationException | IllegalAccessException e) {
+								throw new IllegalStateException(e);
+							}
+						})
+						.orElse(new OtherResearchProduct());
+					result.setId(mergedResult.getId());
+					return (T) mergeResultFields(result, mergedResult);
+				} else {
+					return (T) mergedResult;
+				}
+			}
+		}
 	}
 
 	public static <T extends Oaf> T checkedMerge(final T left, final T right, boolean checkDelegateAuthority) {
@@ -64,12 +112,16 @@ public class MergeUtils {
 	}
 
 	public static Oaf merge(final Oaf left, final Oaf right) {
-		return merge(left, right, false);
+		return merge(left, right, false, false);
 	}
 
-	static Oaf merge(final Oaf left, final Oaf right, boolean checkDelegatedAuthority) {
+	public static Oaf merge(final Oaf left, final Oaf right, boolean promoting) {
+		return merge(left, right, false, promoting);
+	}
+
+	static Oaf merge(final Oaf left, final Oaf right, boolean checkDelegatedAuthority, boolean promoting) {
 		if (sameClass(left, right, OafEntity.class)) {
-			return mergeEntities(left, right, checkDelegatedAuthority);
+			return mergeEntities(left, right, checkDelegatedAuthority, promoting);
 		} else if (sameClass(left, right, Relation.class)) {
 			return mergeRelation((Relation) left, (Relation) right);
 		} else {
@@ -85,10 +137,10 @@ public class MergeUtils {
 		return cls.isAssignableFrom(left.getClass()) && cls.isAssignableFrom(right.getClass());
 	}
 
-	private static Oaf mergeEntities(Oaf left, Oaf right, boolean checkDelegatedAuthority) {
+	private static Oaf mergeEntities(Oaf left, Oaf right, boolean checkDelegatedAuthority, boolean promoting) {
 
 		if (sameClass(left, right, Result.class)) {
-			if (!left.getClass().equals(right.getClass()) || checkDelegatedAuthority) {
+			if (checkDelegatedAuthority) {
 				return mergeResultsOfDifferentTypes((Result) left, (Result) right);
 			}
 
@@ -105,7 +157,11 @@ public class MergeUtils {
 				return mergeSoftware((Software) left, (Software) right);
 			}
 
-			return mergeResultFields((Result) left, (Result) right);
+			if (Boolean.TRUE.equals(promoting)) {
+				return mergeResultFields((Result) left, (Result) right);
+			} else {
+				return left;
+			}
 		} else if (sameClass(left, right, Datasource.class)) {
 			// TODO
 			final int trust = compareTrust(left, right);
@@ -281,6 +337,30 @@ public class MergeUtils {
 		return new ArrayList<>(values.values());
 	}
 
+	// TODO review
+	private static List<KeyValue> appendKey(List<KeyValue> left, List<KeyValue> right, int trust) {
+		if (left == null) {
+			return right;
+		} else if (right == null) {
+			return left;
+		}
+
+		if (trust < 0) {
+			List<KeyValue> s = left;
+			left = right;
+			right = s;
+		}
+
+		List<KeyValue> collect = unionDistinctLists(
+			left.stream().map(HashableKeyValue::newInstance).collect(Collectors.toList()),
+			right.stream().map(HashableKeyValue::newInstance).collect(Collectors.toList()), trust)
+				.stream()
+				.map(HashableKeyValue::toKeyValue)
+				.collect(Collectors.toList());
+		return collect;
+
+	}
+
 	private static List<StructuredProperty> unionTitle(List<StructuredProperty> left, List<StructuredProperty> right,
 		int trust) {
 		if (left == null) {
@@ -367,7 +447,7 @@ public class MergeUtils {
 		}
 
 		// TODO keyvalue merge
-		merge.setProperties(mergeByKey(merge.getProperties(), enrich.getProperties(), trust));
+		merge.setProperties(appendKey(merge.getProperties(), enrich.getProperties(), trust));
 
 		return merge;
 	}
@@ -432,7 +512,10 @@ public class MergeUtils {
 
 		// merge datainfo for same context id
 		merge.setContext(mergeLists(merge.getContext(), enrich.getContext(), trust, Context::getId, (r, l) -> {
-			r.getDataInfo().addAll(l.getDataInfo());
+			List<DataInfo> infos = new ArrayList<>();
+			infos.addAll(r.getDataInfo());
+			infos.addAll(l.getDataInfo());
+			r.setDataInfo(infos);
 			return r;
 		}));
 
@@ -653,16 +736,9 @@ public class MergeUtils {
 	}
 
 	private static Field<String> selectOldestDate(Field<String> d1, Field<String> d2) {
-		if (d1 == null || StringUtils.isBlank(d1.getValue())) {
+		if (!GraphCleaningFunctions.cleanDateField(d1).isPresent()) {
 			return d2;
-		} else if (d2 == null || StringUtils.isBlank(d2.getValue())) {
-			return d1;
-		}
-
-		if (StringUtils.contains(d1.getValue(), "null")) {
-			return d2;
-		}
-		if (StringUtils.contains(d2.getValue(), "null")) {
+		} else if (!GraphCleaningFunctions.cleanDateField(d2).isPresent()) {
 			return d1;
 		}
 
@@ -714,7 +790,11 @@ public class MergeUtils {
 	private static String spKeyExtractor(StructuredProperty sp) {
 		return Optional
 			.ofNullable(sp)
-			.map(s -> Joiner.on("||").join(qualifierKeyExtractor(s.getQualifier()), s.getValue()))
+			.map(
+				s -> Joiner
+					.on("||")
+					.useForNull("")
+					.join(qualifierKeyExtractor(s.getQualifier()), s.getValue()))
 			.orElse(null);
 	}
 
@@ -971,7 +1051,7 @@ public class MergeUtils {
 	private static String extractKeyFromPid(final StructuredProperty pid) {
 		if (pid == null)
 			return null;
-		final StructuredProperty normalizedPid = CleaningFunctions.normalizePidValue(pid);
+		final StructuredProperty normalizedPid = PidCleaner.normalizePidValue(pid);
 
 		return String.format("%s::%s", normalizedPid.getQualifier().getClassid(), normalizedPid.getValue());
 	}

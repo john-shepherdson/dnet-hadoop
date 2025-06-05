@@ -179,7 +179,7 @@ class OafMapperUtilsTest {
 		assertEquals(
 			ModelConstants.DATASET_RESULTTYPE_CLASSID,
 			((Result) MergeUtils
-				.merge(p2, d1))
+				.merge(p2, d1, true))
 					.getResulttype()
 					.getClassid());
 	}

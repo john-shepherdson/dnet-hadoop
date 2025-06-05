@@ -4,7 +4,6 @@ package eu.dnetlib.pace.tree;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 import com.wcohen.ss.AbstractStringDistance;
@@ -13,7 +12,7 @@ import eu.dnetlib.pace.config.Config;
 import eu.dnetlib.pace.model.Person;
 import eu.dnetlib.pace.tree.support.AbstractListComparator;
 import eu.dnetlib.pace.tree.support.ComparatorClass;
-import eu.dnetlib.pace.util.AuthorMatchers;
+import eu.openaire.common.author.AuthorMatchers;
 
 @ComparatorClass("authorsMatch")
 public class AuthorsMatch extends AbstractListComparator {
@@ -64,10 +63,10 @@ public class AuthorsMatch extends AbstractListComparator {
 		List<String> b = new ArrayList<>(right);
 
 		common += AuthorMatchers
-			.removeMatches(a, b, (BiFunction<String, String, Object>) AuthorMatchers::matchEqualsIgnoreCase)
+			.removeMatches(a, b, AuthorMatchers::matchEqualsIgnoreCase)
 			.size() / 2;
 		common += AuthorMatchers
-			.removeMatches(a, b, (BiFunction<String, String, Object>) AuthorMatchers::matchOrderedTokenAndAbbreviations)
+			.removeMatches(a, b, (o1, o2) -> AuthorMatchers.matchOrderedTokenAndAbbreviations(o1, o2).isPresent())
 			.size() / 2;
 
 		List<Person> bList = b.stream().map(author -> new Person(author, false)).collect(Collectors.toList());

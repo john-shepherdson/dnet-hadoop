@@ -21,7 +21,7 @@ public class CodeMatch extends AbstractStringComparator {
 	public CodeMatch(Map<String, String> params) {
 		super(params);
 		this.params = params;
-		this.CODE_REGEX = Pattern.compile(params.getOrDefault("codeRegex", "[a-zA-Z]::\\d+"));
+		this.CODE_REGEX = Pattern.compile(params.getOrDefault("codeRegex", "[a-zA-Z]+::\\d+"));
 	}
 
 	public Set<String> getRegexList(String input) {

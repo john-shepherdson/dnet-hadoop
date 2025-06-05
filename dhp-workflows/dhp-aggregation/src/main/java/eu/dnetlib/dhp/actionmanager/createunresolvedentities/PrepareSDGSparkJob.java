@@ -8,9 +8,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.MapGroupsFunction;
@@ -19,14 +19,23 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.dnetlib.dhp.actionmanager.createunresolvedentities.model.SDGDataModel;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.Subject;
-import eu.dnetlib.dhp.utils.DHPUtils;
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
+import eu.dnetlib.dhp.schema.oaf.utils.PidCleaner;
+import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 
 public class PrepareSDGSparkJob implements Serializable {
+
 	private static final Logger log = LoggerFactory.getLogger(PrepareSDGSparkJob.class);
+
+	private static final String RESULT_ID_PREFIX = ModelSupport.entityIdPrefix
+		.get(Result.class.getSimpleName().toLowerCase()) + IdentifierFactory.ID_PREFIX_SEPARATOR;
+
+	private static final String DOI_PREFIX = "doi_________::";
 
 	public static void main(String[] args) throws Exception {
 
@@ -49,50 +58,18 @@ public class PrepareSDGSparkJob implements Serializable {
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
 
-		final Boolean distributeDOI = Optional
-			.ofNullable(parser.get("distributeDoi"))
-			.map(Boolean::valueOf)
-			.orElse(Boolean.TRUE);
-
-		log.info("distribute doi {}", distributeDOI);
-
 		SparkConf conf = new SparkConf();
 		runWithSparkSession(
 			conf,
 			isSparkSessionManaged,
-			spark -> {
-				if (distributeDOI)
-					doPrepare(
-						spark,
-						sourcePath,
-
-						outputPath);
-				else
-					doPrepareoaid(spark, sourcePath, outputPath);
-
-			});
+			spark -> processSDG(spark, sourcePath, outputPath));
 	}
 
-	private static void doPrepare(SparkSession spark, String sourcePath, String outputPath) {
-		Dataset<Row> sdgDataset = spark
-			.read()
-			.format("csv")
-			.option("sep", DEFAULT_DELIMITER)
-			.option("inferSchema", "true")
-			.option("header", "true")
-			.option("quotes", "\"")
-			.load(sourcePath);
-
-		sdgDataset
-			.groupByKey((MapFunction<Row, String>) v -> ((String) v.getAs("doi")).toLowerCase(), Encoders.STRING())
+	private static void processSDG(SparkSession spark, String sourcePath, String outputPath) {
+		readJsonFromPath(spark, sourcePath, SDGDataModel.class)
+			.groupByKey((MapFunction<SDGDataModel, String>) PrepareSDGSparkJob::createIdentifier, Encoders.STRING())
 			.mapGroups(
-				(MapGroupsFunction<String, Row, Result>) (k,
-					it) -> getResult(
-						DHPUtils
-							.generateUnresolvedIdentifier(
-								ModelSupport.entityIdPrefix.get(Result.class.getSimpleName().toLowerCase()) + "|" + k,
-								DOI),
-						it),
+				(MapGroupsFunction<String, SDGDataModel, Result>) PrepareSDGSparkJob::getResult,
 				Encoders.bean(Result.class))
 			.write()
 			.mode(SaveMode.Overwrite)
@@ -100,37 +77,28 @@ public class PrepareSDGSparkJob implements Serializable {
 			.json(outputPath + "/sdg");
 	}
 
-	private static void doPrepareoaid(SparkSession spark, String sourcePath, String outputPath) {
-		Dataset<Row> sdgDataset = spark
-			.read()
-			.format("csv")
-			.option("sep", DEFAULT_DELIMITER)
-			.option("inferSchema", "true")
-			.option("header", "true")
-			.option("quotes", "\"")
-			.load(sourcePath);
-		;
-
-		sdgDataset
-			.groupByKey((MapFunction<Row, String>) r -> "50|" + ((String) r.getAs("oaid")), Encoders.STRING())
-			.mapGroups(
-				(MapGroupsFunction<String, Row, Result>) PrepareSDGSparkJob::getResult, Encoders.bean(Result.class))
-			.write()
-			.mode(SaveMode.Overwrite)
-			.option("compression", "gzip")
-			.json(outputPath + "/sdg");
+	private static String createIdentifier(SDGDataModel v) {
+		if (StringUtils.isNotBlank(v.getDoi())) {
+			final String doi = PidCleaner.normalizePidValue(PidType.doi.toString(), v.getDoi());
+			return RESULT_ID_PREFIX + DOI_PREFIX + IdentifierFactory.md5(doi);
+		}
+		if (StringUtils.isNotBlank(v.getOaid())) {
+			final String oaid = v.getOaid();
+			return StringUtils.startsWith(oaid, RESULT_ID_PREFIX) ? oaid : RESULT_ID_PREFIX + oaid;
+		}
+		throw new RuntimeException("No identifier found for SDGDataModel: " + v);
 	}
 
-	private static @NotNull Result getResult(String id, Iterator<Row> it) {
+	private static @NotNull Result getResult(String id, Iterator<SDGDataModel> it) {
 		Result r = new Result();
 		r.setId(id);
-		Row first = it.next();
+		SDGDataModel first = it.next();
 		List<Subject> sbjs = new ArrayList<>();
-		sbjs.add(getSubject(first.getAs("sdg"), SDG_CLASS_ID, SDG_CLASS_NAME, UPDATE_SUBJECT_SDG_CLASS_ID));
+		sbjs.add(getSubject(first.getSdg(), SDG_CLASS_ID, SDG_CLASS_NAME, UPDATE_SUBJECT_SDG_CLASS_ID));
 		it
 			.forEachRemaining(
 				s -> sbjs
-					.add(getSubject(s.getAs("sdg"), SDG_CLASS_ID, SDG_CLASS_NAME, UPDATE_SUBJECT_SDG_CLASS_ID)));
+					.add(getSubject(s.getSdg(), SDG_CLASS_ID, SDG_CLASS_NAME, UPDATE_SUBJECT_SDG_CLASS_ID)));
 		r.setSubject(sbjs);
 
 		return r;

@@ -23,6 +23,7 @@ import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
+import eu.dnetlib.dhp.schema.oaf.utils.ModelHardLimits;
 import eu.dnetlib.dhp.schema.solr.*;
 import eu.dnetlib.dhp.schema.solr.AccessRight;
 import eu.dnetlib.dhp.schema.solr.Author;
@@ -37,6 +38,8 @@ import eu.dnetlib.dhp.schema.solr.Measure;
 import eu.dnetlib.dhp.schema.solr.OpenAccessColor;
 import eu.dnetlib.dhp.schema.solr.OpenAccessRoute;
 import eu.dnetlib.dhp.schema.solr.Organization;
+import eu.dnetlib.dhp.schema.solr.Person;
+import eu.dnetlib.dhp.schema.solr.PersonTopic;
 import eu.dnetlib.dhp.schema.solr.Pid;
 import eu.dnetlib.dhp.schema.solr.Project;
 import eu.dnetlib.dhp.schema.solr.Result;
@@ -62,7 +65,7 @@ public class ProvisionModelSupport {
 	public static SolrRecord transform(JoinedEntity je, ContextMapper contextMapper, VocabularyGroup vocs) {
 		SolrRecord r = new SolrRecord();
 		final OafEntity e = je.getEntity();
-		final RecordType type = RecordType.valueOf(e.getClass().getSimpleName().toLowerCase());
+		final RecordType type = RecordType.fromString(e.getClass().getSimpleName().toLowerCase());
 		final Boolean deletedbyinference = Optional
 			.ofNullable(e.getDataInfo())
 			.map(DataInfo::getDeletedbyinference)
@@ -89,6 +92,8 @@ public class ProvisionModelSupport {
 			r.setOrganization(mapOrganization((eu.dnetlib.dhp.schema.oaf.Organization) e));
 		} else if (e instanceof eu.dnetlib.dhp.schema.oaf.Project) {
 			r.setProject(mapProject((eu.dnetlib.dhp.schema.oaf.Project) e, vocs));
+		} else if (e instanceof eu.dnetlib.dhp.schema.oaf.Person) {
+			r.setPerson(mapPerson((eu.dnetlib.dhp.schema.oaf.Person) e));
 		}
 		r
 			.setLinks(
@@ -108,7 +113,7 @@ public class ProvisionModelSupport {
 		RelatedRecord rr = new RelatedRecord();
 
 		final RelatedEntity re = rew.getTarget();
-		final RecordType relatedRecordType = RecordType.valueOf(re.getType());
+		final RecordType relatedRecordType = RecordType.fromString(re.getType());
 		final Relation relation = rew.getRelation();
 		final String relationProvenance = Optional
 			.ofNullable(relation.getDataInfo())
@@ -128,6 +133,25 @@ public class ProvisionModelSupport {
 						relatedRecordType,
 						relationProvenance,
 						Optional.ofNullable(relation.getDataInfo()).map(DataInfo::getTrust).orElse(null)));
+
+		Optional
+			.ofNullable(relation.getProperties())
+			.ifPresent(props -> {
+				props
+					.stream()
+					.filter(p -> "role".equals(p.getKey()))
+					.map(KeyValue::getValue)
+					.findFirst()
+					.ifPresent(rr::setPersonRoleInProject);
+				List<CodeLabel> affiliationTimeline = props
+					.stream()
+					.filter(p -> "startDate".equals(p.getKey()) || "endDate".equals(p.getKey()))
+					.map(ProvisionModelSupport::mapCodeLabel)
+					.collect(Collectors.toList());
+				if (!affiliationTimeline.isEmpty()) {
+					rr.setAffiliationsTimeline(affiliationTimeline);
+				}
+			});
 
 		rr.setAcronym(re.getAcronym());
 		rr.setCode(re.getCode());
@@ -150,6 +174,17 @@ public class ProvisionModelSupport {
 		rr.setPublisher(re.getPublisher());
 		rr.setResulttype(mapQualifier(re.getResulttype()));
 		rr.setTitle(Optional.ofNullable(re.getTitle()).map(StructuredProperty::getValue).orElse(null));
+		rr.setDescription(StringUtils.left(re.getDescription(), ModelHardLimits.MAX_RELATED_ABSTRACT_LENGTH));
+		rr
+			.setAuthor(
+				Optional
+					.ofNullable(re.getAuthor())
+					.map(
+						aa -> aa
+							.stream()
+							.limit(ModelHardLimits.MAX_RELATED_AUTHORS)
+							.collect(Collectors.toList()))
+					.orElse(null));
 
 		if (relation.getValidated() == null) {
 			relation.setValidated(false);
@@ -158,6 +193,8 @@ public class ProvisionModelSupport {
 			&& StringUtils.isNotBlank(relation.getValidationDate())) {
 			rr.setValidationDate(relation.getValidationDate());
 		}
+		rr.setGivenName(re.getGivenName());
+		rr.setFamilyName(re.getFamilyName());
 
 		return rr;
 	}
@@ -183,6 +220,38 @@ public class ProvisionModelSupport {
 		ps.setWebsiteurl(mapField(p.getWebsiteurl()));
 		ps.setFunding(mapFundingField(p.getFundingtree(), vocs));
 		return ps;
+	}
+
+	private static Person mapPerson(eu.dnetlib.dhp.schema.oaf.Person p) {
+		Person ps = new Person();
+		ps.setFamilyName(p.getFamilyName());
+		ps.setGivenName(p.getGivenName());
+		ps.setAlternativeNames(p.getAlternativeNames());
+		ps.setBiography(p.getBiography());
+		ps.setConsent(p.getConsent());
+		ps.setSubject(mapPersonTopics(p.getSubject()));
+
+		return ps;
+	}
+
+	private static List<PersonTopic> mapPersonTopics(List<eu.dnetlib.dhp.schema.oaf.PersonTopic> subjects) {
+		return Optional
+			.ofNullable(subjects)
+			.map(
+				ss -> ss
+					.stream()
+					.map(ProvisionModelSupport::mapPersonTopic)
+					.collect(Collectors.toList()))
+			.orElse(null);
+	}
+
+	private static PersonTopic mapPersonTopic(eu.dnetlib.dhp.schema.oaf.PersonTopic pt) {
+		PersonTopic topic = new PersonTopic();
+		topic.setValue(pt.getValue());
+		topic.setSchema(pt.getSchema());
+		topic.setFromYear(pt.getFromYear());
+		topic.setToYear(pt.getToYear());
+		return topic;
 	}
 
 	private static Funding mapFunding(List<String> fundingtree, VocabularyGroup vocs) {
@@ -359,10 +428,10 @@ public class ProvisionModelSupport {
 		rs.setFormat(mapFieldList(r.getFormat()));
 		rs.setContributor(mapFieldList(r.getContributor()));
 		rs.setCoverage(mapFieldList(r.getCoverage()));
-		rs
-			.setBestaccessright(
-				BestAccessRight
-					.newInstance(r.getBestaccessright().getClassid(), r.getBestaccessright().getClassname()));
+		Optional
+			.ofNullable(r.getBestaccessright())
+			.map(b -> BestAccessRight.newInstance(b.getClassid(), b.getClassname()))
+			.ifPresent(rs::setBestaccessright);
 		rs.setFulltext(mapFieldList(r.getFulltext()));
 		rs.setCountry(asCountry(r.getCountry()));
 		rs.setEoscifguidelines(asEOSCIF(r.getEoscifguidelines()));
@@ -378,6 +447,7 @@ public class ProvisionModelSupport {
 		rs.setPubliclyFunded(r.getPubliclyFunded());
 		rs.setTransformativeAgreement(r.getTransformativeAgreement());
 		rs.setExternalReference(mapExternalReference(r.getExternalReference()));
+		rs.setBestinstancetype(mapQualifier(r.getBestInstancetype()));
 		rs.setInstance(mapInstances(r.getInstance()));
 
 		if (r instanceof Publication) {
@@ -484,14 +554,18 @@ public class ProvisionModelSupport {
 	}
 
 	private static AccessRight mapAccessRight(eu.dnetlib.dhp.schema.oaf.AccessRight accessright) {
-		return AccessRight
-			.newInstance(
-				accessright.getClassid(),
-				accessright.getClassname(),
-				Optional
-					.ofNullable(accessright.getOpenAccessRoute())
-					.map(route -> OpenAccessRoute.valueOf(route.toString()))
-					.orElse(null));
+		return Optional
+			.ofNullable(accessright)
+			.map(
+				ar -> AccessRight
+					.newInstance(
+						accessright.getClassid(),
+						accessright.getClassname(),
+						Optional
+							.ofNullable(accessright.getOpenAccessRoute())
+							.map(route -> OpenAccessRoute.valueOf(route.toString()))
+							.orElse(null)))
+			.orElse(null);
 	}
 
 	private static <T> T mapField(eu.dnetlib.dhp.schema.oaf.Field<T> f) {
@@ -667,14 +741,23 @@ public class ProvisionModelSupport {
 	}
 
 	private static List<Author> asAuthor(List<eu.dnetlib.dhp.schema.oaf.Author> authorList) {
+		return asAuthor(authorList, ModelHardLimits.MAX_AUTHORS);
+	}
+
+	private static List<Author> asAuthor(List<eu.dnetlib.dhp.schema.oaf.Author> authorList, int maxAuthors) {
 		return Optional
 			.ofNullable(authorList)
 			.map(
 				authors -> authors
 					.stream()
+					.limit(maxAuthors)
 					.map(
 						a -> Author
-							.newInstance(a.getFullname(), a.getName(), a.getSurname(), a.getRank(), asPid(a.getPid())))
+							.newInstance(
+								StringUtils.left(a.getFullname(), ModelHardLimits.MAX_AUTHOR_FULLNAME_LENGTH),
+								a.getName(),
+								a.getSurname(),
+								a.getRank(), asPid(a.getPid())))
 					.collect(Collectors.toList()))
 			.orElse(null);
 	}

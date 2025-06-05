@@ -1,3 +1,5 @@
+set mapred.job.queue.name=analytics;
+
 drop database if exists TARGET cascade;
 create database if not exists TARGET;
 
@@ -14,7 +16,6 @@ create table TARGET.result stored as parquet as
              'openorgs____::cad284878801b9465fa51a95b1d779db', --Universidad Politécnica de Madrid
              'openorgs____::eadc8da90a546e98c03f896661a2e4d4', --University of Göttingen
              'openorgs____::c0286313e36479eff8676dba9b724b40', --National and Kapodistrian University of Athens
-             -- 'openorgs____::c80a8243a5e5c620d7931c88d93bf17a', --Université Paris Diderot
              'openorgs____::c08634f0a6b0081c3dc6e6c93a4314f3', --Bielefeld University
              'openorgs____::6fc85e4a8f7ecaf4b0c738d010e967ea', --University of Southern Denmark
              'openorgs____::3d6122f87f9a97a99d8f6e3d73313720', --Humboldt-Universität zu Berlin
@@ -65,5 +66,25 @@ create table TARGET.result stored as parquet as
              'openorgs____::64badd35233ba2cd4946368ef2f4cf57',  -- University of Vienna
              'openorgs____::7501d66d2297a963ebfb075c43fff88e',  -- Royal Institute of Technology
              'openorgs____::d5eb679abdd31f70fcd4c8ba711148bf',	-- Sorbonne University
-             'openorgs____::b316f25380d106aac402f5ae8653910d'   -- Centre for Research on Ecology and Forestry Applications
-        )))  foo;
+             'openorgs____::b316f25380d106aac402f5ae8653910d',  -- Centre for Research on Ecology and Forestry Applications
+             'openorgs____::45a2076eee3013e0e85625ce61bcd272',  -- Institut d'Investigació Sanitària Illes Balears
+             'openorgs____::00b20b0a743a96169e6cf135e6e2bd7c',  -- Universidad Publica De Navarra
+             'openorgs____::0f398605c2459294d125ff23473a97dc',  -- Aalto University
+             'openorgs____::25b1fa62c7fd8e409d3a83c07e04b2d4',  -- WHU-Otto Beisheim School of Management
+             'openorgs____::d6eec313417f11205db4e736a34c0db6',  -- KEMPELENOV INSTITUT INTELIGENTNYCH TECHNOLOGII
+             'openorgs____::c2dfb90e797a2dc52f0084c549289d0c',  -- National Research Institute for Agriculture, Food and Environment
+             'openorgs____::363e3a4ac2859f3506fae9fdf768660b', -- Stockholm University
+             'openorgs____::0b0102bae51f4f4ef5ba57fbe1523b92', -- University of Duisburg-Essen
+             'openorgs____::cdda7cfe17c89eb50628ec2eb1f8acd2', -- University of Iceland
+             'openorgs____::039192f47416999e406a6b57da19beeb', -- Palacký University, Olomouc
+             'openorgs____::0a45de396fc864dc70d42d13f4e786e1', -- Copenhagen Business School
+             'openorgs____::925676880d50bf53409a6dd7d4d90283', -- South-West University "Neofit Rilski"
+             'openorgs____::305ca93734416f1874ef0a3412b0612b', -- University of Pavol Jozef Šafárik
+             'openorgs____::eb0669daa9efeb898a3090d8aac7c953', -- University Federico II of Naples
+             'openorgs____::f7cfcc98245e22c7d6e321cde930e746', -- University of Innsbruck
+             'openorgs____::d1f5d132714edad4a952e0414fc3c94b', -- Paris-East Créteil University
+             'openorgs____::408f8173e66f58588f4fa679bac35190', -- V.N. Karazin Kharkiv National University
+             'openorgs____::0120387227da5845aa410ad5b994a2e2', -- University of Tetova
+             'openorgs____::d6ddbed2807becaf5b096013ba158c9b', -- University of Padua
+             'openorgs____::2c42515d58e84fe37929b0bd11c30b8b' -- University of Beira Interior
+            )))  foo;

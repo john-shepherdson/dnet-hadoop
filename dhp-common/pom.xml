@@ -7,7 +7,6 @@
 		<artifactId>dhp</artifactId>
 		<version>1.2.5-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
-
 	</parent>
 
 	<artifactId>dhp-common</artifactId>
@@ -62,6 +61,11 @@
 	</build>
 
 	<dependencies>
+		<dependency>
+			<groupId>eu.openaire</groupId>
+			<artifactId>author-identifier-reconciler</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>edu.cmu</groupId>
 			<artifactId>secondstring</artifactId>
@@ -128,6 +132,12 @@
 		<dependency>
 			<groupId>eu.dnetlib</groupId>
 			<artifactId>cnr-rmi-api</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>log4j</artifactId>
+					<groupId>log4j</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -167,25 +177,18 @@
 			<groupId>com.opencsv</groupId>
 			<artifactId>opencsv</artifactId>
 		</dependency>
-	</dependencies>
 
 	<!-- dependencies required on JDK9+ because J2EE has been removed -->
-	<profiles>
-		<profile>
-			<id>spark-34</id>
-			<dependencies>
-				<dependency>
-					<groupId>javax.xml.bind</groupId>
-					<artifactId>jaxb-api</artifactId>
-					<version>2.2.11</version>
-				</dependency>
-				<dependency>
-					<groupId>com.sun.xml.ws</groupId>
-					<artifactId>jaxws-ri</artifactId>
-					<version>2.3.3</version>
-					<type>pom</type>
-				</dependency>
-			</dependencies>
-		</profile>
-	</profiles>
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+			<version>2.2.11</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.xml.ws</groupId>
+			<artifactId>jaxws-ri</artifactId>
+			<version>2.3.3</version>
+			<type>pom</type>
+		</dependency>
+	</dependencies>
 </project>

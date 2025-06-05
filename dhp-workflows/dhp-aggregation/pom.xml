@@ -49,6 +49,13 @@
 
     <dependencies>
 
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.woodstox/woodstox-core -->
+        <dependency>
+            <groupId>com.fasterxml.woodstox</groupId>
+            <artifactId>woodstox-core</artifactId>
+        </dependency>
+
+
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
@@ -115,6 +122,16 @@
             <artifactId>mongo-java-driver</artifactId>
         </dependency>
 
+		 <dependency>
+           <groupId>eu.dnetlib</groupId>
+           <artifactId>uoa-validator-engine2</artifactId>
+         </dependency>
+         
+         <dependency>
+				<groupId>com.jcraft</groupId>
+                <artifactId>jsch</artifactId>
+                <version>0.1.55</version>
+         </dependency>
     </dependencies>
 
 </project>

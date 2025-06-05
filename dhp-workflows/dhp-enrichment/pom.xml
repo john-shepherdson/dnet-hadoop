@@ -8,12 +8,51 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>dhp-enrichment</artifactId>
-    <dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>scala-maven-plugin</artifactId>
+                <version>${net.alchim31.maven.version}</version>
+                <executions>
+                    <execution>
+                        <id>scala-compile-first</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>scala-test-compile</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <args>
+                        <arg>-Xmax-classfile-name</arg>
+                        <arg>200</arg>
+                    </args>
+                    <failOnMultipleScalaVersions>true</failOnMultipleScalaVersions>
+                    <scalaCompatVersion>${scala.binary.version}</scalaCompatVersion>
+                    <scalaVersion>${scala.version}</scalaVersion>
+                </configuration>
+            </plugin>
+        </plugins>
+
+    </build>
+
+
+    <dependencies>
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-core_${scala.binary.version}</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-sql_${scala.binary.version}</artifactId>
@@ -22,6 +61,13 @@
         <dependency>
             <groupId>eu.dnetlib.dhp</groupId>
             <artifactId>dhp-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>eu.dnetlib.dhp</groupId>
+            <artifactId>dhp-graph-mapper</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -48,16 +94,11 @@
             <groupId>io.github.classgraph</groupId>
             <artifactId>classgraph</artifactId>
         </dependency>
+
         <dependency>
-            <groupId>eu.dnetlib.dhp</groupId>
-            <artifactId>dhp-aggregation</artifactId>
-            <version>1.2.5-SNAPSHOT</version>
-            <scope>compile</scope>
+            <groupId>org.json4s</groupId>
+            <artifactId>json4s-jackson_${scala.binary.version}</artifactId>
         </dependency>
 
-
     </dependencies>
-
-
-
 </project>

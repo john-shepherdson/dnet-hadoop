@@ -24,12 +24,12 @@
 
     <decision name="resume_from">
         <switch>
-            <case to="download">${wf:conf('resumeFrom') eq 'DownloadDump'}</case>
+            <case to="deleteoutputpath">${wf:conf('resumeFrom') eq 'DownloadDump'}</case>
             <case to="extract">${wf:conf('resumeFrom') eq 'ExtractContent'}</case>
             <case to="read">${wf:conf('resumeFrom') eq 'ReadContent'}</case>
             <case to="remap">${wf:conf('resumeFrom') eq 'MapContent'}</case>
             <case to="create_actionset">${wf:conf('resumeFrom') eq 'CreateAS'}</case>
-            <default to="deleteoutputpath"/> <!-- first action to be done when downloadDump is to be performed -->
+            <default to="deleteoutputpath"/> <!-- first action to be done when downloadDump is to be performed the old association are preserved on another folder. the new will be considered only-->
         </switch>
     </decision>
 
@@ -77,7 +77,7 @@
                     <value>${queueName}</value>
                 </property>
             </configuration>
-            <exec>download_corr.sh</exec>
+            <exec>download.sh</exec>
             <argument>${filecorrespondence}</argument>
             <argument>${inputPath}/correspondence</argument>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
@@ -94,17 +94,7 @@
             <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
             <arg>--inputPath</arg><arg>${inputPath}/Original</arg>
             <arg>--outputPath</arg><arg>${inputPath}/Extracted</arg>
-        </java>
-        <ok to="read"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="extract_correspondence">
-        <java>
-            <main-class>eu.dnetlib.dhp.actionmanager.opencitations.GetOpenCitationsRefs</main-class>
-            <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
-            <arg>--inputPath</arg><arg>${inputPath}/correspondence</arg>
-            <arg>--outputPath</arg><arg>${inputPath}/correspondence_extracted</arg>
+            <arg>--backupPath</arg><arg>${inputPath}/backup</arg>
         </java>
         <ok to="read"/>
         <error to="Kill"/>

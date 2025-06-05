@@ -1,3 +1,5 @@
+set mapred.job.queue.name=analytics;
+
 create view if not exists TARGET.category as select * from SOURCE.category;
 create view if not exists TARGET.concept as select * from SOURCE.concept;
 create view if not exists TARGET.context as select * from SOURCE.context;
@@ -66,6 +68,8 @@ create table TARGET.result_orcid stored as parquet as select * from SOURCE.resul
 create table TARGET.indi_pub_publicly_funded stored as parquet as select * from SOURCE.indi_pub_publicly_funded orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 
 create table TARGET.result_instance stored as parquet as select * from SOURCE.result_instance orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+
+create table TARGET.result_coar stored as parquet as select * from SOURCE.result_coar orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 
 create view TARGET.foo1 as select * from SOURCE.result_result rr where rr.source in (select id from TARGET.result);
 create view TARGET.foo2 as select * from SOURCE.result_result rr where rr.target in (select id from TARGET.result);

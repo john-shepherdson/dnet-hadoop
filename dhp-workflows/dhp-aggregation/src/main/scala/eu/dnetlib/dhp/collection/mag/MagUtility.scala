@@ -399,7 +399,7 @@ object MagUtility extends Serializable {
         )
       case "journal" =>
         result = new Publication
-        qualifier("0043", "Journal", ModelConstants.DNET_PUBLICATION_RESOURCE, ModelConstants.DNET_PUBLICATION_RESOURCE)
+        qualifier("0001", "Article", ModelConstants.DNET_PUBLICATION_RESOURCE, ModelConstants.DNET_PUBLICATION_RESOURCE)
       case "patent" =>
         if (source != null && source.orNull != null) {
           val s = source.get.toLowerCase

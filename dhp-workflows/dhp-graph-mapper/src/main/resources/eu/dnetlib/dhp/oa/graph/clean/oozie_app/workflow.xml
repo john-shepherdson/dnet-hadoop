@@ -46,6 +46,11 @@
             <value>NARCIS</value>
             <description>the only datasource for which the country NL will be removed from the country list</description>
         </property>
+        <property>
+            <name>zenodoWithdrawn</name>
+            <value>/data/zenodo/withdrawn/20250307</value>
+            <description>Zenodo withdrawn dataset</description>
+        </property>
 
         <property>
             <name>sparkDriverMemory</name>
@@ -81,6 +86,22 @@
             <name>spark2EventLogDir</name>
             <description>spark 2.* event log dir location</description>
         </property>
+        <!-- General oozie workflow properties -->
+        <property>
+            <name>sparkClusterOpts</name>
+            <value>--conf spark.extraListeners= --conf spark.sql.queryExecutionListeners= --conf spark.yarn.historyServer.address=http://iis-cdh5-test-m3.ocean.icm.edu.pl:18088 --conf spark.eventLog.dir=hdfs://nameservice1/user/spark/applicationHistory</value>
+            <description>spark cluster-wide options</description>
+        </property>
+        <property>
+            <name>sparkResourceOpts</name>
+            <value>--executor-memory=8G --conf spark.executor.memoryOverhead=6G --executor-cores=6 --driver-memory=9G --driver-cores=4</value>
+            <description>spark resource options</description>
+        </property>
+        <property>
+            <name>sparkApplicationOpts</name>
+            <value>--conf spark.sql.shuffle.partitions=1000</value>
+            <description>spark resource options</description>
+        </property>
     </parameters>
 
     <start to="prepare_info"/>
@@ -102,13 +123,9 @@
             <class>eu.dnetlib.dhp.oa.graph.clean.GetDatasourceFromCountry</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
                 --conf spark.sql.shuffle.partitions=10000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}</arg>
@@ -128,6 +145,27 @@
             <arg>--hdfsPath</arg><arg>${workingDir}/masterduplicate</arg>
             <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
         </java>
+        <ok to="generate_blacklist"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="generate_blacklist">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Generate blacklist</name>
+            <class>eu.dnetlib.dhp.oa.graph.clean.GenerateBlacklistSparkJob</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
+                --conf spark.sql.shuffle.partitions=15000
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${graphInputPath}</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/blacklist</arg>
+            <arg>--zenodoWithdrawn</arg><arg>${zenodoWithdrawn}</arg>
+        </spark>
         <ok to="wait_prepare"/>
         <error to="Kill"/>
     </action>
@@ -142,6 +180,7 @@
         <path start="clean_datasource"/>
         <path start="clean_organization"/>
         <path start="clean_project"/>
+        <path start="clean_person"/>
         <path start="clean_relation"/>
     </fork>
 
@@ -153,14 +192,9 @@
             <class>eu.dnetlib.dhp.oa.graph.clean.CleanGraphSparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
                 --conf spark.sql.shuffle.partitions=15000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/publication</arg>
@@ -175,6 +209,7 @@
             <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
             <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
             <arg>--deepClean</arg><arg>${shouldClean}</arg>
+            <arg>--blacklist</arg><arg>${workingDir}/blacklist</arg>
         </spark>
         <ok to="wait_clean"/>
         <error to="Kill"/>
@@ -188,14 +223,9 @@
             <class>eu.dnetlib.dhp.oa.graph.clean.CleanGraphSparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
                 --conf spark.sql.shuffle.partitions=8000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/dataset</arg>
@@ -210,6 +240,7 @@
             <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
             <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
             <arg>--deepClean</arg><arg>${shouldClean}</arg>
+            <arg>--blacklist</arg><arg>${workingDir}/blacklist</arg>
         </spark>
         <ok to="wait_clean"/>
         <error to="Kill"/>
@@ -223,14 +254,9 @@
             <class>eu.dnetlib.dhp.oa.graph.clean.CleanGraphSparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
                 --conf spark.sql.shuffle.partitions=5000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/otherresearchproduct</arg>
@@ -245,6 +271,7 @@
             <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
             <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
             <arg>--deepClean</arg><arg>${shouldClean}</arg>
+            <arg>--blacklist</arg><arg>${workingDir}/blacklist</arg>
         </spark>
         <ok to="wait_clean"/>
         <error to="Kill"/>
@@ -258,14 +285,9 @@
             <class>eu.dnetlib.dhp.oa.graph.clean.CleanGraphSparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
                 --conf spark.sql.shuffle.partitions=2000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/software</arg>
@@ -280,6 +302,7 @@
             <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
             <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
             <arg>--deepClean</arg><arg>${shouldClean}</arg>
+            <arg>--blacklist</arg><arg>${workingDir}/blacklist</arg>
         </spark>
         <ok to="wait_clean"/>
         <error to="Kill"/>
@@ -293,14 +316,9 @@
             <class>eu.dnetlib.dhp.oa.graph.clean.CleanGraphSparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
                 --conf spark.sql.shuffle.partitions=1000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/datasource</arg>
@@ -315,6 +333,7 @@
             <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
             <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
             <arg>--deepClean</arg><arg>${shouldClean}</arg>
+            <arg>--blacklist</arg><arg>${workingDir}/blacklist</arg>
         </spark>
         <ok to="wait_clean"/>
         <error to="Kill"/>
@@ -328,14 +347,9 @@
             <class>eu.dnetlib.dhp.oa.graph.clean.CleanGraphSparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
                 --conf spark.sql.shuffle.partitions=1000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/organization</arg>
@@ -350,6 +364,7 @@
             <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
             <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
             <arg>--deepClean</arg><arg>${shouldClean}</arg>
+            <arg>--blacklist</arg><arg>${workingDir}/blacklist</arg>
         </spark>
         <ok to="wait_clean"/>
         <error to="Kill"/>
@@ -363,14 +378,9 @@
             <class>eu.dnetlib.dhp.oa.graph.clean.CleanGraphSparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
                 --conf spark.sql.shuffle.partitions=2000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/project</arg>
@@ -385,6 +395,38 @@
             <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
             <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
             <arg>--deepClean</arg><arg>${shouldClean}</arg>
+            <arg>--blacklist</arg><arg>${workingDir}/blacklist</arg>
+        </spark>
+        <ok to="wait_clean"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="clean_person">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Clean person</name>
+            <class>eu.dnetlib.dhp.oa.graph.clean.CleanGraphSparkJob</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
+                --conf spark.sql.shuffle.partitions=2000
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${graphInputPath}/person</arg>
+            <arg>--outputPath</arg><arg>${graphOutputPath}/person</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Person</arg>
+            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--contextId</arg><arg>${contextId}</arg>
+            <arg>--verifyParam</arg><arg>${verifyParam}</arg>
+            <arg>--country</arg><arg>${country}</arg>
+            <arg>--verifyCountryParam</arg><arg>${verifyCountryParam}</arg>
+            <arg>--hostedBy</arg><arg>${workingDir}/working/hostedby</arg>
+            <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
+            <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
+            <arg>--deepClean</arg><arg>${shouldClean}</arg>
+            <arg>--blacklist</arg><arg>${workingDir}/blacklist</arg>
         </spark>
         <ok to="wait_clean"/>
         <error to="Kill"/>
@@ -398,14 +440,9 @@
             <class>eu.dnetlib.dhp.oa.graph.clean.CleanGraphSparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
                 --conf spark.sql.shuffle.partitions=20000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/relation</arg>
@@ -420,6 +457,7 @@
             <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
             <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
             <arg>--deepClean</arg><arg>${shouldClean}</arg>
+            <arg>--blacklist</arg><arg>${workingDir}/blacklist</arg>
         </spark>
         <ok to="wait_clean"/>
         <error to="Kill"/>

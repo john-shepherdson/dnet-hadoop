@@ -29,7 +29,7 @@ class IdentifierFactoryTest {
 			"publication_doi2.json", "50|doi_________::79dbc7a2a56dc1532659f9038843256e", true);
 
 		verifyIdentifier(
-			"publication_doi3.json", "50|pmc_________::94e4cb08c93f8733b48e2445d04002ac", true);
+			"publication_doi3.json", "50|pmc_________::e2a339e0e11bfbf55462e14a07f1b304", true);
 
 		verifyIdentifier(
 			"publication_doi4.json", "50|od______2852::38861c44e6052a8d49f59a4c39ba5e66", true);
@@ -41,7 +41,7 @@ class IdentifierFactoryTest {
 			"publication_pmc1.json", "50|DansKnawCris::0829b5191605bdbea36d6502b8c1ce1f", true);
 
 		verifyIdentifier(
-			"publication_pmc2.json", "50|pmc_________::94e4cb08c93f8733b48e2445d04002ac", true);
+			"publication_pmc2.json", "50|pmc_________::e2a339e0e11bfbf55462e14a07f1b304", true);
 
 		verifyIdentifier(
 			"publication_openapc.json", "50|doi_________::79dbc7a2a56dc1532659f9038843256e", true);

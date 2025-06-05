@@ -407,10 +407,9 @@ object DataciteToOAFTransformation {
         )
       }
       if (c.affiliation.isDefined)
-        a.setAffiliation(
+        a.setRawAffiliationString(
           c.affiliation.get
             .filter(af => af.nonEmpty)
-            .map(af => OafMapperUtils.field(af, dataInfo))
             .asJava
         )
       a.setRank(idx + 1)

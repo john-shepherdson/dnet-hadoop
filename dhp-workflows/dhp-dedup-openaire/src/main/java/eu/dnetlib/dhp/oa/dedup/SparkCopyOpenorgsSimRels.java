@@ -69,7 +69,9 @@ public class SparkCopyOpenorgsSimRels extends AbstractSparkAction {
 
 		Dataset<Relation> rawRels = spark
 			.read()
-			.textFile(relationPath)
+			.schema(Encoders.bean(Relation.class).schema())
+			.json(relationPath)
+			.as(Encoders.bean(Relation.class))
 			.map(patchRelFn(), Encoders.bean(Relation.class))
 			.filter(this::filterOpenorgsRels);
 

@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.actionmanager.createunresolvedentities.model.FOSDataModel;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import scala.math.Ordering;
 
 public class GetFOSSparkJob implements Serializable {
 
@@ -74,8 +75,8 @@ public class GetFOSSparkJob implements Serializable {
 
 		fosData.map((MapFunction<Row, FOSDataModel>) r -> {
 			FOSDataModel fosDataModel = new FOSDataModel();
-			fosDataModel.setDoi(r.getString(0).toLowerCase());
-			fosDataModel.setOaid(r.getString(1).toLowerCase());
+			fosDataModel.setDoi(Optional.ofNullable(r.getString(0)).map(String::toLowerCase).orElse(null));
+			fosDataModel.setOaid(Optional.ofNullable(r.getString(1)).map(String::toLowerCase).orElse(null));
 			fosDataModel.setLevel1(r.getString(2));
 			fosDataModel.setLevel2(r.getString(3));
 			fosDataModel.setLevel3(r.getString(4));

@@ -4,7 +4,7 @@ package eu.dnetlib.dhp.bulktag.community;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 
-import org.apache.htrace.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import eu.dnetlib.dhp.bulktag.criteria.Selection;
 import eu.dnetlib.dhp.bulktag.criteria.VerbResolver;

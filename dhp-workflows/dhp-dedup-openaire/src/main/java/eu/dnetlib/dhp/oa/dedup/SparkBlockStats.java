@@ -91,7 +91,6 @@ public class SparkBlockStats extends AbstractSparkAction {
 				.read()
 				.textFile(DedupUtility.createEntityPath(graphBasePath, subEntity))
 				.transform(deduper.model().parseJsonDataset())
-				.transform(deduper.filterAndCleanup())
 				.transform(deduper.generateClustersWithCollect())
 				.filter(functions.size(new Column("block")).geq(1));
 
