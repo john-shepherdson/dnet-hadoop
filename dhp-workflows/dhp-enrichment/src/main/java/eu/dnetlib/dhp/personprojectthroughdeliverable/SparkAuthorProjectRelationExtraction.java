@@ -27,21 +27,7 @@ public class SparkAuthorProjectRelationExtraction {
 
 	private static final Logger log = LoggerFactory.getLogger(SparkAuthorProjectRelationExtraction.class);
 	private static final String PERSON_PREFIX = ModelSupport.getIdPrefix(Person.class) + "|orcid_______";
-	private static final String PROJECT_ID_PREFIX = ModelSupport.getIdPrefix(Project.class)
-			+ IdentifierFactory.ID_PREFIX_SEPARATOR;
-	public static final DataInfo DATAINFO = OafMapperUtils
-		.dataInfo(
-			false,
-			"openaire",
-			true,
-			false,
-			OafMapperUtils
-				.qualifier(
-					ModelConstants.SYSIMPORT_CROSSWALK_REPOSITORY,
-					ModelConstants.SYSIMPORT_CROSSWALK_REPOSITORY,
-					ModelConstants.DNET_PROVENANCE_ACTIONS,
-					ModelConstants.DNET_PROVENANCE_ACTIONS),
-			"0.85");
+
 
 	public static void main(String[] args) throws Exception {
 
@@ -64,6 +50,9 @@ public class SparkAuthorProjectRelationExtraction {
 		final String workingDir = parser.get("workingDir");
 		log.info("workingPath: {}", workingDir);
 
+		final String classCodes = parser.get("classCodes");
+		log.info("classCodes: {}", classCodes);
+
 		SparkConf conf = new SparkConf();
 		runWithSparkSession(
 			conf,
@@ -73,25 +62,29 @@ public class SparkAuthorProjectRelationExtraction {
 				exec(
 					spark,
 					sourcePath,
-						workingDir);
+						workingDir,
+						classCodes);
 			});
 	}
 
-	private static void exec(SparkSession spark, String sourcePath,  String workingPath){
+	private static void exec(SparkSession spark, String sourcePath,  String workingPath, String classCodes){
+		String[] classIds = classCodes.split(";");
+		Dataset<Row> publications = spark.read().schema(Encoders.bean(Publication.class).schema())
+				.json(sourcePath + "/publication");
 
-		//Project deliverable
-		Dataset<Row> deliverables = spark.read().schema(Encoders.bean(Publication.class).schema())
-				.json(sourcePath + "/publication")
-				.filter(functions.array_contains(functions.col("instance.instancetype.classid"), "0034"))
-				.select("id","author","instance")
-				;
-		//Project reports not clear the classid to be included
+		Dataset<Row> selectedResults =
+				Arrays.stream(classIds).map(classid ->
+					publications.filter(functions.array_contains(functions.col("instance.instancetype.classid"), classid))
+							.select("id","author","instance")
+						).reduce(Dataset::union)
+						.orElseGet(spark::emptyDataFrame);
+
 		Dataset<Row> relations = spark.read().schema(Encoders.bean(Relation.class).schema())
 				.json(sourcePath + "/relation")
 				.filter("subRelType = 'outcome'")
 				.select("source","target");
 
-		deliverables.joinWith(relations, deliverables.col("id").equalTo(relations.col("target")))
+		selectedResults.joinWith(relations, selectedResults.col("id").equalTo(relations.col("target")))
 				.flatMap((FlatMapFunction<Tuple2<Row, Row>,  Relation>) t2 -> {
 					Seq<Row> scalaSeq = t2._1().getAs("author");
 					List<Row> authors = JavaConverters.seqAsJavaListConverter(scalaSeq).asJava();

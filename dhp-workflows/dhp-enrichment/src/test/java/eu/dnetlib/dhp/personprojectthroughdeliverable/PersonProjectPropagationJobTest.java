@@ -74,7 +74,7 @@ public class PersonProjectPropagationJobTest {
 	 * @throws Exception
 	 */
 	@Test
-	void projectAuthorRelationTest() throws Exception {
+	void projectAuthorRelationTestDeliverableOnly() throws Exception {
 
 		SparkAuthorProjectRelationExtraction
 			.main(
@@ -82,10 +82,11 @@ public class PersonProjectPropagationJobTest {
 
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-workingDir", workingDir.toString() ,
-					"-sourcePath", getClass()
-				.getResource(
+					"-sourcePath", getClass().getResource(
 						"/eu/dnetlib/dhp/person/projectrelsextraction/graph")
-				.getPath()
+						.getPath(),
+					"-classCodes","0034"
+
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -105,46 +106,41 @@ public class PersonProjectPropagationJobTest {
 				.textFile(workingDir.toString() + "/relation")
 				.map(item -> OBJECT_MAPPER.readValue(item, Relation.class));
 
-		tmp.foreach(r -> System.out.println(new ObjectMapper().writeValueAsString(r)));
+	}
 
-//		// JavaRDD<Relation> tmp = sc.textFile("/tmp/relation")
-//		// .map(item -> OBJECT_MAPPER.readValue(item, Relation.class));
-//
-//		// got 20 new relations because "produces" and "isProducedBy" are added
-//		Assertions.assertEquals(8, tmp.count());
-//
-//		Dataset<Relation> verificationDs = spark.createDataset(tmp.rdd(), Encoders.bean(Relation.class));
-//
-//		Assertions.assertEquals(4, verificationDs.filter("relClass = 'produces'").count());
-//		Assertions.assertEquals(4, verificationDs.filter("relClass = 'isProducedBy'").count());
-//
-//		Assertions
-//				.assertEquals(
-//						4,
-//						verificationDs
-//								.filter(
-//										(FilterFunction<Relation>) r -> r.getSource().startsWith("50")
-//												&& r.getTarget().startsWith("40")
-//												&& r.getRelClass().equals("isProducedBy"))
-//								.count());
-//		Assertions
-//				.assertEquals(
-//						4,
-//						verificationDs
-//								.filter(
-//										(FilterFunction<Relation>) r -> r.getSource().startsWith("40")
-//												&& r.getTarget().startsWith("50")
-//												&& r.getRelClass().equals("produces"))
-//								.count());
-//
-//		verificationDs.createOrReplaceTempView("temporary");
-//
-//		Assertions
-//				.assertEquals(
-//						8,
-//						spark
-//								.sql(
-//										"Select * from temporary where datainfo.inferenceprovenance = 'propagation'")
-//								.count());
+	@Test
+	void projectAuthorRelationTest() throws Exception {
+
+		SparkAuthorProjectRelationExtraction
+				.main(
+						new String[] {
+
+								"-isSparkSessionManaged", Boolean.FALSE.toString(),
+								"-workingDir", workingDir.toString() ,
+								"-sourcePath", getClass().getResource(
+								"/eu/dnetlib/dhp/person/projectrelsextraction/graph")
+								.getPath(),
+								"-classCodes","0034;0017"
+
+						});
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		Dataset<Relation> relations = spark.read().schema(Encoders.bean(Relation.class).schema())
+				.json(workingDir.toString() + "/relation")
+				.as(Encoders.bean(Relation.class));
+
+		Assertions.assertEquals(3, relations.count());
+		Assertions.assertEquals(2, relations.filter((FilterFunction<Relation>) relation -> relation.getTarget().equalsIgnoreCase("40|aka_________::4892912a1a2c54a98fa85bb08afc2a32")).count());
+		Assertions.assertEquals(1, relations.filter((FilterFunction<Relation>) relation -> relation.getTarget().equalsIgnoreCase("40|aka_________::08271906a58b12101a2413c4eeaffe98")).count());
+		Assertions.assertTrue(relations.filter((FilterFunction<Relation>) r -> r.getSource().equalsIgnoreCase("30|orcid_______::bc79e7b6b0e339357634105055d5f29c")).count() > 0);
+		Assertions.assertTrue(relations.filter((FilterFunction<Relation>) r -> r.getSource().equalsIgnoreCase("30|orcid_______::61fea345f34b5166d4afbe9e98fcbe4f")).count() > 0);
+		relations.foreach((ForeachFunction<Relation>) relation -> Assertions.assertEquals("projectPerson", relation.getRelType()));
+		relations.foreach((ForeachFunction<Relation>) relation -> Assertions.assertEquals("participation", relation.getSubRelType()));
+		relations.foreach((ForeachFunction<Relation>) relation -> Assertions.assertEquals("participatesToProject", relation.getRelClass()));
+		JavaRDD<Relation> tmp = sc
+				.textFile(workingDir.toString() + "/relation")
+				.map(item -> OBJECT_MAPPER.readValue(item, Relation.class));
+
 	}
 }

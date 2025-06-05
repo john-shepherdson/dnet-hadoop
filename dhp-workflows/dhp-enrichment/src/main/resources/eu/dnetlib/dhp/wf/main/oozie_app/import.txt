@@ -11,3 +11,4 @@ community_sem_rel classpath eu/dnetlib/dhp/wf/subworkflows/resulttocommunityfrom
 country_propagation classpath eu/dnetlib/dhp/wf/subworkflows/countrypropagation/oozie_app
 person_propagation classpath eu/dnetlib/dhp/wf/subworkflows/person/oozie_app
 publisher_propagation classpath eu/dnetlib/dhp/wf/subworkflows/enrich/publisher/oozie_app
+personproject_relation_propagation classpath eu/dnetlib/dhp/wf/subworkflows/personprojectthroughdeliverable/oozie_app

@@ -17,5 +17,10 @@
     "paramLongName": "isSparkSessionManaged",
     "paramDescription": "true if the spark session is managed, false otherwise",
     "paramRequired": false
-  }
+  },  {
+  "paramName": "cc",
+  "paramLongName": "classCodes",
+  "paramDescription": "the classid codes to select publication to use for the propagation",
+  "paramRequired": true
+}
 ]

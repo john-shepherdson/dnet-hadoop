@@ -164,6 +164,26 @@
 
             </configuration>
         </sub-workflow>
+        <ok to="personproject_relation_propagation" />
+        <error to="Kill" />
+    </action>
+
+    <action name="personproject_relation_propagation">
+        <sub-workflow>
+            <app-path>${wf:appPath()}/personproject_relation_propagation
+            </app-path>
+            <propagate-configuration/>
+            <configuration>
+                <property>
+                    <name>sourcePath</name>
+                    <value>${outputPath}</value>
+                </property>
+                <property>
+                    <name>classCodes</name>
+                    <value>${classCodes}</value>
+                </property>
+            </configuration>
+        </sub-workflow>
         <ok to="bulk_tagging" />
         <error to="Kill" />
     </action>

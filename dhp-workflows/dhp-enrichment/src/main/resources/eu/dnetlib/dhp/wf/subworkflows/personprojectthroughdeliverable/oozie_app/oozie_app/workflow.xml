@@ -64,6 +64,7 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
+            <arg>--classCodes</arg><arg>${classCodes}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
