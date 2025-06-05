@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import eu.dnetlib.dhp.personprojectthroughdeliverable.SparkAuthorProjectRelationExtraction;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -63,7 +62,114 @@ public class ProjectPropagationJobTest {
 		spark.stop();
 	}
 
+	/**
+	 * There are no new relations to be added. All the possible relations have already been linked with the project in
+	 * the graph
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	void NoUpdateTest() throws Exception {
 
+		final String potentialUpdateDate = getClass()
+			.getResource(
+				"/eu/dnetlib/dhp/projecttoresult/preparedInfo/noupdates/potentialUpdates")
+			.getPath();
+		final String alreadyLinkedPath = getClass()
+			.getResource(
+				"/eu/dnetlib/dhp/projecttoresult/preparedInfo/alreadyLinked")
+			.getPath();
+		SparkResultToProjectThroughSemRelJob
+			.main(
+				new String[] {
+					"-isTest", Boolean.TRUE.toString(),
+					"-isSparkSessionManaged", Boolean.FALSE.toString(),
+					"-hive_metastore_uris", "",
+					"-saveGraph", "true",
+					"-outputPath", workingDir.toString() + "/relation",
+					"-potentialUpdatePath", potentialUpdateDate,
+					"-alreadyLinkedPath", alreadyLinkedPath,
+				});
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<Relation> tmp = sc
+			.textFile(workingDir.toString() + "/relation")
+			.map(item -> OBJECT_MAPPER.readValue(item, Relation.class));
+
+		Assertions.assertEquals(0, tmp.count());
+	}
+
+	/**
+	 * All the possible updates will produce a new relation. No relations are already linked in the grpha
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	void UpdateTenTest() throws Exception {
+		final String potentialUpdatePath = getClass()
+			.getResource(
+				"/eu/dnetlib/dhp/projecttoresult/preparedInfo/tenupdates/potentialUpdates")
+			.getPath();
+		final String alreadyLinkedPath = getClass()
+			.getResource(
+				"/eu/dnetlib/dhp/projecttoresult/preparedInfo/alreadyLinked")
+			.getPath();
+		SparkResultToProjectThroughSemRelJob
+			.main(
+				new String[] {
+					"-isTest", Boolean.TRUE.toString(),
+					"-isSparkSessionManaged", Boolean.FALSE.toString(),
+					"-hive_metastore_uris", "",
+					"-saveGraph", "true",
+					"-outputPath", workingDir.toString() + "/relation",
+					"-potentialUpdatePath", potentialUpdatePath,
+					"-alreadyLinkedPath", alreadyLinkedPath,
+				});
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<Relation> tmp = sc
+			.textFile(workingDir.toString() + "/relation")
+			.map(item -> OBJECT_MAPPER.readValue(item, Relation.class));
+
+		// got 20 new relations because "produces" and "isProducedBy" are added
+		Assertions.assertEquals(10, tmp.count());
+
+		Dataset<Relation> verificationDs = spark.createDataset(tmp.rdd(), Encoders.bean(Relation.class));
+
+		Assertions.assertEquals(5, verificationDs.filter("relClass = 'produces'").count());
+		Assertions.assertEquals(5, verificationDs.filter("relClass = 'isProducedBy'").count());
+
+		Assertions
+			.assertEquals(
+				5,
+				verificationDs
+					.filter(
+						(FilterFunction<Relation>) r -> r.getSource().startsWith("50")
+							&& r.getTarget().startsWith("40")
+							&& r.getRelClass().equals("isProducedBy"))
+					.count());
+		Assertions
+			.assertEquals(
+				5,
+				verificationDs
+					.filter(
+						(FilterFunction<Relation>) r -> r.getSource().startsWith("40")
+							&& r.getTarget().startsWith("50")
+							&& r.getRelClass().equals("produces"))
+					.count());
+
+		verificationDs.createOrReplaceTempView("temporary");
+
+		Assertions
+			.assertEquals(
+				10,
+				spark
+					.sql(
+						"Select * from temporary where datainfo.inferenceprovenance = 'propagation'")
+					.count());
+	}
 
 	/**
 	 * One of the relations in the possible updates is already linked to the project in the graph. All the others are
@@ -72,66 +178,71 @@ public class ProjectPropagationJobTest {
 	 * @throws Exception
 	 */
 	@Test
-	void projectAuthorRelationTest() throws Exception {
-
-		SparkAuthorProjectRelationExtraction
+	void UpdateMixTest() throws Exception {
+		final String potentialUpdatepath = getClass()
+			.getResource(
+				"/eu/dnetlib/dhp/projecttoresult/preparedInfo/updatesmixed/potentialUpdates")
+			.getPath();
+		final String alreadyLinkedPath = getClass()
+			.getResource(
+				"/eu/dnetlib/dhp/projecttoresult/preparedInfo/alreadyLinked")
+			.getPath();
+		SparkResultToProjectThroughSemRelJob
 			.main(
 				new String[] {
-
+					"-isTest", Boolean.TRUE.toString(),
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
-					"-outputPath", workingDir.toString() ,
-					"-sourcePath", getClass()
-				.getResource(
-						"/eu/dnetlib/dhp/person/projectrelsextraction/graph")
-				.getPath()
+					"-hive_metastore_uris", "",
+					"-saveGraph", "true",
+					"-outputPath", workingDir.toString() + "/relation",
+					"-potentialUpdatePath", potentialUpdatepath,
+					"-alreadyLinkedPath", alreadyLinkedPath,
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<Relation> tmp = sc
-				.textFile(workingDir.toString() + "/relation")
-				.map(item -> OBJECT_MAPPER.readValue(item, Relation.class));
+			.textFile(workingDir.toString() + "/relation")
+			.map(item -> OBJECT_MAPPER.readValue(item, Relation.class));
 
-		tmp.foreach(r -> System.out.println(new ObjectMapper().writeValueAsString(r)));
+		// JavaRDD<Relation> tmp = sc.textFile("/tmp/relation")
+		// .map(item -> OBJECT_MAPPER.readValue(item, Relation.class));
 
-//		// JavaRDD<Relation> tmp = sc.textFile("/tmp/relation")
-//		// .map(item -> OBJECT_MAPPER.readValue(item, Relation.class));
-//
-//		// got 20 new relations because "produces" and "isProducedBy" are added
-//		Assertions.assertEquals(8, tmp.count());
-//
-//		Dataset<Relation> verificationDs = spark.createDataset(tmp.rdd(), Encoders.bean(Relation.class));
-//
-//		Assertions.assertEquals(4, verificationDs.filter("relClass = 'produces'").count());
-//		Assertions.assertEquals(4, verificationDs.filter("relClass = 'isProducedBy'").count());
-//
-//		Assertions
-//				.assertEquals(
-//						4,
-//						verificationDs
-//								.filter(
-//										(FilterFunction<Relation>) r -> r.getSource().startsWith("50")
-//												&& r.getTarget().startsWith("40")
-//												&& r.getRelClass().equals("isProducedBy"))
-//								.count());
-//		Assertions
-//				.assertEquals(
-//						4,
-//						verificationDs
-//								.filter(
-//										(FilterFunction<Relation>) r -> r.getSource().startsWith("40")
-//												&& r.getTarget().startsWith("50")
-//												&& r.getRelClass().equals("produces"))
-//								.count());
-//
-//		verificationDs.createOrReplaceTempView("temporary");
-//
-//		Assertions
-//				.assertEquals(
-//						8,
-//						spark
-//								.sql(
-//										"Select * from temporary where datainfo.inferenceprovenance = 'propagation'")
-//								.count());
+		// got 20 new relations because "produces" and "isProducedBy" are added
+		Assertions.assertEquals(8, tmp.count());
+
+		Dataset<Relation> verificationDs = spark.createDataset(tmp.rdd(), Encoders.bean(Relation.class));
+
+		Assertions.assertEquals(4, verificationDs.filter("relClass = 'produces'").count());
+		Assertions.assertEquals(4, verificationDs.filter("relClass = 'isProducedBy'").count());
+
+		Assertions
+			.assertEquals(
+				4,
+				verificationDs
+					.filter(
+						(FilterFunction<Relation>) r -> r.getSource().startsWith("50")
+							&& r.getTarget().startsWith("40")
+							&& r.getRelClass().equals("isProducedBy"))
+					.count());
+		Assertions
+			.assertEquals(
+				4,
+				verificationDs
+					.filter(
+						(FilterFunction<Relation>) r -> r.getSource().startsWith("40")
+							&& r.getTarget().startsWith("50")
+							&& r.getRelClass().equals("produces"))
+					.count());
+
+		verificationDs.createOrReplaceTempView("temporary");
+
+		Assertions
+			.assertEquals(
+				8,
+				spark
+					.sql(
+						"Select * from temporary where datainfo.inferenceprovenance = 'propagation'")
+					.count());
 	}
 }

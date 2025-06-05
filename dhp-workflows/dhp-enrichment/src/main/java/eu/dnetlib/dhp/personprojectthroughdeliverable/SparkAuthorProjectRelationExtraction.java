@@ -80,21 +80,17 @@ public class SparkAuthorProjectRelationExtraction {
 	private static void exec(SparkSession spark, String sourcePath,  String workingPath){
 
 		//Project deliverable
-
 		Dataset<Row> deliverables = spark.read().schema(Encoders.bean(Publication.class).schema())
 				.json(sourcePath + "/publication")
 				.filter(functions.array_contains(functions.col("instance.instancetype.classid"), "0034"))
 				.select("id","author","instance")
 				;
-
-		deliverables.show(false);
 		//Project reports not clear the classid to be included
 		Dataset<Row> relations = spark.read().schema(Encoders.bean(Relation.class).schema())
 				.json(sourcePath + "/relation")
 				.filter("subRelType = 'outcome'")
 				.select("source","target");
 
-		relations.show(false);
 		deliverables.joinWith(relations, deliverables.col("id").equalTo(relations.col("target")))
 				.flatMap((FlatMapFunction<Tuple2<Row, Row>,  Relation>) t2 -> {
 					Seq<Row> scalaSeq = t2._1().getAs("author");
@@ -119,6 +115,7 @@ public class SparkAuthorProjectRelationExtraction {
 					});
 					return relationList.iterator();
 				} , Encoders.bean(Relation.class))
+				.distinct()
 				.write()
 				.mode(SaveMode.Overwrite)
 				.option("compression","gzip")
