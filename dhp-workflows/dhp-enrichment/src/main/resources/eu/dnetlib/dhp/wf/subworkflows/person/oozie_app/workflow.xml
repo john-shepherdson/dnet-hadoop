@@ -45,17 +45,17 @@
             <delete path="${workingDir}"/>
             <mkdir path="${workingDir}"/>
         </fs>
-        <ok to="extract_personproject_relation_from_graph"/>
+        <ok to="extract_person_relation_from_graph"/>
         <error to="Kill"/>
     </action>
 
 
-    <action name="extract_personproject_relation_from_graph">
+    <action name="extract_person_relation_from_graph">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
             <name>personPropagation</name>
-            <class>eu.dnetlib.dhp.personprojectthroughdeliverable.SparkAuthorProjectRelationExtraction</class>
+            <class>eu.dnetlib.dhp.person.SparkExtractPersonRelationsAndAddIndicators</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 ${sparkClusterOpts}
@@ -63,11 +63,13 @@
                 ${sparkApplicationOpts}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/</arg>
-            <arg>--workingDir</arg><arg>${workingDir}</arg>
+            <arg>--outputPath</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
+
+
 
     <end name="End"/>
 
