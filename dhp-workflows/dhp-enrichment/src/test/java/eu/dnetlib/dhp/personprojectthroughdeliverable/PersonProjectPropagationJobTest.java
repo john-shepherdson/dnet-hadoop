@@ -81,7 +81,7 @@ public class PersonProjectPropagationJobTest {
 				new String[] {
 
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
-					"-outputPath", workingDir.toString() ,
+					"-workingDir", workingDir.toString() ,
 					"-sourcePath", getClass()
 				.getResource(
 						"/eu/dnetlib/dhp/person/projectrelsextraction/graph")

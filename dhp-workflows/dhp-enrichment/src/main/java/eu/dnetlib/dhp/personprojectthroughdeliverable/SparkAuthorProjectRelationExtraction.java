@@ -49,7 +49,7 @@ public class SparkAuthorProjectRelationExtraction {
 			.toString(
 					SparkAuthorProjectRelationExtraction.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/wf/subworkflows/person/input_personpropagation_parameters.json"));
+						"/eu/dnetlib/dhp/wf/subworkflows/personprojectthroughdeliverable/input_personprojectpropagation_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
@@ -61,8 +61,8 @@ public class SparkAuthorProjectRelationExtraction {
 		String sourcePath = parser.get("sourcePath");
 		log.info("sourcePath: {}", sourcePath);
 
-		final String workingPath = parser.get("outputPath");
-		log.info("workingPath: {}", workingPath);
+		final String workingDir = parser.get("workingDir");
+		log.info("workingPath: {}", workingDir);
 
 		SparkConf conf = new SparkConf();
 		runWithSparkSession(
@@ -73,7 +73,7 @@ public class SparkAuthorProjectRelationExtraction {
 				exec(
 					spark,
 					sourcePath,
-						workingPath);
+						workingDir);
 			});
 	}
 
