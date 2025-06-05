@@ -50,6 +50,10 @@
             <description>the path to the orcid information extracted from the orcid profiles</description>
         </property>
         <property>
+            <name>classCodes</name>
+            <description>the codes to be used for the person - project propagation</description>
+        </property>
+        <property>
             <name>hiveDbName</name>
             <description>the target hive database name</description>
         </property>
@@ -109,6 +113,7 @@
     <decision name="resumeFrom">
         <switch>
             <case to="orcid_propagation">${wf:conf('resumeFrom') eq 'OrcidPropagation'}</case>
+            <case to="personproject_relation_propagation">${wf:conf('resumeFrom') eq 'PersonProjectPropagation'}</case>
             <case to="bulk_tagging">${wf:conf('resumeFrom') eq 'BulkTagging'}</case>
             <case to="affiliation_inst_repo">${wf:conf('resumeFrom') eq 'AffiliationInstitutionalRepository'}</case>
             <case to="entity_semantic_relation">${wf:conf('resumeFrom') eq 'AffiliationSemanticRelation'}</case>
