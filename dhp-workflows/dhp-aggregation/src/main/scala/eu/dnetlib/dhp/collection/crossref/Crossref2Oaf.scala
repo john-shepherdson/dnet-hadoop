@@ -886,7 +886,6 @@ case object Crossref2Oaf {
               queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
 //              Added mapping for DFG
             case "10.13039/501100001659" =>
-              generateSimpleRelationFromAward(funder, "dfgf________", a => a)
               val targetId = getProjectId("dfgf________", "1e5e62235d094afd01cd56e65112fc63")
               queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
               queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
