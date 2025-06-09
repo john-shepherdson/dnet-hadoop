@@ -133,8 +133,9 @@ create table if not exists ${stats_db_name}.indi_funder_country_collab stored as
 drop table if exists ${stats_db_name}.indi_result_country_collab purge; /*EOS*/
 create table if not exists ${stats_db_name}.indi_result_country_collab stored as parquet as
     WITH tmp AS (
-        select distinct country, ro.id as result  from ${stats_db_name}.organization o
-        join ${stats_db_name}.result_organization ro on o.id=ro.organization
+        select distinct country, ro.id as result
+        from ${stats_db_name}.result_organization ro
+        join ${stats_db_name}.organization o on o.id=ro.organization
         where country <> 'UNKNOWN' and o.name is not null)
     select /*+ COALESCE(100) */ o1.country country1, o2.country country2, count(o1.result) as collaborations
     from tmp as o1
@@ -308,7 +309,8 @@ create table if not exists ${stats_db_name}.indi_org_fairness stored as parquet 
         group by ro.organization),
 --return all results group by organization
     allresults as (
-        select ro.organization, count(distinct ro.id) no_allresults from ${stats_db_name}.result_organization ro
+        select ro.organization, count(distinct ro.id) no_allresults
+        from ${stats_db_name}.result_organization ro
         join ${stats_db_name}.result r on r.id=ro.id
         where  cast(year as int)>2003
         group by ro.organization)
@@ -328,7 +330,8 @@ select ro.organization organization, count(distinct ro.id) no_result_fair
     group by ro.organization; /*EOS*/
 
 CREATE TEMPORARY VIEW allresults as
-select ro.organization, count(distinct ro.id) no_allresults from ${stats_db_name}.result_organization ro
+select ro.organization, count(distinct ro.id) no_allresults
+    from ${stats_db_name}.result_organization ro
     join ${stats_db_name}.publication p on p.id=ro.id
     where cast(year as int)>2003
     group by ro.organization; /*EOS*/
@@ -344,12 +347,14 @@ DROP VIEW result_fair; /*EOS*/
 DROP VIEW allresults; /*EOS*/
 
 CREATE TEMPORARY VIEW result_fair as
-    select year, ro.organization organization, count(distinct ro.id) no_result_fair from ${stats_db_name}.result_organization ro
+    select year, ro.organization organization, count(distinct ro.id) no_result_fair
+    from ${stats_db_name}.result_organization ro
     join ${stats_db_name}.result p on p.id=ro.id
     where (title is not null) and (publisher is not null) and (abstract=true) and (year is not null) and (authors>0) and cast(year as int)>2003
     group by ro.organization, year; /*EOS*/
 
-CREATE TEMPORARY VIEW allresults as select year, ro.organization, count(distinct ro.id) no_allresults from ${stats_db_name}.result_organization ro
+CREATE TEMPORARY VIEW allresults as select year, ro.organization, count(distinct ro.id) no_allresults
+    from ${stats_db_name}.result_organization ro
     join ${stats_db_name}.result p on p.id=ro.id
     where cast(year as int)>2003
     group by ro.organization, year; /*EOS*/
@@ -367,13 +372,14 @@ DROP VIEW allresults; /*EOS*/
 CREATE TEMPORARY VIEW result_fair as
     select ro.organization organization, count(distinct ro.id) no_result_fair
      from ${stats_db_name}.result_organization ro
-              join ${stats_db_name}.result p on p.id=ro.id
+     join ${stats_db_name}.result p on p.id=ro.id
      where (title is not null) and (publisher is not null) and (abstract=true) and (year is not null)
        and (authors>0) and cast(year as int)>2003
      group by ro.organization; /*EOS*/
 
 CREATE TEMPORARY VIEW allresults as
-    select ro.organization, count(distinct ro.id) no_allresults from ${stats_db_name}.result_organization ro
+    select ro.organization, count(distinct ro.id) no_allresults
+    from ${stats_db_name}.result_organization ro
     join ${stats_db_name}.result p on p.id=ro.id
     where cast(year as int)>2003
     group by ro.organization; /*EOS*/
@@ -389,14 +395,16 @@ DROP VIEW result_fair; /*EOS*/
 DROP VIEW allresults; /*EOS*/
 
 CREATE TEMPORARY VIEW result_fair as
-    select year, ro.organization organization, count(distinct ro.id) no_result_fair from ${stats_db_name}.result_organization ro
+    select year, ro.organization organization, count(distinct ro.id) no_result_fair
+    from ${stats_db_name}.result_organization ro
     join ${stats_db_name}.result r on r.id=ro.id
     join ${stats_db_name}.result_pids rp on r.id=rp.id
     where (title is not null) and (publisher is not null) and (abstract=true) and (year is not null) and (authors>0) and  cast(year as int)>2003
     group by ro.organization, year; /*EOS*/
 
 CREATE TEMPORARY VIEW allresults as
-    select year, ro.organization, count(distinct ro.id) no_allresults from ${stats_db_name}.result_organization ro
+    select year, ro.organization, count(distinct ro.id) no_allresults
+    from ${stats_db_name}.result_organization ro
     join ${stats_db_name}.result r on r.id=ro.id
     where  cast(year as int)>2003
     group by ro.organization, year; /*EOS*/
@@ -412,14 +420,16 @@ DROP VIEW result_fair; /*EOS*/
 DROP VIEW allresults; /*EOS*/
 
 CREATE TEMPORARY VIEW result_with_pid as
-    select year, ro.organization, count(distinct rp.id) no_result_with_pid from ${stats_db_name}.result_organization ro
+    select year, ro.organization, count(distinct rp.id) no_result_with_pid
+    from ${stats_db_name}.result_organization ro
     join ${stats_db_name}.result_pids rp on rp.id=ro.id
     join ${stats_db_name}.result r on r.id=rp.id
     where cast(year as int) >2003
     group by ro.organization, year; /*EOS*/
 
 CREATE TEMPORARY VIEW allresults as
-    select year, ro.organization, count(distinct ro.id) no_allresults from ${stats_db_name}.result_organization ro
+    select year, ro.organization, count(distinct ro.id) no_allresults
+    from ${stats_db_name}.result_organization ro
     join ${stats_db_name}.result r on r.id=ro.id
     where cast(year as int) >2003
     group by ro.organization, year; /*EOS*/
@@ -435,14 +445,16 @@ DROP VIEW result_with_pid; /*EOS*/
 DROP VIEW allresults; /*EOS*/
 
 CREATE TEMPORARY VIEW result_with_pid as
-select ro.organization, count(distinct rp.id) no_result_with_pid from ${stats_db_name}.result_organization ro
+select ro.organization, count(distinct rp.id) no_result_with_pid
+    from ${stats_db_name}.result_organization ro
     join ${stats_db_name}.result_pids rp on rp.id=ro.id
     join ${stats_db_name}.result r on r.id=rp.id
     where cast(year as int) >2003
     group by ro.organization; /*EOS*/
 
 CREATE TEMPORARY VIEW allresults as
-select ro.organization, count(distinct ro.id) no_allresults from ${stats_db_name}.result_organization ro
+select ro.organization, count(distinct ro.id) no_allresults
+    from ${stats_db_name}.result_organization ro
     join ${stats_db_name}.result r on r.id=ro.id
     where cast(year as int) >2003
     group by ro.organization; /*EOS*/
@@ -482,19 +494,22 @@ SELECT ro.organization, count(distinct r.id) no_oasoftware FROM ${stats_db_name}
     group by ro.organization; /*EOS*/
 
 CREATE TEMPORARY VIEW allpubs as
-SELECT ro.organization, count(ro.id) no_allpubs FROM ${stats_db_name}.result_organization ro
+SELECT ro.organization, count(ro.id) no_allpubs
+    FROM ${stats_db_name}.result_organization ro
     join ${stats_db_name}.publication ps on ps.id=ro.id
     where cast(ps.year as int)>2003
     group by ro.organization; /*EOS*/
 
 CREATE TEMPORARY VIEW alldatasets as
-SELECT ro.organization, count(ro.id) no_alldatasets FROM ${stats_db_name}.result_organization ro
+SELECT ro.organization, count(ro.id) no_alldatasets
+    FROM ${stats_db_name}.result_organization ro
     join ${stats_db_name}.dataset ps on ps.id=ro.id
     where cast(ps.year as int)>2003
     group by ro.organization; /*EOS*/
 
 CREATE TEMPORARY VIEW allsoftware as
-SELECT ro.organization, count(ro.id) no_allsoftware FROM ${stats_db_name}.result_organization ro
+SELECT ro.organization, count(ro.id) no_allsoftware
+    FROM ${stats_db_name}.result_organization ro
     join ${stats_db_name}.software ps on ps.id=ro.id
     where cast(ps.year as int)>2003
     group by ro.organization; /*EOS*/
@@ -562,17 +577,20 @@ SELECT r.year,ro.organization, count(distinct r.id) no_oasoftware FROM ${stats_d
     group by ro.organization, r.year; /*EOS*/
 
 CREATE TEMPORARY VIEW allpubs as
-SELECT p.year,ro.organization organization, count(ro.id) no_allpubs FROM ${stats_db_name}.result_organization ro
+SELECT p.year,ro.organization organization, count(ro.id) no_allpubs
+    FROM ${stats_db_name}.result_organization ro
     join ${stats_db_name}.publication p on p.id=ro.id where cast(p.year as int)>2003
     group by ro.organization, p.year; /*EOS*/
 
 CREATE TEMPORARY VIEW alldatasets as
-SELECT d.year, ro.organization organization, count(ro.id) no_alldatasets FROM ${stats_db_name}.result_organization ro
+SELECT d.year, ro.organization organization, count(ro.id) no_alldatasets
+    FROM ${stats_db_name}.result_organization ro
     join ${stats_db_name}.dataset d on d.id=ro.id where cast(d.year as int)>2003
     group by ro.organization, d.year; /*EOS*/
 
 CREATE TEMPORARY VIEW allsoftware as
-SELECT s.year,ro.organization organization, count(ro.id) no_allsoftware FROM ${stats_db_name}.result_organization ro
+SELECT s.year,ro.organization organization, count(ro.id) no_allsoftware
+    FROM ${stats_db_name}.result_organization ro
     join ${stats_db_name}.software s on s.id=ro.id where cast(s.year as int)>2003
     group by ro.organization, s.year; /*EOS*/
 
@@ -989,7 +1007,8 @@ with org_names_pids as
 select /*+ COALESCE(100) */ distinct p.id, coalesce(publicly_funded, 0) as publicly_funded
 from ${stats_db_name}.publication p
 left outer join (
-select distinct ro.id, 1 as publicly_funded from ${stats_db_name}.result_organization ro
+select distinct ro.id, 1 as publicly_funded
+from ${stats_db_name}.result_organization ro
 join ${stats_db_name}.organization o on o.id=ro.organization
 join publicly_funded_orgs pfo on o.name=pfo.name) tmp on p.id=tmp.id; /*EOS*/
 
