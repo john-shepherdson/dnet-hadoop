@@ -188,7 +188,7 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-	    <dependency>
+            <dependency>
                 <groupId>eu.dnetlib</groupId>
                 <artifactId>uoa-validator-engine2-result-models</artifactId>
                 <version>${uoa-validator-models.version}</version>
@@ -1025,8 +1025,8 @@
         <unidecode.version>0.0.7</unidecode.version>
         <vtd.version>[2.12,3.0)</vtd.version>
 
-	<uoa-validator-engine.version>2.1.0</uoa-validator-engine.version>
-	<uoa-validator-models.version>2.1.0</uoa-validator-models.version>
+        <uoa-validator-engine.version>2.1.0</uoa-validator-engine.version>
+        <uoa-validator-models.version>2.1.0</uoa-validator-models.version>
 
         <zookeeper.version>3.4.6</zookeeper.version>
     </properties>
