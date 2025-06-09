@@ -25,25 +25,9 @@ import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.ModelHardLimits;
 import eu.dnetlib.dhp.schema.solr.*;
-import eu.dnetlib.dhp.schema.solr.AccessRight;
-import eu.dnetlib.dhp.schema.solr.Author;
-import eu.dnetlib.dhp.schema.solr.Context;
-import eu.dnetlib.dhp.schema.solr.Country;
-import eu.dnetlib.dhp.schema.solr.Datasource;
-import eu.dnetlib.dhp.schema.solr.EoscIfGuidelines;
-import eu.dnetlib.dhp.schema.solr.ExternalReference;
-import eu.dnetlib.dhp.schema.solr.Instance;
-import eu.dnetlib.dhp.schema.solr.Journal;
-import eu.dnetlib.dhp.schema.solr.Measure;
 import eu.dnetlib.dhp.schema.solr.OpenAccessColor;
 import eu.dnetlib.dhp.schema.solr.OpenAccessRoute;
-import eu.dnetlib.dhp.schema.solr.Organization;
-import eu.dnetlib.dhp.schema.solr.Person;
-import eu.dnetlib.dhp.schema.solr.PersonTopic;
 import eu.dnetlib.dhp.schema.solr.Pid;
-import eu.dnetlib.dhp.schema.solr.Project;
-import eu.dnetlib.dhp.schema.solr.Result;
-import eu.dnetlib.dhp.schema.solr.Subject;
 
 public class ProvisionModelSupport {
 
@@ -63,7 +47,7 @@ public class ProvisionModelSupport {
 	}
 
 	public static SolrRecord transform(JoinedEntity je, ContextMapper contextMapper, VocabularyGroup vocs) {
-		SolrRecord r = new SolrRecord();
+		final SolrRecord r = new SolrRecord();
 		final OafEntity e = je.getEntity();
 		final RecordType type = RecordType.fromString(e.getClass().getSimpleName().toLowerCase());
 		final Boolean deletedbyinference = Optional
@@ -199,8 +183,9 @@ public class ProvisionModelSupport {
 		return rr;
 	}
 
-	private static Project mapProject(eu.dnetlib.dhp.schema.oaf.Project p, VocabularyGroup vocs) {
-		Project ps = new Project();
+	private static eu.dnetlib.dhp.schema.solr.Project mapProject(eu.dnetlib.dhp.schema.oaf.Project p,
+		VocabularyGroup vocs) {
+		eu.dnetlib.dhp.schema.solr.Project ps = new eu.dnetlib.dhp.schema.solr.Project();
 		ps.setAcronym(mapField(p.getAcronym()));
 		ps.setCode(mapField(p.getCode()));
 		ps.setContracttype(mapCodeLabel(p.getContracttype()));
@@ -222,8 +207,8 @@ public class ProvisionModelSupport {
 		return ps;
 	}
 
-	private static Person mapPerson(eu.dnetlib.dhp.schema.oaf.Person p) {
-		Person ps = new Person();
+	private static eu.dnetlib.dhp.schema.solr.Person mapPerson(eu.dnetlib.dhp.schema.oaf.Person p) {
+		eu.dnetlib.dhp.schema.solr.Person ps = new eu.dnetlib.dhp.schema.solr.Person();
 		ps.setFamilyName(p.getFamilyName());
 		ps.setGivenName(p.getGivenName());
 		ps.setAlternativeNames(p.getAlternativeNames());
@@ -234,7 +219,8 @@ public class ProvisionModelSupport {
 		return ps;
 	}
 
-	private static List<PersonTopic> mapPersonTopics(List<eu.dnetlib.dhp.schema.oaf.PersonTopic> subjects) {
+	private static List<eu.dnetlib.dhp.schema.solr.PersonTopic> mapPersonTopics(
+		List<eu.dnetlib.dhp.schema.oaf.PersonTopic> subjects) {
 		return Optional
 			.ofNullable(subjects)
 			.map(
@@ -245,8 +231,8 @@ public class ProvisionModelSupport {
 			.orElse(null);
 	}
 
-	private static PersonTopic mapPersonTopic(eu.dnetlib.dhp.schema.oaf.PersonTopic pt) {
-		PersonTopic topic = new PersonTopic();
+	private static eu.dnetlib.dhp.schema.solr.PersonTopic mapPersonTopic(eu.dnetlib.dhp.schema.oaf.PersonTopic pt) {
+		eu.dnetlib.dhp.schema.solr.PersonTopic topic = new eu.dnetlib.dhp.schema.solr.PersonTopic();
 		topic.setValue(pt.getValue());
 		topic.setSchema(pt.getSchema());
 		topic.setFromYear(pt.getFromYear());
@@ -265,11 +251,11 @@ public class ProvisionModelSupport {
 						try {
 							Document doc = reader.read(new StringReader(ft));
 							String countryCode = doc.valueOf("/fundingtree/funder/jurisdiction/text()");
-							Country country = vocs
+							eu.dnetlib.dhp.schema.solr.Country country = vocs
 								.find("dnet:countries")
 								.map(voc -> voc.getTerm(countryCode))
 								.map(VocabularyTerm::getName)
-								.map(label -> Country.newInstance(countryCode, label))
+								.map(label -> eu.dnetlib.dhp.schema.solr.Country.newInstance(countryCode, label))
 								.orElse(null);
 
 							String level0_id = doc.valueOf("//funding_level_0/id/text()");
@@ -329,8 +315,8 @@ public class ProvisionModelSupport {
 			vocs);
 	}
 
-	private static Organization mapOrganization(eu.dnetlib.dhp.schema.oaf.Organization o) {
-		Organization org = new Organization();
+	private static eu.dnetlib.dhp.schema.solr.Organization mapOrganization(eu.dnetlib.dhp.schema.oaf.Organization o) {
+		eu.dnetlib.dhp.schema.solr.Organization org = new eu.dnetlib.dhp.schema.solr.Organization();
 		org.setCountry(mapCodeLabel(o.getCountry()));
 		org.setLegalname(mapField(o.getLegalname()));
 		org.setLegalshortname(mapField(o.getLegalshortname()));
@@ -352,8 +338,8 @@ public class ProvisionModelSupport {
 		return org;
 	}
 
-	private static Datasource mapDatasource(eu.dnetlib.dhp.schema.oaf.Datasource d) {
-		Datasource ds = new Datasource();
+	private static eu.dnetlib.dhp.schema.solr.Datasource mapDatasource(eu.dnetlib.dhp.schema.oaf.Datasource d) {
+		eu.dnetlib.dhp.schema.solr.Datasource ds = new eu.dnetlib.dhp.schema.solr.Datasource();
 		ds.setEnglishname(mapField(d.getEnglishname()));
 		ds.setOfficialname(mapField(d.getOfficialname()));
 		ds.setDescription(mapField(d.getDescription()));
@@ -411,8 +397,8 @@ public class ProvisionModelSupport {
 		return ds;
 	}
 
-	private static Result mapResult(eu.dnetlib.dhp.schema.oaf.Result r) {
-		Result rs = new Result();
+	private static eu.dnetlib.dhp.schema.solr.Result mapResult(eu.dnetlib.dhp.schema.oaf.Result r) {
+		eu.dnetlib.dhp.schema.solr.Result rs = new eu.dnetlib.dhp.schema.solr.Result();
 
 		rs.setResulttype(mapQualifier(r.getResulttype()));
 		rs.setAuthor(asAuthor(r.getAuthor()));
@@ -467,8 +453,39 @@ public class ProvisionModelSupport {
 			rs.setContactperson(mapFieldList(orp.getContactperson()));
 			rs.setContactgroup(mapFieldList(orp.getContactgroup()));
 			rs.setTool(mapFieldList(orp.getTool()));
+			// RAID specific
+			rs.setActivityPeriod(mapActivityPeriod(orp.getRelevantdate()));
 		}
 		return rs;
+	}
+
+	public static ActivityPeriod mapActivityPeriod(List<StructuredProperty> relevantdateList) {
+		return Optional
+			.ofNullable(relevantdateList)
+			.map(list -> {
+				String fromDate = null;
+				String toDate = null;
+				for (StructuredProperty sp : list) {
+					if (sp.getQualifier() != null && sp.getQualifier().getClassid() != null) {
+						String classid = sp.getQualifier().getClassid();
+						if ("fromDate".equals(classid)) {
+							fromDate = sp.getValue();
+						} else if ("toDate".equals(classid)) {
+							toDate = sp.getValue();
+						}
+					}
+				}
+
+				if (fromDate == null && toDate == null) {
+					return null; // or throw an exception if both are required
+				}
+
+				ActivityPeriod period = new ActivityPeriod();
+				period.setStartDate(fromDate);
+				period.setEndDate(toDate);
+				return period;
+			})
+			.orElse(null);
 	}
 
 	private static Language asLanguage(Qualifier lang) {
@@ -515,14 +532,15 @@ public class ProvisionModelSupport {
 			.orElse(null);
 	}
 
-	private static List<Instance> mapInstances(List<eu.dnetlib.dhp.schema.oaf.Instance> instanceList) {
+	private static List<eu.dnetlib.dhp.schema.solr.Instance> mapInstances(
+		List<eu.dnetlib.dhp.schema.oaf.Instance> instanceList) {
 		return Optional
 			.ofNullable(instanceList)
 			.map(
 				instances -> instances
 					.stream()
 					.map(instance -> {
-						Instance i = new Instance();
+						eu.dnetlib.dhp.schema.solr.Instance i = new eu.dnetlib.dhp.schema.solr.Instance();
 						i.setCollectedfrom(asProvenance(instance.getCollectedfrom()));
 						i.setHostedby(asProvenance(instance.getHostedby()));
 						i.setFulltext(instance.getFulltext());
@@ -553,11 +571,12 @@ public class ProvisionModelSupport {
 			.orElse(null);
 	}
 
-	private static AccessRight mapAccessRight(eu.dnetlib.dhp.schema.oaf.AccessRight accessright) {
+	private static eu.dnetlib.dhp.schema.solr.AccessRight mapAccessRight(
+		eu.dnetlib.dhp.schema.oaf.AccessRight accessright) {
 		return Optional
 			.ofNullable(accessright)
 			.map(
-				ar -> AccessRight
+				ar -> eu.dnetlib.dhp.schema.solr.AccessRight
 					.newInstance(
 						accessright.getClassid(),
 						accessright.getClassname(),
@@ -583,11 +602,11 @@ public class ProvisionModelSupport {
 		return Optional.ofNullable(q).map(Qualifier::getClassname).orElse(null);
 	}
 
-	private static Journal mapJournal(eu.dnetlib.dhp.schema.oaf.Journal joaf) {
+	private static eu.dnetlib.dhp.schema.solr.Journal mapJournal(eu.dnetlib.dhp.schema.oaf.Journal joaf) {
 		return Optional
 			.ofNullable(joaf)
 			.map(jo -> {
-				Journal j = new Journal();
+				eu.dnetlib.dhp.schema.solr.Journal j = new eu.dnetlib.dhp.schema.solr.Journal();
 				j.setConferencedate(jo.getConferencedate());
 				j.setConferenceplace(jo.getConferenceplace());
 				j.setEdition(jo.getEdition());
@@ -626,18 +645,19 @@ public class ProvisionModelSupport {
 			.orElse(null);
 	}
 
-	private static List<Measure> mapMeasures(List<eu.dnetlib.dhp.schema.oaf.Measure> measures) {
+	private static List<eu.dnetlib.dhp.schema.solr.Measure> mapMeasures(
+		List<eu.dnetlib.dhp.schema.oaf.Measure> measures) {
 		return Optional
 			.ofNullable(measures)
 			.map(
 				ml -> ml
 					.stream()
-					.map(m -> Measure.newInstance(m.getId(), mapCodeLabelKV(m.getUnit())))
+					.map(m -> eu.dnetlib.dhp.schema.solr.Measure.newInstance(m.getId(), mapCodeLabelKV(m.getUnit())))
 					.collect(Collectors.toList()))
 			.orElse(null);
 	}
 
-	private static List<ExternalReference> mapExternalReference(
+	private static List<eu.dnetlib.dhp.schema.solr.ExternalReference> mapExternalReference(
 		List<eu.dnetlib.dhp.schema.oaf.ExternalReference> externalReference) {
 		return Optional
 			.ofNullable(externalReference)
@@ -645,7 +665,7 @@ public class ProvisionModelSupport {
 				ext -> ext
 					.stream()
 					.map(
-						e -> ExternalReference
+						e -> eu.dnetlib.dhp.schema.solr.ExternalReference
 							.newInstance(
 								e.getSitename(),
 								e.getLabel(),
@@ -658,7 +678,7 @@ public class ProvisionModelSupport {
 			.orElse(Lists.newArrayList());
 	}
 
-	private static List<Context> asContext(List<eu.dnetlib.dhp.schema.oaf.Context> ctxList,
+	private static List<eu.dnetlib.dhp.schema.solr.Context> asContext(List<eu.dnetlib.dhp.schema.oaf.Context> ctxList,
 		ContextMapper contextMapper) {
 
 		final Set<String> contexts = Optional
@@ -681,7 +701,7 @@ public class ProvisionModelSupport {
 				ctx -> ctx
 					.stream()
 					.map(contextPath -> {
-						Context context = new Context();
+						eu.dnetlib.dhp.schema.solr.Context context = new eu.dnetlib.dhp.schema.solr.Context();
 						String id = "";
 						Map<String, Category> categoryMap = Maps.newHashMap();
 						for (final String token : Splitter.on("::").split(contextPath)) {
@@ -731,7 +751,7 @@ public class ProvisionModelSupport {
 					.filter(p -> Objects.nonNull(p.getQualifier()))
 					.filter(p -> Objects.nonNull(p.getQualifier().getClassid()))
 					.map(
-						p -> Pid
+						p -> eu.dnetlib.dhp.schema.solr.Pid
 							.newInstance(
 								p.getValue(),
 								p.getQualifier().getClassid(),
@@ -740,11 +760,12 @@ public class ProvisionModelSupport {
 			.orElse(null);
 	}
 
-	private static List<Author> asAuthor(List<eu.dnetlib.dhp.schema.oaf.Author> authorList) {
+	private static List<eu.dnetlib.dhp.schema.solr.Author> asAuthor(List<eu.dnetlib.dhp.schema.oaf.Author> authorList) {
 		return asAuthor(authorList, ModelHardLimits.MAX_AUTHORS);
 	}
 
-	private static List<Author> asAuthor(List<eu.dnetlib.dhp.schema.oaf.Author> authorList, int maxAuthors) {
+	private static List<eu.dnetlib.dhp.schema.solr.Author> asAuthor(List<eu.dnetlib.dhp.schema.oaf.Author> authorList,
+		int maxAuthors) {
 		return Optional
 			.ofNullable(authorList)
 			.map(
@@ -752,7 +773,7 @@ public class ProvisionModelSupport {
 					.stream()
 					.limit(maxAuthors)
 					.map(
-						a -> Author
+						a -> eu.dnetlib.dhp.schema.solr.Author
 							.newInstance(
 								StringUtils.left(a.getFullname(), ModelHardLimits.MAX_AUTHOR_FULLNAME_LENGTH),
 								a.getName(),
@@ -762,7 +783,8 @@ public class ProvisionModelSupport {
 			.orElse(null);
 	}
 
-	private static List<Subject> asSubject(List<eu.dnetlib.dhp.schema.oaf.Subject> subjectList) {
+	private static List<eu.dnetlib.dhp.schema.solr.Subject> asSubject(
+		List<eu.dnetlib.dhp.schema.oaf.Subject> subjectList) {
 		return Optional
 			.ofNullable(subjectList)
 			.map(
@@ -772,13 +794,14 @@ public class ProvisionModelSupport {
 					.filter(s -> Objects.nonNull(s.getQualifier().getClassname()))
 					.filter(ProvisionModelSupport::filterFosL1L2)
 					.map(
-						s -> Subject
+						s -> eu.dnetlib.dhp.schema.solr.Subject
 							.newInstance(s.getValue(), s.getQualifier().getClassid(), s.getQualifier().getClassname()))
 					.collect(Collectors.toList()))
 			.orElse(null);
 	}
 
-	private static List<Subject> asSubjectSP(List<eu.dnetlib.dhp.schema.oaf.StructuredProperty> subjectList) {
+	private static List<eu.dnetlib.dhp.schema.solr.Subject> asSubjectSP(
+		List<eu.dnetlib.dhp.schema.oaf.StructuredProperty> subjectList) {
 		return Optional
 			.ofNullable(subjectList)
 			.map(
@@ -787,7 +810,7 @@ public class ProvisionModelSupport {
 					.filter(s -> Objects.nonNull(s.getQualifier()))
 					.filter(s -> Objects.nonNull(s.getQualifier().getClassname()))
 					.map(
-						s -> Subject
+						s -> eu.dnetlib.dhp.schema.solr.Subject
 							.newInstance(s.getValue(), s.getQualifier().getClassid(), s.getQualifier().getClassname()))
 					.collect(Collectors.toList()))
 			.orElse(null);
@@ -803,33 +826,35 @@ public class ProvisionModelSupport {
 		return true;
 	}
 
-	private static Country asCountry(eu.dnetlib.dhp.schema.oaf.Qualifier country) {
+	private static eu.dnetlib.dhp.schema.solr.Country asCountry(eu.dnetlib.dhp.schema.oaf.Qualifier country) {
 		return Optional
 			.ofNullable(country)
 			.filter(c -> Objects.nonNull(c.getClassid()) && Objects.nonNull(c.getClassname()))
-			.map(c -> Country.newInstance(c.getClassid(), c.getClassname()))
+			.map(c -> eu.dnetlib.dhp.schema.solr.Country.newInstance(c.getClassid(), c.getClassname()))
 			.orElse(null);
 	}
 
-	private static List<Country> asCountry(List<eu.dnetlib.dhp.schema.oaf.Country> countryList) {
+	private static List<eu.dnetlib.dhp.schema.solr.Country> asCountry(
+		List<eu.dnetlib.dhp.schema.oaf.Country> countryList) {
 		return Optional
 			.ofNullable(countryList)
 			.map(
 				countries -> countries
 					.stream()
-					.map(c -> Country.newInstance(c.getClassid(), c.getClassname()))
+					.map(c -> eu.dnetlib.dhp.schema.solr.Country.newInstance(c.getClassid(), c.getClassname()))
 					.collect(Collectors.toList()))
 			.orElse(null);
 	}
 
-	private static List<EoscIfGuidelines> asEOSCIF(List<eu.dnetlib.dhp.schema.oaf.EoscIfGuidelines> eoscIfGuidelines) {
+	private static List<eu.dnetlib.dhp.schema.solr.EoscIfGuidelines> asEOSCIF(
+		List<eu.dnetlib.dhp.schema.oaf.EoscIfGuidelines> eoscIfGuidelines) {
 		return Optional
 			.ofNullable(eoscIfGuidelines)
 			.map(
 				eoscif -> eoscif
 					.stream()
 					.map(
-						e -> EoscIfGuidelines
+						e -> eu.dnetlib.dhp.schema.solr.EoscIfGuidelines
 							.newInstance(e.getCode(), e.getLabel(), e.getUrl(), e.getSemanticRelation()))
 					.collect(Collectors.toList()))
 			.orElse(null);
