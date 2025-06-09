@@ -975,6 +975,12 @@ case object Crossref2Oaf {
               val targetId = getProjectId("nnf_________", "1e5e62235d094afd01cd56e65112fc63")
               queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
               queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
+            //Research and Innovation Foundation (RIF)
+            case "10.13039/501100018877" =>
+              generateSimpleRelationFromAward(funder, "rif___________", a => a)
+              val targetId = getProjectId("rif_________", "1e5e62235d094afd01cd56e65112fc63")
+              queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
+              queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
             case _ => logger.debug("no match for " + funder.DOI.get)
           }
 
