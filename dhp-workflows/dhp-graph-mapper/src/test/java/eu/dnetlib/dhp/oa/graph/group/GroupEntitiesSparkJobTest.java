@@ -199,7 +199,8 @@ public class GroupEntitiesSparkJobTest {
 			.readLines(
 				Objects
 					.requireNonNull(
-						getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/terms.txt")), Charset.defaultCharset());
+						getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/terms.txt")),
+				Charset.defaultCharset());
 	}
 
 	private List<String> synonyms() throws IOException {
@@ -207,7 +208,8 @@ public class GroupEntitiesSparkJobTest {
 			.readLines(
 				Objects
 					.requireNonNull(
-						getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/synonyms.txt")), Charset.defaultCharset());
+						getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/synonyms.txt")),
+				Charset.defaultCharset());
 	}
 
 	private ArgumentApplicationParser args(String paramSpecs, String[] args) throws IOException, ParseException {
@@ -221,7 +223,8 @@ public class GroupEntitiesSparkJobTest {
 			.toString(
 				Objects
 					.requireNonNull(
-						GroupEntitiesSparkJobTest.class.getResourceAsStream(path)), Charset.defaultCharset());
+						GroupEntitiesSparkJobTest.class.getResourceAsStream(path)),
+				Charset.defaultCharset());
 	}
 
 }

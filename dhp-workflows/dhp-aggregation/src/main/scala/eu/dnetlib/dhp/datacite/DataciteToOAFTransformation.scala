@@ -23,7 +23,7 @@ import scala.io.Source
 
 object DataciteToOAFTransformation {
 
-  val DOI_PREFIX ="50|doi_________::"
+  val DOI_PREFIX = "50|doi_________::"
 
   case class HostedByMapType(
     openaire_id: String,
@@ -663,7 +663,7 @@ object DataciteToOAFTransformation {
       .map(r => {
         val subRelType = subRelTypeMapping(r.relationType).relType
         val targetPid = PidCleaner.normalizePidValue(r.relatedIdentifierType, r.relatedIdentifier)
-        val target =  DHPUtils.generateIdentifier(targetPid, DOI_PREFIX)
+        val target = DHPUtils.generateIdentifier(targetPid, DOI_PREFIX)
         relation(id, target, subRelType, r.relationType, date)
       })
     val citationRels: List[Relation] = rels
@@ -673,7 +673,7 @@ object DataciteToOAFTransformation {
       )
       .map(r => {
         val targetPid = PidCleaner.normalizePidValue(r.relatedIdentifierType, r.relatedIdentifier)
-        val relatedID =  DHPUtils.generateIdentifier(targetPid, DOI_PREFIX)
+        val relatedID = DHPUtils.generateIdentifier(targetPid, DOI_PREFIX)
         r.relationType match {
           case ModelConstants.CITES | ModelConstants.REFERENCES =>
             relation(id, relatedID, ModelConstants.CITATION, ModelConstants.CITES, date)

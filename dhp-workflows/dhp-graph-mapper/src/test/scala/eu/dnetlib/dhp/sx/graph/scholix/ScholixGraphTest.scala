@@ -28,8 +28,6 @@ class ScholixGraphTest extends AbstractVocabularyTest {
     super.setUpVocabulary()
   }
 
-
-
   @Test
   def testOAFToSummary(): Unit = {
     val inputRelations = Source

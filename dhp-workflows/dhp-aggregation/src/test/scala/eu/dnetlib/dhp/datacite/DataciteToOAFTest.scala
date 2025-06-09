@@ -126,16 +126,19 @@ class DataciteToOAFTest extends AbstractVocabularyTest {
 
   }
 
-    @Test
-  def testRelationGeneration():Unit = {
-      val record = Source
-        .fromInputStream(
-          getClass.getResourceAsStream("/eu/dnetlib/dhp/actionmanager/datacite/record.json")
-        )
-        .mkString
-      val res: List[Oaf] = DataciteToOAFTransformation.generateOAF(record, 0L, 0L, vocabularies, true)
+  @Test
+  def testRelationGeneration(): Unit = {
+    val record = Source
+      .fromInputStream(
+        getClass.getResourceAsStream("/eu/dnetlib/dhp/actionmanager/datacite/record.json")
+      )
+      .mkString
+    val res: List[Oaf] = DataciteToOAFTransformation.generateOAF(record, 0L, 0L, vocabularies, true)
 
-      res.filter(s => s.isInstanceOf[Relation]).map(s => s.asInstanceOf[Relation]).foreach(r => {
+    res
+      .filter(s => s.isInstanceOf[Relation])
+      .map(s => s.asInstanceOf[Relation])
+      .foreach(r => {
         assertNotNull(r.getSource)
         assertNotNull(r.getTarget)
         assertNotNull(r.getRelClass)
@@ -143,6 +146,6 @@ class DataciteToOAFTest extends AbstractVocabularyTest {
         assertTrue(r.getSource.startsWith("50|"))
         assertTrue(r.getTarget.startsWith("50|"))
       })
-    }
+  }
 
 }
