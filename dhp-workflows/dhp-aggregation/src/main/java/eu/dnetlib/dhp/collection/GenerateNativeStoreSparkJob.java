@@ -57,7 +57,7 @@ import eu.dnetlib.dhp.schema.mdstore.MDStoreVersion;
 import eu.dnetlib.dhp.schema.mdstore.MetadataRecord;
 import eu.dnetlib.dhp.schema.mdstore.Provenance;
 import eu.dnetlib.dhp.schema.mdstore.ValidationType;
-import eu.dnetlib.validator2.validation.StandardValidationResult;
+import eu.dnetlib.validator2.result_models.StandardValidationResult;
 import eu.dnetlib.validator2.validation.guideline.openaire.AbstractOpenAireProfile;
 import eu.dnetlib.validator2.validation.guideline.openaire.DataArchiveGuidelinesV2Profile;
 import eu.dnetlib.validator2.validation.guideline.openaire.FAIR_Data_GuidelinesProfile;
