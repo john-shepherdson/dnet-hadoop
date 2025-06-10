@@ -225,10 +225,10 @@ object BioDBToOAF {
     } yield pid
 
     val references_doi: List[String] = for {
-      JObject(reference)           <- json \ "references"
+      JObject(reference)          <- json \ "references"
       JField("DOI", JString(pid)) <- reference
     } yield pid
-    var relations:List[Relation] = List()
+    var relations: List[Relation] = List()
     if (references_pmid != null && references_pmid.nonEmpty) {
       val rel = createRelation(
         references_pmid.head,
@@ -240,7 +240,7 @@ object BioDBToOAF {
         if (i_date.isDefined) i_date.get.date else null
       )
       rel.getCollectedfrom
-      relations =relations ::: List(rel)
+      relations = relations ::: List(rel)
     }
     if (references_doi != null && references_doi.nonEmpty) {
       val rel = createRelation(
@@ -252,7 +252,7 @@ object BioDBToOAF {
         ModelConstants.IS_RELATED_TO,
         if (i_date.isDefined) i_date.get.date else null
       )
-      relations =relations ::: List(rel)
+      relations = relations ::: List(rel)
     }
     List(d) ::: relations
   }
@@ -340,7 +340,11 @@ object BioDBToOAF {
       return List()
     d.setTitle(
       List(
-        OafMapperUtils.structuredProperty(title.toLowerCase().capitalize, ModelConstants.MAIN_TITLE_QUALIFIER, DATA_INFO)
+        OafMapperUtils.structuredProperty(
+          title.toLowerCase().capitalize,
+          ModelConstants.MAIN_TITLE_QUALIFIER,
+          DATA_INFO
+        )
       ).asJava
     )
 
@@ -349,7 +353,7 @@ object BioDBToOAF {
     if (authors != null) {
       val convertedAuthors = authors.zipWithIndex.map { a =>
         val res = new Author
-        res. setFullname(a._1)
+        res.setFullname(a._1)
         res.setRank(a._2 + 1)
         res
       }
@@ -358,11 +362,10 @@ object BioDBToOAF {
     }
 
     val i = new Instance
-    val inputDate :String = (json \ "date").extractOrElse[String](null)
+    val inputDate: String = (json \ "date").extractOrElse[String](null)
     if (inputDate != null) {
       d.setDateofacceptance(OafMapperUtils.field(inputDate, DATA_INFO))
     }
-
 
     i.setPid(d.getPid)
     i.setUrl(List(s"https://www.rcsb.org/structure/$pdb").asJava)
@@ -401,24 +404,24 @@ object BioDBToOAF {
       )
     }
 
-      val pmid = (json \ "pmid").extractOrElse[String](null)
+    val pmid = (json \ "pmid").extractOrElse[String](null)
 
-      if (pmid != null) {
-        relations = relations ::: List(
-          createRelation(
-            pmid,
-            "pmid",
-            d.getId,
-            collectedFromMap("pdb"),
-            ModelConstants.SUPPLEMENT,
-            ModelConstants.IS_SUPPLEMENTED_BY,
-            if (inputDate != null) inputDate else null
-          )
+    if (pmid != null) {
+      relations = relations ::: List(
+        createRelation(
+          pmid,
+          "pmid",
+          d.getId,
+          collectedFromMap("pdb"),
+          ModelConstants.SUPPLEMENT,
+          ModelConstants.IS_SUPPLEMENTED_BY,
+          if (inputDate != null) inputDate else null
         )
+      )
 
-      }
+    }
 
-      List(d) ::: relations
+    List(d) ::: relations
   }
 
   def extractEBILinksFromDump(input: String): EBILinkItem = {

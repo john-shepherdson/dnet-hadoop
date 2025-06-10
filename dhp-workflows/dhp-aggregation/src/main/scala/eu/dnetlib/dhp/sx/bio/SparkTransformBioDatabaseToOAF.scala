@@ -1,8 +1,10 @@
 package eu.dnetlib.dhp.sx.bio
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.collection.CollectionUtils
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
+import eu.dnetlib.dhp.schema.mdstore.MDStoreVersion
 import eu.dnetlib.dhp.schema.oaf.Oaf
 import eu.dnetlib.dhp.sx.bio.BioDBToOAF.ScholixResolved
 import eu.dnetlib.dhp.utils.ISLookupClientFactory
@@ -27,11 +29,14 @@ object SparkTransformBioDatabaseToOAF {
 
     val dbPath: String = parser.get("dbPath")
     log.info("dbPath: {}", database)
-    val targetPath: String = parser.get("targetPath")
-    log.info("targetPath: {}", database)
+    val mdstoreOutputVersion = parser.get("mdstoreOutputVersion")
+    log.info(s"mdstoreOutputVersion is '$mdstoreOutputVersion'")
     val isLookupUrl: String = parser.get("isLookupUrl")
     log.info("isLookupUrl: {}", isLookupUrl)
-
+    val mapper = new ObjectMapper()
+    val cleanedMdStoreVersion = mapper.readValue(mdstoreOutputVersion, classOf[MDStoreVersion])
+    val outputBasePath = cleanedMdStoreVersion.getHdfsPath
+    log.info(s"outputBasePath is '$outputBasePath'")
     val isLookupService = ISLookupClientFactory.getLookUpService(isLookupUrl)
     val vocabularies = VocabularyGroup.loadVocsFromIS(isLookupService)
     require(vocabularies != null)
@@ -51,23 +56,13 @@ object SparkTransformBioDatabaseToOAF {
       case "UNIPROT" =>
         CollectionUtils.saveDataset(
           spark.createDataset(sc.textFile(dbPath).flatMap(i => BioDBToOAF.uniprotToOAF(i, vocabularies))),
-          targetPath
+          outputBasePath
         )
       case "PDB" =>
         CollectionUtils.saveDataset(
           spark.createDataset(sc.textFile(dbPath).flatMap(i => BioDBToOAF.pdbTOOaf(i, vocabularies))),
-          targetPath
+          outputBasePath
         )
-//      case "SCHOLIX" =>
-//        CollectionUtils.saveDataset(
-//          spark.read.load(dbPath).as[ScholixResolved].map(i => BioDBToOAF.scholixResolvedToOAF(i)),
-//          targetPath
-//        )
-//      case "CROSSREF_LINKS" =>
-//        CollectionUtils.saveDataset(
-//          spark.createDataset(sc.textFile(dbPath).map(i => BioDBToOAF.crossrefLinksToOaf(i))),
-//          targetPath
-//        )
     }
   }
 
