@@ -1,12 +1,15 @@
 package eu.dnetlib.dhp.sx.bio
 
+import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
 import eu.dnetlib.dhp.schema.common.ModelConstants
-import eu.dnetlib.dhp.schema.oaf.utils.{GraphCleaningFunctions, OafMapperUtils}
 import eu.dnetlib.dhp.schema.oaf._
+import eu.dnetlib.dhp.schema.oaf.utils.{GraphCleaningFunctions, IdentifierFactory, OafMapperUtils}
 import org.json4s.DefaultFormats
 import org.json4s.JsonAST.{JField, JObject, JString}
 import org.json4s.jackson.JsonMethods.{compact, parse, render}
-import collection.JavaConverters._
+
+import java.time.LocalDate
+import scala.collection.JavaConverters._
 
 object BioDBToOAF {
 
@@ -109,126 +112,7 @@ object BioDBToOAF {
     )
   }
 
-  def crossrefLinksToOaf(input: String): Oaf = {
-    implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
-    lazy val json = parse(input)
-    val source_pid = (json \ "Source" \ "Identifier" \ "ID").extract[String].toLowerCase
-    val source_pid_type = (json \ "Source" \ "Identifier" \ "IDScheme").extract[String].toLowerCase
-
-    val target_pid = (json \ "Target" \ "Identifier" \ "ID").extract[String].toLowerCase
-    val target_pid_type = (json \ "Target" \ "Identifier" \ "IDScheme").extract[String].toLowerCase
-
-    val relation_semantic = (json \ "RelationshipType" \ "Name").extract[String]
-
-    val date = GraphCleaningFunctions.cleanDate((json \ "LinkedPublicationDate").extract[String])
-
-    createRelation(
-      target_pid,
-      target_pid_type,
-      generate_unresolved_id(source_pid, source_pid_type),
-      collectedFromMap("elsevier"),
-      "relationship",
-      relation_semantic,
-      date
-    )
-
-  }
-
-  def scholixResolvedToOAF(input: ScholixResolved): Oaf = {
-
-    val d = new Dataset
-
-    d.setPid(
-      List(
-        OafMapperUtils.structuredProperty(
-          input.pid.toLowerCase,
-          input.pidType.toLowerCase,
-          input.pidType.toLowerCase,
-          ModelConstants.DNET_PID_TYPES,
-          ModelConstants.DNET_PID_TYPES,
-          DATA_INFO
-        )
-      ).asJava
-    )
-
-    d.setDataInfo(DATA_INFO)
-
-    val nsPrefix = input.pidType.toLowerCase.padTo(12, '_')
-    d.setId(OafMapperUtils.createOpenaireId(50, s"$nsPrefix::${input.pid.toLowerCase}", true))
-
-    if (input.tilte != null && input.tilte.nonEmpty)
-      d.setTitle(
-        List(
-          OafMapperUtils.structuredProperty(
-            input.tilte.head,
-            ModelConstants.MAIN_TITLE_QUALIFIER,
-            DATA_INFO
-          )
-        ).asJava
-      )
-
-    d.setOriginalId(List(input.pid).asJava)
-    val i = new Instance
-
-    i.setPid(d.getPid)
-
-    if (resolvedURL.contains(input.pidType)) {
-      i.setUrl(List(s"${resolvedURL(input.pidType)}${input.pid}").asJava)
-    }
-
-    if (input.pidType.equalsIgnoreCase("clinicaltrials.gov")) {
-      i.setInstancetype(
-        OafMapperUtils.qualifier(
-          "0037",
-          "Clinical Trial",
-          ModelConstants.DNET_PUBLICATION_RESOURCE,
-          ModelConstants.DNET_PUBLICATION_RESOURCE
-        )
-      )
-      val itm = new InstanceTypeMapping
-      itm.setOriginalType(input.pidType)
-      itm.setVocabularyName(ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1)
-      i.setInstanceTypeMapping(List(itm).asJava)
-    } else {
-      i.setInstancetype(
-        OafMapperUtils.qualifier(
-          "0046",
-          "Bioentity",
-          ModelConstants.DNET_PUBLICATION_RESOURCE,
-          ModelConstants.DNET_PUBLICATION_RESOURCE
-        )
-      )
-      val itm = new InstanceTypeMapping
-      itm.setOriginalType("Bioentity")
-      itm.setVocabularyName(ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1)
-      i.setInstanceTypeMapping(List(itm).asJava)
-    }
-
-    if (input.datasource == null || input.datasource.isEmpty)
-      return null
-
-    val ds = input.datasource.head
-    d.setCollectedfrom(List(collectedFromMap(ds)).asJava)
-    i.setCollectedfrom(collectedFromMap(ds))
-    d.setInstance(List(i).asJava)
-
-    if (input.authors != null && input.authors.nonEmpty) {
-      val authors = input.authors.map(a => {
-        val authorOAF = new Author
-        authorOAF.setFullname(a)
-        authorOAF
-      })
-      d.setAuthor(authors.asJava)
-    }
-    if (input.date != null && input.date.nonEmpty) {
-      val dt = input.date.head
-      i.setDateofacceptance(OafMapperUtils.field(GraphCleaningFunctions.cleanDate(dt), DATA_INFO))
-      d.setDateofacceptance(OafMapperUtils.field(GraphCleaningFunctions.cleanDate(dt), DATA_INFO))
-    }
-    d
-  }
-
-  def uniprotToOAF(input: String): List[Oaf] = {
+  def uniprotToOAF(input: String, vocabularies: VocabularyGroup): List[Oaf] = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     lazy val json = parse(input)
     val pid = (json \ "pid").extract[String]
@@ -278,6 +162,10 @@ object BioDBToOAF {
     itm.setOriginalType("Bioentity")
     itm.setVocabularyName(ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1)
     i.setInstanceTypeMapping(List(itm).asJava)
+
+    i.setAccessright(ModelConstants.OPEN_ACCESS_RIGHT())
+    val ccby: Qualifier = vocabularies.getSynonymAsQualifier("dnet:licenses", "CC BY")
+    i.setLicense(OafMapperUtils.field(ccby.getClassname, null))
 
     i.setCollectedfrom(collectedFromMap("uniprot"))
     d.setInstance(List(i).asJava)
@@ -338,9 +226,9 @@ object BioDBToOAF {
 
     val references_doi: List[String] = for {
       JObject(reference)           <- json \ "references"
-      JField(" DOI", JString(pid)) <- reference
+      JField("DOI", JString(pid)) <- reference
     } yield pid
-
+    var relations:List[Relation] = List()
     if (references_pmid != null && references_pmid.nonEmpty) {
       val rel = createRelation(
         references_pmid.head,
@@ -352,8 +240,9 @@ object BioDBToOAF {
         if (i_date.isDefined) i_date.get.date else null
       )
       rel.getCollectedfrom
-      List(d, rel)
-    } else if (references_doi != null && references_doi.nonEmpty) {
+      relations =relations ::: List(rel)
+    }
+    if (references_doi != null && references_doi.nonEmpty) {
       val rel = createRelation(
         references_doi.head,
         "doi",
@@ -363,13 +252,9 @@ object BioDBToOAF {
         ModelConstants.IS_RELATED_TO,
         if (i_date.isDefined) i_date.get.date else null
       )
-      List(d, rel)
-    } else
-      List(d)
-  }
-
-  def generate_unresolved_id(pid: String, pidType: String): String = {
-    s"unresolved::$pid::$pidType"
+      relations =relations ::: List(rel)
+    }
+    List(d) ::: relations
   }
 
   def createRelation(
@@ -391,13 +276,11 @@ object BioDBToOAF {
     rel.setRelClass(relClass)
 
     rel.setSource(sourceId)
-    rel.setTarget(s"unresolved::$pid::$pidType")
-
+    rel.setTarget(IdentifierFactory.idFromPid("50", pidType, pid, true))
     val dateProps: KeyValue = OafMapperUtils.keyValue(DATE_RELATION_KEY, date)
 
     rel.setProperties(List(dateProps).asJava)
 
-    rel.getTarget.startsWith("unresolved")
     rel.setCollectedfrom(List(collectedFrom).asJava)
     rel
 
@@ -421,7 +304,7 @@ object BioDBToOAF {
     )
   }
 
-  def pdbTOOaf(input: String): List[Oaf] = {
+  def pdbTOOaf(input: String, vocabularies: VocabularyGroup): List[Oaf] = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     lazy val json = parse(input)
     val pdb = (json \ "pdb").extract[String].toLowerCase
@@ -444,6 +327,8 @@ object BioDBToOAF {
       ).asJava
     )
 
+    d.setDateofcollection(LocalDate.now().toString)
+    d.setDateoftransformation(LocalDate.now().toString)
     d.setCollectedfrom(List(collectedFromMap("pdb")).asJava)
     d.setDataInfo(DATA_INFO)
     d.setId(OafMapperUtils.createOpenaireId(50, s"pdb_________::$pdb", true))
@@ -455,7 +340,7 @@ object BioDBToOAF {
       return List()
     d.setTitle(
       List(
-        OafMapperUtils.structuredProperty(title, ModelConstants.MAIN_TITLE_QUALIFIER, DATA_INFO)
+        OafMapperUtils.structuredProperty(title.toLowerCase().capitalize, ModelConstants.MAIN_TITLE_QUALIFIER, DATA_INFO)
       ).asJava
     )
 
@@ -464,7 +349,7 @@ object BioDBToOAF {
     if (authors != null) {
       val convertedAuthors = authors.zipWithIndex.map { a =>
         val res = new Author
-        res.setFullname(a._1)
+        res. setFullname(a._1)
         res.setRank(a._2 + 1)
         res
       }
@@ -473,6 +358,11 @@ object BioDBToOAF {
     }
 
     val i = new Instance
+    val inputDate :String = (json \ "date").extractOrElse[String](null)
+    if (inputDate != null) {
+      d.setDateofacceptance(OafMapperUtils.field(inputDate, DATA_INFO))
+    }
+
 
     i.setPid(d.getPid)
     i.setUrl(List(s"https://www.rcsb.org/structure/$pdb").asJava)
@@ -488,16 +378,47 @@ object BioDBToOAF {
     itm.setOriginalType("Bioentity")
     itm.setVocabularyName(ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1)
     i.setInstanceTypeMapping(List(itm).asJava)
+    i.setAccessright(ModelConstants.OPEN_ACCESS_RIGHT())
+    val cc0: Qualifier = vocabularies.getSynonymAsQualifier("dnet:licenses", "cc0")
+    i.setLicense(OafMapperUtils.field(cc0.getClassname, null))
 
     i.setCollectedfrom(collectedFromMap("pdb"))
     d.setInstance(List(i).asJava)
+    var relations: List[Oaf] = List()
+    val doi = (json \ "doi").extractOrElse[String](null)
 
-    val pmid = (json \ "pmid").extractOrElse[String](null)
+    if (doi != null) {
+      relations = relations ::: List(
+        createRelation(
+          doi,
+          "doi",
+          d.getId,
+          collectedFromMap("pdb"),
+          ModelConstants.SUPPLEMENT,
+          ModelConstants.IS_SUPPLEMENTED_BY,
+          if (inputDate != null) inputDate else null
+        )
+      )
+    }
 
-    if (pmid != null)
-      List(d, createSupplementaryRelation(pmid, "pmid", d.getId, collectedFromMap("pdb"), null))
-    else
-      List(d)
+      val pmid = (json \ "pmid").extractOrElse[String](null)
+
+      if (pmid != null) {
+        relations = relations ::: List(
+          createRelation(
+            pmid,
+            "pmid",
+            d.getId,
+            collectedFromMap("pdb"),
+            ModelConstants.SUPPLEMENT,
+            ModelConstants.IS_SUPPLEMENTED_BY,
+            if (inputDate != null) inputDate else null
+          )
+        )
+
+      }
+
+      List(d) ::: relations
   }
 
   def extractEBILinksFromDump(input: String): EBILinkItem = {

@@ -276,6 +276,7 @@ object PubMedToOaf {
         result.setLanguage(term)
     }
 
+    if (article.getSubjects!= null) {
     val subjects: List[Subject] = article.getSubjects.asScala.map(s =>
       OafMapperUtils.subject(
         s.getValue,
@@ -285,10 +286,10 @@ object PubMedToOaf {
         ModelConstants.DNET_SUBJECT_TYPOLOGIES,
         dataInfo
       )
-    )(collection.breakOut)
+    ).toList
     if (subjects != null)
       result.setSubject(subjects.asJava)
-
+    }
     val authors: List[Author] = article.getAuthors.asScala.zipWithIndex.map { case (a, index) =>
       val author = new Author()
       author.setName(a.getForeName)
