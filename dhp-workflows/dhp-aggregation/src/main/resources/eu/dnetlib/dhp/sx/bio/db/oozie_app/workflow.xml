@@ -8,7 +8,10 @@
             <name>database</name>
             <description>the PDB Database Working Path</description>
         </property>
-
+        <property>
+            <name>isLookupUrl</name>
+            <description>The IS lookUp service endopoint</description>
+        </property>
         <property>
             <name>targetPath</name>
             <description>the Target Working dir path</description>
@@ -42,6 +45,7 @@
             <arg>--dbPath</arg><arg>${sourcePath}</arg>
             <arg>--database</arg><arg>${database}</arg>
             <arg>--targetPath</arg><arg>${targetPath}</arg>
+            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
