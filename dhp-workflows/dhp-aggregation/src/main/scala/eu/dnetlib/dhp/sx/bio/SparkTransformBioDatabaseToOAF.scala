@@ -7,12 +7,13 @@ import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
 import eu.dnetlib.dhp.schema.mdstore.MDStoreVersion
 import eu.dnetlib.dhp.schema.oaf.Oaf
 import eu.dnetlib.dhp.sx.bio.BioDBToOAF.ScholixResolved
+import eu.dnetlib.dhp.utils.DHPUtils.writeHdfsFile
 import eu.dnetlib.dhp.utils.ISLookupClientFactory
 import org.apache.commons.io.IOUtils
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.{Encoder, Encoders, SparkSession}
 import org.slf4j.{Logger, LoggerFactory}
-
+import eu.dnetlib.dhp.common.Constants.{MDSTORE_DATA_PATH, MDSTORE_SIZE_PATH}
 object SparkTransformBioDatabaseToOAF {
 
   def main(args: Array[String]): Unit = {
@@ -56,13 +57,18 @@ object SparkTransformBioDatabaseToOAF {
       case "UNIPROT" =>
         CollectionUtils.saveDataset(
           spark.createDataset(sc.textFile(dbPath).flatMap(i => BioDBToOAF.uniprotToOAF(i, vocabularies))),
-          outputBasePath
+          outputBasePath + MDSTORE_DATA_PATH
         )
+        val mdStoreSize = spark.read.text(outputBasePath).count
+        writeHdfsFile(spark.sparkContext.hadoopConfiguration, "" + mdStoreSize, outputBasePath + MDSTORE_SIZE_PATH)
+
       case "PDB" =>
         CollectionUtils.saveDataset(
           spark.createDataset(sc.textFile(dbPath).flatMap(i => BioDBToOAF.pdbTOOaf(i, vocabularies))),
-          outputBasePath
+          outputBasePath + MDSTORE_DATA_PATH
         )
+        val mdStoreSize = spark.read.text(outputBasePath).count
+        writeHdfsFile(spark.sparkContext.hadoopConfiguration, "" + mdStoreSize, outputBasePath + MDSTORE_SIZE_PATH)
     }
   }
 
