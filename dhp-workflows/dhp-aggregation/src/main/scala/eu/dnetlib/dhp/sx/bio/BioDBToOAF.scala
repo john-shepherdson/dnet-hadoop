@@ -235,8 +235,8 @@ object BioDBToOAF {
         "pmid",
         d.getId,
         collectedFromMap("uniprot"),
-        ModelConstants.RELATIONSHIP,
-        ModelConstants.IS_RELATED_TO,
+        ModelConstants.SUPPLEMENT,
+        ModelConstants.IS_SUPPLEMENTED_BY,
         if (i_date.isDefined) i_date.get.date else null
       )
       rel.getCollectedfrom
@@ -248,8 +248,8 @@ object BioDBToOAF {
         "doi",
         d.getId,
         collectedFromMap("uniprot"),
-        ModelConstants.RELATIONSHIP,
-        ModelConstants.IS_RELATED_TO,
+        ModelConstants.SUPPLEMENT,
+        ModelConstants.IS_SUPPLEMENTED_BY,
         if (i_date.isDefined) i_date.get.date else null
       )
       relations = relations ::: List(rel)

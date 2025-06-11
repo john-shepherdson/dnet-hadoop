@@ -14,6 +14,7 @@ import org.apache.spark.SparkConf
 import org.apache.spark.sql.{Encoder, Encoders, SparkSession}
 import org.slf4j.{Logger, LoggerFactory}
 import eu.dnetlib.dhp.common.Constants.{MDSTORE_DATA_PATH, MDSTORE_SIZE_PATH}
+
 object SparkTransformBioDatabaseToOAF {
 
   def main(args: Array[String]): Unit = {
@@ -59,7 +60,7 @@ object SparkTransformBioDatabaseToOAF {
           spark.createDataset(sc.textFile(dbPath).flatMap(i => BioDBToOAF.uniprotToOAF(i, vocabularies))),
           outputBasePath + MDSTORE_DATA_PATH
         )
-        val mdStoreSize = spark.read.text(outputBasePath).count
+        val mdStoreSize = spark.read.text(outputBasePath + MDSTORE_DATA_PATH).count
         writeHdfsFile(spark.sparkContext.hadoopConfiguration, "" + mdStoreSize, outputBasePath + MDSTORE_SIZE_PATH)
 
       case "PDB" =>
@@ -67,7 +68,7 @@ object SparkTransformBioDatabaseToOAF {
           spark.createDataset(sc.textFile(dbPath).flatMap(i => BioDBToOAF.pdbTOOaf(i, vocabularies))),
           outputBasePath + MDSTORE_DATA_PATH
         )
-        val mdStoreSize = spark.read.text(outputBasePath).count
+        val mdStoreSize = spark.read.text(outputBasePath + MDSTORE_DATA_PATH).count
         writeHdfsFile(spark.sparkContext.hadoopConfiguration, "" + mdStoreSize, outputBasePath + MDSTORE_SIZE_PATH)
     }
   }
