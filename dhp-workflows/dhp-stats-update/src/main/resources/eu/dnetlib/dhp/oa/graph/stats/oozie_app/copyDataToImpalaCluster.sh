@@ -276,4 +276,4 @@ for i in ${contexts}; do
   copydb ${MONITOR_DB}'_'${tmp}
 done
 
-copydb $MONITOR_DB'_monitor_ie'
+copydb $MONITOR_DB'_ie'
