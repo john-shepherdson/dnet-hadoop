@@ -5,7 +5,6 @@ import java.io.Serializable;
 
 /**
  * @author miriam.baglioni
- * @Date 24/02/23
  */
 public class Project implements Serializable {
 	private String acronym;
