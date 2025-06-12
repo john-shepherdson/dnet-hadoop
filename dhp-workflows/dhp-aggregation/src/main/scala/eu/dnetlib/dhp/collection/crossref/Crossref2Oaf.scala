@@ -955,7 +955,6 @@ case object Crossref2Oaf {
             //ERASMUS+
             case "10.13039/501100010790" =>
               generateSimpleRelationFromAward(funder, "erasmusplus_", a => a)
-            case _ => logger.debug("no match for " + funder.DOI.get)
             //Add for Danish funders
             //Independent Research Fund Denmark (IRFD)
             case "10.13039/501100004836" =>
