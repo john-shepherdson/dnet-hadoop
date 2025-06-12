@@ -163,14 +163,14 @@ public class SparkAuthorProjectRelationExtraction {
 		return OafMapperUtils
 			.getRelation(
 				source, projectId, ModelConstants.PROJECT_PERSON_RELTYPE,
-					ModelConstants.PROJECT_PERSON_SUBRELTYPE,
+				ModelConstants.PROJECT_PERSON_SUBRELTYPE,
 				ModelConstants.PROJECT_PERSON_PARTICIPATES,
 				null,
-					getDataInfo(
-							PROPAGATION_DATA_INFO_TYPE,
-							PROPAGATION_PARCIPATES_TO_PROJECT_CLASS_ID,
-							PROPAGATION_PARCIPATES_TO_PROJECT_CLASS_NAME,
-							ModelConstants.DNET_PROVENANCE_ACTIONS),
+				getDataInfo(
+					PROPAGATION_DATA_INFO_TYPE,
+					PROPAGATION_PARCIPATES_TO_PROJECT_CLASS_ID,
+					PROPAGATION_PARCIPATES_TO_PROJECT_CLASS_NAME,
+					ModelConstants.DNET_PROVENANCE_ACTIONS),
 				null);
 	}
 

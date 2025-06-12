@@ -82,7 +82,6 @@ public class PropagationConstant {
 	public static final String PROPAGATION_PARCIPATES_TO_PROJECT_CLASS_ID = "person:project:deliverable";
 	public static final String PROPAGATION_PARCIPATES_TO_PROJECT_CLASS_NAME = "Extraction of relations person participates in project if person orcid is found as author of a project deliverable";
 
-
 	public static final String ITERATION_ONE = "ExitAtFirstIteration";
 	public static final String ITERATION_TWO = "ExitAtSecondIteration";
 	public static final String ITERATION_THREE = "ExitAtThirdIteration";
