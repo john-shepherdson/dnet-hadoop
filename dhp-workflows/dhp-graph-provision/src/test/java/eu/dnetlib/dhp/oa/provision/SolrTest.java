@@ -24,8 +24,6 @@ import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import sun.security.provider.SHA;
-
 public abstract class SolrTest {
 
 	protected static final Logger log = LoggerFactory.getLogger(SolrTest.class);

@@ -222,15 +222,29 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	}
 
 	/**
-	 * Extracts the resource type from The Datacite element
 	 *
+	 * Extracts the original resource type from the given XML {@link Document}.
+	 * <p>
+	 * This method navigates the XML structure to locate the first occurrence of a
+	 * {@code <resourceType>} element nested within {@code <resource>} and {@code <metadata>} elements,
+	 * regardless of their namespace. It then attempts to extract the most relevant type information
+	 * from the element by checking, in order of priority:
+	 * <ul>
+	 *  <li>The {@code uri} attribute</li>
+	 *  <li>The {@code anyURI} attribute</li>
+	 *  <li>The text content of the element</li>
+	 *  <li>The {@code resourceTypeGeneral} attribute</li>
+	 * </ul>
+	 * The first non-blank value found among these is returned. If none are present or the
+	 * {@code <resourceType>} element is not found, the method returns {@code null}.
+	 * Example:
 	 * <datacite:resourceType
 	 * 		anyURI="http://purl.org/coar/resource_type/c_6501"
 	 * 		uri="http://purl.org/coar/resource_type/c_6501"
 	 * 	    resourceTypeGeneral="Dataset">journal article</datacite:resourceType>
 	 *
-	 * @param doc the input document
-	 * @return the chosen resource type
+	 * @param doc
+	 * @return
 	 */
 	@Override
 	protected String findOriginalType(Document doc) {
