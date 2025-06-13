@@ -37,9 +37,10 @@ public class IndexEventSubsetJob {
 	public static void main(final String[] args) throws Exception {
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
-				IOUtils
-						.toString(IndexEventSubsetJob.class
-								.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/index_event_subset.json")));
+			IOUtils
+				.toString(
+					IndexEventSubsetJob.class
+						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/index_event_subset.json")));
 		parser.parseArgument(args);
 
 		final SparkConf conf = new SparkConf();
@@ -78,14 +79,17 @@ public class IndexEventSubsetJob {
 		final long now = new Date().getTime();
 
 		final Dataset<Event> subset = ClusterUtils
-				.readPath(spark, eventsPath, Event.class)
-				.groupByKey((MapFunction<Event, String>) e -> e.getTopic() + '@' + e.getMap().getTargetDatasourceId(), Encoders.STRING())
-				.agg(aggr)
-				.map((MapFunction<Tuple2<String, EventGroup>, EventGroup>) t -> t._2, Encoders.bean(EventGroup.class))
-				.flatMap((FlatMapFunction<EventGroup, Event>) g -> g.getData().iterator(), Encoders.bean(Event.class))
-				.map((MapFunction<Event, Event>) e -> prepareEventForIndexing(e, now), Encoders.bean(Event.class));
+			.readPath(spark, eventsPath, Event.class)
+			.groupByKey(
+				(MapFunction<Event, String>) e -> e.getTopic() + '@' + e.getMap().getTargetDatasourceId(),
+				Encoders.STRING())
+			.agg(aggr)
+			.map((MapFunction<Tuple2<String, EventGroup>, EventGroup>) t -> t._2, Encoders.bean(EventGroup.class))
+			.flatMap((FlatMapFunction<EventGroup, Event>) g -> g.getData().iterator(), Encoders.bean(Event.class))
+			.map((MapFunction<Event, Event>) e -> prepareEventForIndexing(e, now), Encoders.bean(Event.class));
 
-		final ESIndexer indexer = new ESIndexer(indexHost, index, esBatchWriteRetryCount, esBatchWriteRetryWait, esBatchSizeEntries, esNodesWanOnly);
+		final ESIndexer indexer = new ESIndexer(indexHost, index, esBatchWriteRetryCount, esBatchWriteRetryWait,
+			esBatchSizeEntries, esNodesWanOnly);
 
 		indexer.performIndex(subset, "eventId");
 
@@ -108,7 +112,7 @@ public class IndexEventSubsetJob {
 	}
 
 	private static Event prepareEventForIndexing(final Event e, final long creationDate)
-			throws JsonProcessingException {
+		throws JsonProcessingException {
 
 		e.setCreationDate(creationDate);
 		e.setExpiryDate(Long.MAX_VALUE);

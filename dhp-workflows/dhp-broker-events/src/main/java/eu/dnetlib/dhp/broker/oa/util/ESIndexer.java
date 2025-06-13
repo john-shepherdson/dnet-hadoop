@@ -26,9 +26,10 @@ public class ESIndexer {
 	private final String esNodesWanOnly;
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
-	public ESIndexer(final String indexHost, final String indexName, final String esBatchWriteRetryCount, final String esBatchWriteRetryWait,
-			final String esBatchSizeEntries,
-			final String esNodesWanOnly) {
+	public ESIndexer(final String indexHost, final String indexName, final String esBatchWriteRetryCount,
+		final String esBatchWriteRetryWait,
+		final String esBatchSizeEntries,
+		final String esNodesWanOnly) {
 		this.indexHost = indexHost;
 		this.indexName = indexName;
 		this.esBatchWriteRetryCount = esBatchWriteRetryCount;
@@ -57,9 +58,11 @@ public class ESIndexer {
 	}
 
 	public <T> void performIndex(final Dataset<T> dataset, final String idField) {
-		performIndex(dataset
+		performIndex(
+			dataset
 				.map((MapFunction<T, String>) o -> this.objectMapper.writeValueAsString(o), Encoders.STRING())
-				.toJavaRDD(), idField);
+				.toJavaRDD(),
+			idField);
 	}
 
 }

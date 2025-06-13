@@ -27,9 +27,10 @@ public class IndexNotificationsJob {
 	public static void main(final String[] args) throws Exception {
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
-				IOUtils
-						.toString(IndexNotificationsJob.class
-								.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/index_notifications.json")));
+			IOUtils
+				.toString(
+					IndexNotificationsJob.class
+						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/index_notifications.json")));
 		parser.parseArgument(args);
 
 		final SparkConf conf = new SparkConf();
@@ -61,14 +62,15 @@ public class IndexNotificationsJob {
 		final SparkSession spark = SparkSession.builder().config(conf).getOrCreate();
 
 		final Long date = ClusterUtils
-				.readPath(spark, notificationsPath, Notification.class)
-				.first()
-				.getDate();
+			.readPath(spark, notificationsPath, Notification.class)
+			.first()
+			.getDate();
 
 		final Dataset<Notification> dataset = ClusterUtils
-				.readPath(spark, notificationsPath, Notification.class);
+			.readPath(spark, notificationsPath, Notification.class);
 
-		final ESIndexer indexer = new ESIndexer(indexHost, index, esBatchWriteRetryCount, esBatchWriteRetryWait, esBatchSizeEntries, esNodesWanOnly);
+		final ESIndexer indexer = new ESIndexer(indexHost, index, esBatchWriteRetryCount, esBatchWriteRetryWait,
+			esBatchSizeEntries, esNodesWanOnly);
 
 		indexer.performIndex(dataset, "notificationId");
 

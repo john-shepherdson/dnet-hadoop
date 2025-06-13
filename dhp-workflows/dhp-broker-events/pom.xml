@@ -59,6 +59,11 @@
 			<groupId>eu.dnetlib.dhp</groupId>
 			<artifactId>dnet-openaire-broker-common</artifactId>
 		</dependency>
+		
+		<dependency>
+            <groupId>eu.dnetlib</groupId>
+            <artifactId>uoa-validator-engine2-result-models</artifactId>
+        </dependency>
 
 	</dependencies>
 
