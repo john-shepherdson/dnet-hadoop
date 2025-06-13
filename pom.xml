@@ -178,6 +178,33 @@
                 <version>${dhp-schemas.version}</version>
             </dependency>
             <dependency>
+                <groupId>eu.dnetlib.dhp</groupId>
+                <artifactId>dhp-index-schemas</artifactId>
+                <version>${dhp-index-schemas.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>eu.dnetlib</groupId>
+                <artifactId>uoa-validator-engine2</artifactId>
+                <version>${uoa-validator-engine.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>logback-classic</artifactId>
+                        <groupId>ch.qos.logback</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>eu.dnetlib</groupId>
+                <artifactId>uoa-validator-engine2-result-models</artifactId>
+                <version>${uoa-validator-models.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>logback-classic</artifactId>
+                        <groupId>ch.qos.logback</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.hadoop</groupId>
                 <artifactId>hadoop-hdfs</artifactId>
                 <version>${dhp.hadoop.version}</version>
@@ -962,7 +989,8 @@
         <commons-validator.version>1.7</commons-validator.version>
         <cxf.version>3.5.10</cxf.version>
         <dateparser.version>1.0.7</dateparser.version>
-        <dhp-schemas.version>[10.1.4]</dhp-schemas.version>
+        <dhp-schemas.version>[11.1.0]</dhp-schemas.version>
+        <dhp-index-schemas.version>[1.2.0]</dhp-index-schemas.version>
         <dhp.cdh.version>cdh5.9.2</dhp.cdh.version>
         <dhp.commons.lang.version>3.5</dhp.commons.lang.version>
         <dhp.guava.version>11.0.2</dhp.guava.version>
@@ -990,6 +1018,10 @@
         <sparksolr.version>3.6.0</sparksolr.version>
         <unidecode.version>0.0.7</unidecode.version>
         <vtd.version>[2.12,3.0)</vtd.version>
+
+        <uoa-validator-engine.version>2.1.0</uoa-validator-engine.version>
+        <uoa-validator-models.version>2.1.0</uoa-validator-models.version>
+
         <zookeeper.version>3.4.6</zookeeper.version>
     </properties>
 

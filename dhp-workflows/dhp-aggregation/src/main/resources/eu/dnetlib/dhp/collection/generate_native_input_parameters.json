@@ -24,6 +24,12 @@
     "paramRequired": true
   },
   {
+    "paramName": "a",
+    "paramLongName": "apidescriptor",
+    "paramDescription": "the infos about the datasource API",
+    "paramRequired": true
+  },
+  {
     "paramName": "x",
     "paramLongName": "xpath",
     "paramDescription": "the xpath to identify the record identifier",
