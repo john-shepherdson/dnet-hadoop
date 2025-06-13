@@ -218,6 +218,11 @@
             <version>${project.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>eu.dnetlib.dhp</groupId>
+            <artifactId>dhp-index-schemas</artifactId>
+        </dependency>
+
     </dependencies>
 
     <profiles>
