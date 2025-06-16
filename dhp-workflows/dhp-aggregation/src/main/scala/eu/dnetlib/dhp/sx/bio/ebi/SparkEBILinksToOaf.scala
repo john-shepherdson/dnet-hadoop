@@ -52,6 +52,7 @@ object SparkEBILinksToOaf {
     CollectionUtils.saveDataset(
       ebLinks
         .flatMap(j => BioDBToOAF.parse_ebi_links(j.links))
+        .repartition(1000)
         .filter(p => BioDBToOAF.EBITargetLinksFilter(p))
         .flatMap(p => BioDBToOAF.convertEBILinksToOaf(p)),
       s"$outputBasePath/$MDSTORE_DATA_PATH"

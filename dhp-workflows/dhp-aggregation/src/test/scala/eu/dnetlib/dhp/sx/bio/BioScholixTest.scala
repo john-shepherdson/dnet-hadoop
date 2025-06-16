@@ -117,7 +117,7 @@ class BioScholixTest extends AbstractVocabularyTest {
     val parser = new PMParser2()
     val article = parser.parse(xml)
 
-//    println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(article))
+    //    println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(article))
 
     println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(PubMedToOaf.convert(article, vocabularies)))
 
@@ -261,7 +261,7 @@ class BioScholixTest extends AbstractVocabularyTest {
     records.linesWithSeparators.map(l => l.stripLineEnd).foreach(s => assertTrue(s.nonEmpty))
 
     val result: List[Oaf] =
-      records.linesWithSeparators.map(l => l.stripLineEnd).toList.flatMap(o => BioDBToOAF.pdbTOOaf(o))
+      records.linesWithSeparators.map(l => l.stripLineEnd).toList.flatMap(o => BioDBToOAF.pdbTOOaf(o, vocabularies))
 
     assertTrue(result.nonEmpty)
     result.foreach(r => assertNotNull(r))
@@ -283,7 +283,7 @@ class BioScholixTest extends AbstractVocabularyTest {
     records.linesWithSeparators.map(l => l.stripLineEnd).foreach(s => assertTrue(s.nonEmpty))
 
     val result: List[Oaf] =
-      records.linesWithSeparators.map(l => l.stripLineEnd).toList.flatMap(o => BioDBToOAF.uniprotToOAF(o))
+      records.linesWithSeparators.map(l => l.stripLineEnd).toList.flatMap(o => BioDBToOAF.uniprotToOAF(o, vocabularies))
 
     assertTrue(result.nonEmpty)
     result.foreach(r => assertNotNull(r))
@@ -321,24 +321,6 @@ class BioScholixTest extends AbstractVocabularyTest {
   }
 
   @Test
-  def testCrossrefLinksToOAF(): Unit = {
-
-    val records: String = Source
-      .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/crossref_links"))
-      .mkString
-    records.linesWithSeparators.map(l => l.stripLineEnd).foreach(s => assertTrue(s.nonEmpty))
-
-    val result: List[Oaf] =
-      records.linesWithSeparators.map(l => l.stripLineEnd).map(s => BioDBToOAF.crossrefLinksToOaf(s)).toList
-
-    assertNotNull(result)
-    assertTrue(result.nonEmpty)
-
-    println(mapper.writeValueAsString(result.head))
-
-  }
-
-  @Test
   def testEBILinksToOAF(): Unit = {
     val iterator = GzFileIterator(
       getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/ebi_links.gz"),
@@ -354,31 +336,6 @@ class BioScholixTest extends AbstractVocabularyTest {
 
     println(mapper.writeValueAsString(res.head))
 
-  }
-
-  @Test
-  def scholixResolvedToOAF(): Unit = {
-
-    val records: String = Source
-      .fromInputStream(
-        getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/scholix_resolved")
-      )
-      .mkString
-    records.linesWithSeparators.map(l => l.stripLineEnd).foreach(s => assertTrue(s.nonEmpty))
-
-    implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
-
-    val l: List[ScholixResolved] = records.linesWithSeparators
-      .map(l => l.stripLineEnd)
-      .map { input =>
-        lazy val json = parse(input)
-        json.extract[ScholixResolved]
-      }
-      .toList
-
-    val result: List[Oaf] = l.map(s => BioDBToOAF.scholixResolvedToOAF(s))
-
-    assertTrue(result.nonEmpty)
   }
 
 }

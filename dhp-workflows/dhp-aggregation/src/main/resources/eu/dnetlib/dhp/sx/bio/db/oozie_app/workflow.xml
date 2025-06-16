@@ -9,8 +9,8 @@
             <description>the PDB Database Working Path</description>
         </property>
         <property>
-            <name>mdStoreOutputId</name>
-            <description>the identifier of the cleaned MDStore</description>
+            <name>isLookupUrl</name>
+            <description>The IS lookUp service endopoint</description>
         </property>
         <property>
             <name>mdStoreManagerURI</name>
@@ -19,7 +19,6 @@
     </parameters>
 
     <start to="StartTransaction"/>
-
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -42,6 +41,7 @@
         <ok to="ConvertDB"/>
         <error to="RollBack"/>
     </action>
+
     <action name="ConvertDB">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
@@ -63,47 +63,47 @@
             <arg>--dbPath</arg><arg>${sourcePath}</arg>
             <arg>--database</arg><arg>${database}</arg>
             <arg>--mdstoreOutputVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
+            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
         </spark>
         <ok to="CommitVersion"/>
         <error to="RollBack"/>
-
     </action>
-        <action name="CommitVersion">
-            <java>
-                <configuration>
-                    <property>
-                        <name>oozie.launcher.mapreduce.user.classpath.first</name>
-                        <value>true</value>
-                    </property>
-                </configuration>
-                <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
-                <arg>--action</arg><arg>COMMIT</arg>
-                <arg>--namenode</arg><arg>${nameNode}</arg>
-                <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
-                <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
-            </java>
-            <ok to="End"/>
-            <error to="Kill"/>
-        </action>
+    <action name="CommitVersion">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>COMMIT</arg>
+            <arg>--namenode</arg><arg>${nameNode}</arg>
+            <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+        </java>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
 
-        <action name="RollBack">
-            <java>
-                <configuration>
-                    <property>
-                        <name>oozie.launcher.mapreduce.user.classpath.first</name>
-                        <value>true</value>
-                    </property>
-                </configuration>
-                <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
-                <arg>--action</arg><arg>ROLLBACK</arg>
-                <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
-                <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
-            </java>
-            <ok to="Kill"/>
-            <error to="Kill"/>
-        </action>
+    <action name="RollBack">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>ROLLBACK</arg>
+            <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+        </java>
+        <ok to="Kill"/>
+        <error to="Kill"/>
+    </action>
 
 
-        <end name="End"/>
+    <end name="End"/>
 
 </workflow-app>

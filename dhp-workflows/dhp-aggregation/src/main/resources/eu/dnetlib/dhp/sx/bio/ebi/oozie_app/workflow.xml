@@ -6,6 +6,7 @@
         </property>
         <property>
             <name>workingPath</name>
+            <value>StartTransaction</value>
             <description>the Working Path</description>
         </property>
         <property>
@@ -18,7 +19,7 @@
         </property>
         <property>
             <name>resumeFrom</name>
-            <value>CreateEBIDataSet</value>
+            <value>StartTransaction</value>
             <description>node to start</description>
         </property>
     </parameters>
