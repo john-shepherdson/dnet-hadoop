@@ -7,10 +7,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * @author miriam.baglioni
- * @Date 18/12/23
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-
 public class TransformativeAgreementModel implements Serializable {
 	private String institution;
 	private String doi;

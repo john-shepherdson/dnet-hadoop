@@ -59,7 +59,6 @@ public class ZenodoAPIClient implements Serializable {
 	 * Brand new deposition in Zenodo. It sets the deposition_id and the bucket where to store the files to upload
 	 *
 	 * @return response code
-	 * @throws IOException
 	 */
 	public int newDeposition() throws IOException {
 		String json = "{}";
@@ -144,7 +143,6 @@ public class ZenodoAPIClient implements Serializable {
 	 *
 	 * @param metadata the metadata
 	 * @return response code
-	 * @throws IOException
 	 */
 	public int sendMretadata(String metadata) throws IOException {
 
@@ -182,7 +180,6 @@ public class ZenodoAPIClient implements Serializable {
 	 * To publish the current deposition. It works for both new deposition or new version of an old deposition
 	 *
 	 * @return response code
-	 * @throws IOException
 	 */
 	@Deprecated
 	public int publish() throws IOException {
@@ -260,10 +257,8 @@ public class ZenodoAPIClient implements Serializable {
 	 * @param deposition_id the deposition id of the not yet published upload
 	 *            concept_rec_id = 656930
 	 * @return response code
-	 * @throws IOException
-	 * @throws MissingConceptDoiException
 	 */
-	public int uploadOpenDeposition(String deposition_id) throws IOException, MissingConceptDoiException {
+	public int uploadOpenDeposition(String deposition_id) throws IOException {
 
 		this.deposition_id = deposition_id;
 
