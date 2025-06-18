@@ -18,9 +18,9 @@ import org.slf4j.{Logger, LoggerFactory}
 
 import scala.io.Source
 
-object UnpackCrtossrefEntries {
+object UnpackCrossrefEntries {
 
-  val log: Logger = LoggerFactory.getLogger(UnpackCrtossrefEntries.getClass)
+  val log: Logger = LoggerFactory.getLogger(UnpackCrossrefEntries.getClass)
 
   def extractDump(input: String): List[String] = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
@@ -50,7 +50,7 @@ object UnpackCrtossrefEntries {
     val spark: SparkSession = SparkSession
       .builder()
       .config(conf)
-      .appName(UnpackCrtossrefEntries.getClass.getSimpleName)
+      .appName(UnpackCrossrefEntries.getClass.getSimpleName)
       .master(master)
       .getOrCreate()
     val sc: SparkContext = spark.sparkContext
