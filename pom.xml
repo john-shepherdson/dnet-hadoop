@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.dnetlib.dhp</groupId>
     <artifactId>dhp</artifactId>
-    <version>1.2.5-SNAPSHOT</version>
+    <version>1.2.6-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <licenses>
@@ -180,11 +180,41 @@
             <dependency>
                 <groupId>eu.dnetlib</groupId>
                 <artifactId>uoa-validator-engine2</artifactId>
-                <version>2.0.0</version>
+                <version>${uoa-validator-engine.version}</version>
                 <exclusions>
                     <exclusion>
                         <artifactId>logback-classic</artifactId>
                         <groupId>ch.qos.logback</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>eu.dnetlib</groupId>
+                <artifactId>uoa-validator-engine2-result-models</artifactId>
+                <version>${uoa-validator-models.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>logback-classic</artifactId>
+                        <groupId>ch.qos.logback</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>eu.dnetlib.dhp</groupId>
+                <artifactId>openaire-solr-importer</artifactId>
+                <version>[1.0.9,2.0.0)</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>io.netty</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.spark</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.logging.log4j</groupId>
+                        <artifactId>*</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -377,30 +407,8 @@
                 <groupId>org.apache.solr</groupId>
                 <artifactId>solr-solrj</artifactId>
                 <version>${solr.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>*</artifactId>
-                        <groupId>*</groupId>
-                    </exclusion>
-                </exclusions>
             </dependency>
-            <dependency>
-                <groupId>com.lucidworks.spark</groupId>
-                <artifactId>spark-solr</artifactId>
-                <version>${sparksolr.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>*</artifactId>
-                        <groupId>*</groupId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.solr</groupId>
-                <artifactId>solr-test-framework</artifactId>
-                <version>${solr.version}</version>
-                <scope>test</scope>
-            </dependency>
+
             <dependency>
                 <groupId>io.dropwizard.metrics</groupId>
                 <artifactId>metrics-core</artifactId>
@@ -408,12 +416,12 @@
                 <scope>test</scope>
             </dependency>
 
-
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
                 <version>${org.apache.httpcomponents.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpmime</artifactId>
@@ -461,6 +469,12 @@
                 <groupId>eu.dnetlib</groupId>
                 <artifactId>cnr-rmi-api</artifactId>
                 <version>${rmi-api.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>eu.openaire</groupId>
+                <artifactId>author-identifier-reconciler</artifactId>
+                <version>${aider.version}</version>
             </dependency>
 
             <dependency>
@@ -687,6 +701,7 @@
                 <artifactId>javassist</artifactId>
                 <version>${javassist.version}</version>
             </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -707,15 +722,6 @@
                     <artifactId>maven-project-info-reports-plugin</artifactId>
                     <version>3.0.0</version>
                 </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-site-plugin</artifactId>
-                    <version>3.9.1</version>
-                    <configuration>
-                        <skip>${dhp.site.skip}</skip>
-                    </configuration>
-                </plugin>
-
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
@@ -759,150 +765,21 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.2.0</version>
-                    <configuration>
-                        <detectLinks>true</detectLinks>
-                        <doclint>none</doclint>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
                     <version>3.6.1</version>
-                </plugin>
-
-                <plugin>
-                    <groupId>net.revelc.code.formatter</groupId>
-                    <artifactId>formatter-maven-plugin</artifactId>
-                    <version>2.11.0</version>
-                    <dependencies>
-                        <dependency>
-                            <groupId>eu.dnetlib.dhp</groupId>
-                            <artifactId>dhp-code-style</artifactId>
-                            <version>${project.version}</version>
-                        </dependency>
-                    </dependencies>
-                </plugin>
-                <plugin>
-                    <groupId>org.antipathy</groupId>
-                    <artifactId>mvn-scalafmt_${scala.binary.version}</artifactId>
-                    <version>1.0.1640073709.733712b</version>
-                    <dependencies>
-                        <dependency>
-                            <groupId>eu.dnetlib.dhp</groupId>
-                            <artifactId>dhp-code-style</artifactId>
-                            <version>${project.version}</version>
-                        </dependency>
-                    </dependencies>
                 </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-site-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>net.revelc.code.formatter</groupId>
-                <artifactId>formatter-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>format</goal>
-                        </goals>
-                        <configuration>
-                            <configFile>eclipse/formatter_dnet.xml</configFile>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>net.revelc.code</groupId>
-                <artifactId>impsort-maven-plugin</artifactId>
-                <version>1.6.2</version>
-                <configuration>
-                    <groups>java.,javax.,org.,com.</groups>
-                    <staticGroups>java,*</staticGroups>
-                    <excludes>
-                        <exclude>**/thrift/*.java</exclude>
-                    </excludes>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>sort-imports</id>
-                        <goals>
-                            <goal>sort</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.antipathy</groupId>
-                <artifactId>mvn-scalafmt_${scala.binary.version}</artifactId>
-                <configuration>
-                    <configLocation>
-                        https://code-repo.d4science.org/D-Net/dnet-hadoop/raw/branch/beta/dhp-build/dhp-code-style/src/main/resources/scalafmt/scalafmt.conf
-                    </configLocation>
-                    <skipTestSources>false</skipTestSources>
-                    <skipSources>false</skipSources>
-                    <sourceDirectories>
-                        <param>${project.basedir}/src/main/scala</param>
-                    </sourceDirectories>
-                    <testSourceDirectories>
-                        <param>${project.basedir}/src/test/scala</param>
-                    </testSourceDirectories>
-                    <validateOnly>false</validateOnly>
-                    <onlyChangedFiles>false</onlyChangedFiles>
-                    <branch>: git rev-parse --abbrev-ref HEAD</branch>
-                    <useSpecifiedRepositories>false</useSpecifiedRepositories>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>format</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.5.3</version>
             </plugin>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.10</version>
-                <configuration>
-                    <excludes>
-                        <exclude>**/schemas/*</exclude>
-                        <exclude>**/com/cloudera/**/*</exclude>
-                        <exclude>**/org/apache/avro/io/**/*</exclude>
-                    </excludes>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>default-prepare-agent</id>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>default-report</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
         </plugins>
 
         <extensions>
@@ -924,26 +801,9 @@
             <id>dnet45-releases</id>
             <url>https://maven.d4science.org/nexus/content/repositories/dnet45-releases</url>
         </repository>
-        <site>
-            <id>DHPSite</id>
-            <url>${dhp.site.stage.path}/</url>
-        </site>
     </distributionManagement>
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <detectLinks>true</detectLinks>
-                    <doclint>none</doclint>
-                </configuration>
-            </plugin>
-        </plugins>
-    </reporting>
 
     <properties>
-        <dhp.site.stage.path>sftp://dnet-hadoop@static-web.d4science.org/dnet-hadoop</dhp.site.stage.path>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -961,6 +821,7 @@
 
         <!-- dependency versions -->
         <apache.poi.version>4.1.2</apache.poi.version>
+        <aider.version>0.1.0</aider.version>
         <rmi-api.version>2.6.1</rmi-api.version>
         <common.compress.version>1.20</common.compress.version>
         <common.csv.version>1.8</common.csv.version>
@@ -973,14 +834,13 @@
         <commons-validator.version>1.7</commons-validator.version>
         <cxf.version>3.5.10</cxf.version>
         <dateparser.version>1.0.7</dateparser.version>
-        <dhp-schemas.version>[10.1.4]</dhp-schemas.version>
+        <dhp-schemas.version>11.1.0</dhp-schemas.version>
         <dhp.cdh.version>cdh5.9.2</dhp.cdh.version>
         <dhp.commons.lang.version>3.5</dhp.commons.lang.version>
         <dhp.guava.version>11.0.2</dhp.guava.version>
         <dhp.hadoop.version>2.6.0-${dhp.cdh.version}</dhp.hadoop.version>
         <dhp.jackson.version>2.9.6</dhp.jackson.version>
         <dhp.oozie.version>4.1.0-${dhp.cdh.version}</dhp.oozie.version>
-        <dhp.site.skip>true</dhp.site.skip>
         <dhp.spark.version>2.4.0.cloudera2</dhp.spark.version>
         <dnet-openaire-broker-common.version>[3.1.6]</dnet-openaire-broker-common.version>
         <google.gson.version>2.2.2</google.gson.version>
@@ -997,10 +857,14 @@
         <org.slf4j.version>1.7.25</org.slf4j.version>
         <reflections.version>0.9.10</reflections.version>
         <scala-xml.version>1.3.0</scala-xml.version>
-        <solr.version>7.5.0</solr.version>
-        <sparksolr.version>3.6.0</sparksolr.version>
+        <solr.version>8.11.0</solr.version>
+
         <unidecode.version>0.0.7</unidecode.version>
         <vtd.version>[2.12,3.0)</vtd.version>
+
+        <uoa-validator-engine.version>2.1.0</uoa-validator-engine.version>
+        <uoa-validator-models.version>2.1.0</uoa-validator-models.version>
+
         <zookeeper.version>3.4.6</zookeeper.version>
     </properties>
 
@@ -1048,7 +912,6 @@
 
                 <dhp.guava.version>14.0.1</dhp.guava.version>
                 <solr.version>8.11.0</solr.version>
-                <sparksolr.version>4.0.4</sparksolr.version>
                 <dhp.spark.version>3.4.2.openaire</dhp.spark.version>
                 <dhp.jackson.version>2.14.2</dhp.jackson.version>
                 <dhp.commons.lang.version>3.12.0</dhp.commons.lang.version>
@@ -1087,7 +950,6 @@
 
                 <dhp.guava.version>14.0.1</dhp.guava.version>
                 <solr.version>8.11.0</solr.version>
-                <sparksolr.version>4.0.4</sparksolr.version>
                 <dhp.spark.version>3.5.3</dhp.spark.version>
                 <dhp.jackson.version>2.15.2</dhp.jackson.version>
                 <dhp.commons.lang.version>3.12.0</dhp.commons.lang.version>

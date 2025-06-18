@@ -5,7 +5,6 @@ import java.io.Serializable;
 
 /**
  * @author miriam.baglioni
- * @Date 21/07/22
  */
 public class MasterDuplicate implements Serializable {
 	private String duplicateId;

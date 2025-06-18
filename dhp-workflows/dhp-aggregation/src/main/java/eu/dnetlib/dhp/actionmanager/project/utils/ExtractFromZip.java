@@ -1,13 +1,8 @@
 
 package eu.dnetlib.dhp.actionmanager.project.utils;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.Serializable;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -20,16 +15,13 @@ import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.actionmanager.project.PrepareProjects;
-import eu.dnetlib.dhp.actionmanager.project.utils.model.Project;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 
 /**
  * @author miriam.baglioni
- * @Date 28/02/23
  */
 public class ExtractFromZip implements Serializable {
 	private static final Logger log = LoggerFactory.getLogger(PrepareProjects.class);

@@ -26,7 +26,6 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 
 /**
  * @author miriam.baglioni
- * @Date 28/02/23
  */
 public class ReadTopics implements Serializable {
 	private static final Logger log = LoggerFactory.getLogger(ReadTopics.class);

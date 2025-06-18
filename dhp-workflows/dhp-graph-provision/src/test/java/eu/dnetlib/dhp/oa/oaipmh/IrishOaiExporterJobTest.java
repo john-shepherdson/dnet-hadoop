@@ -1,7 +1,7 @@
 
 package eu.dnetlib.dhp.oa.oaipmh;
 
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -17,6 +17,7 @@ import org.apache.commons.io.IOUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.io.SAXReader;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class IrishOaiExporterJobTest {
@@ -63,7 +64,7 @@ public class IrishOaiExporterJobTest {
 
 	@Test
 	void testGzip_empty() {
-		assertNull(IrishOaiExporterJob.gzip(""));
+		Assertions.assertNull(IrishOaiExporterJob.gzip(""));
 		assertNull(IrishOaiExporterJob.gzip(null));
 	}
 
