@@ -1,8 +1,9 @@
 
 package eu.dnetlib.dhp.personprojectthroughdeliverable;
 
-import static eu.dnetlib.dhp.PropagationConstant.isSparkSessionManaged;
+import static eu.dnetlib.dhp.PropagationConstant.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+import static eu.dnetlib.dhp.common.enrichment.Constants.PROPAGATION_DATA_INFO_TYPE;
 
 import java.util.*;
 
@@ -161,10 +162,15 @@ public class SparkAuthorProjectRelationExtraction {
 
 		return OafMapperUtils
 			.getRelation(
-				source, projectId, ModelConstants.PROJECT_PERSON_RELTYPE, ModelConstants.PROJECT_PERSON_SUBRELTYPE,
+				source, projectId, ModelConstants.PROJECT_PERSON_RELTYPE,
+				ModelConstants.PROJECT_PERSON_SUBRELTYPE,
 				ModelConstants.PROJECT_PERSON_PARTICIPATES,
 				null,
-				null,
+				getDataInfo(
+					PROPAGATION_DATA_INFO_TYPE,
+					PROPAGATION_PARCIPATES_TO_PROJECT_CLASS_ID,
+					PROPAGATION_PARCIPATES_TO_PROJECT_CLASS_NAME,
+					ModelConstants.DNET_PROVENANCE_ACTIONS),
 				null);
 	}
 

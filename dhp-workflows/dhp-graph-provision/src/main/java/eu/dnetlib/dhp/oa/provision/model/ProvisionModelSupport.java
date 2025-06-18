@@ -180,6 +180,9 @@ public class ProvisionModelSupport {
 		rr.setGivenName(re.getGivenName());
 		rr.setFamilyName(re.getFamilyName());
 
+		rr.setEndDate(re.getEndDate());
+		rr.setStartDate(re.getStartDate());
+
 		return rr;
 	}
 

@@ -70,12 +70,12 @@
         </property>
         <property>
             <name>sparkResourceOpts</name>
-            <value>--executor-memory=8G --conf spark.executor.memoryOverhead=6G --executor-cores=4 --driver-memory=9G --driver-cores=4 --conf spark.default.parallelism=3840 --conf spark.sql.shuffle.partitions=7680 --conf spark.sql.files.maxPartitionBytes=33554432 --conf spark.sql.adaptive.advisoryPartitionSizeInBytes=32m --conf spark.sql.adaptive.coalescePartitions.parallelismFirst=false --conf spark.sql.adaptive.forceOptimizeSkewedJoin=true --conf spark.sql.adaptive.skewJoin.skewedPartitionThresholdInBytes=64m --conf spark.sql.adaptive.skewJoin.skewedPartitionFactor=3.0 --conf spark.executor.extraJavaOptions="-XX:MaxDirectMemorySize=4g"</value>
+            <value>--executor-memory=8G --conf spark.executor.memoryOverhead=6G --executor-cores=4 --driver-memory=9G --driver-cores=4 --conf spark.default.parallelism=3840 --conf spark.sql.shuffle.partitions=7680 --conf spark.sql.files.maxPartitionBytes=33554432 --conf spark.sql.adaptive.advisoryPartitionSizeInBytes=32m --conf spark.sql.adaptive.coalescePartitions.parallelismFirst=false --conf spark.sql.adaptive.forceOptimizeSkewedJoin=true --conf spark.sql.adaptive.skewJoin.skewedPartitionThresholdInBytes=64m --conf spark.sql.adaptive.skewJoin.skewedPartitionFactor=3.0 --conf spark.executor.extraJavaOptions="-XX:MaxDirectMemorySize=4g" --conf spark.sql.parquet.enableVectorizedReader=false --conf spark.kryoserializer.buffer.max=128m</value>
             <description>spark resource options</description>
         </property>
         <property>
             <name>sparkResourceOptsForIndexing</name>
-            <value>--executor-memory=1G --conf spark.executor.memoryOverhead=1G --driver-memory=8G --driver-cores=4 --conf spark.driver.memoryOverhead=4G --conf spark.dynamicAllocation.maxExecutors=64 --conf spark.dynamicAllocation.enabled=true</value>
+            <value>--executor-memory=2G --conf spark.executor.memoryOverhead=1G --driver-memory=8G --driver-cores=4 --conf spark.driver.memoryOverhead=4G --conf spark.dynamicAllocation.maxExecutors=64 --conf spark.dynamicAllocation.enabled=true</value>
             <description>spark resource options</description>
         </property>
     </parameters>
