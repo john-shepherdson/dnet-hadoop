@@ -68,6 +68,7 @@ public class PaceFunctionTest extends AbstractPaceFunctions {
 		assertEquals("UK", countryInference("UK", "Università di Bologna"));
 		assertEquals("IT", countryInference("UNKNOWN", "Universiteé de Naples"));
 		assertEquals("UNKNOWN", countryInference("UNKNOWN", "Università del Lavoro"));
+		assertEquals("NL", countryInference("", "Università di Amsterdam"));
 	}
 
 	@Test

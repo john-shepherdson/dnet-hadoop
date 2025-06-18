@@ -1,19 +1,16 @@
+
 package eu.dnetlib.dhp.oa.dedup;
 
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.oa.dedup.maxclique.AllMaxCliqueFinder;
-import eu.dnetlib.dhp.oa.dedup.maxclique.MaxCliqueFinderFacade;
-import eu.dnetlib.dhp.oa.dedup.model.SimRelWeigher;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.utils.ISLookupClientFactory;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
-import eu.dnetlib.pace.config.DedupConfig;
-import eu.dnetlib.pace.model.SparkDeduper;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_PROVENANCE_ACTIONS;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.PROVENANCE_DEDUP;
+import static org.apache.spark.sql.functions.*;
+
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import eu.dnetlib.pace.tree.support.TreeProcessor;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FlatMapFunction;
@@ -30,205 +27,307 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
-import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_PROVENANCE_ACTIONS;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.PROVENANCE_DEDUP;
-import static org.apache.spark.sql.functions.*;
-
-import java.io.IOException;
-import java.util.*;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
+import eu.dnetlib.dhp.schema.oaf.DataInfo;
+import eu.dnetlib.dhp.schema.oaf.Qualifier;
+import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
+import eu.dnetlib.pace.config.DedupConfig;
+import eu.dnetlib.pace.model.SparkDeduper;
 
 public class SparkRefineMergeRels extends AbstractSparkAction {
 
-    private static final Logger log = LoggerFactory.getLogger(SparkRefineMergeRels.class);
-    private static final StructType rowSchema = new StructType(new StructField[]{
-        new StructField("source", DataTypes.StringType, false, Metadata.empty()),
-                new StructField("target", DataTypes.StringType, false, Metadata.empty())
-    });
+	private static final Logger log = LoggerFactory.getLogger(SparkRefineMergeRels.class);
+	private static final StructType rowSchema = new StructType(new StructField[] {
+		new StructField("source", DataTypes.StringType, false, Metadata.empty()),
+		new StructField("target", DataTypes.StringType, false, Metadata.empty())
+	});
 
-    public SparkRefineMergeRels(ArgumentApplicationParser parser, SparkSession spark) {
-        super(parser, spark);
-    }
+	private static double THRESHOLD = 0.7;
 
-    public static void main(String[] args) throws Exception {
-        ArgumentApplicationParser parser = new ArgumentApplicationParser(
-                IOUtils
-                        .toString(
-                                SparkCreateMergeRels.class
-                                        .getResourceAsStream(
-                                                "/eu/dnetlib/dhp/oa/dedup/refineMergeRels_parameters.json")));
-        parser.parseArgument(args);
+	public SparkRefineMergeRels(ArgumentApplicationParser parser, SparkSession spark) {
+		super(parser, spark);
+	}
 
-        final String isLookUpUrl = parser.get("isLookUpUrl");
-        log.info("isLookupUrl {}", isLookUpUrl);
+	public static void main(String[] args) throws Exception {
+		ArgumentApplicationParser parser = new ArgumentApplicationParser(
+			IOUtils
+				.toString(
+					SparkCreateMergeRels.class
+						.getResourceAsStream(
+							"/eu/dnetlib/dhp/oa/dedup/refineMergeRels_parameters.json")));
+		parser.parseArgument(args);
 
-        SparkConf conf = new SparkConf();
-        conf.set("hive.metastore.uris", parser.get("hiveMetastoreUris"));
-        conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
+		final String isLookUpUrl = parser.get("isLookUpUrl");
+		log.info("isLookupUrl {}", isLookUpUrl);
 
-        conf.registerKryoClasses(ModelSupport.getOafModelClasses());
+		SparkConf conf = new SparkConf();
+//		conf.set("hive.metastore.uris", parser.get("hiveMetastoreUris"));
+		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
 
-        new SparkRefineMergeRels(parser, getSparkWithHiveSession(conf))
-                .run(ISLookupClientFactory.getLookUpService(isLookUpUrl));
-    }
+		conf.registerKryoClasses(ModelSupport.getOafModelClasses());
 
-    @Override
-    void run(ISLookUpService isLookUpService) throws DocumentException, IOException, ISLookUpException, SAXException {
+		new SparkRefineMergeRels(parser, getSparkWithHiveSession(conf))
+			.run(ISLookupClientFactory.getLookUpService(isLookUpUrl));
+	}
 
-        // read oozie parameters
-        final String graphBasePath = parser.get("graphBasePath");
-        final String isLookUpUrl = parser.get("isLookUpUrl");
-        final String actionSetId = parser.get("actionSetId");
-        final String workingPath = parser.get("workingPath");
-        final int numPartitions = Optional
-                .ofNullable(parser.get("numPartitions"))
-                .map(Integer::valueOf)
-                .orElse(NUM_PARTITIONS);
+	@Override
+	void run(ISLookUpService isLookUpService) throws DocumentException, IOException, ISLookUpException, SAXException {
 
-        log.info("numPartitions: '{}'", numPartitions);
-        log.info("graphBasePath: '{}'", graphBasePath);
-        log.info("isLookUpUrl:   '{}'", isLookUpUrl);
-        log.info("actionSetId:   '{}'", actionSetId);
-        log.info("workingPath:   '{}'", workingPath);
+		// read oozie parameters
+		final String graphBasePath = parser.get("graphBasePath");
+		final String isLookUpUrl = parser.get("isLookUpUrl");
+		final String actionSetId = parser.get("actionSetId");
+		final String workingPath = parser.get("workingPath");
+		final int numPartitions = Optional
+			.ofNullable(parser.get("numPartitions"))
+			.map(Integer::valueOf)
+			.orElse(NUM_PARTITIONS);
 
-        // for each dedup configuration
-        for (DedupConfig dedupConf : getConfigurations(isLookUpService, actionSetId)) {
+		log.info("numPartitions: '{}'", numPartitions);
+		log.info("graphBasePath: '{}'", graphBasePath);
+		log.info("isLookUpUrl:   '{}'", isLookUpUrl);
+		log.info("actionSetId:   '{}'", actionSetId);
+		log.info("workingPath:   '{}'", workingPath);
 
-            final String subEntity = dedupConf.getWf().getSubEntityValue();
-            log.info("Processing mergerels for: '{}'", subEntity);
+		// for each dedup configuration
+		for (DedupConfig dedupConf : getConfigurations(isLookUpService, actionSetId)) {
 
-            final String mergeRelPath = DedupUtility.createMergeRelPath(workingPath, actionSetId, subEntity);
+			final String subEntity = dedupConf.getWf().getSubEntityValue();
+			log.info("Processing mergerels for: '{}'", subEntity);
 
-            SparkDeduper deduper = new SparkDeduper(dedupConf);
+			final String mergeRelPath = DedupUtility.createMergeRelPath(workingPath, actionSetId, subEntity);
 
-            // compute negative constraints and append to the entities
-            Dataset<Row> entities = spark
-                    .read()
-                    .textFile(DedupUtility.createEntityPath(graphBasePath, subEntity))
-                    .transform(deduper.model().parseJsonDataset());
-            entities = appendNegativeConstraints(spark, entities, graphBasePath, subEntity);
+			SparkDeduper deduper = new SparkDeduper(dedupConf);
 
-            Dataset<Row> rawMergeRels = spark
-                    .read()
-                    .load(mergeRelPath)
-                    .as(Encoders.bean(Relation.class))
-                    .where("relClass == 'merges'")
-                    .select("source", "target")
-                    .join(entities, col("target").equalTo(entities.col("identifier")))
-                    .withColumnRenamed("source", "groupId");
+			// compute negative constraints and append to the entities
+			Dataset<Row> entities = spark
+				.read()
+				.textFile(DedupUtility.createEntityPath(graphBasePath, subEntity))
+				.transform(deduper.model().parseJsonDataset());
+			entities = appendNegativeConstraints(spark, entities, graphBasePath, subEntity);
 
-            Dataset<Row> conflictualIds = getConflictualIds(rawMergeRels);
+			Dataset<Row> rawMergeRels = spark
+				.read()
+				.load(mergeRelPath)
+				.as(Encoders.bean(Relation.class))
+				.where("relClass == 'merges'")
+				.select("source", "target")
+				.join(entities, col("target").equalTo(entities.col("identifier")))
+				.withColumnRenamed("source", "groupId");
 
-            Dataset<Row> conflictualMergeRels = rawMergeRels.join(conflictualIds, rawMergeRels.col("groupId").equalTo(conflictualIds.col("groupId")), "left_semi");
+			Dataset<Row> conflictualIds = getConflictualIds(rawMergeRels);
 
-            Dataset<Row> splitMergeRels = conflictualMergeRels
-                    .groupByKey((MapFunction<Row, String>) t -> t.getAs("groupId"), Encoders.STRING())
-                    .flatMapGroups((FlatMapGroupsFunction<String, Row, Row>) (key, values) ->
-                                    splitGroup(values, dedupConf), RowEncoder.apply(rowSchema))
-                    .persist();
+			Dataset<Row> conflictualMergeRels = rawMergeRels
+				.join(conflictualIds, rawMergeRels.col("groupId").equalTo(conflictualIds.col("groupId")), "left_semi");
 
-            Dataset<Row> cleanMergeRels = rawMergeRels.join(conflictualIds, rawMergeRels.col("groupId").equalTo(conflictualIds.col("groupId")), "left_anti")
-                    .select(col("groupId").as("source"), col("target"));
+			Dataset<Row> splitMergeRels = conflictualMergeRels
+				.groupByKey((MapFunction<Row, String>) t -> t.getAs("groupId"), Encoders.STRING())
+				.flatMapGroups(
+					(FlatMapGroupsFunction<String, Row, Row>) (key, values) -> splitGroup(values, dedupConf),
+					RowEncoder.apply(rowSchema))
+				.persist();
 
-            Dataset<Relation> output = cleanMergeRels
-                    .union(splitMergeRels)
-                    .flatMap(
-                        (FlatMapFunction<Row, Relation>) r -> {
-                            String dedupId = r.getString(0);
-                            String id = r.getString(1);
+			Dataset<Row> cleanMergeRels = rawMergeRels
+				.join(conflictualIds, rawMergeRels.col("groupId").equalTo(conflictualIds.col("groupId")), "left_anti")
+				.select(col("groupId").as("source"), col("target"));
 
-                            ArrayList<Relation> res = new ArrayList<>();
-                            res.add(rel(dedupId, id, ModelConstants.MERGES, dedupConf));
-                            res.add(rel(id, dedupId, ModelConstants.IS_MERGED_IN, dedupConf));
+			Dataset<Relation> output = cleanMergeRels
+				.union(splitMergeRels)
+				.flatMap(
+					(FlatMapFunction<Row, Relation>) r -> {
+						String dedupId = r.getString(0);
+						String id = r.getString(1);
 
-                            return res.iterator();
-                            }, Encoders.bean(Relation.class)
-                    );
+						ArrayList<Relation> res = new ArrayList<>();
+						res.add(rel(dedupId, id, ModelConstants.MERGES, dedupConf));
+						res.add(rel(id, dedupId, ModelConstants.IS_MERGED_IN, dedupConf));
 
-            saveParquet(output, mergeRelPath + "_tmp", SaveMode.Overwrite);
-            renameParquet(spark, mergeRelPath + "_tmp", mergeRelPath);
-            splitMergeRels.unpersist();
-        }
-    }
+						return res.iterator();
+					}, Encoders.bean(Relation.class));
 
-    // append a negativeConstraints column to the dataset to be used by the clique finder
-    public static Dataset<Row> appendNegativeConstraints(SparkSession spark, Dataset<Row> entities, String graphBasePath, String subEntity) {
+			saveParquet(output, mergeRelPath + "_refined", SaveMode.Overwrite);
+//			renameParquet(spark, mergeRelPath + "_refined", mergeRelPath);  // TODO put it back
+			splitMergeRels.unpersist();
+		}
+	}
 
-        switch (subEntity) {
-            case "organization":
-                Dataset<Row> families = OpenorgsUtility.createFamilies(spark, graphBasePath + "/relation", ModelConstants.IS_PARENT_OF);
+	// append a negativeConstraints column to the dataset to be used by the clique finder
+	public static Dataset<Row> appendNegativeConstraints(SparkSession spark, Dataset<Row> entities,
+		String graphBasePath, String subEntity) {
 
-                // construct labels for negative constraints
-                Column negativeConstraints = array_union(
-                    when(col("identifier").contains("nwo"), array(lit("nwo"))).otherwise(array()),
-                    when(families.col("groupId").isNotNull(), array(families.col("groupId").cast("string"))).otherwise(array())
-                );
+		switch (subEntity) {
+			case "organization":
+				Dataset<Row> families = OpenorgsUtility
+					.createFamilies(spark, graphBasePath + "/relation", ModelConstants.IS_PARENT_OF);
 
-                return entities
-                        .join(families, entities.col("identifier").equalTo(families.col("id")), "left")
-                        .withColumn("negativeConstraints", negativeConstraints)
-                        .drop("id", "groupId");
-            default:
-                return spark.emptyDataFrame();
-        }
-    }
+				// construct labels for negative constraints
+				Column negativeConstraints = array_union(
+					when(col("identifier").contains("nwo"), array(lit("nwo"))).otherwise(array()),
+					when(families.col("groupId").isNotNull(), array(families.col("groupId").cast("string")))
+						.otherwise(array()));
 
-    // compute the list of conflictual ids (groups containing conflicts)
-    private static Dataset<Row> getConflictualIds(Dataset<Row> rawMergeRels) {
+				return entities
+					.join(families, entities.col("identifier").equalTo(families.col("id")), "left")
+					.withColumn("negativeConstraints", negativeConstraints)
+					.drop("id", "groupId");
+			default:
+				return spark.emptyDataFrame();
+		}
+	}
 
-        return rawMergeRels
-                .select("groupId", "negativeConstraints")
-                .groupBy("groupId")
-                .agg(flatten(collect_list(col("negativeConstraints"))).alias("allConstraints"))
-                .where(size(col("allConstraints")).notEqual(size(array_distinct(col("allConstraints")))))
-                .select("groupId");
-    }
+	// compute the list of conflictual ids (groups containing conflicts)
+	private static Dataset<Row> getConflictualIds(Dataset<Row> rawMergeRels) {
 
-    private static Relation rel(String source, String target, String relClass, DedupConfig dedupConf) {
+		return rawMergeRels
+			.select("groupId", "negativeConstraints")
+			.groupBy("groupId")
+			.agg(flatten(collect_list(col("negativeConstraints"))).alias("allConstraints"))
+			.where(size(col("allConstraints")).notEqual(size(array_distinct(col("allConstraints")))))
+			.select("groupId");
+	}
 
-        String entityType = dedupConf.getWf().getEntityType();
+	private static Relation rel(String source, String target, String relClass, DedupConfig dedupConf) {
 
-        Relation r = new Relation();
-        r.setSource(source);
-        r.setTarget(target);
-        r.setRelClass(relClass);
-        r.setRelType(entityType + entityType.substring(0, 1).toUpperCase() + entityType.substring(1));
-        r.setSubRelType(ModelConstants.DEDUP);
+		String entityType = dedupConf.getWf().getEntityType();
 
-        DataInfo info = new DataInfo();
-        info.setDeletedbyinference(false);
-        info.setInferred(true);
-        info.setInvisible(false);
-        info.setInferenceprovenance(dedupConf.getWf().getConfigurationId());
-        Qualifier provenanceAction = new Qualifier();
-        provenanceAction.setClassid(PROVENANCE_DEDUP);
-        provenanceAction.setClassname(PROVENANCE_DEDUP);
-        provenanceAction.setSchemeid(DNET_PROVENANCE_ACTIONS);
-        provenanceAction.setSchemename(DNET_PROVENANCE_ACTIONS);
-        info.setProvenanceaction(provenanceAction);
+		Relation r = new Relation();
+		r.setSource(source);
+		r.setTarget(target);
+		r.setRelClass(relClass);
+		r.setRelType(entityType + entityType.substring(0, 1).toUpperCase() + entityType.substring(1));
+		r.setSubRelType(ModelConstants.DEDUP);
 
-        r.setDataInfo(info);
-        return r;
-    }
+		DataInfo info = new DataInfo();
+		info.setDeletedbyinference(false);
+		info.setInferred(true);
+		info.setInvisible(false);
+		info.setInferenceprovenance(dedupConf.getWf().getConfigurationId());
+		Qualifier provenanceAction = new Qualifier();
+		provenanceAction.setClassid(PROVENANCE_DEDUP);
+		provenanceAction.setClassname(PROVENANCE_DEDUP);
+		provenanceAction.setSchemeid(DNET_PROVENANCE_ACTIONS);
+		provenanceAction.setSchemename(DNET_PROVENANCE_ACTIONS);
+		info.setProvenanceaction(provenanceAction);
 
-    public static Iterator<Row> splitGroup(Iterator<Row> values, DedupConfig dedupConf) {
-        List<Row> mergeRels = new ArrayList<>();
-        AllMaxCliqueFinder<Row> finder = new AllMaxCliqueFinder<>(
-                () -> values,
-                MaxCliqueFinderFacade.getInstance(),
-                new SimRelWeigher(dedupConf)
-        );
+		r.setDataInfo(info);
+		return r;
+	}
 
-        finder.iterator().forEachRemaining(clique -> {
-            if (clique.size() > 1) {
-                String newDedupId = IdGenerator.generate(clique.iterator().next().getAs("identifier"));
+	public static Iterator<Row> splitGroup(Iterator<Row> values, DedupConfig dedupConf) {
 
-                for (Row r : clique.members()) {
-                    mergeRels.add(RowFactory.create(newDedupId, r.getAs("identifier")));
-                }
-            }
-        });
+		List<Row> mergeRels = new ArrayList<>(); // to return the result
+		List<Row> entities = StreamSupport
+				.stream(Spliterators.spliteratorUnknownSize(values, 0), false)
+				.collect(Collectors.toList());
 
-        return mergeRels.iterator();
-    }
+		double[][] simMatrix = getSimMatrix(entities, dedupConf);
+
+		List<Set<Integer>> cliques = allMaxCliquesGreedyFinder(simMatrix);
+
+		for (Set<Integer> clique: cliques) {
+			if (clique.size() > 1) {
+				String newDedupId = IdGenerator.generate(entities.get(clique.stream().findFirst().orElseThrow(RuntimeException::new)).getAs("identifier"));
+
+				for (Integer i : clique) {
+					Row r = entities.get(i);
+					mergeRels.add(RowFactory.create(newDedupId, r.getAs("identifier")));
+				}
+			}
+		}
+
+		return mergeRels.iterator();
+	}
+
+	public static List<Set<Integer>> allMaxCliquesGreedyFinder(double[][] simMatrix) {
+
+		int n = simMatrix.length;
+		boolean[] used = new boolean[n];
+		List<Set<Integer>> cliques = new ArrayList<>();
+
+		for (int i = 0; i < n; i++) {
+			if (used[i]) continue;
+
+			Set<Integer> clique = new HashSet<>();
+			clique.add(i);
+
+			for (int j = 0; j < n; j++) {
+				if (i == j || used[j]) continue;
+
+				boolean valid = true;
+				double totalSim = 0.0;
+				int count = 0;
+
+				for (int member : clique) {
+					double sim = simMatrix[j][member];
+					if (sim == -1 || simMatrix[member][j] == -1) {
+						valid = false;
+						break;
+					}
+					totalSim += sim;
+					count++;
+				}
+
+				if (valid && count > 0 && (totalSim / count) >= THRESHOLD) {
+					clique.add(j);
+				}
+			}
+
+			for (int node : clique) {
+				used[node] = true;
+			}
+
+			cliques.add(clique);
+		}
+
+		return cliques;
+	}
+
+	public static double[][] getSimMatrix(List<Row> entities, DedupConfig dedupConf) {
+
+		TreeProcessor treeProcessor = new TreeProcessor(dedupConf);
+
+		int n = entities.size();
+		double[][] simMatrix = new double[n][n];
+
+		for (int i = 0; i < n; i++) {
+			Row a = entities.get(i);
+
+			for (int j = i; j < n; j++) {
+				Row b = entities.get(j);
+
+				if( j == i) {
+					simMatrix[i][j] = 1.0; // similarity with itself
+				} else {
+					double sim = weigh(a, b, treeProcessor);
+					simMatrix[i][j] = sim;
+					simMatrix[j][i] = sim;
+				}
+			}
+		}
+
+		return simMatrix;
+	}
+
+	public static double weigh(Row a, Row b, TreeProcessor treeProcessor) {
+		List<String> negativeConstraintsA = Arrays.asList(a.schema().fieldNames()).contains("negativeConstraints")
+				? a.getList(a.fieldIndex("negativeConstraints"))
+				: Collections.emptyList();
+		List<String> negativeConstraintsB = Arrays.asList(b.schema().fieldNames()).contains("negativeConstraints")
+				? b.getList(b.fieldIndex("negativeConstraints"))
+				: Collections.emptyList();
+
+		if (!negativeConstraintsA.isEmpty() && !negativeConstraintsB.isEmpty()
+				&& !Collections.disjoint(negativeConstraintsA, negativeConstraintsB)) {
+			return -1;
+		}
+
+		return treeProcessor.computeScore(a, b);
+
+	}
 
 }

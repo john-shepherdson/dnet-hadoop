@@ -6,7 +6,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import com.google.common.collect.Lists;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -19,6 +18,8 @@ import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.dedup.model.OrgSimRel;
@@ -113,11 +114,17 @@ public class SparkPrepareNewOrgs extends AbstractSparkAction {
 		final String entitiesPath) {
 
 		// collect DiffRels from the raw graph relations: <<best id, other id>, "diffRel">
-		JavaRDD<Tuple2<Tuple2<String, String>, String>> diffRels = OpenorgsUtility.collectRels(spark, relationPath, ModelConstants.IS_DIFFERENT_FROM, ModelConstants.ORG_ORG_RELTYPE, ModelConstants.DEDUP, true);
+		JavaRDD<Tuple2<Tuple2<String, String>, String>> diffRels = OpenorgsUtility
+			.collectRels(
+				spark, relationPath, ModelConstants.IS_DIFFERENT_FROM, ModelConstants.ORG_ORG_RELTYPE,
+				ModelConstants.DEDUP, true);
 		log.info("Number of DiffRels collected: {}", diffRels.count());
 
 		// collect ParentChildRels from the raw graph relations: <<best id, other id>, "parentChildRel">
-		JavaRDD<Tuple2<Tuple2<String, String>, String>> parentChildRels = OpenorgsUtility.collectRels(spark, relationPath, ModelConstants.IS_PARENT_OF, ModelConstants.ORG_ORG_RELTYPE, ModelConstants.DEDUP, false);
+		JavaRDD<Tuple2<Tuple2<String, String>, String>> parentChildRels = OpenorgsUtility
+			.collectRels(
+				spark, relationPath, ModelConstants.IS_PARENT_OF, ModelConstants.ORG_ORG_RELTYPE, ModelConstants.DEDUP,
+				false);
 		log.info("Number of Parent/Child Rels collected: {}", parentChildRels.count());
 
 		// collect entities: <id, json_entity>
@@ -134,7 +141,10 @@ public class SparkPrepareNewOrgs extends AbstractSparkAction {
 		// collect mergerels and remove ids in the diffrels
 		Dataset<Tuple2<String, String>> openorgsRels = spark
 			.createDataset(
-				OpenorgsUtility.processMergeRels(spark, mergeRelsPath, diffRels, parentChildRels).mapToPair(r -> new Tuple2<>(r._1(), r._2())).rdd(),
+				OpenorgsUtility
+					.processMergeRels(spark, mergeRelsPath, diffRels, parentChildRels)
+					.mapToPair(r -> new Tuple2<>(r._1(), r._2()))
+					.rdd(),
 				Encoders.tuple(Encoders.STRING(), Encoders.STRING()));
 		log.info("Number of Openorgs Relations loaded: '{}'", openorgsRels.count());
 

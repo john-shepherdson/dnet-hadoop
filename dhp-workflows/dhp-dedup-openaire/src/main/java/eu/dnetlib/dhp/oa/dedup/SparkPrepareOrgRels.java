@@ -6,7 +6,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import eu.dnetlib.dhp.oa.dedup.model.ParentChildRel;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -23,6 +22,7 @@ import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.dedup.model.OrgSimRel;
+import eu.dnetlib.dhp.oa.dedup.model.ParentChildRel;
 import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
@@ -92,30 +92,40 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 		final String relationPath = DedupUtility.createEntityPath(graphBasePath, "relation");
 
 		// collect DiffRels from the raw graph relations: <<best id, other id>, "diffRel">
-		JavaRDD<Tuple2<Tuple2<String, String>, String>> diffRels = OpenorgsUtility.collectRels(spark, relationPath, ModelConstants.IS_DIFFERENT_FROM, ModelConstants.ORG_ORG_RELTYPE, ModelConstants.DEDUP, true);
+		JavaRDD<Tuple2<Tuple2<String, String>, String>> diffRels = OpenorgsUtility
+			.collectRels(
+				spark, relationPath, ModelConstants.IS_DIFFERENT_FROM, ModelConstants.ORG_ORG_RELTYPE,
+				ModelConstants.DEDUP, true);
 		log.info("Number of DiffRels collected: {}", diffRels.count());
 
 		// collect ParentChildRels from the raw graph relations: <<best id, other id>, "parentChildRel">
-		JavaRDD<Tuple2<Tuple2<String, String>, String>> parentChildRels = OpenorgsUtility.collectRels(spark, relationPath, ModelConstants.IS_PARENT_OF, ModelConstants.ORG_ORG_RELTYPE, ModelConstants.DEDUP, false);
+		JavaRDD<Tuple2<Tuple2<String, String>, String>> parentChildRels = OpenorgsUtility
+			.collectRels(
+				spark, relationPath, ModelConstants.IS_PARENT_OF, ModelConstants.ORG_ORG_RELTYPE, ModelConstants.DEDUP,
+				false);
 		log.info("Number of Parent/Child Rels collected: {}", parentChildRels.count());
 
 		// collect all the organizations
 		Dataset<Tuple2<String, Organization>> entities = spark
-				.read()
-				.textFile(entityPath)
-				.map(
-						(MapFunction<String, Tuple2<String, Organization>>) it -> {
-							Organization entity = OBJECT_MAPPER.readValue(it, Organization.class);
-							return new Tuple2<>(entity.getId(), entity);
-						},
-						Encoders.tuple(Encoders.STRING(), Encoders.kryo(Organization.class)));
+			.read()
+			.textFile(entityPath)
+			.map(
+				(MapFunction<String, Tuple2<String, Organization>>) it -> {
+					Organization entity = OBJECT_MAPPER.readValue(it, Organization.class);
+					return new Tuple2<>(entity.getId(), entity);
+				},
+				Encoders.tuple(Encoders.STRING(), Encoders.kryo(Organization.class)));
 
 		// process mergeRels: <source, target, group id>
-		JavaRDD<Tuple3<String, String, String>> processedMergeRels = OpenorgsUtility.processMergeRels(spark, mergeRelPath, diffRels, parentChildRels).cache();
+		JavaRDD<Tuple3<String, String, String>> processedMergeRels = OpenorgsUtility
+			.processMergeRels(spark, mergeRelPath, diffRels, parentChildRels)
+			.cache();
 		// create parent/child suggestion relations: <parent(raw or representative), child (raw or representative)>
-		Dataset<ParentChildRel> parentChildSuggestions = createParentChildSuggestions(spark, processedMergeRels, parentChildRels, entities).cache();
+		Dataset<ParentChildRel> parentChildSuggestions = createParentChildSuggestions(
+			spark, processedMergeRels, parentChildRels, entities).cache();
 		// create duplicate suggestion relations: <best id, other id>
-		Dataset<OrgSimRel> duplicatesSuggestions = createDuplicatesSuggestions(spark, processedMergeRels, entities).cache();
+		Dataset<OrgSimRel> duplicatesSuggestions = createDuplicatesSuggestions(spark, processedMergeRels, entities)
+			.cache();
 		processedMergeRels.unpersist();
 
 		final Properties connectionProperties = new Properties();
@@ -140,90 +150,99 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 
 	}
 
-	private static Dataset<ParentChildRel> createParentChildSuggestions(SparkSession spark, JavaRDD<Tuple3<String, String, String>> openorgsRels, JavaRDD<Tuple2<Tuple2<String, String>, String>> parentChildRels, Dataset<Tuple2<String, Organization>> entities) {
+	private static Dataset<ParentChildRel> createParentChildSuggestions(SparkSession spark,
+		JavaRDD<Tuple3<String, String, String>> openorgsRels,
+		JavaRDD<Tuple2<Tuple2<String, String>, String>> parentChildRels,
+		Dataset<Tuple2<String, Organization>> entities) {
 
 		JavaPairRDD<String, String> pcRels = parentChildRels
-				.mapToPair(r -> r._1()); // <raw_parent, raw_child>
+			.mapToPair(r -> r._1()); // <raw_parent, raw_child>
 
 		JavaPairRDD<String, String> rawReprRels = openorgsRels
-				.mapToPair(r -> new Tuple2<>(r._2(), r._1())); // <raw, repr>
+			.mapToPair(r -> new Tuple2<>(r._2(), r._1())); // <raw, repr>
 
 		pcRels = pcRels
-					.leftOuterJoin(rawReprRels) // <raw_parent, <raw_child, parent_repr>>
-					.mapToPair(j -> new Tuple2<>(j._2()._1(), j._2()._2().orElse(j._1()))); // <raw_child, parent_repr>
+			.leftOuterJoin(rawReprRels) // <raw_parent, <raw_child, parent_repr>>
+			.mapToPair(j -> new Tuple2<>(j._2()._1(), j._2()._2().orElse(j._1()))); // <raw_child, parent_repr>
 
 		pcRels = pcRels
-					.leftOuterJoin(rawReprRels) // <raw_child, <parent_repr, child_repr>>
-					.mapToPair(j -> new Tuple2<>(j._2()._1(), j._2()._2().orElse(j._1()))); // <parent_repr, child_repr>
+			.leftOuterJoin(rawReprRels) // <raw_child, <parent_repr, child_repr>>
+			.mapToPair(j -> new Tuple2<>(j._2()._1(), j._2()._2().orElse(j._1()))); // <parent_repr, child_repr>
 
 		JavaRDD<ParentChildRel> parentChildRelRDD = pcRels
-				.join(entities.toJavaRDD().mapToPair(r -> new Tuple2<>(r._1(), r._2())))
-				.mapToPair(r -> new Tuple2<>(r._2()._1(), Optional.ofNullable(r._2()._2().getOriginalId()).map(oid -> oid.get(0)).orElse(null)))
-				.join(entities.toJavaRDD().mapToPair(r -> new Tuple2<>(r._1(), r._2())))
-				.mapToPair(r -> new Tuple2<>(r._2()._1(), Optional.ofNullable(r._2()._2().getOriginalId()).map(oid -> oid.get(0)).orElse(null)))
-				.filter(j -> !j._1().equals(j._2())) // remove self relations
-				.flatMap(
-						j -> Arrays.asList(
-								new ParentChildRel(j._1(), j._2(), ModelConstants.IS_PARENT_OF),
-								new ParentChildRel(j._2(), j._1(), ModelConstants.IS_CHILD_OF)
-						).iterator());
+			.join(entities.toJavaRDD().mapToPair(r -> new Tuple2<>(r._1(), r._2())))
+			.mapToPair(
+				r -> new Tuple2<>(r._2()._1(),
+					Optional.ofNullable(r._2()._2().getOriginalId()).map(oid -> oid.get(0)).orElse(null)))
+			.join(entities.toJavaRDD().mapToPair(r -> new Tuple2<>(r._1(), r._2())))
+			.mapToPair(
+				r -> new Tuple2<>(r._2()._1(),
+					Optional.ofNullable(r._2()._2().getOriginalId()).map(oid -> oid.get(0)).orElse(null)))
+			.filter(j -> !j._1().equals(j._2())) // remove self relations
+			.flatMap(
+				j -> Arrays
+					.asList(
+						new ParentChildRel(j._1(), j._2(), ModelConstants.IS_PARENT_OF),
+						new ParentChildRel(j._2(), j._1(), ModelConstants.IS_CHILD_OF))
+					.iterator());
 
 		return spark.createDataset(parentChildRelRDD.rdd(), Encoders.bean(ParentChildRel.class));
 	}
 
-	private static Dataset<OrgSimRel> createDuplicatesSuggestions(SparkSession spark, JavaRDD<Tuple3<String, String, String>> openorgsRels, Dataset<Tuple2<String, Organization>> entities) {
+	private static Dataset<OrgSimRel> createDuplicatesSuggestions(SparkSession spark,
+		JavaRDD<Tuple3<String, String, String>> openorgsRels, Dataset<Tuple2<String, Organization>> entities) {
 		// <best ID based on priority, ID, groupID>
 		Dataset<Tuple3<String, String, String>> relations = spark
-				.createDataset(
-						openorgsRels.rdd(),
-						Encoders.tuple(Encoders.STRING(), Encoders.STRING(), Encoders.STRING()));
+			.createDataset(
+				openorgsRels.rdd(),
+				Encoders.tuple(Encoders.STRING(), Encoders.STRING(), Encoders.STRING()));
 
 		// create OrgSimRels: <local_id, orgsimrel>
 		Dataset<Tuple2<String, OrgSimRel>> relations2 = relations
-				.joinWith(entities, relations.col("_2").equalTo(entities.col("_1")), "inner")
-				.map(
-						(MapFunction<Tuple2<Tuple3<String, String, String>, Tuple2<String, Organization>>, OrgSimRel>) r -> {
-							final Organization o = r._2()._2();
-							return new OrgSimRel(
-									r._1()._1(),
-									Optional.ofNullable(o.getOriginalId()).map(oid -> oid.get(0)).orElse(null),
-									Optional.ofNullable(o.getLegalname()).map(Field::getValue).orElse(""),
-									Optional.ofNullable(o.getLegalshortname()).map(Field::getValue).orElse(""),
-									Optional.ofNullable(o.getCountry()).map(Qualifier::getClassid).orElse(""),
-									Optional.ofNullable(o.getWebsiteurl()).map(Field::getValue).orElse(""),
-									Optional
-											.ofNullable(o.getCollectedfrom())
-											.map(c -> Optional.ofNullable(c.get(0)).map(KeyValue::getValue).orElse(""))
-											.orElse(""),
-									r._1()._3(),
-									structuredPropertyListToString(o.getPid()),
-									parseECField(o.getEclegalbody()),
-									parseECField(o.getEclegalperson()),
-									parseECField(o.getEcnonprofit()),
-									parseECField(o.getEcresearchorganization()),
-									parseECField(o.getEchighereducation()),
-									parseECField(o.getEcinternationalorganizationeurinterests()),
-									parseECField(o.getEcinternationalorganization()),
-									parseECField(o.getEcenterprise()),
-									parseECField(o.getEcsmevalidated()),
-									parseECField(o.getEcnutscode()));
-						},
-						Encoders.bean(OrgSimRel.class))
-				.map(
-						(MapFunction<OrgSimRel, Tuple2<String, OrgSimRel>>) o -> new Tuple2<>(o.getLocal_id(), o),
-						Encoders.tuple(Encoders.STRING(), Encoders.bean(OrgSimRel.class)));
+			.joinWith(entities, relations.col("_2").equalTo(entities.col("_1")), "inner")
+			.map(
+				(MapFunction<Tuple2<Tuple3<String, String, String>, Tuple2<String, Organization>>, OrgSimRel>) r -> {
+					final Organization o = r._2()._2();
+					return new OrgSimRel(
+						r._1()._1(),
+						Optional.ofNullable(o.getOriginalId()).map(oid -> oid.get(0)).orElse(null),
+						Optional.ofNullable(o.getLegalname()).map(Field::getValue).orElse(""),
+						Optional.ofNullable(o.getLegalshortname()).map(Field::getValue).orElse(""),
+						Optional.ofNullable(o.getCountry()).map(Qualifier::getClassid).orElse(""),
+						Optional.ofNullable(o.getWebsiteurl()).map(Field::getValue).orElse(""),
+						Optional
+							.ofNullable(o.getCollectedfrom())
+							.map(c -> Optional.ofNullable(c.get(0)).map(KeyValue::getValue).orElse(""))
+							.orElse(""),
+						r._1()._3(),
+						structuredPropertyListToString(o.getPid()),
+						parseECField(o.getEclegalbody()),
+						parseECField(o.getEclegalperson()),
+						parseECField(o.getEcnonprofit()),
+						parseECField(o.getEcresearchorganization()),
+						parseECField(o.getEchighereducation()),
+						parseECField(o.getEcinternationalorganizationeurinterests()),
+						parseECField(o.getEcinternationalorganization()),
+						parseECField(o.getEcenterprise()),
+						parseECField(o.getEcsmevalidated()),
+						parseECField(o.getEcnutscode()));
+				},
+				Encoders.bean(OrgSimRel.class))
+			.map(
+				(MapFunction<OrgSimRel, Tuple2<String, OrgSimRel>>) o -> new Tuple2<>(o.getLocal_id(), o),
+				Encoders.tuple(Encoders.STRING(), Encoders.bean(OrgSimRel.class)));
 
 		return relations2
-				.joinWith(entities, relations2.col("_1").equalTo(entities.col("_1")), "inner")
-				.map(
-						(MapFunction<Tuple2<Tuple2<String, OrgSimRel>, Tuple2<String, Organization>>, OrgSimRel>) r -> {
-							OrgSimRel orgSimRel = r._1()._2();
-							orgSimRel
-									.setLocal_id(
-											Optional.ofNullable(r._2()._2().getOriginalId()).map(oid -> oid.get(0)).orElse(null));
-							return orgSimRel;
-						},
-						Encoders.bean(OrgSimRel.class));
+			.joinWith(entities, relations2.col("_1").equalTo(entities.col("_1")), "inner")
+			.map(
+				(MapFunction<Tuple2<Tuple2<String, OrgSimRel>, Tuple2<String, Organization>>, OrgSimRel>) r -> {
+					OrgSimRel orgSimRel = r._1()._2();
+					orgSimRel
+						.setLocal_id(
+							Optional.ofNullable(r._2()._2().getOriginalId()).map(oid -> oid.get(0)).orElse(null));
+					return orgSimRel;
+				},
+				Encoders.bean(OrgSimRel.class));
 	}
 
 }

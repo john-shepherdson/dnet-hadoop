@@ -102,6 +102,7 @@
         <switch>
             <case to="CreateSimRels">${wf:conf('resumeFrom') eq 'CreateSimRels'}</case>
             <case to="CreateMergeRels">${wf:conf('resumeFrom') eq 'CreateMergeRels'}</case>
+            <case to="RefineMergeRels">${wf:conf('resumeFrom') eq 'RefineMergeRels'}</case>
             <case to="PrepareOrgRels">${wf:conf('resumeFrom') eq 'PrepareOrgRels'}</case>
             <case to="update_openorgs">${wf:conf('resumeFrom') eq 'update_openorgs'}</case>
             <default to="resetOrgSimRels"/>
@@ -227,7 +228,7 @@
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
             <arg>--actionSetId</arg><arg>${actionSetId}</arg>
         </spark>
-        <ok to="PrepareOrgRels"/>
+        <ok to="End"/>
         <error to="Kill"/>
     </action>
 
@@ -285,7 +286,7 @@
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
             <arg>--actionSetId</arg><arg>${actionSetId}</arg>
             <arg>--dbUrl</arg><arg>${dbUrl}</arg>
-            <arg>--dbTable</arg><arg>${dbTable}</arg>
+            <arg>--dedupEventsTable</arg><arg>${dedupEventsTable}</arg>
             <arg>--dbUser</arg><arg>${dbUser}</arg>
             <arg>--dbPwd</arg><arg>${dbPwd}</arg>
             <arg>--numConnections</arg><arg>${dbConnections}</arg>
