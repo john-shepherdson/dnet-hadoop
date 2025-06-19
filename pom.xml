@@ -862,7 +862,7 @@
                 <artifactId>mvn-scalafmt_${scala.binary.version}</artifactId>
                 <configuration>
                     <configLocation>
-                        https://code-repo.d4science.org/D-Net/dnet-hadoop/raw/branch/beta/dhp-build/dhp-code-style/src/main/resources/scalafmt/scalafmt.conf
+                        https://code-repo.d4science.org/D-Net/dnet-hadoop/raw/branch/main/dhp-build/dhp-code-style/src/main/resources/scalafmt/scalafmt.conf
                     </configLocation>
                     <skipTestSources>false</skipTestSources>
                     <skipSources>false</skipSources>
