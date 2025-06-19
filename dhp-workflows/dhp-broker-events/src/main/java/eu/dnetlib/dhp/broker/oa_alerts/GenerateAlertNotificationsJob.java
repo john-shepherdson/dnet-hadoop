@@ -1,6 +1,7 @@
 
 package eu.dnetlib.dhp.broker.oa_alerts;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -10,6 +11,11 @@ import java.util.stream.Collectors;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
@@ -26,6 +32,7 @@ import eu.dnetlib.dhp.broker.model.MappedFields;
 import eu.dnetlib.dhp.broker.model.Notification;
 import eu.dnetlib.dhp.broker.model.Subscription;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
+import eu.dnetlib.dhp.broker.oa.util.aggregators.stats.DatasourceStats;
 import eu.dnetlib.dhp.collection.ApiDescriptor;
 import eu.dnetlib.dhp.common.Constants;
 import eu.dnetlib.dhp.common.SparkSessionSupport;
@@ -72,7 +79,10 @@ public class GenerateAlertNotificationsJob {
 		final String inputPath = mdstoreVersion.getHdfsPath() + Constants.MDSTORE_DATA_PATH;
 		log.info("inputPath: {}", inputPath);
 
-		if (StringUtils.isAnyBlank(dsId, compatibilityLevel, inputPath)) { throw new RuntimeException("A required information is missing"); }
+		final String brokerApiBaseUrl = parser.get("brokerApiBaseUrl");
+		log.info("brokerApiBaseUrl: {}", brokerApiBaseUrl);
+
+		if (StringUtils.isAnyBlank(dsId, compatibilityLevel, inputPath, brokerApiBaseUrl)) { throw new RuntimeException("A required information is missing"); }
 
 		ValidationType validationType;
 		switch (compatibilityLevel) {
@@ -118,7 +128,12 @@ public class GenerateAlertNotificationsJob {
 					.map(r -> generatePayload(r.getOriginalId(), dsId, dsName, r.getValidationResults().get(validationType)), Encoders
 							.bean(ValidatorAlertMessage.class));
 
-			updateStats(dsId, topic, payloads.count());
+			final DatasourceStats stats = new DatasourceStats();
+			stats.setId(dsId);
+			stats.setName(dsName);
+			stats.setType("-"); // TODO
+			stats.setTopic(topic);
+			stats.setSize(payloads.count());
 
 			final List<Subscription> subscriptions = listSubscriptions(dsId, topic);
 
@@ -175,9 +190,18 @@ public class GenerateAlertNotificationsJob {
 		return null;
 	}
 
-	private static void updateStats(final String dsId, final String topic, final long count) {
-		// TODO Auto-generated method stub
+	private static void updateStats(final String brokerApiBaseUrl, final DatasourceStats stats) throws IOException {
 
+		final HttpPost req = new HttpPost(brokerApiBaseUrl + "/api/openaire-alerts/stats/update");
+		req.setHeader("Accept", "application/json");
+		req.setHeader("Content-type", "application/json");
+		req.setEntity(new StringEntity(DHPUtils.MAPPER.writeValueAsString(stats)));
+
+		try (final CloseableHttpClient client = HttpClients.createDefault()) {
+			try (final CloseableHttpResponse response = client.execute(req)) {
+
+			}
+		}
 	}
 
 	private static ValidatorAlertMessage generatePayload(final String originalId,
