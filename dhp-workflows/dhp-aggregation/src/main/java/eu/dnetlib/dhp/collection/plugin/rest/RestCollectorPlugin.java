@@ -22,7 +22,6 @@ import eu.dnetlib.dhp.common.collection.HttpClientParams;
  * TODO: delegate HTTP requests to the common HttpConnector2 implementation.
  *
  * @author 	js, Andreas Czerniak
- * @date 	2020-04-09
  *
  */
 public class RestCollectorPlugin implements CollectorPlugin {

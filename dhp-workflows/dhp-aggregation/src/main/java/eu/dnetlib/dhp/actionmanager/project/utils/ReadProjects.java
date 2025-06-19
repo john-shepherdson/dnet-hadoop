@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -27,7 +26,6 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 
 /**
  * @author miriam.baglioni
- * @Date 28/02/23
  */
 public class ReadProjects implements Serializable {
 	private static final Logger log = LoggerFactory.getLogger(ReadProjects.class);
