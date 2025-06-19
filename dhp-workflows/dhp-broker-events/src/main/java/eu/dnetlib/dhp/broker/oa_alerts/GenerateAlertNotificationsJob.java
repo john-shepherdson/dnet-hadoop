@@ -135,6 +135,8 @@ public class GenerateAlertNotificationsJob {
 			stats.setTopic(topic);
 			stats.setSize(payloads.count());
 
+			updateStats(brokerApiBaseUrl, stats);
+
 			final List<Subscription> subscriptions = listSubscriptions(dsId, topic);
 
 			final Long date = new Date().getTime();
