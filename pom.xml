@@ -1085,5 +1085,26 @@
                 </pluginManagement>
             </build>
         </profile>
-	</profiles>
+        <profile>
+            <id>no-javadoc</id>
+            <activation>
+                <property>
+                    <name>maven.javadoc.skip</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+    </profiles>
 </project>

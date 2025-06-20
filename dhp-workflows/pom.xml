@@ -39,6 +39,12 @@
 
     <pluginRepositories>
         <pluginRepository>
+            <id>dnet45-releases</id>
+            <name>D-Net 45 releases</name>
+            <url>https://maven.d4science.org/nexus/content/repositories/dnet45-releases</url>
+            <layout>default</layout>
+        </pluginRepository>
+        <pluginRepository>
             <id>iis-releases</id>
             <name>iis releases plugin repository</name>
             <url>https://maven.ceon.pl/artifactory/iis-releases</url>
