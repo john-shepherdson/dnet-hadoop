@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.dnetlib.dhp</groupId>
         <artifactId>dhp</artifactId>
-        <version>1.2.5-SNAPSHOT</version>
+        <version>1.2.5</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -79,7 +79,7 @@
         <dependency>
             <groupId>eu.dnetlib.dhp</groupId>
             <artifactId>dhp-build-assembly-resources</artifactId>
-            <version>1.2.5-SNAPSHOT</version>
+            <version>1.2.5</version>
         </dependency>
         <dependency>
             <groupId>org.apache.oozie</groupId>
@@ -210,7 +210,7 @@
                             <dependency>
                                 <groupId>eu.dnetlib.dhp</groupId>
                                 <artifactId>dhp-build-assembly-resources</artifactId>
-                                <version>1.2.5-SNAPSHOT</version>
+                                <version>1.2.5</version>
                                 <!-- contains project-default.properties -->
                             </dependency>
                         </dependencies>
@@ -260,7 +260,7 @@
                     <plugin>
                         <groupId>eu.dnetlib.dhp</groupId>
                         <artifactId>dhp-build-properties-maven-plugin</artifactId>
-                        <version>1.2.5-SNAPSHOT</version>
+                        <version>1.2.5</version>
                         <executions>
                             <execution>
                                 <phase>validate</phase>
@@ -325,7 +325,7 @@
                             <dependency>
                                 <groupId>eu.dnetlib.dhp</groupId>
                                 <artifactId>dhp-build-assembly-resources</artifactId>
-                                <version>1.2.5-SNAPSHOT</version>
+                                <version>1.2.5</version>
                             </dependency>
                         </dependencies>
                         <executions>
