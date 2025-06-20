@@ -725,15 +725,6 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-site-plugin</artifactId>
-                    <version>3.9.1</version>
-                    <configuration>
-                        <skip>${dhp.site.skip}</skip>
-                    </configuration>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${maven.compiler.plugin.version}</version>
                     <configuration>
@@ -748,22 +739,6 @@
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>3.0.2</version>
                 </plugin>
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-source-plugin</artifactId>
-                    <version>3.0.1</version>
-                    <executions>
-                        <execution>
-                            <id>attach-sources</id>
-                            <phase>verify</phase>
-                            <goals>
-                                <goal>jar-no-fork</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
@@ -775,150 +750,21 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.2.0</version>
-                    <configuration>
-                        <detectLinks>true</detectLinks>
-                        <doclint>none</doclint>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
                     <version>3.6.1</version>
-                </plugin>
-
-                <plugin>
-                    <groupId>net.revelc.code.formatter</groupId>
-                    <artifactId>formatter-maven-plugin</artifactId>
-                    <version>2.11.0</version>
-                    <dependencies>
-                        <dependency>
-                            <groupId>eu.dnetlib.dhp</groupId>
-                            <artifactId>dhp-code-style</artifactId>
-                            <version>${project.version}</version>
-                        </dependency>
-                    </dependencies>
-                </plugin>
-                <plugin>
-                    <groupId>org.antipathy</groupId>
-                    <artifactId>mvn-scalafmt_${scala.binary.version}</artifactId>
-                    <version>1.0.1640073709.733712b</version>
-                    <dependencies>
-                        <dependency>
-                            <groupId>eu.dnetlib.dhp</groupId>
-                            <artifactId>dhp-code-style</artifactId>
-                            <version>${project.version}</version>
-                        </dependency>
-                    </dependencies>
                 </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-site-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>net.revelc.code.formatter</groupId>
-                <artifactId>formatter-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>format</goal>
-                        </goals>
-                        <configuration>
-                            <configFile>eclipse/formatter_dnet.xml</configFile>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>net.revelc.code</groupId>
-                <artifactId>impsort-maven-plugin</artifactId>
-                <version>1.6.2</version>
-                <configuration>
-                    <groups>java.,javax.,org.,com.</groups>
-                    <staticGroups>java,*</staticGroups>
-                    <excludes>
-                        <exclude>**/thrift/*.java</exclude>
-                    </excludes>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>sort-imports</id>
-                        <goals>
-                            <goal>sort</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.antipathy</groupId>
-                <artifactId>mvn-scalafmt_${scala.binary.version}</artifactId>
-                <configuration>
-                    <configLocation>
-                        https://code-repo.d4science.org/D-Net/dnet-hadoop/raw/branch/main/dhp-build/dhp-code-style/src/main/resources/scalafmt/scalafmt.conf
-                    </configLocation>
-                    <skipTestSources>false</skipTestSources>
-                    <skipSources>false</skipSources>
-                    <sourceDirectories>
-                        <param>${project.basedir}/src/main/scala</param>
-                    </sourceDirectories>
-                    <testSourceDirectories>
-                        <param>${project.basedir}/src/test/scala</param>
-                    </testSourceDirectories>
-                    <validateOnly>false</validateOnly>
-                    <onlyChangedFiles>false</onlyChangedFiles>
-                    <branch>: git rev-parse --abbrev-ref HEAD</branch>
-                    <useSpecifiedRepositories>false</useSpecifiedRepositories>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>format</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.5.3</version>
             </plugin>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.10</version>
-                <configuration>
-                    <excludes>
-                        <exclude>**/schemas/*</exclude>
-                        <exclude>**/com/cloudera/**/*</exclude>
-                        <exclude>**/org/apache/avro/io/**/*</exclude>
-                    </excludes>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>default-prepare-agent</id>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>default-report</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
         </plugins>
 
         <extensions>
@@ -940,10 +786,6 @@
             <id>dnet45-releases</id>
             <url>https://maven.d4science.org/nexus/content/repositories/dnet45-releases</url>
         </repository>
-        <site>
-            <id>DHPSite</id>
-            <url>${dhp.site.stage.path}/</url>
-        </site>
     </distributionManagement>
     <reporting>
         <plugins>
@@ -959,7 +801,6 @@
     </reporting>
 
     <properties>
-        <dhp.site.stage.path>sftp://dnet-hadoop@static-web.d4science.org/dnet-hadoop</dhp.site.stage.path>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -997,7 +838,6 @@
         <dhp.hadoop.version>2.6.0-${dhp.cdh.version}</dhp.hadoop.version>
         <dhp.jackson.version>2.9.6</dhp.jackson.version>
         <dhp.oozie.version>4.1.0-${dhp.cdh.version}</dhp.oozie.version>
-        <dhp.site.skip>true</dhp.site.skip>
         <dhp.spark.version>2.4.0.cloudera2</dhp.spark.version>
         <dnet-openaire-broker-common.version>[3.1.6]</dnet-openaire-broker-common.version>
         <google.gson.version>2.2.2</google.gson.version>

@@ -20,12 +20,4 @@
 		<module>dhp-build-properties-maven-plugin</module>
 	</modules>
 
-
- <distributionManagement>
-	 <site>
-		 <id>DHPSite</id>
-		 <url>${dhp.site.stage.path}/dhp-build/</url>
-	 </site>
- </distributionManagement>
-
 </project>
