@@ -4,7 +4,7 @@
     <parent>
         <groupId>eu.dnetlib.dhp</groupId>
         <artifactId>dhp-workflows</artifactId>
-        <version>1.2.5</version>
+        <version>1.2.6-SNAPSHOT</version>
     </parent>
 
     <artifactId>dhp-impact-indicators</artifactId>
@@ -21,7 +21,7 @@
     <scm>
         <url>https://github.com/athenarc/Bip-Ranker</url>
         <connection>scm:git:https://github.com/athenarc/Bip-Ranker.git</connection>
-      <tag>dhp-1.2.5</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <build>
