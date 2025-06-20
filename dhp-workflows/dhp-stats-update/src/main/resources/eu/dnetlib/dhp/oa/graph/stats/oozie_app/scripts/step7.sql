@@ -125,27 +125,19 @@ UNION ALL
 SELECT *
 FROM ${stats_db_name}.otherresearchproduct_topics; /*EOS*/
 
-
-DROP TABLE IF EXISTS ${stats_db_name}.result_fos_base_tmp purge; /*EOS*/
-
-create table ${stats_db_name}.result_fos_base_tmp stored as parquet as
-select /*+ COALESCE(100) */ id, topic from ${stats_db_name}.result_topics where type='Fields of Science and Technology classification'; /*EOS*/
-
-ANALYZE TABLE ${stats_db_name}.result_fos_base_tmp COMPUTE STATISTICS; /*EOS*/
-
 DROP TABLE IF EXISTS ${stats_db_name}.result_fos purge; /*EOS*/
-
 create table ${stats_db_name}.result_fos stored as parquet as
 with
-    lvl1 as (select * from ${stats_db_name}.result_fos_base_tmp where topic like '__ %'),
-    lvl2 as (select * from ${stats_db_name}.result_fos_base_tmp where topic like '____ %'),
-    lvl3 as (select * from ${stats_db_name}.result_fos_base_tmp where topic like '______ %'),
-    lvl4 as (select * from ${stats_db_name}.result_fos_base_tmp where topic like '________ %')
-select /*+ COALESCE(100) */ lvl1.id, lvl1.topic as lvl1, lvl2.topic as lvl2, lvl3.topic as lvl3, lvl4.topic as lvl4
+    result_fos_base_tmp as (select id, topic from ${stats_db_name}.result_topics where type='Fields of Science and Technology classification'),
+    lvl1 as (select * from result_fos_base_tmp where topic like '__ %'),
+    lvl2 as (select * from result_fos_base_tmp where topic like '____ %'),
+    lvl3 as (select * from result_fos_base_tmp where topic like '______ %'),
+    lvl4 as (select * from result_fos_base_tmp where topic like '________ %')
+select lvl1.id, lvl1.topic as lvl1, lvl2.topic as lvl2, lvl3.topic as lvl3, lvl4.topic as lvl4
 from lvl1
-    join lvl2 on lvl1.id=lvl2.id and substr(lvl2.topic, 1, 2)=substr(lvl1.topic, 1, 2)
-    join lvl3 on lvl3.id=lvl1.id and substr(lvl3.topic, 1, 4)=substr(lvl2.topic, 1, 4)
-    join lvl4 on lvl4.id=lvl1.id and substr(lvl4.topic, 1, 6)=substr(lvl3.topic, 1, 6); /*EOS*/
+         left outer join lvl2 on lvl1.id=lvl2.id and substr(lvl2.topic, 1, 2)=substr(lvl1.topic, 1, 2)
+         left outer join lvl3 on lvl3.id=lvl1.id and substr(lvl3.topic, 1, 4)=substr(lvl2.topic, 1, 4)
+         left outer join lvl4 on lvl4.id=lvl1.id and substr(lvl4.topic, 1, 6)=substr(lvl3.topic, 1, 6); /*EOS*/
 
 ANALYZE TABLE ${stats_db_name}.result_fos COMPUTE STATISTICS; /*EOS*/
 
