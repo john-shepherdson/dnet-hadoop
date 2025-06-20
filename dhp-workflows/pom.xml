@@ -80,7 +80,7 @@
         <dependency>
             <groupId>eu.dnetlib.dhp</groupId>
             <artifactId>dhp-build-assembly-resources</artifactId>
-            <version>${project.version}</version>
+            <version>1.2.6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.oozie</groupId>
@@ -212,7 +212,7 @@
                             <dependency>
                                 <groupId>eu.dnetlib.dhp</groupId>
                                 <artifactId>dhp-build-assembly-resources</artifactId>
-                                <version>${project.version}</version>
+                                <version>1.2.6-SNAPSHOT</version>
                                 <!-- contains project-default.properties -->
                             </dependency>
                         </dependencies>
@@ -262,7 +262,7 @@
                     <plugin>
                         <groupId>eu.dnetlib.dhp</groupId>
                         <artifactId>dhp-build-properties-maven-plugin</artifactId>
-                        <version>${project.version}</version>
+                        <version>1.2.6-SNAPSHOT</version>
                         <executions>
                             <execution>
                                 <phase>validate</phase>
@@ -327,7 +327,7 @@
                             <dependency>
                                 <groupId>eu.dnetlib.dhp</groupId>
                                 <artifactId>dhp-build-assembly-resources</artifactId>
-                                <version>${project.version}</version>
+                                <version>1.2.6-SNAPSHOT</version>
                             </dependency>
                         </dependencies>
                         <executions>

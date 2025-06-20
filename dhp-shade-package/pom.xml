@@ -24,7 +24,6 @@
         <dependency>
             <groupId>eu.dnetlib.dhp</groupId>
             <artifactId>dhp-aggregation</artifactId>
-            <version>${project.version}</version>
         </dependency>
 <!--        <dependency>-->
 <!--            <groupId>eu.dnetlib.dhp</groupId>-->
@@ -39,7 +38,6 @@
         <dependency>
             <groupId>eu.dnetlib.dhp</groupId>
             <artifactId>dhp-dedup-openaire</artifactId>
-            <version>${project.version}</version>
         </dependency>
 <!--        <dependency>-->
 <!--            <groupId>eu.dnetlib.dhp</groupId>-->
@@ -49,7 +47,6 @@
         <dependency>
             <groupId>eu.dnetlib.dhp</groupId>
             <artifactId>dhp-graph-mapper</artifactId>
-            <version>${project.version}</version>
         </dependency>
 <!--        <dependency>-->
 <!--            <groupId>eu.dnetlib.dhp</groupId>-->
