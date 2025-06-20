@@ -12,6 +12,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -24,12 +25,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.broker.objects.alerts.ValidatorAlertMessage;
 import eu.dnetlib.broker.objects.alerts.ValidatorErrorMessage;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.broker.model.MappedFields;
-import eu.dnetlib.dhp.broker.model.Notification;
+import eu.dnetlib.dhp.broker.model.MapCondition;
+import eu.dnetlib.dhp.broker.model.OaAlertMappedFields;
+import eu.dnetlib.dhp.broker.model.OaAlertNotification;
 import eu.dnetlib.dhp.broker.model.Subscription;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
 import eu.dnetlib.dhp.broker.oa.util.aggregators.stats.DatasourceStats;
@@ -137,39 +140,41 @@ public class GenerateAlertNotificationsJob {
 
 			updateStats(brokerApiBaseUrl, stats);
 
-			final List<Subscription> subscriptions = listSubscriptions(dsId, topic);
+			final List<Subscription> subscriptions = listSubscriptions(brokerApiBaseUrl)
+					.stream()
+					.filter(s -> s.getTopic().equals(topic))
+					.filter(s -> extractDatasourceId(s).equalsIgnoreCase(dsId))
+					.collect(Collectors.toList());
 
 			final Long date = new Date().getTime();
 			log.info("date: {}", date);
 
 			if (subscriptions.size() > 0) {
 
-				final Dataset<Notification> dataset =
-						payloads.flatMap(p -> generateAlertNotifications(p, date, subscriptions).iterator(), Encoders.bean(Notification.class))
+				final Dataset<OaAlertNotification> dataset =
+						payloads.flatMap(p -> generateAlertNotifications(p, date, subscriptions).iterator(), Encoders.bean(OaAlertNotification.class))
 								.filter(n -> StringUtils.isNotBlank(n.getPayload()));
 
-				ClusterUtils.save(dataset, outputPath, Notification.class, total);
+				ClusterUtils.save(dataset, outputPath, OaAlertNotification.class, total);
 			} else {
-				ClusterUtils.save(spark.emptyDataset(Encoders.bean(Notification.class)), outputPath, Notification.class, total);
+				ClusterUtils.save(spark.emptyDataset(Encoders.bean(OaAlertNotification.class)), outputPath, OaAlertNotification.class, total);
 			}
 		});
 	}
 
-	private static List<Notification> generateAlertNotifications(final ValidatorAlertMessage alertMessage,
+	private static List<OaAlertNotification> generateAlertNotifications(final ValidatorAlertMessage alertMessage,
 			final Long date,
 			final List<Subscription> subscriptions) {
 
-		final MappedFields fields = new MappedFields();
-
-		// TODO correggere il modello
-		// fields.put("originalId", alertMessage.getOriginalId());
-		// fields.put("datasourceId", alertMessage.getDatasourceId());
-		// fields.put("datasourceName", alertMessage.getDatasourceName());
+		final OaAlertMappedFields fields = new OaAlertMappedFields();
+		fields.setOriginalId(alertMessage.getOriginalId());
+		fields.setDatasourceId(alertMessage.getDatasourceId());
+		fields.setDatasourceName(alertMessage.getDatasourceName());
 
 		final String eventId = "evt-" + UUID.randomUUID();
 
 		return subscriptions.stream().map(s -> {
-			final Notification n = new Notification();
+			final OaAlertNotification n = new OaAlertNotification();
 			n.setNotificationId("ntf-" + DigestUtils.md5Hex(s.getSubscriptionId() + "@@@" + eventId));
 			n.setEventId(eventId);
 			n.setDate(date);
@@ -187,9 +192,19 @@ public class GenerateAlertNotificationsJob {
 		}).collect(Collectors.toList());
 	}
 
-	private static List<Subscription> listSubscriptions(final String dsId, final String topic) {
-		// TODO Auto-generated method stub
-		return null;
+	private static List<Subscription> listSubscriptions(final String brokerApiBaseUrl) throws Exception {
+		final String url = brokerApiBaseUrl + "/api/subscriptions";
+		final HttpGet req = new HttpGet(url);
+
+		final ObjectMapper mapper = new ObjectMapper();
+
+		try (final CloseableHttpClient client = HttpClients.createDefault()) {
+			try (final CloseableHttpResponse response = client.execute(req)) {
+				final String s = IOUtils.toString(response.getEntity().getContent());
+				return mapper
+						.readValue(s, mapper.getTypeFactory().constructCollectionType(List.class, Subscription.class));
+			}
+		}
 	}
 
 	private static void updateStats(final String brokerApiBaseUrl, final DatasourceStats stats) throws IOException {
@@ -235,4 +250,14 @@ public class GenerateAlertNotificationsJob {
 
 	}
 
+	private static String extractDatasourceId(final Subscription sub) {
+		return sub.conditionsAsList()
+				.stream()
+				.filter(c -> "datasourceId".equals(c.getField()))
+				.map(MapCondition::getListParams)
+				.filter(l -> !l.isEmpty())
+				.map(l -> l.get(0).getValue())
+				.findFirst()
+				.orElse("");
+	}
 }

@@ -4,7 +4,7 @@ package eu.dnetlib.dhp.broker.model;
 import java.io.Serializable;
 import java.util.List;
 
-public class MappedFields implements Serializable {
+public class OaMappedFields implements Serializable {
 
 	/**
 	 *
@@ -26,7 +26,7 @@ public class MappedFields implements Serializable {
 	private String provenanceResultId;
 
 	public String getTargetDatasourceId() {
-		return targetDatasourceId;
+		return this.targetDatasourceId;
 	}
 
 	public void setTargetDatasourceId(final String targetDatasourceId) {
@@ -34,7 +34,7 @@ public class MappedFields implements Serializable {
 	}
 
 	public String getTargetDatasourceName() {
-		return targetDatasourceName;
+		return this.targetDatasourceName;
 	}
 
 	public void setTargetDatasourceName(final String targetDatasourceName) {
@@ -42,7 +42,7 @@ public class MappedFields implements Serializable {
 	}
 
 	public String getTargetDatasourceType() {
-		return targetDatasourceType;
+		return this.targetDatasourceType;
 	}
 
 	public void setTargetDatasourceType(final String targetDatasourceType) {
@@ -50,7 +50,7 @@ public class MappedFields implements Serializable {
 	}
 
 	public String getTargetResultId() {
-		return targetResultId;
+		return this.targetResultId;
 	}
 
 	public void setTargetResultId(final String targetResultId) {
@@ -58,7 +58,7 @@ public class MappedFields implements Serializable {
 	}
 
 	public String getTargetResultTitle() {
-		return targetResultTitle;
+		return this.targetResultTitle;
 	}
 
 	public void setTargetResultTitle(final String targetResultTitle) {
@@ -66,7 +66,7 @@ public class MappedFields implements Serializable {
 	}
 
 	public long getTargetDateofacceptance() {
-		return targetDateofacceptance;
+		return this.targetDateofacceptance;
 	}
 
 	public void setTargetDateofacceptance(final long targetDateofacceptance) {
@@ -74,7 +74,7 @@ public class MappedFields implements Serializable {
 	}
 
 	public List<String> getTargetSubjects() {
-		return targetSubjects;
+		return this.targetSubjects;
 	}
 
 	public void setTargetSubjects(final List<String> targetSubjects) {
@@ -82,7 +82,7 @@ public class MappedFields implements Serializable {
 	}
 
 	public List<String> getTargetAuthors() {
-		return targetAuthors;
+		return this.targetAuthors;
 	}
 
 	public void setTargetAuthors(final List<String> targetAuthors) {
@@ -90,7 +90,7 @@ public class MappedFields implements Serializable {
 	}
 
 	public float getTrust() {
-		return trust;
+		return this.trust;
 	}
 
 	public void setTrust(final float trust) {
@@ -98,7 +98,7 @@ public class MappedFields implements Serializable {
 	}
 
 	public String getProvenanceDatasourceId() {
-		return provenanceDatasourceId;
+		return this.provenanceDatasourceId;
 	}
 
 	public void setProvenanceDatasourceId(final String provenanceDatasourceId) {
@@ -106,7 +106,7 @@ public class MappedFields implements Serializable {
 	}
 
 	public String getProvenanceDatasourceName() {
-		return provenanceDatasourceName;
+		return this.provenanceDatasourceName;
 	}
 
 	public void setProvenanceDatasourceName(final String provenanceDatasourceName) {
@@ -114,7 +114,7 @@ public class MappedFields implements Serializable {
 	}
 
 	public String getProvenanceDatasourceType() {
-		return provenanceDatasourceType;
+		return this.provenanceDatasourceType;
 	}
 
 	public void setProvenanceDatasourceType(final String provenanceDatasourceType) {
@@ -122,15 +122,11 @@ public class MappedFields implements Serializable {
 	}
 
 	public String getProvenanceResultId() {
-		return provenanceResultId;
+		return this.provenanceResultId;
 	}
 
 	public void setProvenanceResultId(final String provenanceResultId) {
 		this.provenanceResultId = provenanceResultId;
-	}
-
-	public static long getSerialversionuid() {
-		return serialVersionUID;
 	}
 
 }

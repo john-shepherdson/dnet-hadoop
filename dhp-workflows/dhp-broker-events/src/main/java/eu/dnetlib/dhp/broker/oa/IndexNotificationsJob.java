@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.broker.model.Notification;
+import eu.dnetlib.dhp.broker.model.OaNotification;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
 import eu.dnetlib.dhp.broker.oa.util.ESIndexer;
 
@@ -27,10 +27,9 @@ public class IndexNotificationsJob {
 	public static void main(final String[] args) throws Exception {
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
-			IOUtils
-				.toString(
-					IndexNotificationsJob.class
-						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/index_notifications.json")));
+				IOUtils
+						.toString(IndexNotificationsJob.class
+								.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/index_notifications.json")));
 		parser.parseArgument(args);
 
 		final SparkConf conf = new SparkConf();
@@ -62,15 +61,15 @@ public class IndexNotificationsJob {
 		final SparkSession spark = SparkSession.builder().config(conf).getOrCreate();
 
 		final Long date = ClusterUtils
-			.readPath(spark, notificationsPath, Notification.class)
-			.first()
-			.getDate();
+				.readPath(spark, notificationsPath, OaNotification.class)
+				.first()
+				.getDate();
 
-		final Dataset<Notification> dataset = ClusterUtils
-			.readPath(spark, notificationsPath, Notification.class);
+		final Dataset<OaNotification> dataset = ClusterUtils
+				.readPath(spark, notificationsPath, OaNotification.class);
 
 		final ESIndexer indexer = new ESIndexer(indexHost, index, esBatchWriteRetryCount, esBatchWriteRetryWait,
-			esBatchSizeEntries, esNodesWanOnly);
+				esBatchSizeEntries, esNodesWanOnly);
 
 		indexer.performIndex(dataset, "notificationId");
 
