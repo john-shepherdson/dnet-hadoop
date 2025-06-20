@@ -14,13 +14,6 @@
     <artifactId>dhp-shade-package</artifactId>
     <packaging>jar</packaging>
 
-    <distributionManagement>
-        <site>
-            <id>DHPSite</id>
-            <url>${dhp.site.stage.path}/dhp-common</url>
-        </site>
-    </distributionManagement>
-
     <description>This module create a jar of all module dependencies</description>
 
 
