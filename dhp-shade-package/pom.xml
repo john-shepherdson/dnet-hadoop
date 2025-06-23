@@ -12,13 +12,6 @@
     <artifactId>dhp-shade-package</artifactId>
     <packaging>jar</packaging>
 
-    <distributionManagement>
-        <site>
-            <id>DHPSite</id>
-            <url>${dhp.site.stage.path}/dhp-common</url>
-        </site>
-    </distributionManagement>
-
     <description>This module create a jar of all module dependencies</description>
 
 
@@ -116,7 +109,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.5.3</version>
+                <version>3.4.1</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
