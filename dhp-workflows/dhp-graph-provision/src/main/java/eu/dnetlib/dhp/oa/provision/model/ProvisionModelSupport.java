@@ -795,7 +795,7 @@ public class ProvisionModelSupport {
 					.stream()
 					.filter(s -> Objects.nonNull(s.getQualifier()))
 					.filter(s -> Objects.nonNull(s.getQualifier().getClassname()))
-					.filter(ProvisionModelSupport::filterFosL1L2)
+					//.filter(ProvisionModelSupport::filterFosL1L2)
 					.map(
 						s -> eu.dnetlib.dhp.schema.solr.Subject
 							.newInstance(s.getValue(), s.getQualifier().getClassid(), s.getQualifier().getClassname()))
