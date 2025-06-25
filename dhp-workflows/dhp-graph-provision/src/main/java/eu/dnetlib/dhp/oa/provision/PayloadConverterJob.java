@@ -117,7 +117,7 @@ public class PayloadConverterJob {
 
 		spark
 			.read()
-			.load(toSeq(paths))
+			.load(toSeq(paths).toSeq())
 			.as(Encoders.kryo(JoinedEntity.class))
 			.filter(
 				filterDeletedByInferenceFn())

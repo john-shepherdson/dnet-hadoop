@@ -1,0 +1,20 @@
+[
+  {
+    "paramName": "t",
+    "paramLongName": "outputPath",
+    "paramDescription": "the target path",
+    "paramRequired": true
+  },
+  {
+    "paramName": "hmu",
+    "paramLongName": "hiveMetastoreUris",
+    "paramDescription": "the hive metastore uris",
+    "paramRequired": true
+  },
+  {
+    "paramName": "db",
+    "paramLongName": "hiveDbName",
+    "paramDescription": "the graph hive database name",
+    "paramRequired": true
+  }
+]

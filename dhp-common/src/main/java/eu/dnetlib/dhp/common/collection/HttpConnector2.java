@@ -59,6 +59,10 @@ public class HttpConnector2 {
 		return attemptDownloadAsString(requestUrl, 1, new AggregatorReport());
 	}
 
+	public InputStream getInputSourceAsBinary(final String requestUrl) throws CollectorException, IOException {
+		return attemptDownload(requestUrl, 1, new AggregatorReport());
+	}
+
 	/**
 	 * Given the URL returns the content via HTTP GET
 	 *

@@ -17,9 +17,9 @@ import eu.dnetlib.dhp.oa.merge.AuthorMerger;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.MergeUtils;
+import eu.dnetlib.dhp.utils.DHPUtils;
 import scala.Tuple2;
 import scala.Tuple3;
-import scala.collection.JavaConversions;
 
 public class DedupRecordFactory {
 	public static final class DedupRecordReduceState {
@@ -89,7 +89,7 @@ public class DedupRecordFactory {
 			.selectExpr("source as dedupId", "target as id");
 
 		return mergeRels
-			.join(entities, JavaConversions.asScalaBuffer(Collections.singletonList("id")), "left")
+			.join(entities, DHPUtils.toSeq(Collections.singletonList("id")).toSeq(), "left")
 			.select("dedupId", "id", "kryoObject")
 			.as(Encoders.tuple(Encoders.STRING(), Encoders.STRING(), kryoEncoder))
 			.groupByKey((MapFunction<Tuple3<String, String, OafEntity>, String>) Tuple3::_1, Encoders.STRING())

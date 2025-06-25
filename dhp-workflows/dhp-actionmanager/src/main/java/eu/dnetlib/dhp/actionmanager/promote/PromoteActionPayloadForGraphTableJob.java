@@ -137,14 +137,18 @@ public class PromoteActionPayloadForGraphTableJob {
 		Class<G> rowClazz,
 		Class<A> actionPayloadClazz, Boolean shouldGroupById) {
 		Dataset<G> rowDS = readGraphTable(spark, inputGraphTablePath, rowClazz);
-		Dataset<A> actionPayloadDS = readActionPayload(spark, inputActionPayloadPath, actionPayloadClazz);
+		if (HdfsSupport.exists(inputActionPayloadPath, spark.sparkContext().hadoopConfiguration())) {
+			Dataset<A> actionPayloadDS = readActionPayload(spark, inputActionPayloadPath, actionPayloadClazz);
 
-		Dataset<G> result = promoteActionPayloadForGraphTable(
-			rowDS, actionPayloadDS, mergeAndGetStrategy, promoteActionStrategy, rowClazz, actionPayloadClazz,
-			shouldGroupById)
-				.map((MapFunction<G, G>) value -> value, Encoders.bean(rowClazz));
+			Dataset<G> result = promoteActionPayloadForGraphTable(
+				rowDS, actionPayloadDS, mergeAndGetStrategy, promoteActionStrategy, rowClazz, actionPayloadClazz,
+				shouldGroupById)
+					.map((MapFunction<G, G>) value -> value, Encoders.bean(rowClazz));
 
-		saveGraphTable(result, outputGraphTablePath);
+			saveGraphTable(result, outputGraphTablePath);
+		} else {
+			saveGraphTable(rowDS, outputGraphTablePath);
+		}
 	}
 
 	private static <G extends Oaf> Dataset<G> readGraphTable(

@@ -13,7 +13,6 @@ import java.net.URI;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
-import org.mortbay.log.Log;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 
@@ -39,9 +38,5 @@ public class ExtractCrossrefRecords {
         FileSystem fs = FileSystem.get(URI.create(workingPath), conf);
 
         doExtract(fs, outputPath, workingPath.concat("/").concat(crossrefFileNameTarGz));
-
-        Log.info("Crossref dump reading completed");
-
     }
-
 }

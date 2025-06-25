@@ -41,6 +41,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <cdh.hive.version>1.1.0-cdh5.16.2</cdh.hive.version>
         <cdh.hadoop.version>2.6.0-cdh5.16.2</cdh.hadoop.version>
+        <enforcer.skip>true</enforcer.skip>
     </properties>
 
     <dependencies>

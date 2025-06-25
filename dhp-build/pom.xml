@@ -14,9 +14,20 @@
 		<maven.javadoc.skip>true</maven.javadoc.skip>
 	</properties>
 
-	<modules>
-		<module>dhp-build-assembly-resources</module>
-		<module>dhp-build-properties-maven-plugin</module>
-	</modules>
-
+	<profiles>
+		<profile>
+			<id>spark24</id>
+			<modules>
+				<module>dhp-build-assembly-resources</module>
+				<module>dhp-build-properties-maven-plugin</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>spark34</id>
+			<modules>
+				<module>dhp-build-assembly-resources</module>
+				<module>dhp-build-properties-maven-plugin</module>
+			</modules>
+		</profile>
+	</profiles>
 </project>
