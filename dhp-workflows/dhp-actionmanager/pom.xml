@@ -4,7 +4,7 @@
     <parent>
         <groupId>eu.dnetlib.dhp</groupId>
         <artifactId>dhp-workflows</artifactId>
-        <version>1.2.5-SNAPSHOT</version>
+        <version>1.2.6-SNAPSHOT</version>
     </parent>
     <artifactId>dhp-actionmanager</artifactId>
 
@@ -22,7 +22,6 @@
         <dependency>
             <groupId>eu.dnetlib.dhp</groupId>
             <artifactId>dhp-common</artifactId>
-            <version>${project.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>net.sf.saxon</groupId>

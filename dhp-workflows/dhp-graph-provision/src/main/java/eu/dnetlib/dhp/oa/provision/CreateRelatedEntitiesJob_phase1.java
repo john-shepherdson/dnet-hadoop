@@ -96,15 +96,13 @@ public class CreateRelatedEntitiesJob_phase1 {
 			.map(
 				(MapFunction<Relation, Tuple2<String, Relation>>) r -> new Tuple2<>(r.getTarget(),
 					r),
-				Encoders.tuple(Encoders.STRING(), Encoders.kryo(Relation.class)))
-			.cache();
+				Encoders.tuple(Encoders.STRING(), Encoders.kryo(Relation.class)));
 
 		final Dataset<Tuple2<String, RelatedEntity>> entities = readPathEntity(spark, inputEntityPath, clazz)
 			.filter("dataInfo.invisible == false")
 			.map(
 				(MapFunction<E, Tuple2<String, RelatedEntity>>) e -> new Tuple2<>(e.getId(), asRelatedEntity(e, clazz)),
-				Encoders.tuple(Encoders.STRING(), Encoders.kryo(RelatedEntity.class)))
-			.cache();
+				Encoders.tuple(Encoders.STRING(), Encoders.kryo(RelatedEntity.class)));
 
 		relsByTarget
 			.joinWith(entities, entities.col("_1").equalTo(relsByTarget.col("_1")), "inner")

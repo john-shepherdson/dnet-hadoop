@@ -46,3 +46,5 @@ do
    tmp=`echo "$i"  | sed 's/'-'/'_'/g' | sed 's/'::'/'_'/g'`
   createShadowDB ${MONITOR_DB}'_'${tmp} ${MONITOR_DB_SHADOW}'_shadow_'${tmp}
 done
+
+createShadowDB $MONITOR_DB'_ie' $MONITOR_DB_SHADOW'_shadow_ie'

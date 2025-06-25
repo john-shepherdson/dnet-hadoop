@@ -52,7 +52,6 @@ object SparkResolveRelationById {
       .schema(Encoders.bean(classOf[Relation]).schema)
       .json(s"$graphBasePath/relation")
       .as[Relation]
-      .map(r => resolveRelations(r))
       .join(mergedrels, col("source") === mergedrels.col("mergedId"), "left")
       .withColumn("source", expr("coalesce(dedupId, source)"))
       .drop("mergedId", "dedupID")
@@ -64,26 +63,4 @@ object SparkResolveRelationById {
       .mode(SaveMode.Overwrite)
       .json(s"$targetPath/relation")
   }
-
-  private def resolveRelations(r: Relation): Relation = {
-    if (r.getSource.startsWith("unresolved::"))
-      r.setSource(resolvePid(r.getSource.substring(12)))
-
-    if (r.getTarget.startsWith("unresolved::"))
-      r.setTarget(resolvePid(r.getTarget.substring(12)))
-
-    r
-  }
-
-  private def resolvePid(str: String): String = {
-    val parts = str.split("::")
-    val id = parts(0)
-    val scheme: String = parts.last match {
-      case "arxiv" => "arXiv"
-      case _       => parts.last
-    }
-
-    IdentifierFactory.idFromPid("50", scheme, id, true)
-  }
-
 }

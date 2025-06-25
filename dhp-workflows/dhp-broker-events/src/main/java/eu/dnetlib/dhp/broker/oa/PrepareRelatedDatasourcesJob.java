@@ -13,6 +13,7 @@ import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.functions;
 import org.apache.spark.util.LongAccumulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,7 +80,7 @@ public class PrepareRelatedDatasourcesJob {
 					Encoders.bean(OaBrokerRelatedDatasource.class));
 
 			final Dataset<RelatedDatasource> dataset = rels
-				.joinWith(datasources, datasources.col("openaireId").equalTo(rels.col("_2")), "inner")
+				.joinWith(functions.broadcast(datasources), datasources.col("openaireId").equalTo(rels.col("_2")), "inner")
 				.map(
 					(MapFunction<Tuple2<Tuple3<String, String, String>, OaBrokerRelatedDatasource>, RelatedDatasource>) t -> {
 						final RelatedDatasource r = new RelatedDatasource();

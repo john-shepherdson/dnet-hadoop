@@ -14,6 +14,7 @@ import java.util.zip.ZipInputStream;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
@@ -21,7 +22,6 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FlatMapFunction;
-import org.apache.spark.api.java.function.ForeachFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.*;
 import org.slf4j.Logger;
@@ -35,7 +35,6 @@ import scala.Tuple2;
 
 /**
  * @author miriam.baglioni
- * @Date 29/02/24
  */
 public class MapOCIdsInPids implements Serializable {
 
@@ -129,14 +128,13 @@ public class MapOCIdsInPids implements Serializable {
 			.read()
 			.format("csv")
 			.option("sep", DELIMITER)
-			.option("inferSchema", "true")
-			.option("header", "true")
+			.option("header", "false")
 			.option("quotes", "\"")
 			.load(inputPath + "/correspondence/omid.csv")
 			.repartition(5000)
 			.flatMap((FlatMapFunction<Row, Tuple2<String, String>>) r -> {
-				String ocIdentifier = r.getAs("omid");
-				String[] correspondentIdentifiers = ((String) r.getAs("id")).split(" ");
+				String ocIdentifier = r.getString(0);
+				String[] correspondentIdentifiers = r.getString(1).split("; ");
 				return Arrays
 					.stream(correspondentIdentifiers)
 					.map(ci -> new Tuple2<String, String>(ocIdentifier, ci))
@@ -148,8 +146,8 @@ public class MapOCIdsInPids implements Serializable {
 			.joinWith(correspondenceData, coci.col("citing").equalTo(correspondenceData.col("_1")))
 			.map((MapFunction<Tuple2<COCI, Tuple2<String, String>>, COCI>) t2 -> {
 				String correspondent = t2._2()._2();
-				t2._1().setCiting_pid(correspondent.substring(0, correspondent.indexOf(":")));
-				t2._1().setCiting(correspondent.substring(correspondent.indexOf(":") + 1));
+				t2._1().setCiting_pid(StringUtils.substringBefore(correspondent, ":"));
+				t2._1().setCiting(StringUtils.substringAfter(correspondent, ":"));
 				return t2._1();
 			}, Encoders.bean(COCI.class));
 
@@ -157,8 +155,8 @@ public class MapOCIdsInPids implements Serializable {
 			.joinWith(correspondenceData, mappedCitingDataset.col("cited").equalTo(correspondenceData.col("_1")))
 			.map((MapFunction<Tuple2<COCI, Tuple2<String, String>>, COCI>) t2 -> {
 				String correspondent = t2._2()._2();
-				t2._1().setCited_pid(correspondent.substring(0, correspondent.indexOf(":")));
-				t2._1().setCited(correspondent.substring(correspondent.indexOf(":") + 1));
+				t2._1().setCited_pid(StringUtils.substringBefore(correspondent, ":"));
+				t2._1().setCited(StringUtils.substringAfter(correspondent, ":"));
 				return t2._1();
 			}, Encoders.bean(COCI.class))
 			.write()

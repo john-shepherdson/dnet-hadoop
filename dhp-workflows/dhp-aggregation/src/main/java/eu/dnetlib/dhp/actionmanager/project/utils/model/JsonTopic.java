@@ -5,7 +5,6 @@ import java.io.Serializable;
 
 /**
  * @author miriam.baglioni
- * @Date 28/02/23
  */
 public class JsonTopic implements Serializable {
 	private String projectID;

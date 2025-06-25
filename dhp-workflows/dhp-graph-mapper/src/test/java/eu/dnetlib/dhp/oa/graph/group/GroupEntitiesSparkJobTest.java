@@ -8,6 +8,7 @@ import static org.mockito.Mockito.lenient;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -198,7 +199,8 @@ public class GroupEntitiesSparkJobTest {
 			.readLines(
 				Objects
 					.requireNonNull(
-						getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/terms.txt")));
+						getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/terms.txt")),
+				Charset.defaultCharset());
 	}
 
 	private List<String> synonyms() throws IOException {
@@ -206,7 +208,8 @@ public class GroupEntitiesSparkJobTest {
 			.readLines(
 				Objects
 					.requireNonNull(
-						getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/synonyms.txt")));
+						getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/synonyms.txt")),
+				Charset.defaultCharset());
 	}
 
 	private ArgumentApplicationParser args(String paramSpecs, String[] args) throws IOException, ParseException {
@@ -220,7 +223,8 @@ public class GroupEntitiesSparkJobTest {
 			.toString(
 				Objects
 					.requireNonNull(
-						GroupEntitiesSparkJobTest.class.getResourceAsStream(path)));
+						GroupEntitiesSparkJobTest.class.getResourceAsStream(path)),
+				Charset.defaultCharset());
 	}
 
 }
