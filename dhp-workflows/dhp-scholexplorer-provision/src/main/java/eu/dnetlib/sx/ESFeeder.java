@@ -41,7 +41,8 @@ public class ESFeeder implements Closeable {
 		final RestClient client = RestClient
 			.builder(
 				HttpHost.create(url))
-				.setRequestConfigCallback(conf -> conf
+			.setRequestConfigCallback(
+				conf -> conf
 					.setConnectTimeout(60000)
 					.setSocketTimeout(60000))
 			.build();
@@ -111,12 +112,12 @@ public class ESFeeder implements Closeable {
 				} else
 					return;
 			} catch (Exception e) {
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException ex) {
-                    throw new RuntimeException(ex);
-                }
-            }
+				try {
+					Thread.sleep(2000);
+				} catch (InterruptedException ex) {
+					throw new RuntimeException(ex);
+				}
+			}
 		}
 
 	}
