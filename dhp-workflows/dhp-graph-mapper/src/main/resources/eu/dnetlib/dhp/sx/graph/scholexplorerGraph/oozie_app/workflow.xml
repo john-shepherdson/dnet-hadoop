@@ -26,7 +26,7 @@
         </property>
         <property>
             <name>sparkApplicationOpts</name>
-            <value>--conf spark.sql.shuffle.partitions=3000</value>
+            <value>--conf spark.sql.shuffle.partitions=5000</value>
             <description>spark resource options</description>
         </property>
 
