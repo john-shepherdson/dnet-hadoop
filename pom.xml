@@ -894,10 +894,11 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.5.3</version>
             </plugin>
+            <!--
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>flatten-maven-plugin</artifactId>
-                <version>1.7.1</version>
+                <version>${maven.flatten.plugin.version}</version>
                 <configuration>
                     <defaultOperation>keep</defaultOperation>
                     <flattenMode>clean</flattenMode>
@@ -907,7 +908,6 @@
                     </pomElements>
                 </configuration>
                 <executions>
-                    <!-- enable flattening -->
                     <execution>
                         <id>flatten</id>
                         <phase>process-resources</phase>
@@ -915,7 +915,6 @@
                             <goal>flatten</goal>
                         </goals>
                     </execution>
-                    <!-- ensure proper cleanup -->
                     <execution>
                         <id>flatten.clean</id>
                         <goals>
@@ -924,7 +923,8 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- ENABLE TO CHECK AND RESOLVE CONFLICTS -->
+            -->
+            <!-- ENABLE TO CHECK AND RESOLVE CONFLICTS
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
@@ -943,7 +943,7 @@
                     </execution>
                 </executions>
             </plugin>
-
+        -->
         </plugins>
 
         <extensions>
@@ -982,6 +982,7 @@
         <maven.failsave.plugin.version>2.22.2</maven.failsave.plugin.version>
         <properties.maven.plugin.version>2.0.1</properties.maven.plugin.version>
         <net.alchim31.maven.version>4.0.1</net.alchim31.maven.version>
+        <maven.flatten.plugin.version>1.2.7</maven.flatten.plugin.version>
 
         <!-- dependency versions -->
         <apache.poi.version>4.1.2</apache.poi.version>
@@ -1100,6 +1101,7 @@
 
                 <!-- plugin versions -->
                 <net.alchim31.maven.version>4.8.1</net.alchim31.maven.version>
+                <maven.flatten.plugin.version>1.7.1</maven.flatten.plugin.version>
 
                 <!-- dependencies -->
                 <dhp.hadoop.version>3.3.4</dhp.hadoop.version>
@@ -1156,6 +1158,7 @@
 
                 <!-- plugin versions -->
                 <net.alchim31.maven.version>4.8.1</net.alchim31.maven.version>
+                <maven.flatten.plugin.version>1.7.1</maven.flatten.plugin.version>
 
                 <!-- dependencies -->
                 <dhp.hadoop.version>3.4.1</dhp.hadoop.version>
