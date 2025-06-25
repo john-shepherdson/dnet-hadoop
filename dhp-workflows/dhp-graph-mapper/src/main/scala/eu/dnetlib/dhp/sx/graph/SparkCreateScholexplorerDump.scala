@@ -20,6 +20,28 @@ import org.slf4j.{Logger, LoggerFactory}
 class SparkCreateScholexplorerDump(propertyPath: String, args: Array[String], log: Logger)
     extends AbstractScalaApplication(propertyPath, args, log: Logger) {
 
+  val relationFilters = List(
+      "Cites",
+      "IsSourceOf",
+      "IsRelatedTo",
+      "HasAmongTopNSimilarDocuments",
+      "References",
+      "HasPart",
+      "IsSupplementTo",
+      "IsNewVersionOf",
+      "HasVersion",
+      "Continues",
+      "Documents",
+      "IsIdenticalTo",
+      "IsOriginalFormOf",
+      "Reviews",
+      "Compiles",
+      "Obsoletes",
+      "Describes",
+      "Requires",
+      "IsMetadataOf",
+  )
+
   /** Here all the spark applications runs this method
     * where the whole logic of the spark node is defined
     */
@@ -90,6 +112,7 @@ class SparkCreateScholexplorerDump(propertyPath: String, args: Array[String], lo
       .withColumn("cf", expr("transform(collectedfrom, x -> struct(x.key, x.value))"))
       .drop("collectedfrom")
       .withColumnRenamed("cf", "collectedfrom")
+      .where(col("relClass").isin(relationFilters: _*))
       .groupBy(col("id"))
       .agg(
         first("source").alias("source"),
@@ -116,23 +139,23 @@ class SparkCreateScholexplorerDump(propertyPath: String, args: Array[String], lo
       .save(s"$outputPath/summary")
     val summaries = spark.read.load(s"$outputPath/summary").as[SummaryResource]
 
-    relations
+    val scholix_source = relations
       .joinWith(summaries, relations("source") === summaries("id"))
       .map(k => ScholexplorerUtils.generateScholixFlat(k._1, k._2, true))
-      .write
-      .mode(SaveMode.Overwrite)
-      .save(s"$outputPath/scholix_source")
+//      .write
+//      .mode(SaveMode.Overwrite)
+//      .save(s"$outputPath/scholix_source")
+//
+//    val scholix_source = spark.read.load(s"$outputPath/scholix_source").as[ScholixFlat]
 
-    val scholix_source = spark.read.load(s"$outputPath/scholix_source").as[ScholixFlat]
-
-    relations
+    val scholix_target = relations
       .joinWith(summaries, relations("target") === summaries("id"))
       .map(k => ScholexplorerUtils.generateScholixFlat(k._1, k._2, false))
-      .write
-      .mode(SaveMode.Overwrite)
-      .save(s"$outputPath/scholix_target")
-
-    val scholix_target = spark.read.load(s"$outputPath/scholix_target").as[ScholixFlat]
+//      .write
+//      .mode(SaveMode.Overwrite)
+//      .save(s"$outputPath/scholix_target")
+//
+//    val scholix_target = spark.read.load(s"$outputPath/scholix_target").as[ScholixFlat]
 
     scholix_source
       .joinWith(scholix_target, scholix_source("identifier") === scholix_target("identifier"), "inner")
