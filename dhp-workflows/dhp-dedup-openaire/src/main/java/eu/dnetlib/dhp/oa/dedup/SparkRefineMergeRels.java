@@ -122,19 +122,30 @@ public class SparkRefineMergeRels extends AbstractSparkAction {
 
 			Dataset<Row> conflictualIds = getConflictualIds(rawMergeRels);
 
-			Dataset<Row> conflictualMergeRels = rawMergeRels
-				.join(conflictualIds, rawMergeRels.col("groupId").equalTo(conflictualIds.col("groupId")), "left_semi");
+			// mark mergeRels based on conflictualIds
+			Dataset<Row> markedMergeRels = rawMergeRels
+					.join(conflictualIds, rawMergeRels.col("groupId").equalTo(col("conflictualGroupId")), "left_outer")
+					.withColumn("isConflictual", when(col("conflictualGroupId").isNotNull(), lit(true)).otherwise(lit(false)))
+					.drop(col("conflictualGroupId"))
+					.cache();
 
-			Dataset<Row> splitMergeRels = conflictualMergeRels
+			Dataset<Row> splitMergeRels = markedMergeRels
+				.where(col("isConflictual").equalTo(true))
 				.groupByKey((MapFunction<Row, String>) t -> t.getAs("groupId"), Encoders.STRING())
 				.flatMapGroups(
 					(FlatMapGroupsFunction<String, Row, Row>) (key, values) -> splitGroup(values, dedupConf),
 					RowEncoder.apply(rowSchema))
 				.persist();
 
-			Dataset<Row> cleanMergeRels = rawMergeRels
-				.join(conflictualIds, rawMergeRels.col("groupId").equalTo(conflictualIds.col("groupId")), "left_anti")
-				.select(col("groupId").as("source"), col("target"));
+			// TODO remove
+			saveParquet(splitMergeRels, mergeRelPath + "_split", SaveMode.Overwrite);
+
+			Dataset<Row> cleanMergeRels = markedMergeRels
+					.where(col("isConflictual").equalTo(false))
+					.select("groupId", "target");
+
+			// TODO remove
+			saveParquet(cleanMergeRels, mergeRelPath + "_clean", SaveMode.Overwrite);
 
 			Dataset<Relation> output = cleanMergeRels
 				.union(splitMergeRels)
@@ -152,7 +163,7 @@ public class SparkRefineMergeRels extends AbstractSparkAction {
 
 			saveParquet(output, mergeRelPath + "_refined", SaveMode.Overwrite);
 //			renameParquet(spark, mergeRelPath + "_refined", mergeRelPath);  // TODO put it back
-			splitMergeRels.unpersist();
+			markedMergeRels.unpersist();
 		}
 	}
 
@@ -188,7 +199,7 @@ public class SparkRefineMergeRels extends AbstractSparkAction {
 			.groupBy("groupId")
 			.agg(flatten(collect_list(col("negativeConstraints"))).alias("allConstraints"))
 			.where(size(col("allConstraints")).notEqual(size(array_distinct(col("allConstraints")))))
-			.select("groupId");
+			.select(col("groupId").as("conflictualGroupId"));
 	}
 
 	private static Relation rel(String source, String target, String relClass, DedupConfig dedupConf) {
