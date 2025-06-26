@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
@@ -87,7 +88,9 @@ public class ExtractAndMapDoajJson {
 				if (!fs.isDirectory(path)) {
 					FSDataInputStream is = fs.open(path);
 					CompressionInputStream compressionInputStream = codec.createInputStream(is);
-					DOAJEntry[] doajEntries = new ObjectMapper().readValue(compressionInputStream, DOAJEntry[].class);
+					DOAJEntry[] doajEntries = new ObjectMapper()
+						.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+						.readValue(compressionInputStream, DOAJEntry[].class);
 					Arrays.stream(doajEntries).forEach(doaj -> {
 						try {
 							writer.println(new ObjectMapper().writeValueAsString(getDoajModel(doaj)));

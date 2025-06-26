@@ -33,10 +33,10 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <args>
+                    <!-- <args>
                         <arg>-Xmax-classfile-name</arg>
                         <arg>200</arg>
-                    </args>
+                    </args> -->
                     <failOnMultipleScalaVersions>true</failOnMultipleScalaVersions>
                     <scalaCompatVersion>${scala.binary.version}</scalaCompatVersion>
                     <scalaVersion>${scala.version}</scalaVersion>
@@ -84,9 +84,16 @@
                     <groupId>io.netty</groupId>
                     <artifactId>*</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.apache.zookeeper</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpcore</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
-
         <dependency>
             <groupId>io.dropwizard.metrics</groupId>
             <artifactId>metrics-core</artifactId>
@@ -97,7 +104,6 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpmime</artifactId>
@@ -106,6 +112,7 @@
         <dependency>
             <groupId>org.elasticsearch</groupId>
             <artifactId>elasticsearch-hadoop</artifactId>
+
         </dependency>
 
         <dependency>
@@ -130,7 +137,6 @@
         <dependency>
             <groupId>eu.dnetlib.dhp</groupId>
             <artifactId>dhp-common</artifactId>
-            <version>${project.version}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>log4j</artifactId>

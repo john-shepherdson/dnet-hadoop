@@ -31,6 +31,9 @@ import eu.dnetlib.dhp.schema.solr.Pid;
 
 public class ProvisionModelSupport {
 
+	private final static String ROR_REGEX =	"^(https?://ror.org/)(0[a-z|0-9]{6}[0-9]{2})$";
+	private final static String OPENORGS_REGEX = "(\\d{2}\\|)?(openorgs____)::([a-f0-9]{32})";
+
 	private ProvisionModelSupport() {
 	}
 
@@ -121,12 +124,16 @@ public class ProvisionModelSupport {
 		Optional
 			.ofNullable(relation.getProperties())
 			.ifPresent(props -> {
+
+				// person role in projects
 				props
 					.stream()
 					.filter(p -> "role".equals(p.getKey()))
 					.map(KeyValue::getValue)
 					.findFirst()
 					.ifPresent(rr::setPersonRoleInProject);
+
+				// affiliation timeline
 				List<CodeLabel> affiliationTimeline = props
 					.stream()
 					.filter(p -> "startDate".equals(p.getKey()) || "endDate".equals(p.getKey()))
@@ -134,6 +141,23 @@ public class ProvisionModelSupport {
 					.collect(Collectors.toList());
 				if (!affiliationTimeline.isEmpty()) {
 					rr.setAffiliationsTimeline(affiliationTimeline);
+				}
+
+				// declared affiliation
+				List<DeclaredAffiliation> declaredAffiliations = props
+					.stream()
+					.filter(prop -> "declared_affiliation".equals(prop.getKey()))
+					.map(KeyValue::getValue)
+					.map(v -> {
+						if (v.matches(ROR_REGEX)) {
+							return DeclaredAffiliation.newInstance(v, null);
+						} else if (v.matches(OPENORGS_REGEX)) {
+							return DeclaredAffiliation.newInstance(null, v);
+						} else return null;
+					}).filter(Objects::nonNull)
+					.collect(Collectors.toList());
+				if (!declaredAffiliations.isEmpty()) {
+					rr.setDeclaredAffiliation(declaredAffiliations);
 				}
 			});
 
@@ -795,7 +819,7 @@ public class ProvisionModelSupport {
 					.stream()
 					.filter(s -> Objects.nonNull(s.getQualifier()))
 					.filter(s -> Objects.nonNull(s.getQualifier().getClassname()))
-					.filter(ProvisionModelSupport::filterFosL1L2)
+					//.filter(ProvisionModelSupport::filterFosL1L2)
 					.map(
 						s -> eu.dnetlib.dhp.schema.solr.Subject
 							.newInstance(s.getValue(), s.getQualifier().getClassid(), s.getQualifier().getClassname()))

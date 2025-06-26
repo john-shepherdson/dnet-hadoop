@@ -32,8 +32,6 @@ import eu.dnetlib.dhp.utils.DHPUtils;
 import eu.dnetlib.dhp.utils.ORCIDAuthorEnricherResult;
 import eu.dnetlib.dhp.utils.OrcidAuthor;
 import scala.Tuple2;
-import scala.collection.JavaConverters;
-import scala.collection.mutable.WrappedArray;
 
 public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthors {
 	private static final Logger log = LoggerFactory.getLogger(EnrichExternalDataWithGraphORCID.class);
@@ -245,9 +243,7 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 	}
 
 	private static String getOrcid(Row a) {
-		List<Row> authorPids = JavaConverters
-			.seqAsJavaListConverter(((WrappedArray<Row>) a.getAs("pid")).seq())
-			.asJava();
+		List<Row> authorPids = a.getList(a.fieldIndex("pid"));
 		return authorPids.stream().filter(p -> {
 			Row qualifier = p.getAs("qualifier");
 			return qualifier.getAs("classid").equals("orcid");
@@ -284,15 +280,15 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 
 	private static Iterator<Relation> coAuthorshipRels(Tuple2<Row, Row> t2) {
 
-		List<String> authorsList1 = JavaConverters
-			.seqAsJavaListConverter(((WrappedArray<Row>) t2._1().getAs("orcid_authors")).seq())
-			.asJava()
+		List<String> authorsList1 = t2
+			._1()
+			.<Row> getList(t2._1().fieldIndex("orcid_authors"))
 			.stream()
 			.map(a -> (String) a.getAs("orcid"))
 			.collect(Collectors.toList());
-		List<String> authorsList2 = JavaConverters
-			.seqAsJavaListConverter(((WrappedArray<Row>) t2._2().getAs("enriched_author")).seq())
-			.asJava()
+		List<String> authorsList2 = t2
+			._2()
+			.<Row> getList(t2._2().fieldIndex("enriched_author"))
 			.stream()
 			.map(a -> getOrcid(a))
 			.filter(Objects::nonNull)
@@ -359,14 +355,11 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 
 		List<Relation> relationList = new ArrayList<>();
 
-		List<Row> eauthors = JavaConverters
-			.seqAsJavaListConverter(((WrappedArray<Row>) r.getAs("enriched_author")).seq())
-			.asJava();
+		List<Row> eauthors = r.getList(r.fieldIndex("enriched_author"));
 
 		eauthors.forEach(author -> {
-			List<Row> pids = JavaConverters
-				.seqAsJavaListConverter(((WrappedArray<Row>) author.getAs("pid")).seq())
-				.asJava();
+			List<Row> pids = author.getList(author.fieldIndex("pid"));
+
 			List<Row> pidList = pids
 				.stream()
 				.filter(
@@ -383,10 +376,7 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 						.add(
 							getRelations(
 								r.getAs("doi"),
-								JavaConverters
-									.seqAsJavaListConverter(
-										((WrappedArray<String>) author.getAs("rawAffiliationString")).seq())
-									.asJava(),
+								author.getList(author.fieldIndex("rawAffiliationString")),
 								p.getAs("value"))));
 
 		});
@@ -440,13 +430,11 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 
 		List<Row> publisherPids = new ArrayList<>();
 		if (Optional.ofNullable(a.getAs("pids")).isPresent())
-			publisherPids = JavaConverters.seqAsJavaListConverter(((WrappedArray<Row>) a.getAs("pids")).seq()).asJava();
+			publisherPids = a.getList(a.fieldIndex("pids"));
 
 		publisherPids.forEach(pid -> pids.add(getPid(pid)));
 
-		List<Row> affiliations = JavaConverters
-			.seqAsJavaListConverter(((WrappedArray<Row>) a.getAs("affiliations")).seq())
-			.asJava();
+		List<Row> affiliations = a.getList(a.fieldIndex("affiliations"));
 		// "`Matchings`: ARRAY<STRUCT<`PID`:STRING, `Value`:STRING,`Confidence`:DOUBLE, `Status`:STRING>>,
 		affiliations.forEach(aff -> {
 			String pidtype = aff.getAs("PID");
