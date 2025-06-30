@@ -104,7 +104,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Produces the atomic action with the inferred by OpenAIRE affiliation relations</name>
-            <class>eu.dnetlib.dhp.actionmanager.bipaffiliations.PrepareAffiliationRelations</class>
+            <class>eu.dnetlib.dhp.actionmanager.affro.PrepareAffiliationRelations</class>
             <jar>dhp-aggregation-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}

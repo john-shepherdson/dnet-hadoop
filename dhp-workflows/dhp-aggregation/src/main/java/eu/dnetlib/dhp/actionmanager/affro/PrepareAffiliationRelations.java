@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.actionmanager.bipaffiliations;
+package eu.dnetlib.dhp.actionmanager.affro;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
@@ -27,7 +27,6 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.utils.DoiCleaningRule;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
@@ -57,7 +56,7 @@ public class PrepareAffiliationRelations implements Serializable {
 			.toString(
 				PrepareAffiliationRelations.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/actionmanager/bipaffiliations/input_actionset_parameter.json"));
+							"/eu/dnetlib/dhp/actionmanager/affro/input_actionset_parameter.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 		parser.parseArgument(args);

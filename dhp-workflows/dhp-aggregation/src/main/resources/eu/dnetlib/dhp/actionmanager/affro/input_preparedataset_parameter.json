@@ -1,0 +1,50 @@
+[
+{
+"paramName": "issm",
+"paramLongName": "isSparkSessionManaged",
+"paramDescription": "when true will stop SparkSession after job execution",
+"paramRequired": false
+},
+{
+"paramName": "oalex",
+"paramLongName": "oalexPath",
+"paramDescription": "the path to get the input data from Crossref",
+"paramRequired": true
+},
+{
+"paramName": "oaire",
+"paramLongName": "oairePath",
+"paramDescription": "the path to get the input data from Pubmed",
+"paramRequired": true
+},
+{
+"paramName": "pub",
+"paramLongName": "publishersPath",
+"paramDescription": "the path to get the input data from OpenAPC",
+"paramRequired": true
+},
+{
+"paramName": "iis",
+"paramLongName": "iisPath",
+"paramDescription": "the path to get the input data from Datacite",
+"paramRequired": true
+},
+{
+"paramName": "om",
+"paramLongName": "oldMatches",
+"paramDescription": "the path to get the input data from Web Crawl",
+"paramRequired": true
+},
+{
+"paramName": "op",
+"paramLongName": "outputPath",
+"paramDescription": "the path to get the input data from publishers",
+"paramRequired": true
+},
+{
+"paramName": "all",
+"paramLongName": "applyOnAll",
+"paramDescription": "the path of the new ActionSet",
+"paramRequired": true
+}
+]

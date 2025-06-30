@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.actionmanager.bipaffiliations;
+package eu.dnetlib.dhp.actionmanager.affro;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -74,19 +74,19 @@ public class PrepareAffiliationRelationsTest {
 	void testMatch() throws Exception {
 
 		String crossrefAffiliationRelationPathNew = getClass()
-			.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/doi_to_ror.json")
+			.getResource("/eu/dnetlib/dhp/actionmanager/affro/doi_to_ror.json")
 			.getPath();
 
 		String crossrefAffiliationRelationPath = getClass()
-			.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/doi_to_ror_old.json")
+			.getResource("/eu/dnetlib/dhp/actionmanager/affro/doi_to_ror_old.json")
 			.getPath();
 
 		String publisherAffiliationRelationPath = getClass()
-			.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/publishers")
+			.getResource("/eu/dnetlib/dhp/actionmanager/affro/publishers")
 			.getPath();
 
 		String publisherAffiliationRelationOldPath = getClass()
-			.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/publichers_old")
+			.getResource("/eu/dnetlib/dhp/actionmanager/affro/publichers_old")
 			.getPath();
 
 		String outputPath = workingDir.toString() + "/actionSet";
