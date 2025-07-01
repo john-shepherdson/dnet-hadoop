@@ -142,20 +142,10 @@ class SparkCreateScholexplorerDump(propertyPath: String, args: Array[String], lo
     val scholix_source = relations
       .joinWith(summaries, relations("source") === summaries("id"))
       .map(k => ScholexplorerUtils.generateScholixFlat(k._1, k._2, true))
-//      .write
-//      .mode(SaveMode.Overwrite)
-//      .save(s"$outputPath/scholix_source")
-//
-//    val scholix_source = spark.read.load(s"$outputPath/scholix_source").as[ScholixFlat]
 
     val scholix_target = relations
       .joinWith(summaries, relations("target") === summaries("id"))
       .map(k => ScholexplorerUtils.generateScholixFlat(k._1, k._2, false))
-//      .write
-//      .mode(SaveMode.Overwrite)
-//      .save(s"$outputPath/scholix_target")
-//
-//    val scholix_target = spark.read.load(s"$outputPath/scholix_target").as[ScholixFlat]
 
     scholix_source
       .joinWith(scholix_target, scholix_source("identifier") === scholix_target("identifier"), "inner")
