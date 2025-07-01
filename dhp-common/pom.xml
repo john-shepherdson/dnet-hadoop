@@ -178,6 +178,12 @@
 			<artifactId>opencsv</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>co.elastic.clients</groupId>
+			<artifactId>elasticsearch-java</artifactId>
+		</dependency>
+
+
 	<!-- dependencies required on JDK9+ because J2EE has been removed -->
 		<dependency>
 			<groupId>javax.xml.bind</groupId>
