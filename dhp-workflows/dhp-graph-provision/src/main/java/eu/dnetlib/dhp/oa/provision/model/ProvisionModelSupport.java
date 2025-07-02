@@ -490,26 +490,26 @@ public class ProvisionModelSupport {
 		return Optional
 			.ofNullable(relevantdateList)
 			.map(list -> {
-				String fromDate = null;
-				String toDate = null;
+				String startDate = null;
+				String endDate = null;
 				for (StructuredProperty sp : list) {
 					if (sp.getQualifier() != null && sp.getQualifier().getClassid() != null) {
 						String classid = sp.getQualifier().getClassid();
-						if ("fromDate".equals(classid)) {
-							fromDate = sp.getValue();
-						} else if ("toDate".equals(classid)) {
-							toDate = sp.getValue();
+						if ("startDate".equals(classid)) {
+							startDate = sp.getValue();
+						} else if ("endDate".equals(classid)) {
+							endDate = sp.getValue();
 						}
 					}
 				}
 
-				if (fromDate == null && toDate == null) {
+				if (startDate == null && endDate == null) {
 					return null; // or throw an exception if both are required
 				}
 
 				ActivityPeriod period = new ActivityPeriod();
-				period.setStartDate(fromDate);
-				period.setEndDate(toDate);
+				period.setStartDate(startDate);
+				period.setEndDate(endDate);
 				return period;
 			})
 			.orElse(null);
