@@ -104,7 +104,7 @@ public class SparkRefineMergeRels extends AbstractSparkAction {
 
 			SparkDeduper deduper = new SparkDeduper(dedupConf);
 
-			// compute negative constraints and append to the entities
+			// compute negative constraints
 			Dataset<Row> entities = spark
 				.read()
 				.textFile(DedupUtility.createEntityPath(graphBasePath, subEntity))
@@ -118,52 +118,42 @@ public class SparkRefineMergeRels extends AbstractSparkAction {
 				.where("relClass == 'merges'")
 				.select("source", "target")
 				.join(entities, col("target").equalTo(entities.col("identifier")))
-				.withColumnRenamed("source", "groupId");
+				.withColumnRenamed("source", "groupId");  // (groupId, target)
 
 			Dataset<Row> conflictualIds = getConflictualIds(rawMergeRels);
 
-			// mark mergeRels based on conflictualIds
-			Dataset<Row> markedMergeRels = rawMergeRels
-					.join(conflictualIds, rawMergeRels.col("groupId").equalTo(col("conflictualGroupId")), "left_outer")
-					.withColumn("isConflictual", when(col("conflictualGroupId").isNotNull(), lit(true)).otherwise(lit(false)))
-					.drop(col("conflictualGroupId"))
-					.cache();
+			// collect conflictual merge relations
+			Dataset<Row> conflictualMergeRels = rawMergeRels
+					.join(conflictualIds, rawMergeRels.col("groupId").equalTo(col("conflictualGroupId")), "left_semi");
 
-			Dataset<Row> splitMergeRels = markedMergeRels
-				.where(col("isConflictual").equalTo(true))
+			Dataset<Row> cleanMergeRels = spark
+					.read()
+					.load(mergeRelPath)
+					.as(Encoders.bean(Relation.class))
+					.join(conflictualIds, expr("source = conflictualGroupId OR target = conflictualGroupId"), "left_anti");
+
+			Dataset<Row> splitMergeRels = conflictualMergeRels
 				.groupByKey((MapFunction<Row, String>) t -> t.getAs("groupId"), Encoders.STRING())
 				.flatMapGroups(
 					(FlatMapGroupsFunction<String, Row, Row>) (key, values) -> splitGroup(values, dedupConf),
-					RowEncoder.apply(rowSchema))
-				.persist();
+					RowEncoder.apply(rowSchema));
 
-			// TODO remove
-			saveParquet(splitMergeRels, mergeRelPath + "_split", SaveMode.Overwrite);
+			Dataset<Relation> output = splitMergeRels
+					.flatMap(
+						(FlatMapFunction<Row, Relation>) r -> {
+							String dedupId = r.getString(0);
+							String id = r.getString(1);
 
-			Dataset<Row> cleanMergeRels = markedMergeRels
-					.where(col("isConflictual").equalTo(false))
-					.select("groupId", "target");
+							ArrayList<Relation> res = new ArrayList<>();
+							res.add(rel(dedupId, id, ModelConstants.MERGES, dedupConf));
+							res.add(rel(id, dedupId, ModelConstants.IS_MERGED_IN, dedupConf));
 
-			// TODO remove
-			saveParquet(cleanMergeRels, mergeRelPath + "_clean", SaveMode.Overwrite);
-
-			Dataset<Relation> output = cleanMergeRels
-				.union(splitMergeRels)
-				.flatMap(
-					(FlatMapFunction<Row, Relation>) r -> {
-						String dedupId = r.getString(0);
-						String id = r.getString(1);
-
-						ArrayList<Relation> res = new ArrayList<>();
-						res.add(rel(dedupId, id, ModelConstants.MERGES, dedupConf));
-						res.add(rel(id, dedupId, ModelConstants.IS_MERGED_IN, dedupConf));
-
-						return res.iterator();
-					}, Encoders.bean(Relation.class));
+							return res.iterator();
+						}, Encoders.bean(Relation.class))
+					.union(cleanMergeRels.as(Encoders.bean(Relation.class)));
 
 			saveParquet(output, mergeRelPath + "_refined", SaveMode.Overwrite);
-//			renameParquet(spark, mergeRelPath + "_refined", mergeRelPath);  // TODO put it back
-			markedMergeRels.unpersist();
+			renameParquet(spark, mergeRelPath + "_refined", mergeRelPath);
 		}
 	}
 
@@ -173,19 +163,17 @@ public class SparkRefineMergeRels extends AbstractSparkAction {
 
 		switch (subEntity) {
 			case "organization":
+				Dataset<Row> entitiesWithNwo = entities
+						.withColumn("negativeConstraints", when(lower(col("identifier")).contains("nwo"), array(lit("nwo"))).otherwise(array()));
+
 				Dataset<Row> families = OpenorgsUtility
-					.createFamilies(spark, graphBasePath + "/relation", ModelConstants.IS_PARENT_OF);
+						.createFamilies(spark, graphBasePath + "/relation", ModelConstants.IS_PARENT_OF);
 
-				// construct labels for negative constraints
-				Column negativeConstraints = array_union(
-					when(col("identifier").contains("nwo"), array(lit("nwo"))).otherwise(array()),
-					when(families.col("groupId").isNotNull(), array(families.col("groupId").cast("string")))
-						.otherwise(array()));
+				return entitiesWithNwo
+						.join(families, entitiesWithNwo.col("identifier").equalTo(families.col("id")), "left")
+						.withColumn("negativeConstraints", array_union(col("negativeConstraints"), when(families.col("groupId").isNotNull(), array(families.col("groupId").cast("string"))).otherwise(array())))
+						.drop("id", "groupId", "nwoConstraint", "familyConstraint");
 
-				return entities
-					.join(families, entities.col("identifier").equalTo(families.col("id")), "left")
-					.withColumn("negativeConstraints", negativeConstraints)
-					.drop("id", "groupId");
 			default:
 				return spark.emptyDataFrame();
 		}
@@ -198,7 +186,8 @@ public class SparkRefineMergeRels extends AbstractSparkAction {
 			.select("groupId", "negativeConstraints")
 			.groupBy("groupId")
 			.agg(flatten(collect_list(col("negativeConstraints"))).alias("allConstraints"))
-			.where(size(col("allConstraints")).notEqual(size(array_distinct(col("allConstraints")))))
+			.where(size(col("allConstraints"))
+					.notEqual(size(array_distinct(col("allConstraints")))))
 			.select(col("groupId").as("conflictualGroupId"));
 	}
 

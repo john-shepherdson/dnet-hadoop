@@ -1,11 +1,17 @@
-
 package eu.dnetlib.dhp.oa.dedup;
 
-import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.oa.dedup.model.OrgSimRel;
+import eu.dnetlib.dhp.oa.dedup.model.ParentChildRel;
+import eu.dnetlib.dhp.schema.common.EntityType;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
+import eu.dnetlib.dhp.schema.oaf.Field;
+import eu.dnetlib.dhp.schema.oaf.KeyValue;
+import eu.dnetlib.dhp.schema.oaf.Organization;
+import eu.dnetlib.dhp.schema.oaf.Qualifier;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -17,20 +23,13 @@ import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Lists;
-
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.oa.dedup.model.OrgSimRel;
-import eu.dnetlib.dhp.oa.dedup.model.ParentChildRel;
-import eu.dnetlib.dhp.schema.common.EntityType;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.dhp.utils.ISLookupClientFactory;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import scala.Tuple2;
 import scala.Tuple3;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.Properties;
 
 public class SparkPrepareOrgRels extends AbstractSparkAction {
 
@@ -101,7 +100,7 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 		// collect ParentChildRels from the raw graph relations: <<best id, other id>, "parentChildRel">
 		JavaRDD<Tuple2<Tuple2<String, String>, String>> parentChildRels = OpenorgsUtility
 			.collectRels(
-				spark, relationPath, ModelConstants.IS_PARENT_OF, ModelConstants.ORG_ORG_RELTYPE, ModelConstants.DEDUP,
+				spark, relationPath, ModelConstants.IS_PARENT_OF, ModelConstants.ORG_ORG_RELTYPE, ModelConstants.RELATIONSHIP,
 				false);
 		log.info("Number of Parent/Child Rels collected: {}", parentChildRels.count());
 
@@ -118,19 +117,19 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 
 		// process mergeRels: <source, target, group id>
 		JavaRDD<Tuple3<String, String, String>> processedMergeRels = OpenorgsUtility
-			.processMergeRels(spark, mergeRelPath, diffRels, parentChildRels)
-			.cache();
+			.processMergeRels(spark, mergeRelPath, diffRels, parentChildRels).cache();
+
 		// create parent/child suggestion relations: <parent(raw or representative), child (raw or representative)>
 		Dataset<ParentChildRel> parentChildSuggestions = createParentChildSuggestions(
 			spark, processedMergeRels, parentChildRels, entities).cache();
+
 		// create duplicate suggestion relations: <best id, other id>
-		Dataset<OrgSimRel> duplicatesSuggestions = createDuplicatesSuggestions(spark, processedMergeRels, entities)
-			.cache();
-		processedMergeRels.unpersist();
+		Dataset<OrgSimRel> duplicatesSuggestions = createDuplicatesSuggestions(spark, processedMergeRels, entities).cache();
 
 		final Properties connectionProperties = new Properties();
 		connectionProperties.put("user", dbUser);
 		connectionProperties.put("password", dbPwd);
+		processedMergeRels.unpersist();
 
 		// save dedup events into temporary table
 		duplicatesSuggestions
@@ -147,7 +146,6 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 			.mode(SaveMode.Overwrite)
 			.jdbc(dbUrl, parentChildTable, connectionProperties);
 		parentChildSuggestions.unpersist();
-
 	}
 
 	private static Dataset<ParentChildRel> createParentChildSuggestions(SparkSession spark,
@@ -184,7 +182,8 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 					.asList(
 						new ParentChildRel(j._1(), j._2(), ModelConstants.IS_PARENT_OF),
 						new ParentChildRel(j._2(), j._1(), ModelConstants.IS_CHILD_OF))
-					.iterator());
+					.iterator())
+			.distinct();
 
 		return spark.createDataset(parentChildRelRDD.rdd(), Encoders.bean(ParentChildRel.class));
 	}

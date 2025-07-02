@@ -38,8 +38,8 @@ public class OpenorgsUtility {
 			.read()
 			.schema(Encoders.bean(Relation.class).schema())
 			.json(relationPath)
-			.select("source", "target")
-			.where(col("relClass").equalTo(relClass));
+			.where(col("relClass").equalTo(relClass))
+			.select("source", "target");
 
 		UserDefinedFunction hashUDF = functions
 			.udf(

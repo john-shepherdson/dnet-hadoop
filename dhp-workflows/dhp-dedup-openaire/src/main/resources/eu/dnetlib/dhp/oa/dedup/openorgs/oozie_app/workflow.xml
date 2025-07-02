@@ -191,7 +191,7 @@
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
             <arg>--actionSetId</arg><arg>${actionSetId}</arg>
         </spark>
-        <ok to="End"/>
+        <ok to="PrepareOrgRels"/>
         <error to="Kill"/>
     </action>
 

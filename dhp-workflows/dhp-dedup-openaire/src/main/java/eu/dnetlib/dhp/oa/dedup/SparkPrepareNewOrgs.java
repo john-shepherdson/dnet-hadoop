@@ -123,7 +123,7 @@ public class SparkPrepareNewOrgs extends AbstractSparkAction {
 		// collect ParentChildRels from the raw graph relations: <<best id, other id>, "parentChildRel">
 		JavaRDD<Tuple2<Tuple2<String, String>, String>> parentChildRels = OpenorgsUtility
 			.collectRels(
-				spark, relationPath, ModelConstants.IS_PARENT_OF, ModelConstants.ORG_ORG_RELTYPE, ModelConstants.DEDUP,
+				spark, relationPath, ModelConstants.IS_PARENT_OF, ModelConstants.ORG_ORG_RELTYPE, ModelConstants.RELATIONSHIP,
 				false);
 		log.info("Number of Parent/Child Rels collected: {}", parentChildRels.count());
 
