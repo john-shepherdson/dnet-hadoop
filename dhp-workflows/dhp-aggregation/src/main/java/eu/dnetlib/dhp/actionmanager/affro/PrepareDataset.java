@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 import eu.dnetlib.dhp.actionmanager.affro.beans.Affiliation;
 import eu.dnetlib.dhp.actionmanager.affro.beans.Author;
 import eu.dnetlib.dhp.actionmanager.affro.beans.IISModel;
+import eu.dnetlib.dhp.schema.common.EntityType;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
@@ -130,17 +132,25 @@ public class PrepareDataset implements Serializable {
                          explode(col("raw_affiliation_strings")).alias("raw_affiliation_string"))
                 .as(RowEncoder.apply(DATASET_SCHEMA));
 
-        Dataset<Row> oaire = spark.read().schema(GRAPH_SCHEMA).json(oairePath)
-                .select( col("id"), explode( col("author")).alias("author"))
-                .select( col("id"),  col("author"),  explode( col("author.rawAffiliationString")).alias("raw_affiliation_string"))
-                .filter( col("raw_affiliation_string").isNotNull())
-                .withColumn("fullname",  col("author.fullName"))
+        Dataset<Row> oaire_entities = 
+                spark.createDataFrame(Collections.emptyList(), GRAPH_SCHEMA);
+        for(EntityType entity: ModelSupport.entityTypes.keySet()) {
+            if(ModelSupport.isResult(entity)){
+                oaire_entities = oaire_entities.union(spark.read().schema(GRAPH_SCHEMA).json(oairePath + "/" + entity.name()));
+                        
+            }
+        }
+        Dataset<Row> oaire = oaire_entities
+                .select(col("id"), explode(col("author")).alias("author"))
+                .select(col("id"), col("author"), explode(col("author.rawAffiliationString")).alias("raw_affiliation_string"))
+                .filter(col("raw_affiliation_string").isNotNull())
+                .withColumn("fullname", col("author.fullName"))
                 .drop("author")
-                .select("id","fullname","raw_affiliation_string");
+                .select("id", "fullname", "raw_affiliation_string");
 
-        Dataset<Row> iis = //spark.sql(IIS_QUERY)
-        spark.read().schema(Encoders.bean(IISModel.class).schema())
-                .json(iisPath)
+        Dataset<Row> iis = spark.sql(IIS_QUERY)
+//        spark.read().schema(Encoders.bean(IISModel.class).schema())
+//                .json(iisPath)
                 .as(Encoders.bean(IISModel.class))
                   .filter((FilterFunction<IISModel>) value -> !value.getAuthors().isEmpty() && !value.getAffiliations().isEmpty())
 

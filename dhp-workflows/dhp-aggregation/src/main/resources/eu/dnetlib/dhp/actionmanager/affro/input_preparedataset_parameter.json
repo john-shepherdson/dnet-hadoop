@@ -27,7 +27,7 @@
 "paramName": "iis",
 "paramLongName": "iisPath",
 "paramDescription": "the path to get the input data from Datacite",
-"paramRequired": true
+"paramRequired": false
 },
 {
 "paramName": "om",
