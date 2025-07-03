@@ -1,13 +1,13 @@
 
 package eu.dnetlib.dhp.oa.provision.model;
 
+import java.io.Serializable;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
 
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
-import scala.Serializable;
 
 public class XmlInstance implements Serializable {
 

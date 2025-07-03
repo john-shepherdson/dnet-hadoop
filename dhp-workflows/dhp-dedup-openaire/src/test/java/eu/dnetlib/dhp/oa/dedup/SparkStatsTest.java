@@ -176,7 +176,7 @@ public class SparkStatsTest implements Serializable {
 	}
 
 	@AfterAll
-	public static void tearDown() {
+	public static void tearDown() throws IOException {
 		spark.close();
 	}
 }

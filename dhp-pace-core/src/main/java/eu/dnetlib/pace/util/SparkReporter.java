@@ -1,6 +1,7 @@
 
 package eu.dnetlib.pace.util;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,7 +11,6 @@ import org.apache.spark.SparkContext;
 import org.apache.spark.util.LongAccumulator;
 
 import eu.dnetlib.pace.config.DedupConfig;
-import scala.Serializable;
 import scala.Tuple2;
 
 public class SparkReporter implements Serializable, Reporter {

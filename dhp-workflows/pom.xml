@@ -94,12 +94,6 @@
     </dependencies>
     <profiles>
         <profile>
-            <id>spark-24</id>
-            <modules>
-                <module>dhp-doiboost</module>
-            </modules>
-        </profile>
-        <profile>
             <!-- This profile sets properties that are required for test oozie workflows To be used only with 'oozie-package' profile -->
             <id>attach-test-resources</id>
             <properties>
@@ -363,7 +357,7 @@
                                 </goals>
                                 <configuration>
                                     <tasks>
-                                        <property name="assembly-resources.loc" value="${maven.dependency.eu.dnetlib.dhp.dhp-build-assembly-resources.jar.path}" />
+                                        <property name="assembly-resources.loc" value="${maven.dependency.eu.dnetlib.dhp.dhp-build-assembly-resources.jar.path}"/>
                                         <unjar src="${assembly-resources.loc}" dest="${project.build.directory}/assembly-resources" />
                                     </tasks>
                                 </configuration>
@@ -585,21 +579,5 @@
                 </file>
             </activation>
         </profile>
-        <profile>
-            <id>spark-34</id>
-            <modules>
-                <module>dhp-graph-provision</module>
-            </modules>
-        </profile>
-
-        <profile>
-            <id>spark-35</id>
-            <modules>
-                <module>dhp-graph-provision</module>
-            </modules>
-        </profile>
-
-
     </profiles>
-
 </project>

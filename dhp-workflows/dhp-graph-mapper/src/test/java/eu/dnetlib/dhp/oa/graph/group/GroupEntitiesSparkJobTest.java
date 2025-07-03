@@ -136,7 +136,8 @@ public class GroupEntitiesSparkJobTest {
 				DHPUtils
 					.toSeq(
 						HdfsSupport
-							.listFiles(outputPath.toString(), spark.sparkContext().hadoopConfiguration())))
+							.listFiles(outputPath.toString(), spark.sparkContext().hadoopConfiguration()))
+					.toSeq())
 			.map((MapFunction<String, Result>) s -> mapper.readValue(s, Result.class), Encoders.bean(Result.class));
 
 		assertEquals(3, output.count());
