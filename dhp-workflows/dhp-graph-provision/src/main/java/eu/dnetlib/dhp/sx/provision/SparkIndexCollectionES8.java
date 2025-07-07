@@ -34,7 +34,7 @@ public class SparkIndexCollectionES8 {
                                         .requireNonNull(
                                                 SparkIndexCollectionES8.class
                                                         .getResourceAsStream(
-                                                                "/eu/dnetlib/sx/provisionV8/scholexplorer_parameter.json"))));
+                                                                "/eu/dnetlib/dhp/sx/provision/scholexplorer_parameter.json"))));
         argumentParser.parseArgument(args);
 
         final String hdfsuri = argumentParser.get("namenode");
