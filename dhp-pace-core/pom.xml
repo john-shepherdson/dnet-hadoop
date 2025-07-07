@@ -6,13 +6,13 @@
 	<parent>
 		<groupId>eu.dnetlib.dhp</groupId>
 		<artifactId>dhp</artifactId>
-		<version>1.2.5-SNAPSHOT</version>
+		<version>1.2.6-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
 	</parent>
 
 	<groupId>eu.dnetlib.dhp</groupId>
 	<artifactId>dhp-pace-core</artifactId>
-	<version>1.2.5-SNAPSHOT</version>
+	<version>1.2.6-SNAPSHOT</version>
     <packaging>jar</packaging>
 
 	<build>
@@ -52,7 +52,6 @@
 		<dependency>
 			<groupId>eu.dnetlib.dhp</groupId>
 			<artifactId>dhp-common</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
@@ -138,7 +137,7 @@
 		</profile>
 
 		<profile>
-			<id>spark-34</id>
+			<id>spark34</id>
 
 			<build>
 				<plugins>
@@ -165,7 +164,34 @@
 		</profile>
 
 		<profile>
-			<id>spark-35</id>
+			<id>spark35</id>
+
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>build-helper-maven-plugin</artifactId>
+						<version>3.4.0</version>
+						<executions>
+							<execution>
+								<phase>generate-sources</phase>
+								<goals>
+									<goal>add-source</goal>
+								</goals>
+								<configuration>
+									<sources>
+										<source>src/main/spark-35</source>
+									</sources>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<id>spark40</id>
 
 			<build>
 				<plugins>

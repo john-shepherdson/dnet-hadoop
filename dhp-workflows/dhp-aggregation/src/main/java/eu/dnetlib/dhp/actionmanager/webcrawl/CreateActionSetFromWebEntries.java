@@ -33,7 +33,6 @@ import scala.Tuple2;
 
 /**
  * @author miriam.baglioni
- * @Date 18/04/24
  */
 public class CreateActionSetFromWebEntries implements Serializable {
 	private static final Logger log = LoggerFactory.getLogger(CreateActionSetFromWebEntries.class);

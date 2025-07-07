@@ -43,7 +43,6 @@ import eu.dnetlib.dhp.common.collection.HttpClientParams;
  * known bug: at resumptionType 'discover' if the (resultTotal % resultSizeValue) == 0 the collecting fails -> change the resultSizeValue
  *
  * @author Jochen Schirrwagen, Aenne Loehden, Andreas Czerniak
- * @date 2020-04-09
  *
  */
 public class RestIterator implements Iterator<String> {

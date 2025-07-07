@@ -386,7 +386,7 @@ public class XmlRecordFactory implements Serializable {
 							.getSubject()
 							.stream()
 							.filter(Objects::nonNull)
-							.filter(ProvisionModelSupport::filterFosL1L2)
+							//.filter(ProvisionModelSupport::filterFosL1L2)
 							.map(s -> XmlSerializationUtils.mapStructuredProperty("subject", s))
 							.collect(Collectors.toList()));
 			}

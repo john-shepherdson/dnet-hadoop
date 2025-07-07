@@ -216,9 +216,7 @@ object PubMedToOaf {
     if (alternateIdentifier != null)
       pubmedInstance.setAlternateIdentifier(List(alternateIdentifier).asJava)
     result.setInstance(List(pubmedInstance).asJava)
-    pubmedInstance.getPid.asScala
-      .filter(p => "pmid".equalsIgnoreCase(p.getQualifier.getClassid))
-      .map(p => p.getValue)(collection.breakOut)
+
     //CREATE URL From pmid
     val urlLists: List[String] = pidList
       .map(s => (urlMap.getOrElse(s.getQualifier.getClassid, ""), s.getValue))
@@ -317,7 +315,7 @@ object PubMedToOaf {
         author.setRawAffiliationString(List(a.getAffiliation.getName).asJava)
       author.setRank(index + 1)
       author
-    }(collection.breakOut)
+    }.toList
 
     if (authors != null && authors.nonEmpty)
       result.setAuthor(authors.asJava)

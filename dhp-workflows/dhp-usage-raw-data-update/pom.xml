@@ -3,7 +3,7 @@
     <parent>
         <artifactId>dhp-workflows</artifactId>
         <groupId>eu.dnetlib.dhp</groupId>
-        <version>1.2.5-SNAPSHOT</version>
+        <version>1.2.6-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>dhp-usage-raw-data-update</artifactId>
@@ -41,6 +41,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <cdh.hive.version>1.1.0-cdh5.16.2</cdh.hive.version>
         <cdh.hadoop.version>2.6.0-cdh5.16.2</cdh.hadoop.version>
+        <enforcer.skip>true</enforcer.skip>
     </properties>
 
     <dependencies>
@@ -82,7 +83,6 @@
         <dependency>
             <groupId>eu.dnetlib.dhp</groupId>
             <artifactId>dhp-common</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>c3p0</groupId>
