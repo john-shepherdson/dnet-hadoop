@@ -2,6 +2,7 @@ package eu.dnetlib.dhp.actionmanager.affro;
 
 
 import static eu.dnetlib.dhp.actionmanager.affro.Constants.*;
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 import static org.apache.spark.sql.functions.*;
 
@@ -81,9 +82,13 @@ public class PrepareDataset implements Serializable {
                 .map(Boolean::valueOf)
                 .orElse(Boolean.FALSE);
 
-        SparkConf conf = new SparkConf();
+        String hiveMetastoreUris = parser.get("hiveMetastoreUris");
+        log.info("hiveMetastoreUris: {}", hiveMetastoreUris);
 
-        runWithSparkSession(
+        SparkConf conf = new SparkConf();
+        conf.set("hive.metastore.uris", hiveMetastoreUris);
+
+        runWithSparkHiveSession(
                 conf,
                 isSparkSessionManaged,
                 spark -> {

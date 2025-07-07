@@ -46,5 +46,11 @@
 "paramLongName": "applyOnAll",
 "paramDescription": "the path of the new ActionSet",
 "paramRequired": true
+},
+{
+"paramName": "hmu",
+"paramLongName": "hiveMetastoreUris",
+"paramDescription": "the hive metastore uris",
+"paramRequired": true
 }
 ]
