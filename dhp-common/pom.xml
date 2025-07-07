@@ -42,13 +42,13 @@
 							<goal>testCompile</goal>
 						</goals>
 					</execution>
-					<execution>
-						<id>scala-doc</id>
-						<phase>process-resources</phase> <!-- or wherever -->
-						<goals>
-							<goal>doc</goal>
-						</goals>
-					</execution>
+<!--					<execution>-->
+<!--						<id>scala-doc</id>-->
+<!--						<phase>process-resources</phase> &lt;!&ndash; or wherever &ndash;&gt;-->
+<!--						<goals>-->
+<!--							<goal>doc</goal>-->
+<!--						</goals>-->
+<!--					</execution>-->
 				</executions>
 				<configuration>
 					<failOnMultipleScalaVersions>true</failOnMultipleScalaVersions>
@@ -177,6 +177,12 @@
 			<groupId>com.opencsv</groupId>
 			<artifactId>opencsv</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>co.elastic.clients</groupId>
+			<artifactId>elasticsearch-java</artifactId>
+		</dependency>
+
 
 	<!-- dependencies required on JDK9+ because J2EE has been removed -->
 		<dependency>
