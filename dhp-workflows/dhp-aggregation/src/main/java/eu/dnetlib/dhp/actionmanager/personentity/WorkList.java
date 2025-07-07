@@ -4,8 +4,6 @@ package eu.dnetlib.dhp.actionmanager.personentity;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import org.apache.hadoop.yarn.webapp.hamlet.Hamlet;
-
 import eu.dnetlib.dhp.collection.orcid.model.Work;
 
 public class WorkList implements Serializable {
