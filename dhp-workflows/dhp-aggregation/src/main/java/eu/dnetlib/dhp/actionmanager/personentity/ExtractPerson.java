@@ -3,7 +3,12 @@ package eu.dnetlib.dhp.actionmanager.personentity;
 
 import static eu.dnetlib.dhp.actionmanager.personentity.ASConstants.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
-import static eu.dnetlib.dhp.common.person.Constants.*;
+import static eu.dnetlib.dhp.common.person.Constants.PERSON_PREFIX;
+import static eu.dnetlib.dhp.common.person.Constants.SEPARATOR;
+import static eu.dnetlib.dhp.common.person.Constants.PROJECT_ID_PREFIX;
+import static eu.dnetlib.dhp.common.person.Constants.ORCID_KEY;
+import static eu.dnetlib.dhp.common.person.Constants.ORCIDDATAINFO;
+
 
 import java.io.BufferedWriter;
 import java.io.IOException;

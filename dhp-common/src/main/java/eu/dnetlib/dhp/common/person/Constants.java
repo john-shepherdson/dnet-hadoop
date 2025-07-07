@@ -1,8 +1,6 @@
 
 package eu.dnetlib.dhp.common.person;
 
-import java.util.List;
-
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;

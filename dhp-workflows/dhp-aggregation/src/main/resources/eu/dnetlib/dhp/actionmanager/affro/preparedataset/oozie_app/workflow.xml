@@ -7,7 +7,7 @@
         </property>
         <property>
             <name>oairePath</name>
-            <name>/tmp/prod_provision/graph/01_graph_raw</name>
+            <value>/tmp/prod_provision/graph/01_graph_raw</value>
             <description>the path for the OpenAIRE graph from whcich to get the raw_affiliation_strings</description>
         </property>
         <property>
