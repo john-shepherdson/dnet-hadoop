@@ -12,7 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ConvertScholixResourceToES implements Function<String, BulkOperation> {
-    private static final Pattern summaryIDPattern = Pattern.compile("\"dnetIdentifier\":\"((\\d|\\w)*)\"");
+        private static final Pattern summaryIDPattern = Pattern.compile("\"dnetIdentifier\":\"(\\d{2}\\|.{12}::.{32})\"");
     private static final Pattern summaryTypePattern = Pattern.compile("\"objectType\":\"((\\d|\\w)*)\"");
     private  final String  index;
 
