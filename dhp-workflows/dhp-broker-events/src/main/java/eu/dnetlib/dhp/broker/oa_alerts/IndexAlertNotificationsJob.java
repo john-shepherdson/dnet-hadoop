@@ -66,7 +66,7 @@ public class IndexAlertNotificationsJob {
 		try (final ESFeeder feeder = new ESFeeder(indexHost)) {
 			final FileSystem fileSystem = FileSystem.get(new Configuration());
 			final List<Path> files = ClusterUtils.listFiles(notificationsPath, fileSystem, ".gz");
-			feeder.parallelBulkIndex(files, index, 4, fileSystem, new ConvertJSONWithId("\"notificationId\":\"((\\d|\\w)*)\"", "notificationId"));
+			feeder.parallelBulkIndex(files, 4, fileSystem, new ConvertJSONWithId("\"notificationId\":\"((\\d|\\w)*)\"", index));
 			feeder.refreshIndex(index);
 		}
 
