@@ -48,6 +48,8 @@ import eu.dnetlib.validator2.result_models.StandardValidationResult;
 
 public class GenerateAlertNotificationsJob {
 
+	private static final String TOPIC_PREFIX = "ALERT/VALIDATOR/";
+
 	private static final Logger log = LoggerFactory.getLogger(GenerateAlertNotificationsJob.class);
 
 	public static void main(final String[] args) throws Exception {
@@ -114,7 +116,7 @@ public class GenerateAlertNotificationsJob {
 			return;
 		}
 
-		final String topic = "ALERT/" + validationType;
+		final String topic = TOPIC_PREFIX + StringUtils.upperCase(validationType.toString());
 
 		log.info("topic: {}", topic);
 

@@ -1,11 +1,19 @@
 
 package eu.dnetlib.dhp.broker.oa.util;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.LocatedFileStatus;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.RemoteIterator;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
@@ -24,8 +32,7 @@ public class ClusterUtils {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-	private ClusterUtils() {
-	}
+	private ClusterUtils() {}
 
 	public static void createDirIfMissing(final SparkSession spark, final String path) {
 		HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
@@ -37,22 +44,22 @@ public class ClusterUtils {
 
 	public static Dataset<Relation> loadRelations(final String graphPath, final SparkSession spark) {
 		return ClusterUtils
-			.readPath(spark, graphPath + "/relation", Relation.class)
-			.map((MapFunction<Relation, Relation>) r -> {
-				r.setSource(ConversionUtils.cleanOpenaireId(r.getSource()));
-				r.setTarget(ConversionUtils.cleanOpenaireId(r.getTarget()));
-				return r;
-			}, Encoders.bean(Relation.class));
+				.readPath(spark, graphPath + "/relation", Relation.class)
+				.map((MapFunction<Relation, Relation>) r -> {
+					r.setSource(ConversionUtils.cleanOpenaireId(r.getSource()));
+					r.setTarget(ConversionUtils.cleanOpenaireId(r.getTarget()));
+					return r;
+				}, Encoders.bean(Relation.class));
 	}
 
 	public static <R> Dataset<R> readPath(
-		final SparkSession spark,
-		final String inputPath,
-		final Class<R> clazz) {
+			final SparkSession spark,
+			final String inputPath,
+			final Class<R> clazz) {
 		return spark
-			.read()
-			.textFile(inputPath)
-			.map((MapFunction<String, R>) value -> OBJECT_MAPPER.readValue(value, clazz), Encoders.bean(clazz));
+				.read()
+				.textFile(inputPath)
+				.map((MapFunction<String, R>) value -> OBJECT_MAPPER.readValue(value, clazz), Encoders.bean(clazz));
 	}
 
 	public static boolean isDedupRoot(final String id) {
@@ -60,11 +67,11 @@ public class ClusterUtils {
 	}
 
 	public static final boolean isValidResultResultClass(final String s) {
-		return s.equals(ModelConstants.IS_REFERENCED_BY)
-			|| s.equals(ModelConstants.IS_RELATED_TO)
-			|| s.equals(ModelConstants.REFERENCES)
-			|| s.equals(ModelConstants.IS_SUPPLEMENTED_BY)
-			|| s.equals(ModelConstants.IS_SUPPLEMENT_TO);
+		return ModelConstants.IS_REFERENCED_BY.equals(s)
+				|| ModelConstants.IS_RELATED_TO.equals(s)
+				|| ModelConstants.REFERENCES.equals(s)
+				|| ModelConstants.IS_SUPPLEMENTED_BY.equals(s)
+				|| ModelConstants.IS_SUPPLEMENT_TO.equals(s);
 	}
 
 	public static <T> T incrementAccumulator(final T o, final LongAccumulator acc) {
@@ -75,15 +82,15 @@ public class ClusterUtils {
 	}
 
 	public static <T> void save(final Dataset<T> dataset,
-		final String path,
-		final Class<T> clazz,
-		final LongAccumulator acc) {
+			final String path,
+			final Class<T> clazz,
+			final LongAccumulator acc) {
 		dataset
-			.map((MapFunction<T, T>) o -> ClusterUtils.incrementAccumulator(o, acc), Encoders.bean(clazz))
-			.write()
-			.mode(SaveMode.Overwrite)
-			.option("compression", "gzip")
-			.json(path);
+				.map((MapFunction<T, T>) o -> ClusterUtils.incrementAccumulator(o, acc), Encoders.bean(clazz))
+				.write()
+				.mode(SaveMode.Overwrite)
+				.option("compression", "gzip")
+				.json(path);
 	}
 
 	public static Set<String> parseParamAsList(final ArgumentApplicationParser parser, final String key) {
@@ -93,13 +100,25 @@ public class ClusterUtils {
 
 		if (s.length() > 1) { // A value of a single char (for example: '-') indicates an empty list
 			Arrays
-				.stream(s.split(","))
-				.map(String::trim)
-				.filter(StringUtils::isNotBlank)
-				.forEach(res::add);
+					.stream(s.split(","))
+					.map(String::trim)
+					.filter(StringUtils::isNotBlank)
+					.forEach(res::add);
 		}
 
 		return res;
+	}
+
+	public static List<Path> listFiles(final String path, final FileSystem fileSystem, final String suffix) throws FileNotFoundException, IOException {
+		final RemoteIterator<LocatedFileStatus> ls = fileSystem.listFiles(new Path(path), false);
+		final List<Path> files = new ArrayList<>();
+		while (ls.hasNext()) {
+			final LocatedFileStatus current = ls.next();
+			if (current.getPath().getName().endsWith(suffix)) {
+				files.add(current.getPath());
+			}
+		}
+		return files;
 	}
 
 }

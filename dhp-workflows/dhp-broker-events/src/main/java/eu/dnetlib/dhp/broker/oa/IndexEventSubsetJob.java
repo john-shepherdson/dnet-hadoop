@@ -3,9 +3,13 @@ package eu.dnetlib.dhp.broker.oa;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -17,6 +21,7 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.TypedColumn;
+import org.apache.spark.util.LongAccumulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,9 +30,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.broker.model.Event;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
-import eu.dnetlib.dhp.broker.oa.util.ESIndexer;
 import eu.dnetlib.dhp.broker.oa.util.EventGroup;
 import eu.dnetlib.dhp.broker.oa.util.aggregators.subset.EventSubsetAggregator;
+import eu.dnetlib.dhp.index.es.ConvertJSONWithId;
+import eu.dnetlib.dhp.index.es.ESFeeder;
 import scala.Tuple2;
 
 public class IndexEventSubsetJob {
@@ -37,10 +43,9 @@ public class IndexEventSubsetJob {
 	public static void main(final String[] args) throws Exception {
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
-			IOUtils
-				.toString(
-					IndexEventSubsetJob.class
-						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/index_event_subset.json")));
+				IOUtils
+						.toString(IndexEventSubsetJob.class
+								.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/index_event_subset.json")));
 		parser.parseArgument(args);
 
 		final SparkConf conf = new SparkConf();
@@ -48,23 +53,14 @@ public class IndexEventSubsetJob {
 		final String eventsPath = parser.get("outputDir") + "/events";
 		log.info("eventsPath: {}", eventsPath);
 
+		final String eventsSubsetPath = parser.get("outputDir") + "/events_subset";
+		log.info("eventsSubsetPath: {}", eventsSubsetPath);
+
 		final String index = parser.get("index");
 		log.info("index: {}", index);
 
 		final String indexHost = parser.get("esHost");
 		log.info("indexHost: {}", indexHost);
-
-		final String esBatchWriteRetryCount = parser.get("esBatchWriteRetryCount");
-		log.info("esBatchWriteRetryCount: {}", esBatchWriteRetryCount);
-
-		final String esBatchWriteRetryWait = parser.get("esBatchWriteRetryWait");
-		log.info("esBatchWriteRetryWait: {}", esBatchWriteRetryWait);
-
-		final String esBatchSizeEntries = parser.get("esBatchSizeEntries");
-		log.info("esBatchSizeEntries: {}", esBatchSizeEntries);
-
-		final String esNodesWanOnly = parser.get("esNodesWanOnly");
-		log.info("esNodesWanOnly: {}", esNodesWanOnly);
 
 		final int maxEventsForTopic = NumberUtils.toInt(parser.get("maxEventsForTopic"));
 		log.info("maxEventsForTopic: {}", maxEventsForTopic);
@@ -78,20 +74,26 @@ public class IndexEventSubsetJob {
 
 		final long now = new Date().getTime();
 
+		final LongAccumulator total = spark.sparkContext().longAccumulator("total_events_subset");
+
+		log.info("*** Prepare subset for indexing");
 		final Dataset<Event> subset = ClusterUtils
-			.readPath(spark, eventsPath, Event.class)
-			.groupByKey(
-				(MapFunction<Event, String>) e -> e.getTopic() + '@' + e.getMap().getTargetDatasourceId(),
-				Encoders.STRING())
-			.agg(aggr)
-			.map((MapFunction<Tuple2<String, EventGroup>, EventGroup>) t -> t._2, Encoders.bean(EventGroup.class))
-			.flatMap((FlatMapFunction<EventGroup, Event>) g -> g.getData().iterator(), Encoders.bean(Event.class))
-			.map((MapFunction<Event, Event>) e -> prepareEventForIndexing(e, now), Encoders.bean(Event.class));
+				.readPath(spark, eventsPath, Event.class)
+				.groupByKey((MapFunction<Event, String>) e -> e.getTopic() + '@' + e.getMap().getTargetDatasourceId(), Encoders.STRING())
+				.agg(aggr)
+				.map((MapFunction<Tuple2<String, EventGroup>, EventGroup>) t -> t._2, Encoders.bean(EventGroup.class))
+				.flatMap((FlatMapFunction<EventGroup, Event>) g -> g.getData().iterator(), Encoders.bean(Event.class))
+				.map((MapFunction<Event, Event>) e -> prepareEventForIndexing(e, now), Encoders.bean(Event.class));
 
-		final ESIndexer indexer = new ESIndexer(indexHost, index, esBatchWriteRetryCount, esBatchWriteRetryWait,
-			esBatchSizeEntries, esNodesWanOnly);
+		ClusterUtils.save(subset, eventsSubsetPath, Event.class, total);
 
-		indexer.performIndex(subset, "eventId");
+		log.info("*** Start indexing");
+		try (final ESFeeder feeder = new ESFeeder(indexHost)) {
+			final FileSystem fileSystem = FileSystem.get(new Configuration());
+			final List<Path> files = ClusterUtils.listFiles(eventsSubsetPath, fileSystem, "*.gz");
+			feeder.parallelBulkIndex(files, index, 4, fileSystem, new ConvertJSONWithId("\"notificationId\":\"((\\d|\\w)*)\"", "notificationId"));
+			feeder.refreshIndex(index);
+		}
 
 		log.info("*** Deleting old events");
 		final String message = deleteOldEvents(brokerApiBaseUrl, now - 1000);
@@ -112,7 +114,7 @@ public class IndexEventSubsetJob {
 	}
 
 	private static Event prepareEventForIndexing(final Event e, final long creationDate)
-		throws JsonProcessingException {
+			throws JsonProcessingException {
 
 		e.setCreationDate(creationDate);
 		e.setExpiryDate(Long.MAX_VALUE);

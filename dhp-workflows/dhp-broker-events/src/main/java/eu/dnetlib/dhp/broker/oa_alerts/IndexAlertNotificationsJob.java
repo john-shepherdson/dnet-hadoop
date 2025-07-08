@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.broker.oa;
+package eu.dnetlib.dhp.broker.oa_alerts;
 
 import java.io.IOException;
 import java.util.List;
@@ -23,22 +23,24 @@ import eu.dnetlib.dhp.broker.model.OaNotification;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
 import eu.dnetlib.dhp.index.es.ConvertJSONWithId;
 import eu.dnetlib.dhp.index.es.ESFeeder;
+import eu.dnetlib.dhp.schema.mdstore.Provenance;
+import eu.dnetlib.dhp.utils.DHPUtils;
 
-public class IndexNotificationsJob {
+public class IndexAlertNotificationsJob {
 
-	private static final Logger log = LoggerFactory.getLogger(IndexNotificationsJob.class);
+	private static final Logger log = LoggerFactory.getLogger(IndexAlertNotificationsJob.class);
 
 	public static void main(final String[] args) throws Exception {
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 				IOUtils
-						.toString(IndexNotificationsJob.class
-								.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/index_notifications.json")));
+						.toString(IndexAlertNotificationsJob.class
+								.getResourceAsStream("/eu/dnetlib/dhp/broker/oa_alert/index_alert_notifications.json")));
 		parser.parseArgument(args);
 
 		final SparkConf conf = new SparkConf();
 
-		final String notificationsPath = parser.get("outputDir") + "/notifications";
+		final String notificationsPath = parser.get("path");
 		log.info("notificationsPath: {}", notificationsPath);
 
 		final String index = parser.get("index");
@@ -46,6 +48,9 @@ public class IndexNotificationsJob {
 
 		final String indexHost = parser.get("esHost");
 		log.info("indexHost: {}", indexHost);
+
+		final String dsId = DHPUtils.MAPPER.readValue(parser.get("provenance"), Provenance.class).getDatasourceId();
+		log.info("dsId: {}", dsId);
 
 		final String brokerApiBaseUrl = parser.get("brokerApiBaseUrl");
 		log.info("brokerApiBaseUrl: {}", brokerApiBaseUrl);
@@ -66,17 +71,19 @@ public class IndexNotificationsJob {
 		}
 
 		log.info("*** Deleting old notifications");
-		final String message = deleteOldNotifications(brokerApiBaseUrl, date - 1000);
+		final String message = deleteOldAlertNotifications(brokerApiBaseUrl, dsId, date - 1000);
 		log.info("*** Deleted notifications: {}", message);
 
 		log.info("*** sendNotifications (emails, ...)");
-		sendNotifications(brokerApiBaseUrl, date - 1000);
+		sendAlertNotifications(brokerApiBaseUrl, dsId);
 		log.info("*** ALL done.");
 
 	}
 
-	private static String deleteOldNotifications(final String brokerApiBaseUrl, final long l) throws Exception {
-		final String url = brokerApiBaseUrl + "/api/notifications/byDate/0/" + l;
+	private static String deleteOldAlertNotifications(final String brokerApiBaseUrl, final String dsId, final long l) throws Exception {
+		// TODO Complete the implementation of the remote method
+		final String url = brokerApiBaseUrl + "/api/notifications/byDate/0/" + l + "?type=alert&dsId=" + dsId;
+
 		final HttpDelete req = new HttpDelete(url);
 
 		try (final CloseableHttpClient client = HttpClients.createDefault()) {
@@ -86,8 +93,8 @@ public class IndexNotificationsJob {
 		}
 	}
 
-	private static String sendNotifications(final String brokerApiBaseUrl, final long l) throws IOException {
-		final String url = brokerApiBaseUrl + "/api/openaireBroker/notifications/send/" + l;
+	private static String sendAlertNotifications(final String brokerApiBaseUrl, final String dsId) throws IOException {
+		final String url = brokerApiBaseUrl + "/api/openaire-alerts/notifications/sendMailForNotifications?dsId=" + dsId;
 		final HttpGet req = new HttpGet(url);
 
 		try (final CloseableHttpClient client = HttpClients.createDefault()) {

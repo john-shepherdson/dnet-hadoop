@@ -1,8 +1,14 @@
 [
 	{
-		"paramName": "o",
-		"paramLongName": "outputDir",
-		"paramDescription": "the dir that contains the events folder",
+		"paramName": "p",
+		"paramLongName": "provenance",
+		"paramDescription": "the infos about the provenance of the collected records",
+		"paramRequired": true
+	},
+	{
+		"paramName": "d",
+		"paramLongName": "path",
+		"paramDescription": "the dir that contains the notifications files",
 		"paramRequired": true
 	},
 	{
