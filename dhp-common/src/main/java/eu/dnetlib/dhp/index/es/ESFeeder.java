@@ -94,14 +94,15 @@ public class ESFeeder implements Closeable {
      * Operations are batched in groups of 1000.
      *
      * @param file the HDFS path to the gzipped file
-     * @param index the Elasticsearch index name
      * @param fileSystem the Hadoop FileSystem instance
      * @param converter a function converting a line to a BulkOperation
      */
-    private void indexRecords(Path file, String index, FileSystem fileSystem, Function<String, BulkOperation> converter) {
+    private void indexRecords(Path file, FileSystem fileSystem, Function<String, BulkOperation> converter) {
 
         try (InputStream is = new GZIPInputStream(fileSystem.open(file))) {
+
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
+                logger.info("Starting to index "+file.getName());
                 String line;
                 BulkRequest.Builder br = new BulkRequest.Builder();
                 List<BulkOperation> operations = new ArrayList<>();
@@ -129,16 +130,15 @@ public class ESFeeder implements Closeable {
      * Performs parallel bulk indexing of multiple files.
      *
      * @param files list of HDFS file paths to index
-     * @param index the Elasticsearch index name
      * @param numberOfThreads number of parallel threads to use
      * @param fileSystem the Hadoop FileSystem instance
      * @param converter a function converting a line to a BulkOperation
      */
-    public void parallelBulkIndex(final List<Path> files, String index, final int numberOfThreads,
+    public void parallelBulkIndex(final List<Path> files,  final int numberOfThreads,
                                          FileSystem fileSystem, Function<String, BulkOperation> converter) {
 
         ForkJoinPool customThreadPool = new ForkJoinPool(numberOfThreads); // Set the desired level of parallelism
-        customThreadPool.submit(() -> files.parallelStream().forEach(s -> indexRecords(s, index, fileSystem, converter))).join();
+        customThreadPool.submit(() -> files.parallelStream().forEach(s -> indexRecords(s,  fileSystem, converter))).join();
     }
 
     /**
