@@ -29,11 +29,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.broker.model.Event;
+import eu.dnetlib.dhp.broker.oa.util.BrokerIndexClient;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
 import eu.dnetlib.dhp.broker.oa.util.EventGroup;
 import eu.dnetlib.dhp.broker.oa.util.aggregators.subset.EventSubsetAggregator;
 import eu.dnetlib.dhp.index.es.ConvertJSONWithId;
-import eu.dnetlib.dhp.index.es.ESFeeder;
 import scala.Tuple2;
 
 public class IndexEventSubsetJob {
@@ -88,7 +88,7 @@ public class IndexEventSubsetJob {
 		ClusterUtils.save(subset, eventsSubsetPath, Event.class, total);
 
 		log.info("*** Start indexing");
-		try (final ESFeeder feeder = new ESFeeder(indexHost)) {
+		try (final BrokerIndexClient feeder = new BrokerIndexClient(indexHost)) {
 			final FileSystem fileSystem = FileSystem.get(new Configuration());
 			final List<Path> files = ClusterUtils.listFiles(eventsSubsetPath, fileSystem, "*.gz");
 			feeder.parallelBulkIndex(files, 4, fileSystem, new ConvertJSONWithId("\"notificationId\":\"((\\d|\\w)*)\"", index));

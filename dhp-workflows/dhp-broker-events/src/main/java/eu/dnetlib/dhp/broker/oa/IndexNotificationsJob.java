@@ -20,9 +20,9 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.broker.model.OaNotification;
+import eu.dnetlib.dhp.broker.oa.util.BrokerIndexClient;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
 import eu.dnetlib.dhp.index.es.ConvertJSONWithId;
-import eu.dnetlib.dhp.index.es.ESFeeder;
 
 public class IndexNotificationsJob {
 
@@ -58,7 +58,7 @@ public class IndexNotificationsJob {
 				.getDate();
 
 		log.info("*** Start indexing");
-		try (final ESFeeder feeder = new ESFeeder(indexHost)) {
+		try (final BrokerIndexClient feeder = new BrokerIndexClient(indexHost)) {
 			final FileSystem fileSystem = FileSystem.get(new Configuration());
 			final List<Path> files = ClusterUtils.listFiles(notificationsPath, fileSystem, ".gz");
 			feeder.parallelBulkIndex(files, 4, fileSystem, new ConvertJSONWithId("\"notificationId\":\"((\\d|\\w)*)\"", index));

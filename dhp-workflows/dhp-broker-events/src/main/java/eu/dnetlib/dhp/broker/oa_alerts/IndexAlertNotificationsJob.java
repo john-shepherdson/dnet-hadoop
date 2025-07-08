@@ -14,15 +14,13 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.spark.SparkConf;
-import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.broker.model.OaNotification;
+import eu.dnetlib.dhp.broker.oa.util.BrokerIndexClient;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
 import eu.dnetlib.dhp.index.es.ConvertJSONWithId;
-import eu.dnetlib.dhp.index.es.ESFeeder;
 import eu.dnetlib.dhp.schema.mdstore.Provenance;
 import eu.dnetlib.dhp.utils.DHPUtils;
 
@@ -55,24 +53,16 @@ public class IndexAlertNotificationsJob {
 		final String brokerApiBaseUrl = parser.get("brokerApiBaseUrl");
 		log.info("brokerApiBaseUrl: {}", brokerApiBaseUrl);
 
-		final SparkSession spark = SparkSession.builder().config(conf).getOrCreate();
+		try (final BrokerIndexClient feeder = new BrokerIndexClient(indexHost)) {
+			log.info("*** Clean old notifications");
+			feeder.deleteAlertNotifications(index, dsId);
 
-		final Long date = ClusterUtils
-				.readPath(spark, notificationsPath, OaNotification.class)
-				.first()
-				.getDate();
-
-		log.info("*** Start indexing");
-		try (final ESFeeder feeder = new ESFeeder(indexHost)) {
+			log.info("*** Start indexing");
 			final FileSystem fileSystem = FileSystem.get(new Configuration());
 			final List<Path> files = ClusterUtils.listFiles(notificationsPath, fileSystem, ".gz");
 			feeder.parallelBulkIndex(files, 4, fileSystem, new ConvertJSONWithId("\"notificationId\":\"((\\d|\\w)*)\"", index));
 			feeder.refreshIndex(index);
 		}
-
-		log.info("*** Deleting old notifications");
-		final String message = deleteOldAlertNotifications(brokerApiBaseUrl, dsId, date - 1000);
-		log.info("*** Deleted notifications: {}", message);
 
 		log.info("*** sendNotifications (emails, ...)");
 		sendAlertNotifications(brokerApiBaseUrl, dsId);

@@ -110,7 +110,7 @@ public class ESFeeder implements Closeable {
                     operations.add(converter.apply(line));
                     if (operations.size() == 1000) {
                         br.operations(operations);
-                        tryBulk(esClient, br.build(), 3);
+                        tryBulk(getEsClient(), br.build(), 3);
                         br = new BulkRequest.Builder();
                         operations.clear();
                     }
@@ -118,7 +118,7 @@ public class ESFeeder implements Closeable {
                 }
                 if (!operations.isEmpty()) {
                     br.operations(operations);
-                    tryBulk(esClient, br.build(), 3);
+                    tryBulk(getEsClient(), br.build(), 3);
                 }
             }
         } catch (IOException e) {
@@ -148,7 +148,7 @@ public class ESFeeder implements Closeable {
      * @throws IOException if an I/O error occurs
      */
     public void refreshIndex(String indexName) throws IOException {
-        esClient.indices().refresh(i -> i.index(indexName));
+        getEsClient().indices().refresh(i -> i.index(indexName));
     }
 
     /**
@@ -158,6 +158,10 @@ public class ESFeeder implements Closeable {
      */
     @Override
     public void close() throws IOException {
-        esClient.close();
+        getEsClient().close();
     }
+
+	public ElasticsearchClient getEsClient() {
+		return esClient;
+	}
 }
