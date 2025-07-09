@@ -109,7 +109,7 @@
             <mode>cluster</mode>
             <name>SparkUnpackCrossrefEntries</name>
             <class>eu.dnetlib.dhp.collection.crossref.UnpackCrossrefEntries</class>
-            <jar>dhp-doiboost-${projectVersion}.jar</jar>
+            <jar>dhp-aggregation-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
                 --executor-cores=${sparkExecutorCores}
