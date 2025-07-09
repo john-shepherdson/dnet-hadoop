@@ -25,12 +25,6 @@
         <module>dhp-graph-provision</module>
         <module>dhp-blacklist</module>
         <module>dhp-stats-actionsets</module>
-        <module>dhp-stats-hist-snaps</module>
-        <module>dhp-stats-monitor-update</module>
-        <module>dhp-stats-update</module>
-        <module>dhp-stats-promote</module>
-        <module>dhp-usage-raw-data-update</module>
-        <module>dhp-usagestats-update</module>
         <module>dhp-broker-events</module>
         <module>dhp-impact-indicators</module>
         <module>dhp-swh</module>
