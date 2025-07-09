@@ -512,6 +512,8 @@ object BioDBToOAF {
         ModelConstants.DNET_PUBLICATION_RESOURCE
       )
     )
+    i.setAccessright(ModelConstants.OPEN_ACCESS_RIGHT())
+    i.setLicense(OafMapperUtils.field("CC 0", null))
     val itm = new InstanceTypeMapping
     itm.setOriginalType("Bioentity")
     itm.setVocabularyName(ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1)
