@@ -111,7 +111,7 @@
             <arg>--mdstoreOutputVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
             <arg>--master</arg><arg>yarn</arg>
         </spark>
-        <ok to="End"/>
+        <ok to="CommitVersion"/>
         <error to="Kill"/>
     </action>
 
