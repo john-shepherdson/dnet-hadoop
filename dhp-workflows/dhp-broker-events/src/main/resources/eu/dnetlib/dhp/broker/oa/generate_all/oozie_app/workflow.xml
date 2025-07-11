@@ -61,12 +61,6 @@
         	<name>brokerDbPassword</name>
         	<description>the password of the broker database</description>
         </property>
-        <property>
-            <name>sparkMaxExecutorsForIndexing</name>
-            <value>8</value>
-            <description>Max number of workers for ElasticSearch indexing</description>
-        </property>
-
 
         <!-- General oozie workflow properties -->
         <property>
@@ -403,7 +397,6 @@
                 ${sparkClusterOpts}
                 ${sparkResourceOpts}
                 ${sparkApplicationOpts}
-                --conf spark.dynamicAllocation.maxExecutors=${sparkMaxExecutorsForIndexing}
             </spark-opts>
             <arg>--outputDir</arg><arg>${outputDir}</arg>
             <arg>--index</arg><arg>${esEventIndexName}</arg>
@@ -466,7 +459,6 @@
                 ${sparkClusterOpts}
                 ${sparkResourceOpts}
                 ${sparkApplicationOpts}
-                --conf spark.dynamicAllocation.maxExecutors=${sparkMaxExecutorsForIndexing}
             </spark-opts>
             <arg>--outputDir</arg><arg>${outputDir}</arg>
             <arg>--index</arg><arg>${esNotificationsIndexName}</arg>

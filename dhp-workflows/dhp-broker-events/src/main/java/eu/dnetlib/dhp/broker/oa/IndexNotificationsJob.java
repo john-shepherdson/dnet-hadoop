@@ -70,7 +70,7 @@ public class IndexNotificationsJob {
 			feeder.refreshIndex(index);
 		}
 
-		if (StringUtils.isBlank(brokerApiBaseUrl)) {
+		if (StringUtils.isBlank(brokerApiBaseUrl) || !StringUtils.startsWith(brokerApiBaseUrl, "http")) {
 			log.warn("brokerApiBaseUrl is not set, skipping sendNotifications");
 		} else {
 			log.info("*** sendNotifications (emails, ...)");
