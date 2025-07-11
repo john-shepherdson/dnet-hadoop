@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.broker.oa_alerts;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -18,6 +19,9 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.FilterFunction;
+import org.apache.spark.api.java.function.FlatMapFunction;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.util.LongAccumulator;
@@ -89,27 +93,7 @@ public class GenerateAlertNotificationsJob {
 
 		if (StringUtils.isAnyBlank(dsId, compatibilityLevel, inputPath, brokerApiBaseUrl)) { throw new RuntimeException("A required information is missing"); }
 
-		ValidationType validationType;
-		switch (compatibilityLevel) {
-		case "openaire2.0":
-			validationType = ValidationType.openaire2_0;
-			break;
-		case "openaire3.0":
-			validationType = ValidationType.openaire3_0;
-			break;
-		case "openaire4.0":
-			validationType = ValidationType.openaire4_0;
-			break;
-		case "fair_data":
-			validationType = ValidationType.fair_data;
-			break;
-		case "fair_literature_v4":
-			validationType = ValidationType.fair_literature_v4;
-			break;
-		default:
-			validationType = null;
-			break;
-		}
+		final ValidationType validationType = calculateValidationType(compatibilityLevel);
 
 		if (validationType == null) {
 			log.warn("The compatibility is non managed by the validator engine");
@@ -129,9 +113,10 @@ public class GenerateAlertNotificationsJob {
 					.read()
 					.parquet(inputPath)
 					.as(Encoders.bean(MetadataRecord.class))
-					.filter(r -> r.getValidationResults().containsKey(validationType))
-					.map(r -> generatePayload(r.getOriginalId(), dsId, dsName, r.getValidationResults().get(validationType)), Encoders
-							.bean(ValidatorAlertMessage.class));
+					.filter((FilterFunction<MetadataRecord>) r -> r.getValidationResults().containsKey(validationType))
+					.map((MapFunction<MetadataRecord, ValidatorAlertMessage>) r -> generatePayload(r.getOriginalId(), dsId, dsName, r.getValidationResults()
+							.get(validationType)), Encoders
+									.bean(ValidatorAlertMessage.class));
 
 			final DatasourceStats stats = new DatasourceStats();
 			stats.setId(dsId);
@@ -154,8 +139,9 @@ public class GenerateAlertNotificationsJob {
 			if (subscriptions.size() > 0) {
 
 				final Dataset<OaAlertNotification> dataset =
-						payloads.flatMap(p -> generateAlertNotifications(p, date, subscriptions).iterator(), Encoders.bean(OaAlertNotification.class))
-								.filter(n -> StringUtils.isNotBlank(n.getPayload()));
+						payloads.flatMap((FlatMapFunction<ValidatorAlertMessage, OaAlertNotification>) p -> generateAlertNotifications(p, date, subscriptions), Encoders
+								.bean(OaAlertNotification.class))
+								.filter((FilterFunction<OaAlertNotification>) n -> StringUtils.isNotBlank(n.getPayload()));
 
 				ClusterUtils.save(dataset, outputPath, OaAlertNotification.class, total);
 			} else {
@@ -164,7 +150,17 @@ public class GenerateAlertNotificationsJob {
 		});
 	}
 
-	private static List<OaAlertNotification> generateAlertNotifications(final ValidatorAlertMessage alertMessage,
+	private static ValidationType calculateValidationType(final String compatibilityLevel) {
+		if ("openaire2.0".equalsIgnoreCase(compatibilityLevel)) { return ValidationType.openaire2_0; }
+		if ("openaire3.0".equalsIgnoreCase(compatibilityLevel)) { return ValidationType.openaire3_0; }
+		if ("openaire4.0".equalsIgnoreCase(compatibilityLevel)) { return ValidationType.openaire4_0; }
+		if ("fair_data".equalsIgnoreCase(compatibilityLevel)) { return ValidationType.fair_data; }
+		if ("fair_literature_v4".equalsIgnoreCase(compatibilityLevel)) { return ValidationType.fair_literature_v4; }
+
+		return null;
+	}
+
+	private static Iterator<OaAlertNotification> generateAlertNotifications(final ValidatorAlertMessage alertMessage,
 			final Long date,
 			final List<Subscription> subscriptions) {
 
@@ -191,7 +187,7 @@ public class GenerateAlertNotificationsJob {
 			n.setSubscriptionId(s.getSubscriptionId());
 			n.setTopic(s.getTopic());
 			return n;
-		}).collect(Collectors.toList());
+		}).iterator();
 	}
 
 	private static List<Subscription> listSubscriptions(final String brokerApiBaseUrl) throws Exception {

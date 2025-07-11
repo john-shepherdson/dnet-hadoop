@@ -5,11 +5,11 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -57,33 +57,28 @@ public class IndexNotificationsJob {
 				.first()
 				.getDate();
 
-		log.info("*** Start indexing");
 		try (final BrokerIndexClient feeder = new BrokerIndexClient(indexHost)) {
 			final FileSystem fileSystem = FileSystem.get(new Configuration());
 			final List<Path> files = ClusterUtils.listFiles(notificationsPath, fileSystem, ".gz");
+
+			log.info("*** Start indexing");
 			feeder.parallelBulkIndex(files, 4, fileSystem, new ConvertJSONWithId("\"notificationId\":\"((\\d|\\w)*)\"", index));
+
+			log.info("*** Deleting old notifications");
+			feeder.deleteUsingDateBefore(index, "date", date - 1000);
+
 			feeder.refreshIndex(index);
 		}
 
-		log.info("*** Deleting old notifications");
-		final String message = deleteOldNotifications(brokerApiBaseUrl, date - 1000);
-		log.info("*** Deleted notifications: {}", message);
+		if (StringUtils.isBlank(brokerApiBaseUrl)) {
+			log.warn("brokerApiBaseUrl is not set, skipping sendNotifications");
+		} else {
+			log.info("*** sendNotifications (emails, ...)");
+			// sendNotifications(brokerApiBaseUrl, date - 1000);
+		}
 
-		log.info("*** sendNotifications (emails, ...)");
-		sendNotifications(brokerApiBaseUrl, date - 1000);
 		log.info("*** ALL done.");
 
-	}
-
-	private static String deleteOldNotifications(final String brokerApiBaseUrl, final long l) throws Exception {
-		final String url = brokerApiBaseUrl + "/api/notifications/byDate/0/" + l;
-		final HttpDelete req = new HttpDelete(url);
-
-		try (final CloseableHttpClient client = HttpClients.createDefault()) {
-			try (final CloseableHttpResponse response = client.execute(req)) {
-				return IOUtils.toString(response.getEntity().getContent());
-			}
-		}
 	}
 
 	private static String sendNotifications(final String brokerApiBaseUrl, final long l) throws IOException {

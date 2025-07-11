@@ -12,13 +12,22 @@ public class BrokerIndexClient extends ESFeeder {
 		super(url);
 	}
 
-	public void deleteAlertNotifications(final String index, final String dsId) throws ElasticsearchException, IOException {
+	public void deleteUsingExactField(final String index, final String field, final String value) throws ElasticsearchException, IOException {
 
 		final DeleteByQueryRequest req = DeleteByQueryRequest.of(b -> b
 				.index(index)
-				.query(q -> q.term(t -> t.field("map.datasourceId").value(dsId))));
+				.query(q -> q.term(t -> t.field(field).value(value))));
 
 		getEsClient().deleteByQuery(req);
+	}
+
+	public void deleteUsingDateBefore(final String index, final String field, final double date) throws ElasticsearchException, IOException {
+		final DeleteByQueryRequest req = DeleteByQueryRequest.of(b -> b
+				.index(index)
+				.query(q -> q.range(r -> r.number(n -> n.field(field).lte(date)))));
+
+		getEsClient().deleteByQuery(req);
+
 	}
 
 }

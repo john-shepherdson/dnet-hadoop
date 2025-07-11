@@ -1,7 +1,6 @@
 
 package eu.dnetlib.dhp.broker.oa;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -10,10 +9,6 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.MapFunction;
@@ -65,9 +60,6 @@ public class IndexEventSubsetJob {
 		final int maxEventsForTopic = NumberUtils.toInt(parser.get("maxEventsForTopic"));
 		log.info("maxEventsForTopic: {}", maxEventsForTopic);
 
-		final String brokerApiBaseUrl = parser.get("brokerApiBaseUrl");
-		log.info("brokerApiBaseUrl: {}", brokerApiBaseUrl);
-
 		final SparkSession spark = SparkSession.builder().config(conf).getOrCreate();
 
 		final TypedColumn<Event, EventGroup> aggr = new EventSubsetAggregator(maxEventsForTopic).toColumn();
@@ -87,29 +79,20 @@ public class IndexEventSubsetJob {
 
 		ClusterUtils.save(subset, eventsSubsetPath, Event.class, total);
 
-		log.info("*** Start indexing");
 		try (final BrokerIndexClient feeder = new BrokerIndexClient(indexHost)) {
 			final FileSystem fileSystem = FileSystem.get(new Configuration());
 			final List<Path> files = ClusterUtils.listFiles(eventsSubsetPath, fileSystem, "*.gz");
+
+			log.info("*** Start indexing");
 			feeder.parallelBulkIndex(files, 4, fileSystem, new ConvertJSONWithId("\"notificationId\":\"((\\d|\\w)*)\"", index));
+
+			log.info("*** Deleting old events");
+			feeder.deleteUsingDateBefore(index, "creationDate", now - 1000);
+
 			feeder.refreshIndex(index);
 		}
 
-		log.info("*** Deleting old events");
-		final String message = deleteOldEvents(brokerApiBaseUrl, now - 1000);
-		log.info("*** Deleted events: {}", message);
-
-	}
-
-	private static String deleteOldEvents(final String brokerApiBaseUrl, final long l) throws IOException {
-		final String url = brokerApiBaseUrl + "/api/events/byCreationDate/0/" + l;
-		final HttpDelete req = new HttpDelete(url);
-
-		try (final CloseableHttpClient client = HttpClients.createDefault()) {
-			try (final CloseableHttpResponse response = client.execute(req)) {
-				return IOUtils.toString(response.getEntity().getContent());
-			}
-		}
+		log.info("*** ALL DONE");
 
 	}
 
