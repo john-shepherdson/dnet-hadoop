@@ -15,8 +15,8 @@
             <description>the path where to find the information extracted from the publishers file</description>
         </property>
         <property>
-            <name>outputPath</name>
-            <description>the path where to store the affiliations</description>
+            <name>datasetPath</name>
+            <description>the path where to store the raw affiliation strings affiliations</description>
         </property>
         <property>
             <name>oldMatches</name>
@@ -88,11 +88,47 @@
             <arg>--publishersPath</arg><arg>${publishersPath}</arg>
             <arg>--oldMatches</arg><arg>${oldMatches}</arg>
             <arg>--applyOnAll</arg><arg>${applyOnAll}</arg>
-            <arg>--outputPath</arg><arg>${outputPath}</arg>
+            <arg>--outputPath</arg><arg>${datasetPath}</arg>
+            <arg>--workingDir</arg><arg>${workingDir}</arg>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
         </spark>
-        <ok to="End"/>
+        <ok to="run-affro"/>
         <error to="Kill"/>
+    </action>
+
+    <action name="run-affro">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Affiliations inference (Affro)</name>
+            <jar>dataset.py</jar>
+
+            <spark-opts>
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
+                --executor-cores=5
+                --executor-memory=7G
+                --driver-memory=4G
+                --conf spark.dynamicAllocation.maxExecutors=27
+                --conf spark.executor.memoryOverhead=7G
+                --conf spark.sql.shuffle.partitions=20000
+                --conf spark.yarn.appMasterEnv.PYSPARK_PYTHON=python3
+                --conf spark.executorEnv.PYSPARK_PYTHON=python3
+                --py-files ${wfAppPath}/affRo/affro_cluster.py,${wfAppPath}/affRo/create_input_cluster.py,${wfAppPath}/affRo/functions_cluster.py,${wfAppPath}/affRo/matching_cluster.py,${wfAppPath}/affRo/schemas.py,${wfAppPath}/affRo/utils.py
+                --files ${wfAppPath}/affRo/dictionaries/dix_city_oaire.json,${wfAppPath}/affRo/dictionaries/dix_id_country_oaire.json,${wfAppPath}/affRo/dictionaries/dix_country_legalnames.json,${wfAppPath}/affRo/dictionaries/replacements.json,${wfAppPath}/affRo/dictionaries/dix_acad.json,${wfAppPath}/affRo/dictionaries/dix_acad_oaire.json,${wfAppPath}/affRo/dictionaries/dix_categ.json,${wfAppPath}/affRo/dictionaries/dix_city.json,${wfAppPath}/affRo/dictionaries/dix_country.json,${wfAppPath}/affRo/dictionaries/dix_country_oaire.json,${wfAppPath}/affRo/dictionaries/dix_grids_rors.json,,${wfAppPath}/affRo/dictionaries/dix_id_country.json,${wfAppPath}/affRo/dictionaries/dix_mult.json,${wfAppPath}/affRo/dictionaries/dix_mult_oaire.json,${wfAppPath}/affRo/dictionaries/dix_status.json,${wfAppPath}/affRo/txt_files/city_names.txt,${wfAppPath}/affRo/txt_files/remove_list.txt,${wfAppPath}/affRo/txt_files/country_names.txt,${wfAppPath}/affRo/txt_files/stop_words.txt,${wfAppPath}/affRo/txt_files/university_terms.txt
+            </spark-opts>
+
+            <arg>${outputPath}</arg>
+            <arg>${outputFolder}</arg>
+
+            <file>${wfAppPath}/affRo/dataset.py#dataset.py</file>
+        </spark>
+
+        <ok to="End" />
+        <error to="Kill" />
+
     </action>
 
     <end name="End"/>

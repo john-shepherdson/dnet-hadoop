@@ -52,6 +52,7 @@ public class PrepareDataset implements Serializable {
                         PrepareDataset.class
                                 .getResourceAsStream(
                                         "/eu/dnetlib/dhp/actionmanager/affro/input_preparedataset_parameter.json"));
+        log.info("read parameter file");
 
         final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
         parser.parseArgument(args);
@@ -77,6 +78,9 @@ public class PrepareDataset implements Serializable {
         final String outputPath = parser.get("outputPath");
         log.info("outputPath: {}", outputPath);
 
+        final String workingDir = parser.get("workingDir");
+        log.info("workingDir: {}", workingDir);
+
         final Boolean startFromScratch = Optional
                 .ofNullable(parser.get("applyOnAll"))
                 .map(Boolean::valueOf)
@@ -95,13 +99,13 @@ public class PrepareDataset implements Serializable {
                     Constants.removeOutputDir(spark, outputPath);
                     prepareDataset(
                             spark, oalexPath, oairePath, iisPath, publishersPath, outputPath, oldMatches,
-                            startFromScratch);
+                            startFromScratch, workingDir);
                 });
     }
 
     private static void prepareDataset(SparkSession spark, String oalexPath, String oairePath, String iisPath,
                                        String publishersPath, String outputPath, String oldMatches,
-                                       Boolean startFromScratch) {
+                                       Boolean startFromScratch, String workingDir) {
         // start with oalex. read from the snapshot in the schema needed for this task
         // Function to compute MD5 hash with prefix
         spark
@@ -137,12 +141,12 @@ public class PrepareDataset implements Serializable {
                          explode(col("raw_affiliation_strings")).alias("raw_affiliation_string"))
                 .as(RowEncoder.apply(DATASET_SCHEMA));
 
-        Dataset<Row> oaire_entities = 
+        Dataset<Row> oaire_entities =
                 spark.createDataFrame(Collections.emptyList(), GRAPH_SCHEMA);
         for(EntityType entity: ModelSupport.entityTypes.keySet()) {
             if(ModelSupport.isResult(entity)){
                 oaire_entities = oaire_entities.union(spark.read().schema(GRAPH_SCHEMA).json(oairePath + "/" + entity.name()));
-                        
+
             }
         }
         Dataset<Row> oaire = oaire_entities
@@ -157,7 +161,10 @@ public class PrepareDataset implements Serializable {
 //        spark.read().schema(Encoders.bean(IISModel.class).schema())
 //                .json(iisPath)
                 .as(Encoders.bean(IISModel.class))
-                  .filter((FilterFunction<IISModel>) value -> !value.getAuthors().isEmpty() && !value.getAffiliations().isEmpty())
+                  .filter((FilterFunction<IISModel>) value -> Optional.ofNullable(value.getAuthors()).isPresent() &&
+                  !value.getAuthors().isEmpty() &&
+                          Optional.ofNullable(value.getAffiliations()).isPresent() &&
+                          !value.getAffiliations().isEmpty())
 
                 .flatMap((FlatMapFunction<IISModel, Row>) value -> {
                     List<Row> ret = new ArrayList<>();
@@ -167,8 +174,6 @@ public class PrepareDataset implements Serializable {
                     }
                 , RowEncoder.apply(DATASET_SCHEMA))
                 .select("id","fullname","raw_affiliation_string");
-
-
 
         Dataset<Row> publishers = spark.read().schema(PUBLISHER_SCHEMA).json(publishersPath)
                 .filter( col("success").equalTo(true))
@@ -193,13 +198,13 @@ public class PrepareDataset implements Serializable {
                 .write()
                 .mode(SaveMode.Overwrite)
                 .option("compression","gzip")
-                .json(outputPath + "/temporary/exploded");
+                .json(workingDir + "/exploded");
         inputDataset.select( col("raw_affiliation_string"))
                 .distinct()
                 .write()
                 .mode(SaveMode.Overwrite)
                 .option("compression", "gzip")
-                .json(outputPath + "/temporary/all_strings");
+                .json(workingDir + "/all_strings");
 
         Dataset<Row> alreadyMatched = spark.createDataFrame(Collections.emptyList(), AFFILIATION_SCHEMA);
 
@@ -208,8 +213,8 @@ public class PrepareDataset implements Serializable {
             alreadyMatched = spark.read().schema(AFFILIATION_SCHEMA)
                     .json(oldMatches);
         }
-
-        Dataset<Row> newToMatch =  inputDataset.join(alreadyMatched, inputDataset.col("raw_affiliation_string").equalTo(alreadyMatched.col("Affiliation")), "left")
+        Dataset<Row> affStrings = spark.read().schema(AFFILIATION_STRING_SCHEMA).json(workingDir + "/all_strings");
+        Dataset<Row> newToMatch =  affStrings.join(alreadyMatched, affStrings.col("raw_affiliation_string").equalTo(alreadyMatched.col("Affiliation")), "left")
                 .filter( col("Affiliation").isNull())
                 .select("raw_affiliation_string")
                 .distinct();
@@ -217,14 +222,18 @@ public class PrepareDataset implements Serializable {
         newToMatch.write()
                 .mode(SaveMode.Overwrite)
                 .option("compression", "gzip")
-                .json(outputPath + "/temporary/toMatch");
+                .json(outputPath );
 
     }
 
     private static List<Row> getAuthorLines(String id, Author author, List<Affiliation> affiliations) {
         List<Integer> affiliationPositions = author.getAffiliationpositions();
-        if (!affiliationPositions.isEmpty())
-            return affiliationPositions.stream().map(pos -> RowFactory.create(id, author.getAuthorfullname(), affiliations.get(pos).getRawtext())).collect(Collectors.toList());
+        if (Optional.ofNullable(affiliationPositions).isPresent() && !affiliationPositions.isEmpty())
+            return affiliationPositions.stream().map(pos -> {
+                if(pos < affiliations.size())
+                    return RowFactory.create(id, author.getAuthorfullname(), affiliations.get(pos).getRawtext());
+                return null;
+            }).filter(Objects::nonNull).collect(Collectors.toList());
         else
             return new ArrayList<>();
     }
