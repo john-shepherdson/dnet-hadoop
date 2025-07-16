@@ -267,7 +267,7 @@ public class ProvisionModelSupport {
 		return topic;
 	}
 
-	private static Funding mapFunding(List<String> fundingtree, VocabularyGroup vocs) {
+	protected static Funding mapFunding(List<String> fundingtree, VocabularyGroup vocs) {
 		SAXReader reader = new SAXReader();
 		return Optional
 			.ofNullable(fundingtree)
@@ -277,7 +277,7 @@ public class ProvisionModelSupport {
 					.map(ft -> {
 						try {
 							Document doc = reader.read(new StringReader(ft));
-							String countryCode = doc.valueOf("/fundingtree/funder/jurisdiction/text()");
+							String countryCode = doc.valueOf("/fundingtree/funder/jurisdiction");
 							eu.dnetlib.dhp.schema.solr.Country country = vocs
 								.find("dnet:countries")
 								.map(voc -> voc.getTerm(countryCode))
@@ -285,17 +285,17 @@ public class ProvisionModelSupport {
 								.map(label -> eu.dnetlib.dhp.schema.solr.Country.newInstance(countryCode, label))
 								.orElse(null);
 
-							String level0_id = doc.valueOf("//funding_level_0/id/text()");
-							String level1_id = doc.valueOf("//funding_level_1/id/text()");
-							String level2_id = doc.valueOf("//funding_level_2/id/text()");
+							String level0_id = doc.valueOf("//funding_level_0/id");
+							String level1_id = doc.valueOf("//funding_level_1/id");
+							String level2_id = doc.valueOf("//funding_level_2/id");
 
 							return Funding
 								.newInstance(
 									Funder
 										.newInstance(
-											doc.valueOf("/fundingtree/funder/id/text()"),
-											doc.valueOf("/fundingtree/funder/shortname/text()"),
-											doc.valueOf("/fundingtree/funder/name/text()"),
+											doc.valueOf("/fundingtree/funder/id"),
+											doc.valueOf("/fundingtree/funder/shortname"),
+											doc.valueOf("/fundingtree/funder/name"),
 											country, new ArrayList<>()),
 									Optional
 										.ofNullable(level0_id)
@@ -303,8 +303,8 @@ public class ProvisionModelSupport {
 											id -> FundingLevel
 												.newInstance(
 													id,
-													doc.valueOf("//funding_level_0/description/text()"),
-													doc.valueOf("//funding_level_0/name/text()")))
+													doc.valueOf("//funding_level_0/description"),
+													doc.valueOf("//funding_level_0/name")))
 										.orElse(null),
 									Optional
 										.ofNullable(level1_id)
@@ -312,8 +312,8 @@ public class ProvisionModelSupport {
 											id -> FundingLevel
 												.newInstance(
 													id,
-													doc.valueOf("//funding_level_1/description/text()"),
-													doc.valueOf("//funding_level_1/name/text()")))
+													doc.valueOf("//funding_level_1/description"),
+													doc.valueOf("//funding_level_1/name")))
 										.orElse(null),
 									Optional
 										.ofNullable(level2_id)
@@ -321,8 +321,8 @@ public class ProvisionModelSupport {
 											id -> FundingLevel
 												.newInstance(
 													id,
-													doc.valueOf("//funding_level_2/description/text()"),
-													doc.valueOf("//funding_level_2/name/text()")))
+													doc.valueOf("//funding_level_2/description"),
+													doc.valueOf("//funding_level_2/name")))
 										.orElse(null));
 
 						} catch (DocumentException e) {
