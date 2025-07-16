@@ -13,7 +13,6 @@ import static eu.dnetlib.dhp.utils.DHPUtils.saveDataset;
 import static eu.dnetlib.dhp.utils.DHPUtils.writeHdfsFile;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -32,7 +31,7 @@ import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.functions;
 import org.apache.spark.sql.types.DataType;
-import org.apache.spark.sql.types.StructField;
+import org.apache.spark.sql.types.StructType;
 import org.apache.spark.util.LongAccumulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -128,16 +127,8 @@ public class TransformSparkJobNode {
 
 		final Dataset<Row> rows = spark.read().parquet(inputPath);
 
-		final DataType dataType = Arrays
-				.stream(
-						rows
-								.schema()
-								.fields())
-				.filter(f -> GenerateNativeStoreSparkJob.VALIDATION_RESULTS_FIELD.equals(f.name()))
-				.map(StructField::dataType)
-				.findFirst()
-				.orElseThrow(
-						() -> new RuntimeException("Missing " + GenerateNativeStoreSparkJob.VALIDATION_RESULTS_FIELD + " field in new schema"));
+		final StructType schema = Encoders.bean(MetadataRecord.class).schema();
+		final DataType dataType = schema.apply(GenerateNativeStoreSparkJob.VALIDATION_RESULTS_FIELD).dataType();
 
 		// Make compatible the old mdstores with the evolution of the model class
 		// ie: the addiction of the new field (validationResults)
