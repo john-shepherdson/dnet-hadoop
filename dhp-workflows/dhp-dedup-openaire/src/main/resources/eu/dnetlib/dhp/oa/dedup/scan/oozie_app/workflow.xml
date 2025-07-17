@@ -304,6 +304,27 @@
             <arg>--workingPath</arg><arg>${workingPath}</arg>
             <arg>--dedupGraphPath</arg><arg>${dedupGraphPath}</arg>
         </spark>
+        <ok to="copyRelationsForBroker"/>
+        <error to="Kill"/>
+    </action>
+
+    <!-- copy all relations for the broker -->
+    <action name="copyRelationsForBroker">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Copy Relations for the Broker</name>
+            <class>eu.dnetlib.dhp.oa.dedup.SparkCopyRelationsForBroker</class>
+            <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
+            <spark-opts>
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
+            </spark-opts>
+            <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
+            <arg>--relationsOutputPath</arg><arg>${relationsOutputPath}</arg>
+            <arg>--workingPath</arg><arg>${workingPath}</arg>
+        </spark>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
