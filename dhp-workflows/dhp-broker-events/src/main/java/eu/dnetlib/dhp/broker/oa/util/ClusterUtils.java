@@ -14,6 +14,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
+import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
@@ -40,16 +41,6 @@ public class ClusterUtils {
 
 	public static void removeDir(final SparkSession spark, final String path) {
 		HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
-	}
-
-	public static Dataset<Relation> loadRelations(final String graphPath, final SparkSession spark) {
-		return ClusterUtils
-				.readPath(spark, graphPath + "/relation", Relation.class)
-				.map((MapFunction<Relation, Relation>) r -> {
-					r.setSource(ConversionUtils.cleanOpenaireId(r.getSource()));
-					r.setTarget(ConversionUtils.cleanOpenaireId(r.getTarget()));
-					return r;
-				}, Encoders.bean(Relation.class));
 	}
 
 	public static <R> Dataset<R> readPath(
@@ -119,6 +110,28 @@ public class ClusterUtils {
 			}
 		}
 		return files;
+	}
+
+	public static Dataset<Relation> loadMergedRelations(final String graphPath, final SparkSession spark) {
+		return ClusterUtils
+				.readPath(spark, graphPath + "/relation", Relation.class)
+				.map((MapFunction<Relation, Relation>) r -> {
+					r.setSource(ConversionUtils.cleanOpenaireId(r.getSource()));
+					r.setTarget(ConversionUtils.cleanOpenaireId(r.getTarget()));
+					return r;
+				}, Encoders.bean(Relation.class))
+				.filter((FilterFunction<Relation>) r -> ModelConstants.IS_MERGED_IN.equals(r.getRelClass()));
+	}
+
+	public static Dataset<Relation> loadRawRelations(final String relationsPath, final String relType, final SparkSession spark) {
+		return ClusterUtils
+				.readPath(spark, relationsPath, Relation.class)
+				.map((MapFunction<Relation, Relation>) r -> {
+					r.setSource(ConversionUtils.cleanOpenaireId(r.getSource()));
+					r.setTarget(ConversionUtils.cleanOpenaireId(r.getTarget()));
+					return r;
+				}, Encoders.bean(Relation.class))
+				.filter((FilterFunction<Relation>) r -> relType.equals(r.getRelType()));
 	}
 
 }

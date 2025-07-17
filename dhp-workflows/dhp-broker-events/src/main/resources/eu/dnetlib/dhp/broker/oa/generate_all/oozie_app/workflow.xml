@@ -6,6 +6,10 @@
             <description>the path where the graph is stored</description>
         </property>
         <property>
+            <name>rawRelsInputPath</name>
+            <description>the path where the raw relations are stored</description>
+        </property>
+        <property>
             <name>outputDir</name>
             <description>the path where the generated data will be stored</description>
         </property>
@@ -145,6 +149,7 @@
                 ${sparkApplicationOpts}
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--rawRelsPath</arg><arg>${rawRelsInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="wait_entities_and_rels"/>
@@ -164,6 +169,7 @@
                 ${sparkApplicationOpts}
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--rawRelsPath</arg><arg>${rawRelsInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="wait_entities_and_rels"/>
@@ -184,6 +190,7 @@
                 ${sparkApplicationOpts}
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--rawRelsPath</arg><arg>${rawRelsInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="wait_entities_and_rels"/>
@@ -203,6 +210,7 @@
                 ${sparkApplicationOpts}
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--rawRelsPath</arg><arg>${rawRelsInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="wait_entities_and_rels"/>
@@ -222,6 +230,7 @@
                 ${sparkApplicationOpts}
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--rawRelsPath</arg><arg>${rawRelsInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="wait_entities_and_rels"/>
@@ -241,6 +250,7 @@
                 ${sparkApplicationOpts}
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--rawRelsPath</arg><arg>${rawRelsInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="wait_entities_and_rels"/>
@@ -262,6 +272,7 @@
                 ${sparkApplicationOpts}
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--rawRelsPath</arg><arg>${rawRelsInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="join_entities_step1"/>
@@ -281,6 +292,7 @@
                 ${sparkApplicationOpts}
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--rawRelsPath</arg><arg>${rawRelsInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="join_entities_step2"/>
@@ -300,6 +312,7 @@
                 ${sparkApplicationOpts}
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--rawRelsPath</arg><arg>${rawRelsInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="join_entities_step3"/>
@@ -319,6 +332,7 @@
                 ${sparkApplicationOpts}
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--rawRelsPath</arg><arg>${rawRelsInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="join_entities_step4"/>
@@ -338,6 +352,7 @@
                 ${sparkApplicationOpts}
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--rawRelsPath</arg><arg>${rawRelsInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="prepare_groups"/>
@@ -357,6 +372,7 @@
                 ${sparkApplicationOpts}
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--rawRelsPath</arg><arg>${rawRelsInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="generate_events"/>
