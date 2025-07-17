@@ -58,7 +58,7 @@ public class CleanFolderSparkJob {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				HdfsSupport.remove(deletePath, new Configuration());
+				HdfsSupport.remove(deletePath, spark.sparkContext().hadoopConfiguration());
 			});
 	}
 }
