@@ -45,4 +45,19 @@ SELECT
 	'isDifferentFrom'                                     AS relclass
 FROM oa_duplicates d
 LEFT OUTER JOIN organizations o ON (d.local_id=o.id)
-WHERE d.reltype = 'is_different' AND o.status = 'approved';
+WHERE d.reltype = 'is_different' AND o.status = 'approved'
+
+UNION ALL
+
+SELECT
+    c.id1 AS id1,
+    c.id2 AS id2,
+    'openaire____::openorgs' AS collectedfromid,
+    'OpenOrgs Database'                                   AS collectedfromname,
+    false                                                 AS inferred,
+    false                                                 AS deletedbyinference,
+    0.99                                                  AS trust,
+    ''                                                    AS inferenceprovenance,
+    'isDifferentFrom'                                     AS relclass
+FROM oa_conflicts c
+WHERE c.reltype = 'is_different'

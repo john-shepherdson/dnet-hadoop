@@ -278,7 +278,7 @@ public class SparkOpenorgsDedupTest implements Serializable {
 				.select(col("source"))
 				.distinct()
 				.count();
-		assertEquals(74, orgs_dedup_ids);
+		assertEquals(75, orgs_dedup_ids);
 
 	}
 
@@ -328,7 +328,7 @@ public class SparkOpenorgsDedupTest implements Serializable {
 			.executeQuery();
 		if (resultSet.next()) {
 			int total_rels = resultSet.getInt("total_rels");
-			assertEquals(35, total_rels);
+			assertEquals(34, total_rels);
 		} else
 			fail("No result in the sql DB");
 		resultSet.close();
