@@ -5,6 +5,10 @@
             <description>the raw graph base path</description>
         </property>
         <property>
+            <name>relationsOutputPath</name>
+            <description>the raw relations output path</description>
+        </property>
+        <property>
             <name>isLookUpUrl</name>
             <description>the address of the lookUp service</description>
         </property>
