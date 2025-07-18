@@ -851,7 +851,7 @@ public class SparkDedupTest implements Serializable {
 		new SparkCopyRelationsForBroker(parser, spark).run(isLookUpService);
 
 		final Dataset<Row> outputRels = spark.read().text(relationsOutputPath);
-		System.out.println("outputRels = " + outputRels);
+		assertEquals(11, outputRels.count());
 
 	}
 

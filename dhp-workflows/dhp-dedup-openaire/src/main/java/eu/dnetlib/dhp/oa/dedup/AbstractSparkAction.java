@@ -41,6 +41,7 @@ abstract class AbstractSparkAction implements Serializable {
 
 	protected static final List<String> BROKER_REL_CLASSES = Arrays.asList(
 			ModelConstants.IS_PRODUCED_BY,
+			ModelConstants.PRODUCES,
 			ModelConstants.IS_REFERENCED_BY,
 			ModelConstants.REFERENCES,
 			ModelConstants.IS_RELATED_TO,
