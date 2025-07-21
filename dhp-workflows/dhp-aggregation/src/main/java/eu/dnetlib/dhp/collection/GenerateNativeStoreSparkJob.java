@@ -20,6 +20,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -62,6 +63,7 @@ import eu.dnetlib.validator2.validation.guideline.openaire.FAIR_Data_GuidelinesP
 import eu.dnetlib.validator2.validation.guideline.openaire.FAIR_Literature_GuidelinesV4Profile;
 import eu.dnetlib.validator2.validation.guideline.openaire.LiteratureGuidelinesV3Profile;
 import eu.dnetlib.validator2.validation.guideline.openaire.LiteratureGuidelinesV4Profile;
+import org.xml.sax.SAXException;
 import scala.Tuple2;
 
 public class GenerateNativeStoreSparkJob {
@@ -308,7 +310,7 @@ public class GenerateNativeStoreSparkJob {
 	}
 
 	public static MetadataRecord addValidationReports(final MetadataRecord mdr,
-			final Map<ValidationType, AbstractOpenAireProfile> validators) {
+			final Map<ValidationType, AbstractOpenAireProfile> validators) throws ParserConfigurationException, IOException, SAXException {
 
 		if ((validators == null) || validators.isEmpty()) {
 			return mdr;
@@ -324,11 +326,16 @@ public class GenerateNativeStoreSparkJob {
 			validators.entrySet().forEach(e -> {
 				final ValidationType validationType = e.getKey();
 				final AbstractOpenAireProfile profile = e.getValue();
-				final StandardValidationResult report = profile.validate(mdr.getId(), doc);
-				mdr.getValidationResults().put(validationType, report);
+				try {
+					final StandardValidationResult report = profile.validate(mdr.getId(), doc);
+					final Map<ValidationType, StandardValidationResult> validationResults = new LinkedHashMap<>(mdr.getValidationResults());
+					validationResults.put(validationType, report);
+					mdr.setValidationResults(validationResults);
+				} catch (Exception e1) {
+					final String errorMessage = "Error validating record id: " + mdr.getId() + " with profile: " + validationType;
+					throw new RuntimeException(errorMessage, e1);
+				}
 			});
-		} catch (final Throwable e) {
-			throw new RuntimeException("Error generating validation report, record id: " + mdr.getId(), e);
 		}
 
 		return mdr;
