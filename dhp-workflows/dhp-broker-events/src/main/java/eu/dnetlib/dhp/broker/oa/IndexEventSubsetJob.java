@@ -84,7 +84,7 @@ public class IndexEventSubsetJob {
 			final List<Path> files = ClusterUtils.listFiles(eventsSubsetPath, fileSystem, "*.gz");
 
 			log.info("*** Start indexing");
-			feeder.parallelBulkIndex(files, 4, fileSystem, new ConvertJSONWithId("\"notificationId\":\"((\\d|\\w)*)\"", index));
+			feeder.parallelBulkIndex(files, 4, fileSystem, new ConvertJSONWithId("\"eventId\":\"((\\d|\\w)*)\"", index));
 
 			log.info("*** Deleting old events");
 			feeder.deleteUsingDateBefore(index, "creationDate", now - 1000);

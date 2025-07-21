@@ -74,7 +74,7 @@ public class IndexNotificationsJob {
 			log.warn("brokerApiBaseUrl is not set, skipping sendNotifications");
 		} else {
 			log.info("*** sendNotifications (emails, ...)");
-			// sendNotifications(brokerApiBaseUrl, date - 1000);
+			sendNotifications(brokerApiBaseUrl, date - 1000);
 		}
 
 		log.info("*** ALL done.");
