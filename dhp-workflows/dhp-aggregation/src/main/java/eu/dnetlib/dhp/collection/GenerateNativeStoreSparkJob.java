@@ -77,8 +77,8 @@ public class GenerateNativeStoreSparkJob {
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 				IOUtils
-						.toString(GenerateNativeStoreSparkJob.class
-								.getResourceAsStream("/eu/dnetlib/dhp/collection/generate_native_input_parameters.json")));
+					.toString(GenerateNativeStoreSparkJob.class
+						.getResourceAsStream("/eu/dnetlib/dhp/collection/generate_native_input_parameters.json")));
 		parser.parseArgument(args);
 
 		final String provenanceArgument = parser.get("provenance");
@@ -141,7 +141,9 @@ public class GenerateNativeStoreSparkJob {
 		case "openaire2.0_data":
 			res.put(ValidationType.fair_data, new FAIR_Data_GuidelinesProfile());
 			break;
-		}
+		default:
+			throw new IllegalStateException("Unexpected value: " + compatibilityLevel);
+        }
 
 		return res;
 	}
@@ -220,7 +222,10 @@ public class GenerateNativeStoreSparkJob {
 		final Long total = spark.read().load(targetPath).count();
 		log.info("collected {} records for datasource '{}'", total, provenance.getDatasourceName());
 
-		writeHdfsFile(spark.sparkContext().hadoopConfiguration(), total.toString(), currentVersion.getHdfsPath() + MDSTORE_SIZE_PATH);
+		writeHdfsFile(
+
+				spark.sparkContext().hadoopConfiguration(), total.toString(),
+				currentVersion.getHdfsPath() + MDSTORE_SIZE_PATH);
 	}
 
 	public static class MDStoreAggregator extends Aggregator<MetadataRecord, MetadataRecord, MetadataRecord> {
@@ -243,9 +248,13 @@ public class GenerateNativeStoreSparkJob {
 		}
 
 		private MetadataRecord getLatestRecord(final MetadataRecord b, final MetadataRecord a) {
-			if (b == null) { return a; }
+			if (b == null) {
+				return a;
+			}
 
-			if (a == null) { return b; }
+			if (a == null) {
+				return b;
+			}
 			return (a.getDateOfCollection() > b.getDateOfCollection()) ? a : b;
 		}
 
@@ -301,7 +310,9 @@ public class GenerateNativeStoreSparkJob {
 	public static MetadataRecord addValidationReports(final MetadataRecord mdr,
 			final Map<ValidationType, AbstractOpenAireProfile> validators) {
 
-		if ((validators == null) || validators.isEmpty()) { return mdr; }
+		if ((validators == null) || validators.isEmpty()) {
+			return mdr;
+		}
 
 		if (mdr.getValidationResults() == null) {
 			mdr.setValidationResults(new LinkedHashMap<>());
