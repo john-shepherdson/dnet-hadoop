@@ -328,7 +328,7 @@ public class GenerateNativeStoreSparkJob {
 				mdr.getValidationResults().put(validationType, report);
 			});
 		} catch (final Throwable e) {
-			log.warn("Error generating validation report, record id: {}", mdr.getId(), e);
+			throw new RuntimeException("Error generating validation report, record id: " + mdr.getId(), e);
 		}
 
 		return mdr;
