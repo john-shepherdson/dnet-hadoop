@@ -390,13 +390,14 @@ public class Utils implements Serializable {
 		CommunityEntityMap communityEntityMap) {
 
 		try {
-			List<String> associatedOrgs = MAPPER
+			List<OrganizationAPIModel> associatedOrgs = MAPPER
 				.readValue(
 					QueryCommunityAPI.communityPropagationOrganization(communityId, baseURL),
-					EntityIdentifierList.class);
+					EntityList.class);
 			associatedOrgs
 				.forEach(
-					o -> communityEntityMap.add(ModelSupport.getIdPrefix(Organization.class) + "|" + o, communityId));
+					o -> communityEntityMap
+						.add(ModelSupport.getIdPrefix(Organization.class) + "|" + o.getOrgId(), communityId));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -407,13 +408,14 @@ public class Utils implements Serializable {
 		CommunityEntityMap communityEntityMap) {
 
 		try {
-			List<String> associatedOrgs = MAPPER
+			List<OrganizationAPIModel> associatedOrgs = MAPPER
 				.readValue(
 					QueryCommunityAPI.subcommunityPropagationOrganization(communityId, subcommunityId, baseURL),
-					EntityIdentifierList.class);
+					EntityList.class);
 			associatedOrgs
 				.forEach(
-					o -> communityEntityMap.add(ModelSupport.getIdPrefix(Organization.class) + "|" + o, communityId));
+					o -> communityEntityMap
+						.add(ModelSupport.getIdPrefix(Organization.class) + "|" + o.getOrgId(), communityId));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
