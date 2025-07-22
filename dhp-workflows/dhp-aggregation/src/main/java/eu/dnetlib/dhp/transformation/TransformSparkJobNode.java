@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import eu.dnetlib.dhp.collection.GenerateNativeStoreSparkJob;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.spark.SparkConf;
@@ -29,6 +30,8 @@ import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.functions;
+import org.apache.spark.sql.types.DataType;
+import org.apache.spark.sql.types.StructType;
 import org.apache.spark.util.LongAccumulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -124,11 +127,14 @@ public class TransformSparkJobNode {
 
 		final Dataset<Row> rows = spark.read().parquet(inputPath);
 
+		final StructType schema = Encoders.bean(MetadataRecord.class).schema();
+		final DataType dataType = schema.apply(GenerateNativeStoreSparkJob.VALIDATION_RESULTS_FIELD).dataType();
+
 		// Make compatible the old mdstores with the evolution of the model class
 		// ie: the addiction of the new field (validationResults)
-		final Dataset<Row> rowsWithNewField = ArrayUtils.contains(rows.schema().fieldNames(), "validationResults")
+		final Dataset<Row> rowsWithNewField = ArrayUtils.contains(rows.schema().fieldNames(), GenerateNativeStoreSparkJob.VALIDATION_RESULTS_FIELD)
 			? rows
-			: rows.withColumn("validationResults", functions.map());
+			: rows.withColumn(GenerateNativeStoreSparkJob.VALIDATION_RESULTS_FIELD, functions.lit(null).cast(dataType));
 
 		final Dataset<MetadataRecord> inputMDStore = rowsWithNewField.as(encoder);
 
