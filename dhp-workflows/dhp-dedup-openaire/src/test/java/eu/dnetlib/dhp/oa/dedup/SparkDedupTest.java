@@ -195,7 +195,7 @@ public class SparkDedupTest implements Serializable {
 
 		if (CHECK_CARDINALITIES) {
 			assertEquals(720, orgs_simrel);
-			assertEquals(566, pubs_simrel);
+			assertEquals(567, pubs_simrel);
 			assertEquals(113, sw_simrel);
 			assertEquals(148, ds_simrel);
 			assertEquals(280, orp_simrel);
@@ -256,7 +256,7 @@ public class SparkDedupTest implements Serializable {
 		// entities simrels supposed to be equal to the number of previous step (no rels in whitelist)
 		if (CHECK_CARDINALITIES) {
 			assertEquals(720, orgs_simrel);
-			assertEquals(566, pubs_simrel);
+			assertEquals(567, pubs_simrel);
 			assertEquals(148, ds_simrel);
 			assertEquals(280, orp_simrel);
 			assertEquals(115, sw_simrel.count());
@@ -625,10 +625,10 @@ public class SparkDedupTest implements Serializable {
 
 		if (CHECK_CARDINALITIES) {
 			assertEquals(87, orgs_deduprecord);
-			assertEquals(96, pubs.count());
+			assertEquals(95, pubs.count());
 			assertEquals(47, sw_deduprecord);
 			assertEquals(97, ds_deduprecord);
-			assertEquals(92, orp_deduprecord);
+			assertEquals(93, orp_deduprecord);
 		}
 
 		verifyRoot_1(mapper, pubs);
@@ -766,13 +766,13 @@ public class SparkDedupTest implements Serializable {
 		System.out.println("otherresearchproduct = " + otherresearchproduct);
 
 		if (CHECK_CARDINALITIES) {
-			assertEquals(930, publications);
+			assertEquals(931, publications);
 			assertEquals(840, organizations);
 			assertEquals(100, projects);
 			assertEquals(100, datasource);
 			assertEquals(196, softwares);
 			assertEquals(389, dataset);
-			assertEquals(520, otherresearchproduct);
+			assertEquals(521, otherresearchproduct);
 		}
 
 		long deletedOrgs = jsc
