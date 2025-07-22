@@ -120,7 +120,7 @@ public class PrepareDataset implements Serializable {
         spark
                 .udf()
                 .register(
-                        "selectId", (String doi, String id) -> StringUtils.isNoneEmpty() ? id : "50|doi_________::" + DHPUtils.md5(StringUtils.substringAfter(doi,"doi.org/")), DataTypes.StringType);
+                        "selectId", (String doi, String id) -> StringUtils.isNotEmpty(id) ? id : "50|doi_________::" + DHPUtils.md5(StringUtils.substringAfter(doi,"doi.org/")), DataTypes.StringType);
 
         //the output model for all the datasets will be:
         //id : the openaire identifier for the resource

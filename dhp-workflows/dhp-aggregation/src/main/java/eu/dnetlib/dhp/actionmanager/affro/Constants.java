@@ -26,6 +26,8 @@ public class Constants implements Serializable {
             .add("fullname", StringType)
             .add("raw_affiliation_string", StringType);
 
+
+
     public final static StructType OALEX_SCHEMA = new StructType()
             .add("id", StringType)
             .add("doi", StringType)
@@ -100,6 +102,12 @@ public class Constants implements Serializable {
             .add("Affiliation", StringType)
             .add("Matchings", MATCHING_ARRAY_SCHEMA)
             ;
+
+    public final static StructType JOINED_SCHEMA = new StructType()
+            .add("id", StringType)
+            .add("fullname", StringType)
+            .add("raw_affiliation_string", StringType)
+            .add("Matchings", MATCHING_ARRAY_SCHEMA);
 
     public final static StructType AFFILIATION_STRING_SCHEMA = new StructType()
             .add("raw_affiliation_string", StringType)

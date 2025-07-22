@@ -96,6 +96,7 @@
         <error to="Kill"/>
     </action>
 
+    <!-- Questo da cambiare e da usare il codice in dhf-affiliation-matching project-->
     <action name="run-affro">
         <spark xmlns="uri:oozie:spark-action:0.2">
 
@@ -129,6 +130,31 @@
         <ok to="End" />
         <error to="Kill" />
 
+    </action>
+
+    <action name="redistributerelations">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Associate to the result and authors the affiliation links</name>
+            <class>eu.dnetlib.dhp.actionmanager.affro.PrepareDataset</class>
+            <jar>dhp-aggregation-${projectVersion}.jar</jar>
+            <spark-opts>
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
+            </spark-opts>
+            <arg>--oalexPath</arg><arg>${oalexPath}</arg>
+            <arg>--oairePath</arg><arg>${oairePath}</arg>
+            <arg>--publishersPath</arg><arg>${publishersPath}</arg>
+            <arg>--oldMatches</arg><arg>${oldMatches}</arg>
+            <arg>--applyOnAll</arg><arg>${applyOnAll}</arg>
+            <arg>--outputPath</arg><arg>${datasetPath}</arg>
+            <arg>--workingDir</arg><arg>${workingDir}</arg>
+            <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
+        </spark>
+        <ok to="run-affro"/>
+        <error to="Kill"/>
     </action>
 
     <end name="End"/>
