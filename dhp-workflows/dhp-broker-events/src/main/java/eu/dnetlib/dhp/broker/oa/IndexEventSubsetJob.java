@@ -1,35 +1,22 @@
 
 package eu.dnetlib.dhp.broker.oa;
 
-import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.function.FlatMapFunction;
-import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
-import org.apache.spark.sql.TypedColumn;
-import org.apache.spark.util.LongAccumulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.broker.model.Event;
 import eu.dnetlib.dhp.broker.oa.util.BrokerIndexClient;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
-import eu.dnetlib.dhp.broker.oa.util.EventGroup;
-import eu.dnetlib.dhp.broker.oa.util.aggregators.subset.EventSubsetAggregator;
 import eu.dnetlib.dhp.index.es.ConvertJSONWithId;
-import scala.Tuple2;
 
 public class IndexEventSubsetJob {
 
@@ -45,9 +32,6 @@ public class IndexEventSubsetJob {
 
 		final SparkConf conf = new SparkConf();
 
-		final String eventsPath = parser.get("outputDir") + "/events";
-		log.info("eventsPath: {}", eventsPath);
-
 		final String eventsSubsetPath = parser.get("outputDir") + "/events_subset";
 		log.info("eventsSubsetPath: {}", eventsSubsetPath);
 
@@ -57,52 +41,29 @@ public class IndexEventSubsetJob {
 		final String indexHost = parser.get("esHost");
 		log.info("indexHost: {}", indexHost);
 
-		final int maxEventsForTopic = NumberUtils.toInt(parser.get("maxEventsForTopic"));
-		log.info("maxEventsForTopic: {}", maxEventsForTopic);
-
 		final SparkSession spark = SparkSession.builder().config(conf).getOrCreate();
 
-		final TypedColumn<Event, EventGroup> aggr = new EventSubsetAggregator(maxEventsForTopic).toColumn();
-
-		final long now = new Date().getTime();
-
-		final LongAccumulator total = spark.sparkContext().longAccumulator("total_events_subset");
-
-		log.info("*** Prepare subset for indexing");
-		final Dataset<Event> subset = ClusterUtils
-				.readPath(spark, eventsPath, Event.class)
-				.groupByKey((MapFunction<Event, String>) e -> e.getTopic() + '@' + e.getMap().getTargetDatasourceId(), Encoders.STRING())
-				.agg(aggr)
-				.map((MapFunction<Tuple2<String, EventGroup>, EventGroup>) t -> t._2, Encoders.bean(EventGroup.class))
-				.flatMap((FlatMapFunction<EventGroup, Event>) g -> g.getData().iterator(), Encoders.bean(Event.class))
-				.map((MapFunction<Event, Event>) e -> prepareEventForIndexing(e, now), Encoders.bean(Event.class));
-
-		ClusterUtils.save(subset, eventsSubsetPath, Event.class, total);
+		final Long date = ClusterUtils
+				.readPath(spark, eventsSubsetPath, Event.class)
+				.first()
+				.getCreationDate();
 
 		try (final BrokerIndexClient feeder = new BrokerIndexClient(indexHost)) {
 			final FileSystem fileSystem = FileSystem.get(new Configuration());
-			final List<Path> files = ClusterUtils.listFiles(eventsSubsetPath, fileSystem, "*.gz");
 
-			log.info("*** Start indexing");
+			final List<Path> files = ClusterUtils.listFiles(eventsSubsetPath, fileSystem, ".gz");
+
+			log.info("*** Start indexing " + files.size() + " files");
 			feeder.parallelBulkIndex(files, 4, fileSystem, new ConvertJSONWithId("\"eventId\":\"((\\d|\\w)*)\"", index));
 
 			log.info("*** Deleting old events");
-			feeder.deleteUsingDateBefore(index, "creationDate", now - 1000);
+			feeder.deleteUsingDateBefore(index, "creationDate", date - 1000);
 
 			feeder.refreshIndex(index);
 		}
 
 		log.info("*** ALL DONE");
 
-	}
-
-	private static Event prepareEventForIndexing(final Event e, final long creationDate)
-			throws JsonProcessingException {
-
-		e.setCreationDate(creationDate);
-		e.setExpiryDate(Long.MAX_VALUE);
-
-		return e;
 	}
 
 }

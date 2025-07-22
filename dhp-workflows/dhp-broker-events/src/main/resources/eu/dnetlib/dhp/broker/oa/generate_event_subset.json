@@ -1,0 +1,14 @@
+[
+	{
+		"paramName": "o",
+		"paramLongName": "outputDir",
+		"paramDescription": "the path where the generated data are stored",
+		"paramRequired": true
+	},	
+	{
+		"paramName": "n",
+		"paramLongName": "maxEventsForTopic",
+		"paramDescription": "the max number of events for each couple (ds/topic)",
+		"paramRequired": true
+	}
+]

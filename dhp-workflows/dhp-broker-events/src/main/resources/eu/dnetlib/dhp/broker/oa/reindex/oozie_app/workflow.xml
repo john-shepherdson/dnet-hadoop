@@ -60,12 +60,31 @@
         </configuration>
     </global>
 
-    <start to="index_event_subset"/>
+    <start to="generate_event_subset"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
-        
+    
+    
+    <action name="generate_event_subset">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>GenerateEventSubsetJob</name>
+            <class>eu.dnetlib.dhp.broker.oa.GenerateEventSubsetJob</class>
+            <jar>dhp-broker-events-${projectVersion}.jar</jar>
+            <spark-opts>
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
+            </spark-opts>
+            <arg>--outputDir</arg><arg>${outputDir}</arg>
+            <arg>--maxEventsForTopic</arg><arg>${maxIndexedEventsForDsAndTopic}</arg>
+        </spark>
+        <ok to="index_event_subset"/>
+        <error to="Kill"/>
+    </action>
         
     <action name="index_event_subset">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -82,9 +101,8 @@
             <arg>--outputDir</arg><arg>${outputDir}</arg>
             <arg>--index</arg><arg>${esEventIndexName}</arg>
             <arg>--esHost</arg><arg>${esIndexHost}</arg>
-            <arg>--maxEventsForTopic</arg><arg>${maxIndexedEventsForDsAndTopic}</arg>
         </spark>
-        <ok to="index_notifications"/>
+        <ok to="End"/>
         <error to="Kill"/>
    </action>
     

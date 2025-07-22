@@ -16,11 +16,5 @@
 		"paramLongName": "esHost",
 		"paramDescription": "the ES host",
 		"paramRequired": true
-	},	
-	{
-		"paramName": "n",
-		"paramLongName": "maxEventsForTopic",
-		"paramDescription": "the max number of events for each couple (ds/topic)",
-		"paramRequired": true
 	}
 ]
