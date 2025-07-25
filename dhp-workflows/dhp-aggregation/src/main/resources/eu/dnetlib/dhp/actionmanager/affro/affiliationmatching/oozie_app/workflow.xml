@@ -120,13 +120,13 @@
                 --archives affiliation_matching.tar.gz#env
             </spark-opts>
 
-            <arg>${outputPath}</arg>
-            <arg>${outputFolder}</arg>
+            <arg>${workingDir}/toMatch</arg>
+            <arg>${oldMatches}</arg>
 
             <file>${wfAppPath}/affRo/affiliationmatching.apply.py#affiliationmatching.apply.py</file>
         </spark>
 
-        <ok to="End" />
+        <ok to="redistributerelations" />
         <error to="Kill" />
 
     </action>
@@ -143,16 +143,14 @@
                 ${sparkResourceOpts}
                 ${sparkApplicationOpts}
             </spark-opts>
-            <arg>--oalexPath</arg><arg>${oalexPath}</arg>
-            <arg>--oairePath</arg><arg>${oairePath}</arg>
-            <arg>--publishersPath</arg><arg>${publishersPath}</arg>
-            <arg>--oldMatches</arg><arg>${oldMatches}</arg>
-            <arg>--applyOnAll</arg><arg>${applyOnAll}</arg>
+
+            <arg>--explodedResultPath</arg><arg>${workingDir}/exploded</arg>
+            <arg>--matchingsPath</arg><arg>${workingDir}/matchings</arg>
             <arg>--outputPath</arg><arg>${datasetPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
-            <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
+
         </spark>
-        <ok to="run-affro"/>
+        <ok to="End"/>
         <error to="Kill"/>
     </action>
 
