@@ -3,21 +3,26 @@ package eu.dnetlib.dhp.actionmanager.affro;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
-
+import org.apache.spark.sql.Column;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static eu.dnetlib.dhp.actionmanager.affro.Constants.AFFILIATION_STRING_SCHEMA;
-
-public class PrepareDatasetTest {
+import static eu.dnetlib.dhp.actionmanager.affro.Constants.RESULT_MATCHED_SCHEMA;
+import static org.apache.spark.sql.functions.*;
+public class RedistributeRelationsTest {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -25,16 +30,16 @@ public class PrepareDatasetTest {
 
     private static Path workingDir;
     private static final String ID_PREFIX = "50|doi_________::";
-    private static final Logger log = LoggerFactory.getLogger(PrepareDatasetTest.class);
+    private static final Logger log = LoggerFactory.getLogger(RedistributeRelationsTest.class);
 
     @BeforeAll
     public static void beforeAll() throws IOException {
-        workingDir = Files.createTempDirectory(PrepareDatasetTest.class.getSimpleName());
+        workingDir = Files.createTempDirectory(RedistributeRelationsTest.class.getSimpleName());
 
         log.info("Using work dir {}", workingDir);
 
         SparkConf conf = new SparkConf();
-        conf.setAppName(PrepareDatasetTest.class.getSimpleName());
+        conf.setAppName(RedistributeRelationsTest.class.getSimpleName());
 
         conf.setMaster("local[*]");
         conf.set("spark.driver.host", "localhost");
@@ -45,7 +50,7 @@ public class PrepareDatasetTest {
 
         spark = SparkSession
                 .builder()
-                .appName(PrepareDatasetTest.class.getSimpleName())
+                .appName(RedistributeRelationsTest.class.getSimpleName())
                 .config(conf)
                 .getOrCreate();
     }
@@ -59,45 +64,48 @@ public class PrepareDatasetTest {
     @Test
     void testMatch() throws Exception {
 
-        String oalexPath = getClass()
-                .getResource("/eu/dnetlib/dhp/actionmanager/affro/dataset/oalex")
+
+        String explodedResultPath = getClass()
+                .getResource("/eu/dnetlib/dhp/actionmanager/affro/exploded")
                 .getPath();
 
-        String oairePath = getClass()
-                .getResource("/eu/dnetlib/dhp/actionmanager/affro/dataset/graph")
-                .getPath();
-
-        String publishersPath = getClass()
-                .getResource("/eu/dnetlib/dhp/actionmanager/affro/dataset/publisher")
-                .getPath();
-
-        String iisPath = getClass()
-                .getResource("/eu/dnetlib/dhp/actionmanager/affro/dataset/iis")
-                .getPath();
-
-        String oldMatches = getClass()
-                .getResource("/eu/dnetlib/dhp/actionmanager/affro/oldMatches/oldMatch")
+        String matchingsPath = getClass()
+                .getResource("/eu/dnetlib/dhp/actionmanager/affro/matchings")
                 .getPath();
 
         String outputPath = workingDir.toString() + "/actionSet";
 
 
-        PrepareDataset
+        RedistributeRelations
                 .main(
                         new String[]{
                                 "-isSparkSessionManaged", Boolean.FALSE.toString(),
-                                "-oalexPath", oalexPath,
-                                "-oairePath", oairePath,
-                                "-publishersPath", publishersPath,
-                                "-iisPath", iisPath,
-                                "-oldMatches", oldMatches,
+                                "-explodedResultPath", explodedResultPath,
+                                "-matchingsPath", matchingsPath,
+
                                 "-outputPath", outputPath,
-                                "-applyOnAll", Boolean.TRUE.toString(),
+
                                 "-workingDir", workingDir.toString()
                         });
     final String stringa = outputPath ;
         System.out.println(stringa);
-        spark.read().schema(AFFILIATION_STRING_SCHEMA).json(stringa)
-                        .show(100, false);
+        Dataset<Row> dataset = spark.read().schema(RESULT_MATCHED_SCHEMA).json(stringa);
+        Assertions.assertEquals(32, dataset.count());
+        Assertions.assertEquals(32, dataset.distinct().count());
+
+        dataset.where("id = '50|doi_________::537bbda4fdfe87a42b239f27af5b14be'").
+                withColumn("author", explode(col("authors"))).select("author").show(false);
+
+        Assertions.assertEquals(6, dataset.where("id = '50|doi_________::537bbda4fdfe87a42b239f27af5b14be'")
+                .selectExpr("size(authors) as authors_count")
+                .first()
+                .getInt(0));
+
+        Assertions.assertEquals(3, dataset.where("id = '50|doi_________::537bbda4fdfe87a42b239f27af5b14be'")
+                .selectExpr("size(organizations) as org_count")
+                .first()
+                .getInt(0));
+
+
     }
 }

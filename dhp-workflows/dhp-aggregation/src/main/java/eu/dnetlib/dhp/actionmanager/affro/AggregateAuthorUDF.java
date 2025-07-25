@@ -3,67 +3,73 @@ package eu.dnetlib.dhp.actionmanager.affro;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.RowFactory;
 import org.apache.spark.sql.api.java.UDF1;
+import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.StructType;
 import scala.collection.mutable.WrappedArray;
 
 import java.util.*;
+
+import static org.apache.spark.sql.types.DataTypes.StringType;
 
 public class AggregateAuthorUDF implements UDF1<WrappedArray<Row>, Row> {
 
     @Override
     public Row call(WrappedArray<Row> group) {
-        List<String> affiliations = new ArrayList<>();
-        List<List<Row>> allMatchings = new ArrayList<>();
+        List<Row> affiliations = new ArrayList<>();
+
         String id = null;
         String fullname = null;
-        String rawAffiliation = null;
 
         for (int i = 0; i < group.length(); i++) {
             Row entry = group.apply(i);
-
-            affiliations.add(entry.getAs("raw_affiliation_string"));
-
+            if (id == null) id = entry.getAs("id");
+            if (fullname == null) fullname = entry.getAs("fullname");
+            String rawAffString = entry.getAs("raw_affiliation_string");
             WrappedArray<Row> matchArray = entry.getAs("Matchings");
             List<Row> matchList = new ArrayList<>();
             for (int j = 0; j < matchArray.length(); j++) {
                 matchList.add(matchArray.apply(j));
             }
-            allMatchings.add(matchList);
 
+            List<Row> resolvedMatchings = regroupAndSelectDistinctMatch(matchList);
+            Row affiliationRow = RowFactory.create(rawAffString, resolvedMatchings); // ← solo 2 campi!
+            affiliations.add(affiliationRow);
             // Prendiamo id e fullname dalla prima riga
-            if (id == null) id = entry.getAs("id");
-            if (fullname == null) fullname = entry.getAs("fullname");
-            if (rawAffiliation == null) rawAffiliation = entry.getAs("raw_affiliation_string");
+//50|doi_________::44b6c2afee13b0bf02cee53418327de0
         }
 
-        List<Row> regrouped = regroupAndSelectDistinctMatch(allMatchings);
-
-        return RowFactory.create(id, fullname, rawAffiliation, regrouped);
+        return RowFactory.create(id, fullname, affiliations);
     }
 
-    private List<Row> regroupAndSelectDistinctMatch(List<List<Row>> inputGroups) {
+    private List<Row> regroupAndSelectDistinctMatch(List<Row> inputGroups) {
         // Map: Value → [Confidence, Provenance, PID]
         Map<String, Tuple> valueMap = new HashMap<>();
 
-        for (List<Row> group : inputGroups) {
-            for (Row row : group) {
+        //for (List<Row> group : inputGroups) {
+            for (Row row : inputGroups) {
                 if (!"active".equalsIgnoreCase(row.getAs("Status"))) continue;
 
                 String value = row.getAs("Value");
-                Double confidence = Double.valueOf(row.getAs("Confidence").toString());
+                double confidence = 0.0;
+                if (row.getAs("Confidence") != null)
+                    confidence = row.getAs("Confidence");
                 String provenance = row.getAs("Provenance");
                 String pid = row.getAs("PID");
+                String country = row.getAs("Country");
 
+                Tuple newValue = new Tuple(confidence, provenance, pid, country);
                 // Update only if confidence is higher
-                if (!valueMap.containsKey(value) || valueMap.get(value).confidence < confidence) {
-                    valueMap.put(value, new Tuple(confidence, provenance, pid));
-                }
+                if (!valueMap.containsKey(value) )
+                    valueMap.put(value, newValue);
+                if(valueMap.get(value).confidence < confidence)
+                    valueMap.replace(value, valueMap.get(value), newValue);
             }
-        }
+        //}
 
         List<Row> result = new ArrayList<>();
         for (Map.Entry<String, Tuple> entry : valueMap.entrySet()) {
             Tuple t = entry.getValue();
-            result.add(RowFactory.create(t.provenance, t.pid, entry.getKey(), t.confidence, "active"));
+            result.add(RowFactory.create(t.provenance, t.pid, entry.getKey(), t.confidence, "active", t.country));
         }
 
         return result;
@@ -74,11 +80,13 @@ public class AggregateAuthorUDF implements UDF1<WrappedArray<Row>, Row> {
         double confidence;
         String provenance;
         String pid;
+        String country;
 
-        public Tuple(double confidence, String provenance, String pid) {
+        public Tuple(double confidence, String provenance, String pid, String country) {
             this.confidence = confidence;
             this.provenance = provenance;
             this.pid = pid;
+            this.country = country;
         }
     }
 

@@ -23,6 +23,7 @@ import org.apache.spark.SparkConf;
 
 import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.FlatMapFunction;
+import org.apache.spark.api.java.function.ForeachFunction;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.catalyst.encoders.RowEncoder;
 import org.apache.spark.sql.types.DataTypes;
@@ -93,6 +94,7 @@ public class PrepareDataset implements Serializable {
         conf.set("hive.metastore.uris", hiveMetastoreUris);
 
         runWithSparkHiveSession(
+//        runWithSparkSession(
                 conf,
                 isSparkSessionManaged,
                 spark -> {
@@ -193,12 +195,14 @@ public class PrepareDataset implements Serializable {
 
 
         Dataset<Row> inputDataset = oalex.union(oaire).union(publishers).union(iis)
-                .distinct();
+                .distinct()
+                ;
         inputDataset
                 .write()
                 .mode(SaveMode.Overwrite)
                 .option("compression","gzip")
                 .json(workingDir + "/exploded");
+
         inputDataset.select( col("raw_affiliation_string"))
                 .distinct()
                 .write()
@@ -218,7 +222,7 @@ public class PrepareDataset implements Serializable {
                 .filter( col("Affiliation").isNull())
                 .select("raw_affiliation_string")
                 .distinct();
-        newToMatch.show(false);
+
         newToMatch.write()
                 .mode(SaveMode.Overwrite)
                 .option("compression", "gzip")

@@ -51,6 +51,12 @@
 "paramName": "hmu",
 "paramLongName": "hiveMetastoreUris",
 "paramDescription": "the hive metastore uris",
-"paramRequired": true
-}
+"paramRequired": false
+},
+  {
+    "paramName": "wd",
+    "paramLongName": "workingDir",
+    "paramDescription": "the workingDir",
+    "paramRequired": false
+  }
 ]
