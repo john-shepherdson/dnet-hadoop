@@ -79,8 +79,7 @@ public class PrepareDataset implements Serializable {
         final String outputPath = parser.get("outputPath");
         log.info("outputPath: {}", outputPath);
 
-        final String workingDir = parser.get("workingDir");
-        log.info("workingDir: {}", workingDir);
+
 
         final Boolean startFromScratch = Optional
                 .ofNullable(parser.get("applyOnAll"))
@@ -101,13 +100,13 @@ public class PrepareDataset implements Serializable {
                     Constants.removeOutputDir(spark, outputPath);
                     prepareDataset(
                             spark, oalexPath, oairePath, iisPath, publishersPath, outputPath, oldMatches,
-                            startFromScratch, workingDir);
+                            startFromScratch);
                 });
     }
 
     private static void prepareDataset(SparkSession spark, String oalexPath, String oairePath, String iisPath,
-                                       String publishersPath, String outputPath, String oldMatches,
-                                       Boolean startFromScratch, String workingDir) {
+                                       String publishersPath, String workingDir, String oldMatches,
+                                       Boolean startFromScratch) {
         // start with oalex. read from the snapshot in the schema needed for this task
         // Function to compute MD5 hash with prefix
         spark
@@ -141,25 +140,31 @@ public class PrepareDataset implements Serializable {
                 .withColumn("raw_affiliation_strings", col("author.raw_affiliation_strings"))
                 .select(col("id"), col("fullname"),
                          explode(col("raw_affiliation_strings")).alias("raw_affiliation_string"))
+                .withColumn("corresponding", lit(null))
+                .withColumn("contributor_roles", lit(null))
+                .select(col("id"), col("fullname"), col("raw_affiliation_string"), col("corresponding"), col("contributor_roles"))
                 .as(RowEncoder.apply(DATASET_SCHEMA));
 
         Dataset<Row> oaire_entities =
                 spark.createDataFrame(Collections.emptyList(), GRAPH_SCHEMA);
         for(EntityType entity: ModelSupport.entityTypes.keySet()) {
-            if(ModelSupport.isResult(entity)){
+            if (ModelSupport.isResult(entity)) {
                 oaire_entities = oaire_entities.union(spark.read().schema(GRAPH_SCHEMA).json(oairePath + "/" + entity.name()));
 
             }
         }
-        Dataset<Row> oaire = oaire_entities
-                .select(col("id"), explode(col("author")).alias("author"))
-                .select(col("id"), col("author"), explode(col("author.rawAffiliationString")).alias("raw_affiliation_string"))
-                .filter(col("raw_affiliation_string").isNotNull())
-                .withColumn("fullname", col("author.fullName"))
-                .drop("author")
-                .select("id", "fullname", "raw_affiliation_string");
+            Dataset<Row> oaire = oaire_entities
+                    .select(col("id"), explode(col("author")).alias("author"))
+                    .select(col("id"), col("author"), explode(col("author.rawAffiliationString")).alias("raw_affiliation_string"))
+                    .filter(col("raw_affiliation_string").isNotNull())
+                    .withColumn("fullname", col("author.fullName"))
+                    .drop("author")
+                    .withColumn("corresponding", lit(null))
+                    .withColumn("contributor_roles", lit(null))
+                    .select(col("id"), col("fullname"), col("raw_affiliation_string"), col("corresponding"), col("contributor_roles"));
 
-        Dataset<Row> iis = spark.sql(IIS_QUERY)
+        Dataset<Row> iis =
+                spark.sql(IIS_QUERY)
 //        spark.read().schema(Encoders.bean(IISModel.class).schema())
 //                .json(iisPath)
                 .as(Encoders.bean(IISModel.class))
@@ -175,7 +180,7 @@ public class PrepareDataset implements Serializable {
                     return ret.iterator();
                     }
                 , RowEncoder.apply(DATASET_SCHEMA))
-                .select("id","fullname","raw_affiliation_string");
+                .select(col("id"), col("fullname"), col("raw_affiliation_string"), col("corresponding"), col("contributor_roles"));
 
         Dataset<Row> publishers = spark.read().schema(PUBLISHER_SCHEMA).json(publishersPath)
                 .filter( col("success").equalTo(true))
@@ -186,13 +191,15 @@ public class PrepareDataset implements Serializable {
                 .drop(col("id"))
                 .withColumn("fullname", col("author.name.full"))
                 .withColumn("raw_affiliation_strings",  col("author.raw_affiliations"))
+                .withColumn("corresponding", col("author.corresponding"))
+                .withColumn("contributor_roles", col("author.contributor_roles"))
                 .drop(col("author"))
-                .select(col("graphId"),col("doi"),col("fullname"), explode(col("raw_affiliation_strings")).alias("raw_affiliation_string"))
+                .select(col("graphId"),col("doi"),col("fullname"), explode(col("raw_affiliation_strings")).alias("raw_affiliation_string")
+                ,col("corresponding"), col("contributor_roles"))
                 .withColumn("id",  expr("selectId(doi, graphId)"))
                 .drop(col("graphId"))
                 .drop(col("doi"))
-                .select("id","fullname","raw_affiliation_string");
-
+                .select("id","fullname","raw_affiliation_string","corresponding","contributor_roles");
 
         Dataset<Row> inputDataset = oalex.union(oaire).union(publishers).union(iis)
                 .distinct()
@@ -226,7 +233,7 @@ public class PrepareDataset implements Serializable {
         newToMatch.write()
                 .mode(SaveMode.Overwrite)
                 .option("compression", "gzip")
-                .json(outputPath );
+                .json(workingDir+"/toMatch" );
 
     }
 
@@ -235,7 +242,7 @@ public class PrepareDataset implements Serializable {
         if (Optional.ofNullable(affiliationPositions).isPresent() && !affiliationPositions.isEmpty())
             return affiliationPositions.stream().map(pos -> {
                 if(pos < affiliations.size())
-                    return RowFactory.create(id, author.getAuthorfullname(), affiliations.get(pos).getRawtext());
+                    return RowFactory.create(id, author.getAuthorfullname(), affiliations.get(pos).getRawtext(), null, null);
                 return null;
             }).filter(Objects::nonNull).collect(Collectors.toList());
         else

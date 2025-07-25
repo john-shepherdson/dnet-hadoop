@@ -33,6 +33,11 @@ public class Constants implements Serializable {
             .add("id", StringType)
             .add("fullname", StringType)
             .add("raw_affiliation_string", StringType)
+            .add("corresponding", DataTypes.BooleanType)
+            .add("contributor_roles", DataTypes.createArrayType(new StructType()
+                    .add("schema", StringType)
+                    .add("name", StringType)
+                    .add("value", StringType)))
             ;
 
 
@@ -69,11 +74,11 @@ public class Constants implements Serializable {
                     .add("first", StringType)
                     .add("last", StringType)
                     .add("type", StringType))
-//            .add("corresponding", DataTypes.BooleanType)
-//            .add("contributor_roles", DataTypes.createArrayType(new StructType()
-//                    .add("schema", StringType)
-//                    .add("name", StringType)
-//                    .add("value", StringType)))
+            .add("corresponding", DataTypes.BooleanType)
+            .add("contributor_roles", DataTypes.createArrayType(new StructType()
+                    .add("schema", StringType)
+                    .add("name", StringType)
+                    .add("value", StringType)))
             .add("raw_affiliations", DataTypes.createArrayType(StringType));
 //            .add("pids", DataTypes.createArrayType(PID_SCHEMA));
 
@@ -110,11 +115,11 @@ public class Constants implements Serializable {
             .add("Matchings", MATCHING_ARRAY_SCHEMA)
             ;
 
-    public final static StructType JOINED_SCHEMA = new StructType()
-            .add("id", StringType)
-            .add("fullname", StringType)
-            .add("raw_affiliation_string", StringType)
-            .add("Matchings", MATCHING_ARRAY_SCHEMA);
+//    public final static StructType JOINED_SCHEMA = new StructType()
+//            .add("id", StringType)
+//            .add("fullname", StringType)
+//            .add("raw_affiliation_string", StringType)
+//            .add("Matchings", MATCHING_ARRAY_SCHEMA);
 
     public final static StructType AFFILIATION_STRING_SCHEMA = new StructType()
             .add("raw_affiliation_string", StringType)
@@ -129,7 +134,12 @@ public class Constants implements Serializable {
                     new StructType()
                             .add("raw_affiliation_string", StringType)
                             .add("Matchings", MATCHING_ARRAY_SCHEMA)
-            ));
+            ))
+            .add("corresponding", DataTypes.BooleanType)
+            .add("contributor_roles", DataTypes.createArrayType(new StructType()
+                    .add("schema", StringType)
+                    .add("name", StringType)
+                    .add("value", StringType)));
 
 
     public final static StructType RESULT_MATCHED_SCHEMA = new StructType()
@@ -142,6 +152,11 @@ public class Constants implements Serializable {
                                             .add("raw_affiliation_string", StringType)
                                             .add("Matchings", MATCHING_ARRAY_SCHEMA)
                             ))
+                            .add("corresponding", DataTypes.BooleanType)
+                            .add("contributor_roles", DataTypes.createArrayType(new StructType()
+                                    .add("schema", StringType)
+                                    .add("name", StringType)
+                                    .add("value", StringType)))
                     ))
             .add("organizations",MATCHING_ARRAY_SCHEMA);
 

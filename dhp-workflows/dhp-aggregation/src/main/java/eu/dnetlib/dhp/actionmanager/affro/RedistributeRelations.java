@@ -65,11 +65,11 @@ public class RedistributeRelations implements Serializable {
                 spark -> {
                     Constants.removeOutputDir(spark, outputPath);
                     redistributeRelations(
-                            spark, explodedPath, matchingsPath, outputPath, workingDir);
+                            spark, explodedPath, matchingsPath, outputPath);
                 });
     }
 
-    private static void redistributeRelations(SparkSession spark, String explodedPath, String matchingsPath, String outputPath, String workingDir) {
+    private static void redistributeRelations(SparkSession spark, String explodedPath, String matchingsPath, String outputPath) {
         spark
                 .udf()
                 .register(
@@ -90,12 +90,13 @@ public class RedistributeRelations implements Serializable {
         Dataset<Row> exploded = spark.read().schema(eu.dnetlib.dhp.actionmanager.affro.Constants.DATASET_SCHEMA)
                 .json(explodedPath);
 
+
         Dataset<Row> matchings = spark.read().schema(eu.dnetlib.dhp.actionmanager.affro.Constants.AFFILIATION_SCHEMA)
                 .json(matchingsPath);
 
         Dataset<Row> joined = exploded.join(matchings, exploded.col("raw_affiliation_string").equalTo(matchings.col("Affiliation")))
                 .filter(col("Matchings").isNotNull().and(size(col("Matchings")).gt(0)))
-                .select("id", "fullname", "raw_affiliation_string", "Matchings")
+                .select("id", "fullname", "raw_affiliation_string", "Matchings", "corresponding","contributor_roles")
                 .withColumn("key", expr("insertKey(id, fullname)"));
 
         Dataset<Row> groupedDf = joined

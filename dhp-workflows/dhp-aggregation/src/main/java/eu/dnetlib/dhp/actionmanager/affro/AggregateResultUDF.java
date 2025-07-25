@@ -33,7 +33,7 @@ public class AggregateResultUDF implements UDF1<WrappedArray<Row>, Row> {
 
             // affiliations: WrappedArray<Row> → List<Row>
             WrappedArray<Row> affArray = entry.getAs("affiliations");
-            Row author = RowFactory.create(authorName, affArray);
+            Row author = RowFactory.create(authorName, affArray, entry.getAs("corresponding"), entry.getAs("contributor_roles"));
             authors.add(author);
             if (id == null) id = entry.getAs("id");
             List<Row> matchList = new ArrayList<>();

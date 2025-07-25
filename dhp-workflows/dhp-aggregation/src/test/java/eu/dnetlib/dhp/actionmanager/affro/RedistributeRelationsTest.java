@@ -106,6 +106,21 @@ public class RedistributeRelationsTest {
                 .first()
                 .getInt(0));
 
+        dataset.where("id = '50|doi_________::e57dc736f7f5d7c724faf105b85b9106'").show(false);
+
+        Assertions.assertEquals(1, dataset.where("id = '50|doi_________::e57dc736f7f5d7c724faf105b85b9106'").selectExpr("size(authors) as authors_count")
+                .first()
+                .getInt(0));
+
+        Row author = dataset.where("id = '50|doi_________::e57dc736f7f5d7c724faf105b85b9106'")
+                .select(
+                        explode(col("authors")).alias("author"))
+                .first()
+                .getAs("author");
+        Assertions.assertEquals("Yatracos, Yannis G.", author.getAs("fullname"));
+        Boolean isCorresponding = author.getAs("corresponding");
+        Assertions.assertTrue(isCorresponding);
+
 
     }
 }

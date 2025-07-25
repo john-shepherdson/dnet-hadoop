@@ -19,13 +19,18 @@ public class AggregateAuthorUDF implements UDF1<WrappedArray<Row>, Row> {
 
         String id = null;
         String fullname = null;
+        Boolean corresponding = null;
+        WrappedArray<Row> contributor_roles = null;
 
         for (int i = 0; i < group.length(); i++) {
             Row entry = group.apply(i);
             if (id == null) id = entry.getAs("id");
             if (fullname == null) fullname = entry.getAs("fullname");
+            if(corresponding == null) corresponding = entry.getAs("corresponding");
+            if(contributor_roles == null) contributor_roles = entry.getAs("contributor_roles");
             String rawAffString = entry.getAs("raw_affiliation_string");
             WrappedArray<Row> matchArray = entry.getAs("Matchings");
+
             List<Row> matchList = new ArrayList<>();
             for (int j = 0; j < matchArray.length(); j++) {
                 matchList.add(matchArray.apply(j));
@@ -34,11 +39,10 @@ public class AggregateAuthorUDF implements UDF1<WrappedArray<Row>, Row> {
             List<Row> resolvedMatchings = regroupAndSelectDistinctMatch(matchList);
             Row affiliationRow = RowFactory.create(rawAffString, resolvedMatchings); // ← solo 2 campi!
             affiliations.add(affiliationRow);
-            // Prendiamo id e fullname dalla prima riga
-//50|doi_________::44b6c2afee13b0bf02cee53418327de0
+
         }
 
-        return RowFactory.create(id, fullname, affiliations);
+        return RowFactory.create(id, fullname, affiliations, corresponding, contributor_roles);
     }
 
     private List<Row> regroupAndSelectDistinctMatch(List<Row> inputGroups) {

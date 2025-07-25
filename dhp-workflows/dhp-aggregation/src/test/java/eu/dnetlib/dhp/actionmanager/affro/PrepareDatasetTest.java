@@ -4,8 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -79,7 +82,7 @@ public class PrepareDatasetTest {
                 .getResource("/eu/dnetlib/dhp/actionmanager/affro/oldMatches/oldMatch")
                 .getPath();
 
-        String outputPath = workingDir.toString() + "/actionSet";
+        String outputPath = workingDir.toString();
 
 
         PrepareDataset
@@ -95,9 +98,8 @@ public class PrepareDatasetTest {
                                 "-applyOnAll", Boolean.TRUE.toString(),
                                 "-workingDir", workingDir.toString()
                         });
-    final String stringa = outputPath ;
-        System.out.println(stringa);
-        spark.read().schema(AFFILIATION_STRING_SCHEMA).json(stringa)
-                        .show(100, false);
+
+        Dataset<Row> dataset = spark.read().schema(AFFILIATION_STRING_SCHEMA).json(outputPath + "/toMatch");
+        Assertions.assertTrue(dataset.count() == dataset.distinct().count());
     }
 }

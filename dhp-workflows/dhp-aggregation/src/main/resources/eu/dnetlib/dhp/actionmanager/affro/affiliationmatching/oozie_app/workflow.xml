@@ -62,8 +62,6 @@
     </kill>
     <action name="deleteoutputpath">
         <fs>
-            <delete path="${outputPath}"/>
-            <mkdir path="${outputPath}"/>
             <delete path="${workingDir}"/>
             <mkdir path="${workingDir}"/>
         </fs>
@@ -88,8 +86,7 @@
             <arg>--publishersPath</arg><arg>${publishersPath}</arg>
             <arg>--oldMatches</arg><arg>${oldMatches}</arg>
             <arg>--applyOnAll</arg><arg>${applyOnAll}</arg>
-            <arg>--outputPath</arg><arg>${datasetPath}</arg>
-            <arg>--workingDir</arg><arg>${workingDir}</arg>
+            <arg>--outputPath</arg><arg>${workingDir}</arg>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
         </spark>
         <ok to="run-affro"/>
@@ -136,7 +133,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Associate to the result and authors the affiliation links</name>
-            <class>eu.dnetlib.dhp.actionmanager.affro.PrepareDataset</class>
+            <class>eu.dnetlib.dhp.actionmanager.affro.RedistributeRelations</class>
             <jar>dhp-aggregation-${projectVersion}.jar</jar>
             <spark-opts>
                 ${sparkClusterOpts}
@@ -145,10 +142,32 @@
             </spark-opts>
 
             <arg>--explodedResultPath</arg><arg>${workingDir}/exploded</arg>
-            <arg>--matchingsPath</arg><arg>${workingDir}/matchings</arg>
+            <arg>--matchingsPath</arg><arg>${oldMatches}</arg>
             <arg>--outputPath</arg><arg>${datasetPath}</arg>
-            <arg>--workingDir</arg><arg>${workingDir}</arg>
 
+        </spark>
+        <ok to="atomicactions"/>
+        <error to="Kill"/>
+    </action>
+    <action name="atomicactions">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Produces the atomic action with the inferred by OpenAIRE affiliation relations</name>
+            <class>eu.dnetlib.dhp.actionmanager.affro.PrepareAffiliationRelations</class>
+            <jar>dhp-aggregation-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+            </spark-opts>
+            <arg>--matchingPath</arg><arg>${datasetPath}</arg>
+            <arg>--outputPath</arg><arg>${outputPath}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
