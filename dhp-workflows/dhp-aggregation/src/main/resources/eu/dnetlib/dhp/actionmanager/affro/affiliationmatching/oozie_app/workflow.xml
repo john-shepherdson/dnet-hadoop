@@ -120,7 +120,7 @@
             <arg>${workingDir}/toMatch</arg>
             <arg>${oldMatches}</arg>
 
-            <file>${wfAppPath}/affRo/affiliationmatching.apply.py#affiliationmatching.apply.py</file>
+            <file>${wfAppPath}/affiliationmatching.apply.py#affiliationmatching.apply.py</file>
         </spark>
 
         <ok to="redistributerelations" />
