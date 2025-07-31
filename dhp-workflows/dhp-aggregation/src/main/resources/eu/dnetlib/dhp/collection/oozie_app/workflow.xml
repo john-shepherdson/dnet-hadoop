@@ -61,26 +61,10 @@
 
         <property>
             <name>JAVA_OPTS</name>
-                <value>-Dcom.sun.security.enableAIAcaIssuers=true</value>
+            <value>-Dcom.sun.security.enableAIAcaIssuers=true</value>
             <description>Used to configure the JAVA_OPTS parameter</description>
         </property>
 
-        <!-- General oozie workflow properties -->
-        <property>
-            <name>sparkClusterOpts</name>
-            <value>--conf spark.extraListeners= --conf spark.sql.queryExecutionListeners= --conf spark.yarn.historyServer.address=http://iis-cdh5-test-gw.ocean.icm.edu.pl:18089 --conf spark.eventLog.dir=hdfs://nameservice1/user/spark/spark2ApplicationHistory --conf spark.executorEnv.JAVA_HOME=/srv/java/openjdk-17 --conf spark.yarn.appMasterEnv.JAVA_HOME=/srv/java/openjdk-17 --conf spark.sql.warehouse.dir=/user/hive/warehouse --conf spark.oozie.action.sharelib.for.spark=spark342 --conf spark.eventLog.compression.codec=lz4 --conf spark.shuffle.mapStatus.compression.codec=lz4 --conf spark.shuffle.useOldFetchProtocol=true --conf spark.eventLog.enabled=true --conf spark.sql.codegen.wholeStage=false</value>
-            <description>spark cluster-wide options</description>
-        </property>
-        <property>
-            <name>sparkResourceOpts</name>
-            <value>--executor-memory=8G --conf spark.executor.memoryOverhead=4G --executor-cores=6 --driver-memory=9G --driver-cores=4 --conf spark.default.parallelism=3840 --conf spark.sql.shuffle.partitions=7680 --conf spark.sql.files.maxPartitionBytes=33554432 --conf spark.sql.adaptive.advisoryPartitionSizeInBytes=32m --conf spark.sql.adaptive.coalescePartitions.parallelismFirst=false --conf spark.sql.adaptive.forceOptimizeSkewedJoin=true --conf spark.sql.adaptive.skewJoin.skewedPartitionThresholdInBytes=64m --conf spark.sql.adaptive.skewJoin.skewedPartitionFactor=3.0 --conf spark.executor.extraJavaOptions="-XX:MaxDirectMemorySize=4g"</value>
-            <description>spark resource options</description>
-        </property>
-        <property>
-            <name>sparkApplicationOpts</name>
-            <value>--conf spark.sql.shuffle.partitions=7680</value>
-            <description>spark resource options</description>
-        </property>
     </parameters>
 
     <global>
@@ -98,10 +82,6 @@
             <property>
                 <name>oozie.launcher.mapreduce.map.env</name>
                 <value>JAVA_HOME=${JAVA_HOME}</value>
-            </property>
-            <property>
-                <name>oozie.action.sharelib.for.spark</name>
-                <value>spark2</value>
             </property>
         </configuration>
     </global>
@@ -173,9 +153,13 @@
             <class>eu.dnetlib.dhp.collection.GenerateNativeStoreSparkJob</class>
             <jar>dhp-aggregation-${projectVersion}.jar</jar>
             <spark-opts>
-                ${sparkClusterOpts}
-                ${sparkResourceOpts}
-                ${sparkApplicationOpts}
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--encoding</arg><arg>${metadataEncoding}</arg>
             <arg>--dateOfCollection</arg><arg>${timestamp}</arg>
