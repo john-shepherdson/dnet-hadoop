@@ -211,6 +211,7 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 			.option("compression", "gzip")
 			.json(workingDir + "/relation");
 
+
 		// write the new relations in the relation folder
 		spark
 			.read()
@@ -237,7 +238,14 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 	private static OrcidAuthor getOrcidAuthor(Author a) {
 		return Optional
 			.ofNullable(getOrcid(a))
-			.map(orcid -> new OrcidAuthor(orcid, a.getSurname(), a.getName(), a.getFullname(), null))
+			.map(orcid -> {
+				if(StringUtils.isNotEmpty(a.getSurname()) && StringUtils.isNotEmpty(a.getName()))
+					return new OrcidAuthor(orcid, a.getSurname(), a.getName(), a.getFullname(), null);
+				else
+					return new OrcidAuthor(orcid, StringUtils.substringAfter(a.getFullname(), " "),StringUtils.substringBefore(a.getFullname(), " "),null,null);
+
+
+			})
 			.orElse(null);
 
 	}

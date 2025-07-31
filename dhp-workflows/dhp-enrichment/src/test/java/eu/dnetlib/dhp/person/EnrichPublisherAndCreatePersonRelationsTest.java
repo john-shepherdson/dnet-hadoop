@@ -446,4 +446,66 @@ public class EnrichPublisherAndCreatePersonRelationsTest {
 
 	}
 
+	// this one creates also new coauthorship relationships
+	@Test
+	void testMustMatchNotFoundInGraph() throws Exception {
+		final String sourcePathPubs = getClass()
+				.getResource("/eu/dnetlib/dhp/person/verificationDataset/graph/publication")
+				.getPath();
+		final String sourcePathRels = getClass()
+				.getResource("/eu/dnetlib/dhp/person/verificationDataset/graph/relation")
+				.getPath();
+		final String publisherPath = getClass()
+				.getResource("/eu/dnetlib/dhp/person/verificationDataset/publisher/")
+				.getPath();
+
+		spark.read().json(sourcePathPubs).write().json(workingDir.toString() + "/graph/publication");
+		spark.read().json(sourcePathRels).write().json(workingDir.toString() + "/graph/relation");
+		spark.read().json(publisherPath).write().json(workingDir.toString() + "/publisher");
+
+		EnrichExternalDataWithGraphORCID.main(new String[] {
+
+				"--orcidPath", workingDir.toString() + "/graph",
+				"--targetPath", workingDir.toString() + "/graph",
+				"--graphPath", workingDir.toString() + "/publisher",
+				"--workingDir", workingDir.toString() + "/working",
+				"--master", "yarn",
+				"--matchingSource", "graph"
+		});
+
+		// Anthony R Burrell arricchito con l'orcid' (0000-0001-8255-3618) dal grafo ha
+		// {"Provenance":"AffRo","PID":"ROR","Value":"https:\/\/ror.org\/029m7xn54","Confidence":1,"Status":"active"},{"Provenance":"AffRo","PID":"OpenOrgs","Value":"0000002097","Confidence":1,"Status":"active"}
+
+		org.apache.spark.sql.Dataset<Relation> relations = spark
+				.read()
+				.schema(Encoders.bean(Relation.class).schema())
+				.json(workingDir.toString() + "/graph/relation")
+				.as(Encoders.bean(Relation.class));
+
+		Assertions.assertEquals(18, relations.count());
+		relations
+				.filter((FilterFunction<Relation>) r -> r.getSubRelType().equalsIgnoreCase("authorship"))
+						.foreach((ForeachFunction<Relation>) r -> System.out.println(new ObjectMapper().writeValueAsString(r)));
+		Assertions
+				.assertEquals(
+						1,
+						relations
+								.filter((FilterFunction<Relation>) r -> r.getSubRelType().equalsIgnoreCase("authorship"))
+								.count());
+		Relation relation = relations
+				.filter((FilterFunction<Relation>) r -> r.getSubRelType().equalsIgnoreCase("authorship"))
+				.first();
+		Assertions.assertEquals("30|orcid_______::" + DHPUtils.md5("0000-0003-3361-7560"), relation.getSource());
+		Assertions.assertEquals("50|doi_________::" + DHPUtils.md5("10.1136/gut.2006.101519"), relation.getTarget());
+
+		Assertions.assertEquals(2, relation.getProperties().size());
+		Assertions.assertTrue(relation.getProperties().stream().anyMatch(p -> "declared_affiliation".equalsIgnoreCase(p.getKey())));
+		Assertions
+				.assertTrue(
+						relation.getProperties().stream().anyMatch(p -> p.getValue().equals("https://ror.org/02jz4aj89")));
+
+
+
+	}
+
 }
