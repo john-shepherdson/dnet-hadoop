@@ -334,7 +334,7 @@ public class SparkBulkTagJob {
 			ds.getCollectedfrom().stream().anyMatch(cf -> cf.getKey().equals(EOSC));
 	}
 
-	private static <R extends Result> void execBulkTag(
+	public static <R extends Result> void execBulkTag(
 		SparkSession spark,
 		String inputPath,
 		String outputPath,

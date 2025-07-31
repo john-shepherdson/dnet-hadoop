@@ -1,25 +1,25 @@
 {
-  "author":{
-     "path":"$['author'][*]['fullname']"
-  },
-  "title":{
-     "path":"$['title'][*]['value']"
-  },
-  "orcid":{
-     "path":"$['author'][*]['pid'][*][?(@['qualifier']['classid']=='orcid')]['value']"
-  },
-  "orcid_pending":{
-     "path":"$['author'][*]['pid'][*][?(@['qualifier']['classid']=='orcid_pending')]['value']"
-  },
-  "contributor":{
-     "path":"$['contributor'][*]['value']"
-  },
-  "description":{
-     "path":"$['description'][*]['value']"
-  },
-  "subject":{
-     "path":"$['subject'][*]['value']"
-  },
+   "author":{
+      "path":"$['author'][*]['fullname']"
+   },
+   "title":{
+      "path":"$['title'][*]['value']"
+   },
+   "orcid":{
+      "path":"$['author'][*]['pid'][*][?(@['qualifier']['classid']=='orcid')]['value']"
+   },
+   "orcid_pending":{
+      "path":"$['author'][*]['pid'][*][?(@['qualifier']['classid']=='orcid_pending')]['value']"
+   },
+   "contributor":{
+      "path":"$['contributor'][*]['value']"
+   },
+   "description":{
+      "path":"$['description'][*]['value']"
+   },
+   "subject":{
+      "path":"$['subject'][*]['value']"
+   },
    "fos":{
       "path":"$['subject'][?(@['qualifier']['classid']=='FOS')].value"
    },
@@ -37,6 +37,18 @@
    },
    "publisher":{
       "path":"$['publisher'].value"
+   },
+   "access":{
+      "path":"$['bestaccessright'].classid"
+   },
+   "documentType":{
+      "path":"$['instance'][*]['instancetype'].classname"
+   },
+   "language":{
+      "path":"$['language'].classid"
+   },
+   "resultType":{
+      "path":"$['resulttype'].classid"
    },
    "publicationyear":{
       "path":"$['dateofacceptance'].value",
