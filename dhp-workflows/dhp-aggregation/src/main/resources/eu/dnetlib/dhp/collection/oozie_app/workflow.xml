@@ -101,7 +101,7 @@
             </property>
             <property>
                 <name>oozie.action.sharelib.for.spark</name>
-                <value>spark344</value>
+                <value>spark2</value>
             </property>
         </configuration>
     </global>
