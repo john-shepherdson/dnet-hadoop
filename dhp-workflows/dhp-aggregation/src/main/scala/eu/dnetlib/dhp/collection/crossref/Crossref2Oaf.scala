@@ -974,6 +974,21 @@ case object Crossref2Oaf {
               val targetId = getProjectId("nnf_________", "1e5e62235d094afd01cd56e65112fc63")
               queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
               queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
+            case "10.13039/100008397" =>
+              generateSimpleRelationFromAward(funder, "vf____________", a => a)
+              val targetId = getProjectId("vf__________", "1e5e62235d094afd01cd56e65112fc63")
+              queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
+              queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
+            case "10.13039/100008398" =>
+              generateSimpleRelationFromAward(funder, "ve____________", a => a)
+              val targetId = getProjectId("ve__________", "1e5e62235d094afd01cd56e65112fc63")
+              queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
+              queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
+            case "10.13039/501100003554" =>
+              generateSimpleRelationFromAward(funder, "lf____________", a => a)
+              val targetId = getProjectId("lf__________", "1e5e62235d094afd01cd56e65112fc63")
+              queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
+              queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
             //Research and Innovation Foundation (RIF)
             case "10.13039/501100018877" =>
               generateSimpleRelationFromAward(funder, "rif___________", a => a)
