@@ -56,7 +56,7 @@
         </configuration>
     </global>
 
-    <start to="redistributerelations"/>
+    <start to="preparedataset"/>
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
@@ -86,10 +86,10 @@
             <arg>--publishersPath</arg><arg>${publishersPath}</arg>
             <arg>--oldMatches</arg><arg>${affroDataset}/matchings</arg>
             <arg>--applyOnAll</arg><arg>${applyOnAll}</arg>
-            <arg>--outputPath</arg><arg>${workingDir}</arg>
+            <arg>--outputPath</arg><arg>${affroDataset}</arg>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
         </spark>
-        <ok to="run-affro"/>
+        <ok to="End"/>
         <error to="Kill"/>
     </action>
 

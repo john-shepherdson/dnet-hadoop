@@ -140,10 +140,12 @@ public class PrepareDataset implements Serializable {
                 .withColumn("raw_affiliation_strings", col("author.raw_affiliation_strings"))
                 .select(col("id"), col("fullname"),
                          explode(col("raw_affiliation_strings")).alias("raw_affiliation_string"))
+                .filter("raw_affiliation_string IS NOT NULL AND TRIM(raw_affiliation_string) != '' AND LOWER(raw_affiliation_string) NOT IN ('unknown', 'none')")
                 .withColumn("corresponding", lit(null))
                 .withColumn("contributor_roles", lit(null))
                 .select(col("id"), col("fullname"), col("raw_affiliation_string"), col("corresponding"), col("contributor_roles"))
                 .as(RowEncoder.apply(DATASET_SCHEMA));
+        oalex.write().mode(SaveMode.Overwrite).option("compression","gzip").json(workingDir + "/exploded/oalex");
 
         Dataset<Row> oaire_entities =
                 spark.createDataFrame(Collections.emptyList(), GRAPH_SCHEMA);
@@ -156,12 +158,13 @@ public class PrepareDataset implements Serializable {
             Dataset<Row> oaire = oaire_entities
                     .select(col("id"), explode(col("author")).alias("author"))
                     .select(col("id"), col("author"), explode(col("author.rawAffiliationString")).alias("raw_affiliation_string"))
-                    .filter(col("raw_affiliation_string").isNotNull())
+                    .filter("raw_affiliation_string IS NOT NULL AND TRIM(raw_affiliation_string) != '' AND LOWER(raw_affiliation_string) NOT IN ('unknown', 'none')")
                     .withColumn("fullname", col("author.fullName"))
                     .drop("author")
                     .withColumn("corresponding", lit(null))
                     .withColumn("contributor_roles", lit(null))
                     .select(col("id"), col("fullname"), col("raw_affiliation_string"), col("corresponding"), col("contributor_roles"));
+        oaire.write().mode(SaveMode.Overwrite).option("compression","gzip").json(workingDir + "/exploded/oaire");
 
         Dataset<Row> iis =
                 spark.sql(IIS_QUERY)
@@ -180,7 +183,9 @@ public class PrepareDataset implements Serializable {
                     return ret.iterator();
                     }
                 , RowEncoder.apply(DATASET_SCHEMA))
+                        .filter("raw_affiliation_string IS NOT NULL AND TRIM(raw_affiliation_string) != '' AND LOWER(raw_affiliation_string) NOT IN ('unknown', 'none')")
                 .select(col("id"), col("fullname"), col("raw_affiliation_string"), col("corresponding"), col("contributor_roles"));
+        iis.write().mode(SaveMode.Overwrite).option("compression","gzip").json(workingDir + "/exploded/iis");
 
         Dataset<Row> publishers = spark.read().schema(PUBLISHER_SCHEMA).json(publishersPath)
                 .filter( col("success").equalTo(true))
@@ -196,44 +201,42 @@ public class PrepareDataset implements Serializable {
                 .drop(col("author"))
                 .select(col("graphId"),col("doi"),col("fullname"), explode(col("raw_affiliation_strings")).alias("raw_affiliation_string")
                 ,col("corresponding"), col("contributor_roles"))
+                .filter("raw_affiliation_string IS NOT NULL AND TRIM(raw_affiliation_string) != '' AND LOWER(raw_affiliation_string) NOT IN ('unknown', 'none')")
                 .withColumn("id",  expr("selectId(doi, graphId)"))
                 .drop(col("graphId"))
                 .drop(col("doi"))
                 .select("id","fullname","raw_affiliation_string","corresponding","contributor_roles");
+        publishers.write().mode(SaveMode.Overwrite).option("compression","gzip").json(workingDir + "/exploded/publishers");
 
         Dataset<Row> inputDataset = oalex.union(oaire).union(publishers).union(iis)
                 .distinct()
                 ;
-        inputDataset
-                .write()
-                .mode(SaveMode.Overwrite)
-                .option("compression","gzip")
-                .json(workingDir + "/exploded");
-
-        inputDataset.select( col("raw_affiliation_string"))
-                .distinct()
-                .write()
-                .mode(SaveMode.Overwrite)
-                .option("compression", "gzip")
-                .json(workingDir + "/all_strings");
-
-        Dataset<Row> alreadyMatched = spark.createDataFrame(Collections.emptyList(), AFFILIATION_SCHEMA);
-
-
-        if (!startFromScratch){
-            alreadyMatched = spark.read().schema(AFFILIATION_SCHEMA)
-                    .json(oldMatches);
-        }
-        Dataset<Row> affStrings = spark.read().schema(AFFILIATION_STRING_SCHEMA).json(workingDir + "/all_strings");
-        Dataset<Row> newToMatch =  affStrings.join(alreadyMatched, affStrings.col("raw_affiliation_string").equalTo(alreadyMatched.col("Affiliation")), "left")
-                .filter( col("Affiliation").isNull())
-                .select("raw_affiliation_string")
-                .distinct();
-
-        newToMatch.write()
-                .mode(SaveMode.Overwrite)
-                .option("compression", "gzip")
-                .json(workingDir+"/toMatch" );
+//
+//
+//        inputDataset.select( col("raw_affiliation_string"))
+//                .distinct()
+//                .write()
+//                .mode(SaveMode.Overwrite)
+//                .option("compression", "gzip")
+//                .json(workingDir + "/all_strings");
+//
+//        Dataset<Row> alreadyMatched = spark.createDataFrame(Collections.emptyList(), AFFILIATION_SCHEMA);
+//
+//
+//        if (!startFromScratch){
+//            alreadyMatched = spark.read().schema(AFFILIATION_SCHEMA)
+//                    .json(oldMatches);
+//        }
+//        Dataset<Row> affStrings = spark.read().schema(AFFILIATION_STRING_SCHEMA).json(workingDir + "/all_strings");
+//        Dataset<Row> newToMatch =  affStrings.join(alreadyMatched, affStrings.col("raw_affiliation_string").equalTo(alreadyMatched.col("Affiliation")), "left")
+//                .filter( col("Affiliation").isNull())
+//                .select("raw_affiliation_string")
+//                .distinct();
+//
+//        newToMatch.write()
+//                .mode(SaveMode.Overwrite)
+//                .option("compression", "gzip")
+//                .json(workingDir+"/toMatch" );
 
     }
 
