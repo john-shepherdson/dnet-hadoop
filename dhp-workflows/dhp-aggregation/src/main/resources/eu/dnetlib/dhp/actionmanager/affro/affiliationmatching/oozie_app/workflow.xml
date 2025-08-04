@@ -19,7 +19,7 @@
             <description>the path where to store the raw affiliation strings affiliations</description>
         </property>
         <property>
-            <name>oldMatches</name>
+            <name>affroDataset</name>
             <description>the path the already matched affiliations are stored</description>
         </property>
         <property>
@@ -56,7 +56,7 @@
         </configuration>
     </global>
 
-    <start to="deleteoutputpath"/>
+    <start to="redistributerelations"/>
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
@@ -84,7 +84,7 @@
             <arg>--oalexPath</arg><arg>${oalexPath}</arg>
             <arg>--oairePath</arg><arg>${oairePath}</arg>
             <arg>--publishersPath</arg><arg>${publishersPath}</arg>
-            <arg>--oldMatches</arg><arg>${oldMatches}</arg>
+            <arg>--oldMatches</arg><arg>${affroDataset}/matchings</arg>
             <arg>--applyOnAll</arg><arg>${applyOnAll}</arg>
             <arg>--outputPath</arg><arg>${workingDir}</arg>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
@@ -139,11 +139,20 @@
                 ${sparkClusterOpts}
                 ${sparkResourceOpts}
                 ${sparkApplicationOpts}
+                --executor-cores=5
+                --executor-memory=7G
+                --driver-memory=6G
+                --conf spark.dynamicAllocation.maxExecutors=27
+                --conf spark.executor.memoryOverhead=7G
+                --conf spark.sql.shuffle.partitions=20000
             </spark-opts>
-
-            <arg>--explodedResultPath</arg><arg>${workingDir}/exploded</arg>
-            <arg>--matchingsPath</arg><arg>${oldMatches}</arg>
+            <arg>--explodedResultPath</arg><arg>${affroDataset}/exploded</arg>
+            <arg>--matchingsPath</arg><arg>${affroDataset}/matchings</arg>
             <arg>--outputPath</arg><arg>${datasetPath}</arg>
+
+            <!--            <arg>&#45;&#45;explodedResultPath</arg><arg>${workingDir}/exploded</arg>-->
+<!--            <arg>&#45;&#45;matchingsPath</arg><arg>${oldMatches}</arg>-->
+<!--            <arg>&#45;&#45;outputPath</arg><arg>${datasetPath}</arg>-->
 
         </spark>
         <ok to="atomicactions"/>

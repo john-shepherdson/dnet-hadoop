@@ -54,8 +54,6 @@ public class RedistributeRelations implements Serializable {
         final String outputPath = parser.get("outputPath");
         log.info("outputPath: {}", outputPath);
 
-        final String workingDir = parser.get("workingDir");
-        log.info("workingDir: {}", workingDir);
 
         SparkConf conf = new SparkConf();
 
