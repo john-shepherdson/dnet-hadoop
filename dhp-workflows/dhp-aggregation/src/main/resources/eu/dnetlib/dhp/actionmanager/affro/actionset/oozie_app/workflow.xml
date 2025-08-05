@@ -18,12 +18,16 @@
             <description>the path where to find the inferred affiliation relations from Datacite</description>
         </property>
         <property>
-            <name>webCrawlInputPath</name>
+            <name>oalexInputPath</name>
             <description>the path where to find the inferred affiliation relations from webCrawl</description>
         </property>
         <property>
             <name>publisherInputPath</name>
             <description>the path where to find the inferred affiliation relations from publisher websites</description>
+        </property>
+        <property>
+            <name>oaireInputPath</name>
+            <description>the path where to find the inferred affiliation relations from webCrawl</description>
         </property>
         <property>
             <name>outputPath</name>
@@ -120,8 +124,10 @@
             <arg>--pubmedInputPath</arg><arg>${pubmedInputPath}</arg>
             <arg>--openapcInputPath</arg><arg>${openapcInputPath}</arg>
             <arg>--dataciteInputPath</arg><arg>${dataciteInputPath}</arg>
-            <arg>--webCrawlInputPath</arg><arg>${webCrawlInputPath}</arg>
-            <arg>--publisherInputPath</arg><arg>${publisherInputPath}</arg>
+            <arg>--oalexlInputPath</arg><arg>${inputPaths}/oalex</arg>
+            <arg>--publisherInputPath</arg><arg>${inputPaths}/publishers</arg>
+            <arg>--oaireInputPath</arg><arg>${inputPaths}/oaire</arg>
+            <arg>--iisInputPath</arg><arg>${inputPaths}/iis</arg>
             <arg>--outputPath</arg><arg>${outputPath}</arg>
         </spark>
         <ok to="End"/>

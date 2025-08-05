@@ -61,7 +61,7 @@ public class RedistributeRelations implements Serializable {
                 conf,
                 isSparkSessionManaged,
                 spark -> {
-                    Constants.removeOutputDir(spark, outputPath);
+                   // Constants.removeOutputDir(spark, outputPath);
                     redistributeRelations(
                             spark, explodedPath, matchingsPath, outputPath);
                 });
@@ -84,7 +84,14 @@ public class RedistributeRelations implements Serializable {
                 new AggregateResultUDF(),
                 RESULT_MATCHED_SCHEMA
         );
+        String [] entities = {"iis","oalex","oaire","publishers"};
+        for (String datasource : entities)
+            redistributeFroDatasource(spark, explodedPath + datasource, matchingsPath, outputPath + datasource);
 
+
+    }
+
+    private static void redistributeFroDatasource(SparkSession spark, String explodedPath, String matchingsPath, String outputPath) {
         Dataset<Row> exploded = spark.read().schema(eu.dnetlib.dhp.actionmanager.affro.Constants.DATASET_SCHEMA)
                 .json(explodedPath);
 
@@ -110,8 +117,6 @@ public class RedistributeRelations implements Serializable {
                 .select("result.*");
 
         resultDf.write().mode(SaveMode.Overwrite).option("compression","gzip").json(outputPath);
-                
-
     }
 
 

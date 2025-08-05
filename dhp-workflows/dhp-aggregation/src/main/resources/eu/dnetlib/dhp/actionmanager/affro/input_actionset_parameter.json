@@ -30,16 +30,10 @@
     "paramRequired": true
   },
   {
-  "paramName": "wip",
-  "paramLongName": "webCrawlInputPath",
-  "paramDescription": "the path to get the input data from Web Crawl",
+  "paramName": "ip",
+  "paramLongName": "inputPaths",
+  "paramDescription": "the upper path where all the results reconstructed for oalex, oaire, iis and publishers are stored. Each one in its own directory equal to the name",
   "paramRequired": true
-  },
-  {
-    "paramName": "pub",
-    "paramLongName": "publisherInputPath",
-    "paramDescription": "the path to get the input data from publishers",
-    "paramRequired": true
   },
   {
     "paramName": "o",

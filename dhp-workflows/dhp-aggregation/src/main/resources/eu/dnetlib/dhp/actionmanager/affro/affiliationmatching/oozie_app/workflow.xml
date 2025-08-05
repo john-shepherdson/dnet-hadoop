@@ -56,7 +56,7 @@
         </configuration>
     </global>
 
-    <start to="preparedataset"/>
+    <start to="run-affro"/>
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
@@ -86,10 +86,10 @@
             <arg>--publishersPath</arg><arg>${publishersPath}</arg>
             <arg>--oldMatches</arg><arg>${affroDataset}/matchings</arg>
             <arg>--applyOnAll</arg><arg>${applyOnAll}</arg>
-            <arg>--outputPath</arg><arg>${affroDataset}</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/</arg>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
         </spark>
-        <ok to="End"/>
+        <ok to="run-affro"/>
         <error to="Kill"/>
     </action>
 
@@ -118,7 +118,7 @@
             </spark-opts>
 
             <arg>${workingDir}/toMatch</arg>
-            <arg>${oldMatches}</arg>
+            <arg>${affroDataset}/matchings</arg>
 
             <file>${wfAppPath}/affiliationmatching.apply.py#affiliationmatching.apply.py</file>
         </spark>
@@ -146,9 +146,9 @@
                 --conf spark.executor.memoryOverhead=7G
                 --conf spark.sql.shuffle.partitions=20000
             </spark-opts>
-            <arg>--explodedResultPath</arg><arg>${affroDataset}/exploded</arg>
+            <arg>--explodedResultPath</arg><arg>${workingDir}/exploded/</arg>
             <arg>--matchingsPath</arg><arg>${affroDataset}/matchings</arg>
-            <arg>--outputPath</arg><arg>${datasetPath}</arg>
+            <arg>--outputPath</arg><arg>${datasetPath}/</arg>
 
             <!--            <arg>&#45;&#45;explodedResultPath</arg><arg>${workingDir}/exploded</arg>-->
 <!--            <arg>&#45;&#45;matchingsPath</arg><arg>${oldMatches}</arg>-->
@@ -175,7 +175,11 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
-            <arg>--matchingPath</arg><arg>${datasetPath}</arg>
+            <arg>--crossrefInputPath</arg><arg>${crossrefInputPath}</arg>
+            <arg>--pubmedInputPath</arg><arg>${pubmedInputPath}</arg>
+            <arg>--openapcInputPath</arg><arg>${openapcInputPath}</arg>
+            <arg>--dataciteInputPath</arg><arg>${dataciteInputPath}</arg>
+            <arg>--inputPaths</arg><arg>${datasetPath}/</arg>
             <arg>--outputPath</arg><arg>${outputPath}</arg>
         </spark>
         <ok to="End"/>
