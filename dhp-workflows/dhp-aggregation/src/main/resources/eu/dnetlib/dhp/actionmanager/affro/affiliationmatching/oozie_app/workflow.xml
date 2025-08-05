@@ -114,12 +114,12 @@
                 --conf spark.sql.shuffle.partitions=20000
                 --conf spark.yarn.appMasterEnv.PYSPARK_PYTHON=./env/bin/python
                 --conf spark.executorEnv.PYSPARK_PYTHON=./env/bin/python
-                --archives affiliationmatching.tar.gz#env
+                --archives ${wfAppPath}/affiliationmatching.tar.gz#env
             </spark-opts>
 
             <arg>${workingDir}/toMatch</arg>
             <arg>${affroDataset}/matchings</arg>
-
+<!--            <arg>/tmp/affromatchings</arg>-->
             <file>${wfAppPath}/affiliationmatching.apply.py#affiliationmatching.apply.py</file>
         </spark>
 

@@ -1,0 +1,296 @@
+{
+  "indexed": {
+    "date-parts": [
+      [
+        2025,
+        2,
+        21
+      ]
+    ],
+    "date-time": "2025-02-21T11:21:05Z",
+    "timestamp": 1740136865777,
+    "version": "3.37.3"
+  },
+  "reference-count": 7,
+  "publisher": "Elsevier BV",
+  "issue": "4",
+  "license": [
+    {
+      "start": {
+        "date-parts": [
+          [
+            2020,
+            4,
+            1
+          ]
+        ],
+        "date-time": "2020-04-01T00:00:00Z",
+        "timestamp": 1585699200000
+      },
+      "content-version": "tdm",
+      "delay-in-days": 0,
+      "URL": "https://www.elsevier.com/tdm/userlicense/1.0/"
+    }
+  ],
+  "funder": [
+    {
+      "DOI": "10.13039/501100009708",
+      "name": "Novo Nordisk Fonden",
+      "doi-asserted-by": "publisher",
+      "id": [
+        {
+          "id": "10.13039/501100009708",
+          "id-type": "DOI",
+          "asserted-by": "publisher"
+        }
+      ]
+    }
+  ],
+  "content-domain": {
+    "domain": [
+      "clinicalkey.fr",
+      "clinicalkey.jp",
+      "clinicalkey.es",
+      "clinicalkey.com.au",
+      "clinicalkey.com",
+      "cghjournal.org",
+      "elsevier.com",
+      "sciencedirect.com"
+    ],
+    "crossmark-restriction": true
+  },
+  "short-container-title": [
+    "Clinical Gastroenterology and Hepatology"
+  ],
+  "published-print": {
+    "date-parts": [
+      [
+        2020,
+        4
+      ]
+    ]
+  },
+  "DOI": "10.1016/j.cgh.2019.10.006",
+  "type": "journal-article",
+  "created": {
+    "date-parts": [
+      [
+        2019,
+        10,
+        10
+      ]
+    ],
+    "date-time": "2019-10-10T17:57:00Z",
+    "timestamp": 1570730220000
+  },
+  "page": "1003-1004",
+  "update-policy": "https://doi.org/10.1016/elsevier_cm_policy",
+  "source": "Crossref",
+  "is-referenced-by-count": 0,
+  "title": [
+    "Reply"
+  ],
+  "prefix": "10.1016",
+  "volume": "18",
+  "author": [
+    {
+      "given": "Marie",
+      "family": "Villumsen",
+      "sequence": "first",
+      "affiliation": []
+    },
+    {
+      "given": "Tine",
+      "family": "Jess",
+      "sequence": "additional",
+      "affiliation": []
+    },
+    {
+      "given": "Kristine H.",
+      "family": "Allin",
+      "sequence": "additional",
+      "affiliation": []
+    }
+  ],
+  "member": "78",
+  "reference": [
+    {
+      "key": "10.1016/j.cgh.2019.10.006_bib1",
+      "doi-asserted-by": "crossref",
+      "first-page": "88",
+      "DOI": "10.1038/nrendo.2017.151",
+      "volume": "14",
+      "author": "Zheng",
+      "year": "2018",
+      "journal-title": "Nat Rev Endocrinol"
+    },
+    {
+      "key": "10.1016/j.cgh.2019.10.006_bib2",
+      "doi-asserted-by": "crossref",
+      "first-page": "166",
+      "DOI": "10.1186/1471-230X-13-166",
+      "volume": "13",
+      "author": "Wei",
+      "year": "2013",
+      "journal-title": "BMC Gastroenterol"
+    },
+    {
+      "key": "10.1016/j.cgh.2019.10.006_bib3",
+      "doi-asserted-by": "crossref",
+      "first-page": "961",
+      "DOI": "10.1111/apt.13971",
+      "volume": "45",
+      "author": "Lophaven",
+      "year": "2017",
+      "journal-title": "Aliment Pharmacol Ther"
+    },
+    {
+      "key": "10.1016/j.cgh.2019.10.006_bib4",
+      "volume": "15",
+      "author": "Chen",
+      "year": "2018",
+      "journal-title": "Int J Environ Res Public Health"
+    },
+    {
+      "key": "10.1016/j.cgh.2019.10.006_bib5",
+      "doi-asserted-by": "crossref",
+      "first-page": "1049",
+      "DOI": "10.1097/MIB.0000000000000735",
+      "volume": "22",
+      "author": "Lin",
+      "year": "2016",
+      "journal-title": "Inflamm Bowel Dis"
+    },
+    {
+      "key": "10.1016/j.cgh.2019.10.006_bib6",
+      "first-page": "37",
+      "volume": "25",
+      "author": "Tigas",
+      "year": "2012",
+      "journal-title": "Ann Gastroenterol"
+    },
+    {
+      "key": "10.1016/j.cgh.2019.10.006_bib7",
+      "doi-asserted-by": "crossref",
+      "first-page": "319",
+      "DOI": "10.1093/ecco-jcc/jjy164",
+      "volume": "13",
+      "author": "Aarestrup",
+      "year": "2019",
+      "journal-title": "J Crohns Colitis"
+    }
+  ],
+  "container-title": [
+    "Clinical Gastroenterology and Hepatology"
+  ],
+  "language": "en",
+  "link": [
+    {
+      "URL": "https://api.elsevier.com/content/article/PII:S1542356519311048?httpAccept=text/xml",
+      "content-type": "text/xml",
+      "content-version": "vor",
+      "intended-application": "text-mining"
+    },
+    {
+      "URL": "https://api.elsevier.com/content/article/PII:S1542356519311048?httpAccept=text/plain",
+      "content-type": "text/plain",
+      "content-version": "vor",
+      "intended-application": "text-mining"
+    }
+  ],
+  "deposited": {
+    "date-parts": [
+      [
+        2022,
+        7,
+        13
+      ]
+    ],
+    "date-time": "2022-07-13T12:24:20Z",
+    "timestamp": 1657715060000
+  },
+  "score": 0,
+  "resource": {
+    "primary": {
+      "URL": "https://linkinghub.elsevier.com/retrieve/pii/S1542356519311048"
+    }
+  },
+  "issued": {
+    "date-parts": [
+      [
+        2020,
+        4
+      ]
+    ]
+  },
+  "references-count": 7,
+  "journal-issue": {
+    "issue": "4",
+    "published-print": {
+      "date-parts": [
+        [
+          2020,
+          4
+        ]
+      ]
+    }
+  },
+  "alternative-id": [
+    "S1542356519311048"
+  ],
+  "URL": "https://doi.org/10.1016/j.cgh.2019.10.006",
+  "ISSN": [
+    "1542-3565"
+  ],
+  "issn-type": [
+    {
+      "type": "print",
+      "value": "1542-3565"
+    }
+  ],
+  "published": {
+    "date-parts": [
+      [
+        2020,
+        4
+      ]
+    ]
+  },
+  "assertion": [
+    {
+      "value": "Elsevier",
+      "name": "publisher",
+      "label": "This article is maintained by"
+    },
+    {
+      "value": "Reply",
+      "name": "articletitle",
+      "label": "Article Title"
+    },
+    {
+      "value": "Clinical Gastroenterology and Hepatology",
+      "name": "journaltitle",
+      "label": "Journal Title"
+    },
+    {
+      "value": "https://doi.org/10.1016/j.cgh.2019.10.006",
+      "name": "articlelink",
+      "label": "CrossRef DOI link to publisher maintained version"
+    },
+    {
+      "value": "https://doi.org/10.1016/j.cgh.2019.09.016",
+      "name": "associatedlink",
+      "label": "CrossRef DOI link to the associated document"
+    },
+    {
+      "value": "simple-article",
+      "name": "content_type",
+      "label": "Content Type"
+    },
+    {
+      "value": "© 2019 by the AGA Institute",
+      "name": "copyright",
+      "label": "Copyright"
+    }
+  ]
+}
