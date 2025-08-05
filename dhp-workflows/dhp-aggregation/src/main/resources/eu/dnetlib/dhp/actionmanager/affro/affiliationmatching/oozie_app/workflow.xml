@@ -56,7 +56,7 @@
         </configuration>
     </global>
 
-    <start to="run-affro"/>
+    <start to="preparedataset"/>
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
@@ -114,7 +114,7 @@
                 --conf spark.sql.shuffle.partitions=20000
                 --conf spark.yarn.appMasterEnv.PYSPARK_PYTHON=./env/bin/python
                 --conf spark.executorEnv.PYSPARK_PYTHON=./env/bin/python
-                --archives ${wfAppPath}/affiliationmatching.tar.gz#env
+                --conf spark.yarn.dist.archives=${wfAppPath}/affiliationmatching.tar.gz#env
             </spark-opts>
 
             <arg>${workingDir}/toMatch</arg>
