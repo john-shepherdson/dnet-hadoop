@@ -99,10 +99,36 @@ public class RedistributeRelations implements Serializable {
         Dataset<Row> matchings = spark.read().schema(eu.dnetlib.dhp.actionmanager.affro.Constants.AFFILIATION_SCHEMA)
                 .json(matchingsPath);
 
-        Dataset<Row> joined = exploded.join(matchings, exploded.col("raw_affiliation_string").equalTo(matchings.col("Affiliation")))
+        int numSalts = 100;
+
+        // Add a salt key to the larger dataset (exploded)
+        Dataset<Row> explodedWithSalt = exploded
+                .withColumn("salt", expr("CAST(FLOOR(RAND() * " + numSalts + ") AS INT)"));
+
+        // Replicate the smaller dataset (matchings) across all salt values
+        Dataset<Row> saltedMatchings = matchings
+                .withColumn("salt", explode(expr("sequence(0, " + (numSalts - 1) + ")")));
+
+        // Perform salted join
+        Dataset<Row> joined = explodedWithSalt
+                .join(saltedMatchings,
+                        explodedWithSalt.col("raw_affiliation_string").equalTo(saltedMatchings.col("Affiliation"))
+                                .and(explodedWithSalt.col("salt").equalTo(saltedMatchings.col("salt"))))
                 .filter(col("Matchings").isNotNull().and(size(col("Matchings")).gt(0)))
-                .select("id", "fullname", "raw_affiliation_string", "Matchings", "corresponding","contributor_roles")
+                .select(
+                        explodedWithSalt.col("id"),
+                        explodedWithSalt.col("fullname"),
+                        explodedWithSalt.col("raw_affiliation_string"),
+                        col("Matchings"),
+                        col("corresponding"),
+                        col("contributor_roles"))
                 .withColumn("key", expr("insertKey(id, fullname)"));
+
+
+//        Dataset<Row> joined = exploded.join(matchings, exploded.col("raw_affiliation_string").equalTo(matchings.col("Affiliation")))
+//                .filter(col("Matchings").isNotNull().and(size(col("Matchings")).gt(0)))
+//                .select("id", "fullname", "raw_affiliation_string", "Matchings", "corresponding","contributor_roles")
+//                .withColumn("key", expr("insertKey(id, fullname)"));
 
         Dataset<Row> groupedDf = joined
                 .groupBy("key")
