@@ -13,7 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -223,7 +225,9 @@ class EntityMergerTest implements Serializable {
 					.add(
 						new Tuple2<>(
 							MapDocumentUtil.getJPathString("$.id", line),
-							new ObjectMapper().readValue(line, clazz)));
+							new ObjectMapper()
+									.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+									.readValue(line, clazz)));
 				// read next line
 				line = reader.readLine();
 			}

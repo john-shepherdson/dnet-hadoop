@@ -1175,7 +1175,7 @@
                 <dhp.guava.version>33.4.0-jre</dhp.guava.version>
                 <solr.version>8.11.0</solr.version>
                 <dhp.spark.version>4.0.0</dhp.spark.version>
-                <dhp.jackson.version>2.19.0</dhp.jackson.version>
+                <dhp.jackson.version>2.18.2</dhp.jackson.version>
                 <dhp.commons.lang.version>3.17.0</dhp.commons.lang.version>
                 <log4j.version>2.24.3</log4j.version>
                 <json4s.version>4.0.7</json4s.version>
