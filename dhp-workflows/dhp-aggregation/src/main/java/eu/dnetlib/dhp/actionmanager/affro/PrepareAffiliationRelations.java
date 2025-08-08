@@ -118,7 +118,7 @@ public class PrepareAffiliationRelations implements Serializable {
 		JavaPairRDD<Text, Text> crossrefRelations = prepareAffiliationRelationsNewModel(
 			spark, crossrefInputPath, collectedfromOpenAIRE, BIP_INFERENCE_PROVENANCE + ":crossref");
 
-		JavaPairRDD<Text, Text> pubmedRelations = prepareAffiliationRelationFromPublisherNewModel(
+		JavaPairRDD<Text, Text> pubmedRelations = prepareAffiliationRelations(
 			spark, pubmedInputPath, collectedfromOpenAIRE, BIP_INFERENCE_PROVENANCE + ":pubmed");
 
 		JavaPairRDD<Text, Text> openAPCRelations = prepareAffiliationRelationsNewModel(
@@ -149,6 +149,27 @@ public class PrepareAffiliationRelations implements Serializable {
 				.union(iisRelations)
 			.saveAsHadoopFile(
 				outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, BZip2Codec.class);
+	}
+
+	private static <I extends Result> JavaPairRDD<Text, Text> prepareAffiliationRelations(SparkSession spark,
+																						  String inputPath,
+																						  List<KeyValue> collectedfrom, String dataprovenance) {
+
+		spark
+				.udf()
+				.register(
+						"md5HashWithPrefix", (String doi) -> ID_PREFIX + IdentifierFactory.md5(DoiCleaningRule.clean(removePrefix(doi))), DataTypes.StringType);
+
+		Dataset<Row> df = spark
+				.read()
+				.schema("`DOI` STRING, `Matchings` ARRAY<STRUCT<`RORid`:STRING,`Confidence`:DOUBLE>>")
+				.json(inputPath)
+				.where("DOI is not null")
+				.withColumn("id",  expr("md5HashWithPrefix(doi)"))
+				.withColumn("matching",functions.explode(new Column("Matchings")) )
+				.select("id", "matching");;
+
+		return getTextTextJavaPairRDDNew(collectedfrom, df, dataprovenance);
 	}
 
 	private static JavaPairRDD<Text, Text> prepareAffiliationRelationsGraph(SparkSession spark, String datasetPath, List<KeyValue> collectedfromOpenAIRE, String dataprovenance) {
