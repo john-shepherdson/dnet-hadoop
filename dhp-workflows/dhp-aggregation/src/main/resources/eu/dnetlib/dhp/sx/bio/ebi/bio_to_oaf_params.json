@@ -1,5 +1,5 @@
 [
-  {"paramName":"mt",  "paramLongName":"master",       "paramDescription": "should be local or yarn",                  "paramRequired": true},
+  {"paramName":"mt",  "paramLongName":"master",       "paramDescription": "should be local or yarn",                  "paramRequired": false},
   {"paramName":"db",  "paramLongName":"database",     "paramDescription": "should be PDB or UNIPROT",                 "paramRequired": true},
   {"paramName":"p",   "paramLongName":"dbPath",       "paramDescription": "the path of the database to transform",    "paramRequired": true},
   {"paramName":"i",   "paramLongName":"isLookupUrl",          "paramDescription": "isLookupUrl",                              "paramRequired": true},
