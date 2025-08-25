@@ -435,6 +435,7 @@ class MappersTest {
 
 		assertEquals("doi", d.getInstance().get(0).getPid().get(0).getQualifier().getClassid());
 		assertEquals("10.5281/zenodo.3234526", d.getInstance().get(0).getPid().get(0).getValue());
+		assertEquals("https://doi.org/10.5281/zenodo.3234526", d.getInstance().get(0).getUrl().get(0));
 
 		assertTrue(d.getInstance().get(0).getAlternateIdentifier().isEmpty());
 
