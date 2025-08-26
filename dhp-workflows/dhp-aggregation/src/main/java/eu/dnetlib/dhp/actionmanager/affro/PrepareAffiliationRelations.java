@@ -169,7 +169,55 @@ public class PrepareAffiliationRelations implements Serializable {
 				.withColumn("matching",functions.explode(new Column("Matchings")) )
 				.select("id", "matching");;
 
-		return getTextTextJavaPairRDDNew(collectedfrom, df, dataprovenance);
+		return getTextTextJavaPairRDD(collectedfrom, df, dataprovenance);
+	}
+
+	private static JavaPairRDD<Text, Text> getTextTextJavaPairRDD(List<KeyValue> collectedfrom, Dataset<Row> df,
+																  String dataprovenance) {
+		// unroll nested arrays
+		df = df
+				.select(
+						new Column("id").as("id"),
+						new Column("matching.RORid").as("rorid"),
+						new Column("matching.Confidence").as("confidence"));
+
+		// prepare action sets for affiliation relations
+		return df
+				.toJavaRDD()
+				.flatMap((FlatMapFunction<Row, Relation>) row -> {
+
+					// DOI to OpenAIRE id
+					final String paperId = ID_PREFIX
+							+ IdentifierFactory.md5(DoiCleaningRule.clean(removePrefix(row.getAs("doi"))));
+
+					// ROR id to OpenAIRE id
+					final String affId = GenerateRorActionSetJob.calculateOpenaireId(row.getAs("rorid"));
+
+					Qualifier qualifier = OafMapperUtils
+							.qualifier(
+									BIP_AFFILIATIONS_CLASSID,
+									BIP_AFFILIATIONS_CLASSNAME,
+									ModelConstants.DNET_PROVENANCE_ACTIONS,
+									ModelConstants.DNET_PROVENANCE_ACTIONS);
+
+					// format data info; setting `confidence` into relation's `trust`
+					DataInfo dataInfo = OafMapperUtils
+							.dataInfo(
+									false,
+									dataprovenance,
+									true,
+									false,
+									qualifier,
+									Double.toString(row.getAs("confidence")));
+
+					// return bi-directional relations
+					return getAffiliationRelationPair(paperId, affId, collectedfrom, dataInfo).iterator();
+
+				})
+				.map(p -> new AtomicAction(Relation.class, p))
+				.mapToPair(
+						aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
+								new Text(OBJECT_MAPPER.writeValueAsString(aa))));
 	}
 
 	private static JavaPairRDD<Text, Text> prepareAffiliationRelationsGraph(SparkSession spark, String datasetPath, List<KeyValue> collectedfromOpenAIRE, String dataprovenance) {
