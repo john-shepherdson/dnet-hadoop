@@ -24,7 +24,10 @@ public class NotEqualVerb implements Selection, Serializable {
 	}
 
 	@Override
-	public boolean apply(String value) {
-		return !value.equals(param);
+	public boolean apply(Object value) {
+		if (value instanceof String s ) {
+			return !param.equals(s);
+		}
+		return true;
 	}
 }

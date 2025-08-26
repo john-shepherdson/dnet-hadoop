@@ -24,7 +24,11 @@ public class NotEqualVerbIgnoreCase implements Selection, Serializable {
 	}
 
 	@Override
-	public boolean apply(String value) {
-		return !value.equalsIgnoreCase(param);
+	public boolean apply(Object value)
+	{
+		if(value instanceof String s)
+			return !s.equalsIgnoreCase(param);
+
+		return true;
 	}
 }

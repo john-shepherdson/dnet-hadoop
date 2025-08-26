@@ -2,6 +2,9 @@
 package eu.dnetlib.dhp.bulktag.criteria;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 @VerbClass("equals")
 public class EqualVerb implements Selection, Serializable {
@@ -15,9 +18,15 @@ public class EqualVerb implements Selection, Serializable {
 		this.param = param;
 	}
 
+
 	@Override
-	public boolean apply(String value) {
-		return value.equals(param);
+	public boolean apply(Object value) {
+		// Only if value is an instance of String the comparison can be done
+		if (value instanceof String s ) {
+			return param.equals(s);
+		}
+
+		return false;
 	}
 
 	public String getParam() {

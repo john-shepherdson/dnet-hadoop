@@ -16,8 +16,10 @@ public class StartsWithVerb implements Selection, Serializable {
 	}
 
 	@Override
-	public boolean apply(String value) {
-		return value.startsWith(param);
+	public boolean apply(Object value) {
+		if(value instanceof String s)
+			return s.startsWith(param);
+		return false;
 	}
 
 	public String getParam() {

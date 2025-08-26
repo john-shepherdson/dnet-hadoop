@@ -20,8 +20,12 @@ public class GreatThanVerb implements Selection, Serializable {
 	}
 
 	@Override
-	public boolean apply(String value) {
-		return value.compareTo(param) > 0;
+	public boolean apply(Object value) {
+		if (value instanceof String s)
+			return s.compareTo(param) > 0;
+		if(value instanceof Integer i)
+			return i > Integer.parseInt(param);
+		return false;
 	}
 
 	public String getParam() {

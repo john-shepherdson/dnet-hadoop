@@ -16,8 +16,10 @@ public class StartsWithVerbIgnoreCase implements Selection, Serializable {
 	}
 
 	@Override
-	public boolean apply(String value) {
-		return value.toLowerCase().startsWith(param.toLowerCase());
+	public boolean apply(Object value) {
+		if(value instanceof String s)
+			return s.toLowerCase().startsWith(param.toLowerCase());
+		return false;
 	}
 
 	public String getParam() {
