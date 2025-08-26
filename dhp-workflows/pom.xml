@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.dnetlib.dhp</groupId>
         <artifactId>dhp</artifactId>
-        <version>1.2.5-SNAPSHOT</version>
+        <version>1.2.6-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -32,12 +32,6 @@
         <module>dhp-graph-provision</module>
         <module>dhp-blacklist</module>
         <module>dhp-stats-actionsets</module>
-        <module>dhp-stats-hist-snaps</module>
-        <module>dhp-stats-monitor-update</module>
-        <module>dhp-stats-update</module>
-        <module>dhp-stats-promote</module>
-        <module>dhp-usage-raw-data-update</module>
-        <module>dhp-usagestats-update</module>
         <module>dhp-broker-events</module>
         <module>dhp-impact-indicators</module>
         <module>dhp-swh</module>
@@ -80,7 +74,7 @@
         <dependency>
             <groupId>eu.dnetlib.dhp</groupId>
             <artifactId>dhp-build-assembly-resources</artifactId>
-            <version>${project.version}</version>
+            <version>1.2.6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.oozie</groupId>
@@ -93,12 +87,6 @@
         </dependency>
     </dependencies>
     <profiles>
-        <profile>
-            <id>spark-24</id>
-            <modules>
-                <module>dhp-doiboost</module>
-            </modules>
-        </profile>
         <profile>
             <!-- This profile sets properties that are required for test oozie workflows To be used only with 'oozie-package' profile -->
             <id>attach-test-resources</id>
@@ -212,7 +200,7 @@
                             <dependency>
                                 <groupId>eu.dnetlib.dhp</groupId>
                                 <artifactId>dhp-build-assembly-resources</artifactId>
-                                <version>${project.version}</version>
+                                <version>1.2.6-SNAPSHOT</version>
                                 <!-- contains project-default.properties -->
                             </dependency>
                         </dependencies>
@@ -262,7 +250,7 @@
                     <plugin>
                         <groupId>eu.dnetlib.dhp</groupId>
                         <artifactId>dhp-build-properties-maven-plugin</artifactId>
-                        <version>${project.version}</version>
+                        <version>1.2.6-SNAPSHOT</version>
                         <executions>
                             <execution>
                                 <phase>validate</phase>
@@ -327,7 +315,7 @@
                             <dependency>
                                 <groupId>eu.dnetlib.dhp</groupId>
                                 <artifactId>dhp-build-assembly-resources</artifactId>
-                                <version>${project.version}</version>
+                                <version>1.2.6-SNAPSHOT</version>
                             </dependency>
                         </dependencies>
                         <executions>
@@ -363,7 +351,7 @@
                                 </goals>
                                 <configuration>
                                     <tasks>
-                                        <property name="assembly-resources.loc" value="${maven.dependency.eu.dnetlib.dhp.dhp-build-assembly-resources.jar.path}" />
+                                        <property name="assembly-resources.loc" value="${maven.dependency.eu.dnetlib.dhp.dhp-build-assembly-resources.jar.path}"/>
                                         <unjar src="${assembly-resources.loc}" dest="${project.build.directory}/assembly-resources" />
                                     </tasks>
                                 </configuration>
@@ -585,21 +573,5 @@
                 </file>
             </activation>
         </profile>
-        <profile>
-            <id>spark-34</id>
-            <modules>
-                <module>dhp-graph-provision</module>
-            </modules>
-        </profile>
-
-        <profile>
-            <id>spark-35</id>
-            <modules>
-                <module>dhp-graph-provision</module>
-            </modules>
-        </profile>
-
-
     </profiles>
-
 </project>

@@ -885,10 +885,10 @@ case object Crossref2Oaf {
               queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
               queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
 //              Added mapping for DFG
-//            case "10.13039/501100001659" =>
-//              val targetId = getProjectId("dfgf________", "1e5e62235d094afd01cd56e65112fc63")
-//              queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
-//              queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
+            case "10.13039/501100001659" =>
+              val targetId = getProjectId("dfgf________", "1e5e62235d094afd01cd56e65112fc63")
+              queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
+              queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
             case "10.13039/100020031" =>
               val targetId = getProjectId("tara________", "1e5e62235d094afd01cd56e65112fc63")
               queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
@@ -955,7 +955,6 @@ case object Crossref2Oaf {
             //ERASMUS+
             case "10.13039/501100010790" =>
               generateSimpleRelationFromAward(funder, "erasmusplus_", a => a)
-            case _ => logger.debug("no match for " + funder.DOI.get)
             //Add for Danish funders
             //Independent Research Fund Denmark (IRFD)
             case "10.13039/501100004836" =>
@@ -973,6 +972,12 @@ case object Crossref2Oaf {
             case "10.13039/501100009708" =>
               generateSimpleRelationFromAward(funder, "nnf___________", a => a)
               val targetId = getProjectId("nnf_________", "1e5e62235d094afd01cd56e65112fc63")
+              queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
+              queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
+            //Research and Innovation Foundation (RIF)
+            case "10.13039/501100018877" =>
+              generateSimpleRelationFromAward(funder, "rif___________", a => a)
+              val targetId = getProjectId("rif_________", "1e5e62235d094afd01cd56e65112fc63")
               queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
               queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
             case _ => logger.debug("no match for " + funder.DOI.get)

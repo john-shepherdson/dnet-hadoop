@@ -6,6 +6,7 @@ import static eu.dnetlib.dhp.schema.common.ModelConstants.PROVENANCE_DEDUP;
 import static org.apache.spark.sql.functions.*;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,7 +19,6 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.catalyst.encoders.RowEncoder;
 import org.apache.spark.sql.expressions.UserDefinedFunction;
 import org.apache.spark.sql.expressions.Window;
 import org.apache.spark.sql.expressions.WindowSpec;
@@ -38,13 +38,13 @@ import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.PidType;
+import eu.dnetlib.dhp.utils.DHPUtils;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import eu.dnetlib.pace.config.DedupConfig;
 import eu.dnetlib.pace.util.SparkCompatUtils;
 import scala.Tuple3;
-import scala.collection.JavaConversions;
 
 public class SparkCreateMergeRels extends AbstractSparkAction {
 
@@ -141,7 +141,7 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 			// groupId is kept numeric as its string value is not used
 			// ("id", "groupId")
 			Dataset<Row> rawMergeRels = cliques
-				.join(vertexIdMap, JavaConversions.asScalaBuffer(Collections.singletonList("vertexId")), "inner")
+				.join(vertexIdMap, DHPUtils.toSeq(Collections.singletonList("vertexId")).toSeq(), "inner")
 				.drop("vertexId")
 				.distinct();
 
@@ -210,8 +210,8 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 					col("id").asc_nulls_last());
 
 			Dataset<Relation> output = rawMergeRels
-				.join(pivotHistory, JavaConversions.asScalaBuffer(Collections.singletonList("id")), "full")
-				.join(pivotingData, JavaConversions.asScalaBuffer(Collections.singletonList("id")), "left")
+				.join(pivotHistory, DHPUtils.toSeq(Collections.singletonList("id")).toSeq(), "full")
+				.join(pivotingData, DHPUtils.toSeq(Collections.singletonList("id")).toSeq(), "left")
 				.withColumn("pivot", functions.first("id").over(w))
 				.withColumn("position", functions.row_number().over(w))
 				.flatMap(
@@ -312,6 +312,6 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 	}
 
 	public static long hash(final String id) {
-		return Hashing.murmur3_128().hashString(id).asLong();
+		return Hashing.murmur3_128().hashString(id, StandardCharsets.UTF_8).asLong();
 	}
 }

@@ -6,13 +6,17 @@
     <parent>
         <groupId>eu.dnetlib.dhp</groupId>
         <artifactId>dhp-build</artifactId>
-        <version>1.2.5-SNAPSHOT</version>
+        <version>1.2.6-SNAPSHOT</version>
     </parent>
 
     <artifactId>dhp-build-properties-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
 
     <description>This module is a maven plugin implementing custom properties substitutions in the build lifecycle</description>
+
+    <properties>
+        <enforcer.skip>true</enforcer.skip>
+    </properties>
 
     <dependencies>
         <dependency>

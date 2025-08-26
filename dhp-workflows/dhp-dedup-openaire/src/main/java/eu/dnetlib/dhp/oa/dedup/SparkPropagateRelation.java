@@ -32,8 +32,6 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 
 	private static Encoder<Relation> REL_BEAN_ENC = Encoders.bean(Relation.class);
 
-	private static Encoder<Relation> REL_KRYO_ENC = Encoders.kryo(Relation.class);
-
 	public SparkPropagateRelation(ArgumentApplicationParser parser, SparkSession spark) {
 		super(parser, spark);
 	}
@@ -122,7 +120,7 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 			.map((MapFunction<Relation, Relation>) r -> {
 				r.getDataInfo().setInvisible(false);
 				return r;
-			}, REL_KRYO_ENC);
+			}, REL_BEAN_ENC);
 
 		Dataset<Relation> distinctRels = cleanedRels
 			.groupByKey(

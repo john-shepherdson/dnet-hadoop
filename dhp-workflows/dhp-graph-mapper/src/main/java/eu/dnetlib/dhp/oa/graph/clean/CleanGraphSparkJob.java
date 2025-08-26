@@ -6,6 +6,8 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 import java.util.*;
 import java.util.stream.Stream;
 
+import com.google.common.base.Joiner;
+import eu.dnetlib.dhp.utils.DHPUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
@@ -32,7 +34,6 @@ import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import scala.Tuple2;
-import scala.collection.JavaConversions;
 
 public class CleanGraphSparkJob {
 
@@ -97,7 +98,7 @@ public class CleanGraphSparkJob {
 			.ofNullable(parser.get("verifyCountryParam"))
 			.map(s -> s.split(";"))
 			.orElse(new String[] {});
-		log.info("verifyCountryParam: {}", verifyCountryParam);
+		log.info("verifyCountryParam: {}", Joiner.on(";").join(verifyCountryParam));
 
 		String collectedfrom = parser.get("collectedfrom");
 		log.info("collectedfrom: {}", collectedfrom);
@@ -234,7 +235,7 @@ public class CleanGraphSparkJob {
 
 		Dataset<Row> blacklist = spark.read().load(blacklistPath);
 		return res
-			.join(blacklist, JavaConversions.asScalaBuffer(Collections.singletonList("id")), "left_anti")
+			.join(blacklist, DHPUtils.toSeq(Collections.singletonList("id")).toSeq(), "left_anti")
 			.as(Encoders.bean(clazz));
 	}
 

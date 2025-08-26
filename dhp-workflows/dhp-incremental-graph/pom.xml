@@ -4,7 +4,7 @@
     <parent>
         <groupId>eu.dnetlib.dhp</groupId>
         <artifactId>dhp-workflows</artifactId>
-        <version>1.2.5-SNAPSHOT</version>
+        <version>1.2.6-SNAPSHOT</version>
     </parent>
     <artifactId>dhp-incremental-graph</artifactId>
     <build>
@@ -51,17 +51,14 @@
         <dependency>
             <groupId>eu.dnetlib.dhp</groupId>
             <artifactId>dhp-aggregation</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>eu.dnetlib.dhp</groupId>
             <artifactId>dhp-enrichment</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>eu.dnetlib.dhp</groupId>
             <artifactId>dhp-graph-mapper</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>
