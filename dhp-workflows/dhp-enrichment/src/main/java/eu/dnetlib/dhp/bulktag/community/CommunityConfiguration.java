@@ -151,7 +151,7 @@ public class CommunityConfiguration implements Serializable {
 	}
 
 	public List<String> getCommunityForDatasource(
-		final String dts, final Map<String, List<String>> param) {
+		final String dts, final Map<String, Object> param) {
 		List<Pair<String, SelectionConstraints>> lp = datasourceMap.get(dts);
 		if (lp == null)
 			return Lists.newArrayList();

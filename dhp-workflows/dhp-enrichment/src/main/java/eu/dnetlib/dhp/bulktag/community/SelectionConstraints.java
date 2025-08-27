@@ -32,7 +32,7 @@ public class SelectionConstraints implements Serializable {
 	}
 
 	// Constraints in or
-	public boolean verifyCriteria(final Map<String, List<String>> param) {
+	public boolean verifyCriteria(final Map<String, Object> param) {
 		if (criteria.isEmpty())
 			return true;
 		for (Constraints selc : criteria) {

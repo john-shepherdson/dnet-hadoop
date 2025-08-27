@@ -21,6 +21,12 @@ public class ExecSubstringAction implements Serializable {
 		this.value = value;
 	}
 
+	public void setValue(Object value) {
+		if (! (value instanceof String s))
+			throw new RuntimeException("The value provided for ExecSubstringAction should be String");
+		this.value = s;
+	}
+
 	public String getFrom() {
 		return from;
 	}

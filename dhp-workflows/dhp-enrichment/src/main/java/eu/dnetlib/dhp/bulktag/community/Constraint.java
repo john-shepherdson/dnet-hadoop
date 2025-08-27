@@ -6,16 +6,26 @@ import java.lang.reflect.InvocationTargetException;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import eu.dnetlib.dhp.bulktag.criteria.JsonPathAware;
 import eu.dnetlib.dhp.bulktag.criteria.Selection;
 import eu.dnetlib.dhp.bulktag.criteria.VerbResolver;
 
 public class Constraint implements Serializable {
 	private String verb;
 	private String field;
-	private String value;
+	private Object value;
+	private String jsonpath;
 //	private String element;
 	@JsonIgnore
 	private Selection selection;
+
+	public String getJsonpath() {
+		return jsonpath;
+	}
+
+	public void setJsonpath(String jsonpath) {
+		this.jsonpath = jsonpath;
+	}
 
 	public String getVerb() {
 		return verb;
@@ -33,11 +43,11 @@ public class Constraint implements Serializable {
 		this.field = field;
 	}
 
-	public String getValue() {
+	public Object getValue() {
 		return value;
 	}
 
-	public void setValue(String value) {
+	public void setValue(Object value) {
 		this.value = value;
 	}
 
@@ -50,6 +60,10 @@ public class Constraint implements Serializable {
 		throws InvocationTargetException, NoSuchMethodException, InstantiationException,
 		IllegalAccessException {
 		selection = resolver.getSelectionCriteria(verb, value);
+
+		if (selection instanceof JsonPathAware jpa) {
+			jpa.setJsonPath(jsonpath);
+		}
 	}
 
 	public boolean verifyCriteria(Object metadata) {

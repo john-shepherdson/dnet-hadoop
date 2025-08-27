@@ -53,6 +53,19 @@ class CommunityConfigurationFactoryTest {
 	}
 
 	@Test
+	void applyVerbNotContainsPids()
+			throws InvocationTargetException, IllegalAccessException, NoSuchMethodException,
+			InstantiationException {
+		Constraint sc = new Constraint();
+		sc.setVerb("not_contains");
+		sc.setField("pids");
+		sc.setValue(Arrays.asList("doi", "pmid", "pmc", "arxiv","handle"));
+		sc.setSelection(resolver);// .getSelectionCriteria(sc.getVerb(), sc.getValue()));
+		List<String> metadata = List.of("urn");
+		Assertions.assertTrue(sc.verifyCriteria(metadata));
+	}
+
+	@Test
 	void loadSelCriteriaTest() throws DocumentException, IOException, SAXException {
 		String xml = IOUtils
 			.toString(
@@ -60,7 +73,7 @@ class CommunityConfigurationFactoryTest {
 					.getResourceAsStream(
 						"/eu/dnetlib/dhp/bulktag/communityconfiguration/community_configuration_selcrit.xml"));
 		final CommunityConfiguration cc = CommunityConfigurationFactory.newInstance(xml);
-		Map<String, List<String>> param = new HashMap<>();
+		Map<String, Object> param = new HashMap<>();
 		param.put("author", new ArrayList<>(Collections.singletonList("Pippo Pippi")));
 		param
 			.put(
@@ -91,7 +104,7 @@ class CommunityConfigurationFactoryTest {
 					.getResourceAsStream(
 						"/eu/dnetlib/dhp/bulktag/communityconfiguration/community_configuration_selcrit2.xml"));
 		final CommunityConfiguration cc = CommunityConfigurationFactory.newInstance(xml);
-		Map<String, List<String>> param = new HashMap<>();
+		Map<String, Object> param = new HashMap<>();
 		param.put("author", new ArrayList<>(Collections.singletonList("Pippo Pippi")));
 		param
 			.put(

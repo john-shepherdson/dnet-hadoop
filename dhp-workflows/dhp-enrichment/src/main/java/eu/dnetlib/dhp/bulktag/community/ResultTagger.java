@@ -41,9 +41,9 @@ public class ResultTagger implements Serializable {
 		return (tmp != clist.size());
 	}
 
-	private Map<String, List<String>> getParamMap(final Result result, Map<String, MapModel> params)
+	private Map<String, Object> getParamMap(final Result result, Map<String, MapModel> params)
 		throws NoSuchMethodException, InvocationTargetException {
-		Map<String, List<String>> param = new HashMap<>();
+		Map<String, Object> param = new HashMap<>();
 		String json = new Gson().toJson(result, Result.class);
 		DocumentContext jsonContext = JsonPath.parse(json);
 
@@ -55,17 +55,17 @@ public class ResultTagger implements Serializable {
 
 			try {
 				String path = mapModel.getPath();
-				Object obj = jsonContext.read(path);
-				List<String> pathValue;
-				if (obj instanceof java.lang.String)
-					pathValue = Arrays.asList((String) obj);
-				else
-					pathValue = (List<String>) obj;
+				Object pathValue = jsonContext.read(path);
+//				List<String> pathValue;
+//				if (obj instanceof java.lang.String)
+//					pathValue = Arrays.asList((String) obj);
+//				else
+//					pathValue = (List<String>) obj;
 				if (Optional.ofNullable(mapModel.getAction()).isPresent()) {
 					Class<?> c = Class.forName(mapModel.getAction().getClazz());
 					Object class_instance = c.newInstance();
 					Method setField = c.getMethod("setValue", String.class);
-					setField.invoke(class_instance, pathValue.get(0));
+					setField.invoke(class_instance, pathValue);
 					for (Parameters p : mapModel.getAction().getParams()) {
 						setField = c.getMethod("set" + p.getParamName(), String.class);
 						setField.invoke(class_instance, p.getParamValue());
@@ -103,7 +103,7 @@ public class ResultTagger implements Serializable {
 			return result;
 		}
 
-		final Map<String, List<String>> param = getParamMap(result, criteria);
+		final Map<String, Object> param = getParamMap(result, criteria);
 
 		// Execute the EOSCTag for the services
 		switch (result.getResulttype().getClassid()) {
