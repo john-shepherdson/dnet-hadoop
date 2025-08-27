@@ -19,7 +19,12 @@ public class EqualVerbIgnoreCase implements Selection, Serializable {
 	public EqualVerbIgnoreCase(final List<String> param) {
 		this.params = param;
 	}
-
+	public EqualVerbIgnoreCase(final Object param) {
+		if(param instanceof String s)
+			this.params = List.of(s);
+		if(param instanceof List<?> lista && !lista.isEmpty() && lista.get(0) instanceof String)
+			lista.forEach(l -> params.add(String.valueOf(l)));
+	}
 
 	@Override
 	public boolean apply(Object value) {

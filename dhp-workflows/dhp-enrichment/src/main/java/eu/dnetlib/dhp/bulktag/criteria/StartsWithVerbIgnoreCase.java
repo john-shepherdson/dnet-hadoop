@@ -13,6 +13,13 @@ public class StartsWithVerbIgnoreCase implements Selection, Serializable {
 	public StartsWithVerbIgnoreCase() {
 	}
 
+	public StartsWithVerbIgnoreCase(final Object param) {
+		if(param instanceof String s)
+			this.params = List.of(s);
+		if(param instanceof List<?> lista && !lista.isEmpty() && lista.get(0) instanceof String)
+			lista.forEach(l -> params.add(String.valueOf(l)));
+	}
+
 	public StartsWithVerbIgnoreCase(final String param) {
 		this.params = List.of(param);
 	}

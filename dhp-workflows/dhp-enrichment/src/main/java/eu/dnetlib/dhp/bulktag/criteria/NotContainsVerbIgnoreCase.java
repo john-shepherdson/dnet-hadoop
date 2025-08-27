@@ -19,6 +19,12 @@ public class NotContainsVerbIgnoreCase implements Selection, Serializable {
 		this.params = params;
 	}
 
+	public NotContainsVerbIgnoreCase(final Object param) {
+		if(param instanceof String s)
+			this.params = List.of(s);
+		if(param instanceof List<?> lista && !lista.isEmpty() && lista.get(0) instanceof String)
+			lista.forEach(l -> params.add(String.valueOf(l)));
+	}
 	@Override
 	public boolean apply(Object value) {
 		if(value instanceof String s)

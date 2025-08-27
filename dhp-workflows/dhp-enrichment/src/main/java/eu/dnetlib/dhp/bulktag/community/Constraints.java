@@ -51,15 +51,17 @@ public class Constraints implements Serializable {
 	// Constraint in and
 	public boolean verifyCriteria(final Map<String, List<String>> param) {
 //todo aggiungere un campo mode al constraints che indica se il controlla va fatto valore per valore o tutti i valori insieme
+		boolean verified = false;
 		for (Constraint sc : constraint) {
-			boolean verified = false;
-			for (String value : param.get(sc.getField()) ) {
-				if(verified)
-					break;
-				if (sc.verifyCriteria(value.trim())) {
-					verified = true;
-				}
-			}
+			verified = sc.verifyCriteria(sc.getField());
+
+//			for (String value : param.get(sc.getField()) ) {
+//				if(verified)
+//					break;
+//				if (sc.verifyCriteria(value.trim())) {
+//					verified = true;
+//				}
+//			}
 			if (!verified)
 				return verified;
 		}

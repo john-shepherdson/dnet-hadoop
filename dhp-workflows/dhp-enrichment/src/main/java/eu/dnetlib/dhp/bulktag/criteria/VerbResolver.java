@@ -44,11 +44,11 @@ public class VerbResolver implements Serializable {
 		}
 	}
 
-	public Selection getSelectionCriteria(String name, String param)
+	public Selection getSelectionCriteria(String name, Object param)
 		throws NoSuchMethodException, IllegalAccessException, InvocationTargetException,
 		InstantiationException {
 
 		// return Class.forName(tmp_map.get(name)).
-		return map.get(name).getDeclaredConstructor((String.class)).newInstance(param);
+		return map.get(name).getDeclaredConstructor((Object.class)).newInstance(param);
 	}
 }

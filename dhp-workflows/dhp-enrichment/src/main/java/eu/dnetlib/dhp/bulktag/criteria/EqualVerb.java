@@ -21,7 +21,12 @@ public class EqualVerb implements Selection, Serializable {
 		this.params = param;
 	}
 
-
+	public EqualVerb(final Object param) {
+		if(param instanceof String s)
+			this.params = List.of(s);
+		if(param instanceof List<?> lista && !lista.isEmpty() && lista.get(0) instanceof String)
+			lista.forEach(l -> params.add(String.valueOf(l)));
+	}
 	@Override
 	public boolean apply(Object value) {
 		// Only if value is an instance of String the comparison can be done

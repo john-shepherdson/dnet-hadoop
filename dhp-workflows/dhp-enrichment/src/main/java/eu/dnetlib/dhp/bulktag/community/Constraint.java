@@ -52,7 +52,7 @@ public class Constraint implements Serializable {
 		selection = resolver.getSelectionCriteria(verb, value);
 	}
 
-	public boolean verifyCriteria(String metadata) {
+	public boolean verifyCriteria(Object metadata) {
 		return selection.apply(metadata);
 	}
 

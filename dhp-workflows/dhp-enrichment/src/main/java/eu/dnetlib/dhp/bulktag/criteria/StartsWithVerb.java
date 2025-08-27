@@ -20,6 +20,12 @@ public class StartsWithVerb implements Selection, Serializable {
 		this.params = param;
 	}
 
+	public StartsWithVerb(final Object param) {
+		if(param instanceof String s)
+			this.params = List.of(s);
+		if(param instanceof List<?> lista && !lista.isEmpty() && lista.get(0) instanceof String)
+			lista.forEach(l -> params.add(String.valueOf(l)));
+	}
 	@Override
 	public boolean apply(Object value) {
 		if(params.size() == 1){

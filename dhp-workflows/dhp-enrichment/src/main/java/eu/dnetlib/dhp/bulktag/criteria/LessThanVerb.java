@@ -24,6 +24,13 @@ public class LessThanVerb implements Selection, Serializable {
 		this.params = param;
 	}
 
+	public LessThanVerb(final Object param) {
+		if(param instanceof String s)
+			this.params = List.of(s);
+		if(param instanceof List<?> lista && !lista.isEmpty() && lista.get(0) instanceof String)
+			lista.forEach(l -> params.add(String.valueOf(l)));
+	}
+
 	private boolean compare(String param, Object value){
 		if(value instanceof String s)
 			return s.compareTo(param) < 0;
