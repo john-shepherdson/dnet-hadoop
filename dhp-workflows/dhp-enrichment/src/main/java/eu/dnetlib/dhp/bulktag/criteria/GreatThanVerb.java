@@ -1,7 +1,11 @@
 
 package eu.dnetlib.dhp.bulktag.criteria;
 
+import scala.Int;
+
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author miriam.baglioni
@@ -10,29 +14,41 @@ import java.io.Serializable;
 @VerbClass("greater_than")
 public class GreatThanVerb implements Selection, Serializable {
 
-	private String param;
+	private List<String> params = new ArrayList<>();
 
 	public GreatThanVerb() {
 	}
 
 	public GreatThanVerb(final String param) {
-		this.param = param;
+		this.params = List.of(param);
+	}
+	public GreatThanVerb(final List<String> param) {
+		this.params = param;
 	}
 
 	@Override
 	public boolean apply(Object value) {
-		if (value instanceof String s)
-			return s.compareTo(param) > 0;
-		if(value instanceof Integer i)
-			return i > Integer.parseInt(param);
+		if(params.size() == 1) {
+			if (value instanceof String s)
+				return s.compareTo(params.get(0)) > 0;
+			if (value instanceof Integer i)
+				return i > Integer.parseInt(params.get(0));
+			if(value instanceof List<?> list && list.size() == 1){
+				if (list.get(0) instanceof String s)
+					return s.compareTo(params.get(0)) > 0;
+				if(list.get(0) instanceof Integer i)
+					return i > Integer.parseInt(params.get(0));
+			}
+
+		}
 		return false;
 	}
 
-	public String getParam() {
-		return param;
+	public List<String> getParam() {
+		return params;
 	}
 
-	public void setParam(String param) {
-		this.param = param;
+	public void setParam(List<String> param) {
+		this.params = param;
 	}
 }

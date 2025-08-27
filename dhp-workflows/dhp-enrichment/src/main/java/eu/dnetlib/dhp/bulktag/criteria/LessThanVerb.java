@@ -2,6 +2,8 @@
 package eu.dnetlib.dhp.bulktag.criteria;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author miriam.baglioni
@@ -10,17 +12,19 @@ import java.io.Serializable;
 @VerbClass("lesser_than")
 public class LessThanVerb implements Selection, Serializable {
 
-	private String param;
+	private List<String> params = new ArrayList<>();
 
 	public LessThanVerb() {
 	}
 
 	public LessThanVerb(final String param) {
-		this.param = param;
+		this.params = List.of(param);
+	}
+	public LessThanVerb(final List<String> param) {
+		this.params = param;
 	}
 
-	@Override
-	public boolean apply(Object value) {
+	private boolean compare(String param, Object value){
 		if(value instanceof String s)
 			return s.compareTo(param) < 0;
 		if(value instanceof Integer i)
@@ -28,11 +32,24 @@ public class LessThanVerb implements Selection, Serializable {
 		return false;
 	}
 
-	public String getParam() {
-		return param;
+	@Override
+	public boolean apply(Object value) {
+		if(params.size() == 1){
+			if(value instanceof String || value instanceof Integer)
+				return compare(params.get(0), value);
+			if (value instanceof List<?> list && list.size() == 1){
+				return compare(params.get(0), list.get(0));
+			}
+		}
+
+		return false;
 	}
 
-	public void setParam(String param) {
-		this.param = param;
+	public List<String> getParam() {
+		return params;
+	}
+
+	public void setParam(List<String> param) {
+		this.params = param;
 	}
 }

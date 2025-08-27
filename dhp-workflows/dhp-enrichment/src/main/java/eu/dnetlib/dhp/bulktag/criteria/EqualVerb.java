@@ -9,31 +9,40 @@ import java.util.List;
 @VerbClass("equals")
 public class EqualVerb implements Selection, Serializable {
 
-	private String param;
+	private List<String> params = new ArrayList<>();
 
 	public EqualVerb() {
 	}
 
 	public EqualVerb(final String param) {
-		this.param = param;
+		this.params = List.of(param);
+	}
+	public EqualVerb(final List<String> param) {
+		this.params = param;
 	}
 
 
 	@Override
 	public boolean apply(Object value) {
 		// Only if value is an instance of String the comparison can be done
-		if (value instanceof String s ) {
-			return param.equals(s);
+		if(params.size() == 1){
+			if (value instanceof String s) {
+				return params.get(0).equals(s);
+			}
+			if(value instanceof List<?> list )
+				if(list.size() == 1 && list.get(0) instanceof String s )
+					return params.get(0).equals(s);
 		}
+
 
 		return false;
 	}
 
-	public String getParam() {
-		return param;
+	public List<String> getParam() {
+		return params;
 	}
 
-	public void setParam(String param) {
-		this.param = param;
+	public void setParam(List<String> param) {
+		this.params = param;
 	}
 }
