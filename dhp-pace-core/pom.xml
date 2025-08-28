@@ -107,7 +107,7 @@
 
 	<profiles>
 		<profile>
-			<id>spark-24</id>
+			<id>spark24</id>
 			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>

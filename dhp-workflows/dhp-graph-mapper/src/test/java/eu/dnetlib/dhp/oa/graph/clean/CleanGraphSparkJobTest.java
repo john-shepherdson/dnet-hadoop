@@ -402,6 +402,57 @@ public class CleanGraphSparkJobTest {
 		verify_keyword(p, "FOS: Computer and information sciences");
 	}
 
+    @Test
+    void testCleaning_person() throws Exception {
+
+        final String id = "30|orcid_______::00015c0a74cb5d74682274237a57c505";
+
+        Person p_in = read(spark, graphInputPath + "/person", Person.class)
+                .filter(String.format("id = '%s'", id))
+                .first();
+
+        assertTrue(p_in instanceof Person);
+        assertEquals(id, p_in.getId());
+        assertEquals("CLAUDIO", p_in.getGivenName());
+        assertEquals("CIAVATTA", p_in.getFamilyName());
+
+        assertNotNull(p_in.getPid());
+        assertEquals(2, p_in.getPid().size());
+
+        Optional<String> orcid = p_in.getPid()
+                .stream()
+                .filter(pid -> ModelConstants.ORCID.equals(pid.getQualifier().getClassid()))
+                .map(StructuredProperty::getValue)
+                .findFirst();
+
+        assertTrue(orcid.isPresent());
+        assertEquals("0000-0002-7914-4394", orcid.get());
+
+        new CleanGraphSparkJob(
+                args(
+                        "/eu/dnetlib/dhp/oa/graph/input_clean_graph_parameters.json",
+                        new String[]{
+                                "--inputPath", graphInputPath + "/person",
+                                "--outputPath", graphOutputPath + "/person",
+                                "--isLookupUrl", "lookupurl",
+                                "--graphTableClassName", Person.class.getCanonicalName(),
+                                "--deepClean", "false",
+                                "--masterDuplicatePath", dsMasterDuplicatePath,
+                        })).run(false, isLookUpService);
+
+        Person p = read(spark, graphOutputPath + "/person", Person.class).first();
+
+        assertEquals(id, p.getId());
+
+        orcid = p.getPid()
+                .stream()
+                .filter(pid -> ModelConstants.ORCID.equals(pid.getQualifier().getClassid()))
+                .map(StructuredProperty::getValue)
+                .findFirst();
+        assertTrue(orcid.isPresent());
+        assertEquals("0000-0002-7914-4394", orcid.get());
+    }
+
 	@Test
 	void testCleanDoiBoost() throws IOException, ParseException, ISLookUpException, ClassNotFoundException {
 		verifyFiltering(1, "50|doi_________::b0baa0eb88a5788f0b8815560d2a32f2");

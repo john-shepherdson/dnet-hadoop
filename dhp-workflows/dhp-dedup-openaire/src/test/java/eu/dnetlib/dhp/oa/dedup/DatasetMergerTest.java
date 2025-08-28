@@ -7,12 +7,12 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -88,7 +88,9 @@ class DatasetMergerTest implements Serializable {
 					.add(
 						new Tuple2<>(
 							MapDocumentUtil.getJPathString("$.id", line),
-							new ObjectMapper().readValue(line, clazz)));
+							new ObjectMapper()
+									.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+									.readValue(line, clazz)));
 				// read next line
 				line = reader.readLine();
 			}

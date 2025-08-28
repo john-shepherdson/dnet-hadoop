@@ -104,6 +104,7 @@ public class SparkDedupTest implements Serializable {
 		conf.set("spark.sql.shuffle.partitions", "200");
 		conf.set("spark.sql.warehouse.dir", testOutputBasePath + "/spark-warehouse");
 		conf.set("spark.driver.host", "127.0.0.1");
+		conf.set("spark.sql.codegen.wholeStage", "false");
 		spark = SparkSession
 			.builder()
 			.appName(SparkDedupTest.class.getSimpleName())
