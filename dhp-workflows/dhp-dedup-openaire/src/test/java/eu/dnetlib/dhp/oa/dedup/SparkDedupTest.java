@@ -61,6 +61,7 @@ public class SparkDedupTest implements Serializable {
 	private static String testOutputBasePath;
 	private static String testDedupGraphBasePath;
 	private static String testConsistencyGraphBasePath;
+	private static String relationsOutputPath;
 
 	private static final String testActionSetId = "test-orchestrator";
 	private static String whitelistPath;
@@ -93,6 +94,8 @@ public class SparkDedupTest implements Serializable {
 			.toFile()
 			.getAbsolutePath();
 		whiteList = IOUtils.readLines(new FileReader(whitelistPath));
+
+		relationsOutputPath = testOutputBasePath + "/relations_for_broker";
 
 		FileUtils.deleteDirectory(new File(testOutputBasePath));
 		FileUtils.deleteDirectory(new File(testDedupGraphBasePath));
@@ -831,6 +834,30 @@ public class SparkDedupTest implements Serializable {
 
 	@Test
 	@Order(7)
+	void copyRelationsForBrokerTest() throws Exception {
+
+		ArgumentApplicationParser parser = new ArgumentApplicationParser(
+				IOUtils
+						.toString(
+								SparkCopyRelationsForBroker.class
+										.getResourceAsStream(
+												"/eu/dnetlib/dhp/oa/dedup/copyRelationsForBroker_parameters.json")));
+
+		parser
+				.parseArgument(
+						new String[] {
+								"-i", testGraphBasePath, "-w", testOutputBasePath, "-o", relationsOutputPath
+						});
+
+		new SparkCopyRelationsForBroker(parser, spark).run(isLookUpService);
+
+		final Dataset<Row> outputRels = spark.read().text(relationsOutputPath);
+		assertEquals(11, outputRels.count());
+
+	}
+
+	@Test
+	@Order(8)
 	void propagateRelationTest() throws Exception {
 
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
@@ -876,7 +903,7 @@ public class SparkDedupTest implements Serializable {
 	}
 
 	@Test
-	@Order(8)
+	@Order(9)
 	void testCleanedPropagatedRelations() throws Exception {
 		Dataset<Row> df_before = spark
 			.read()
