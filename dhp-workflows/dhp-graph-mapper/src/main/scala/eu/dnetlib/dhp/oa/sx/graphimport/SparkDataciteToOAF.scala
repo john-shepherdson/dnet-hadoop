@@ -20,7 +20,6 @@ object SparkDataciteToOAF {
         .builder()
         .config(conf)
         .appName(getClass.getSimpleName)
-        .master(parser.get("master"))
         .getOrCreate()
 
     val sc = spark.sparkContext

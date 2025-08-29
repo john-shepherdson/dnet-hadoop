@@ -6,8 +6,8 @@
 
 package eu.dnetlib.dhp.oa.provision.model;
 
-import com.cloudera.com.fasterxml.jackson.core.JsonProcessingException;
-import com.cloudera.com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.solr.Funding;

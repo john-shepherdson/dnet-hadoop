@@ -61,6 +61,7 @@ public class SparkDedupTest implements Serializable {
 	private static String testOutputBasePath;
 	private static String testDedupGraphBasePath;
 	private static String testConsistencyGraphBasePath;
+	private static String relationsOutputPath;
 
 	private static final String testActionSetId = "test-orchestrator";
 	private static String whitelistPath;
@@ -94,6 +95,8 @@ public class SparkDedupTest implements Serializable {
 			.getAbsolutePath();
 		whiteList = IOUtils.readLines(new FileReader(whitelistPath));
 
+		relationsOutputPath = testOutputBasePath + "/relations_for_broker";
+
 		FileUtils.deleteDirectory(new File(testOutputBasePath));
 		FileUtils.deleteDirectory(new File(testDedupGraphBasePath));
 
@@ -101,6 +104,7 @@ public class SparkDedupTest implements Serializable {
 		conf.set("spark.sql.shuffle.partitions", "200");
 		conf.set("spark.sql.warehouse.dir", testOutputBasePath + "/spark-warehouse");
 		conf.set("spark.driver.host", "127.0.0.1");
+		conf.set("spark.sql.codegen.wholeStage", "false");
 		spark = SparkSession
 			.builder()
 			.appName(SparkDedupTest.class.getSimpleName())
@@ -192,7 +196,7 @@ public class SparkDedupTest implements Serializable {
 
 		if (CHECK_CARDINALITIES) {
 			assertEquals(720, orgs_simrel);
-			assertEquals(566, pubs_simrel);
+			assertEquals(567, pubs_simrel);
 			assertEquals(113, sw_simrel);
 			assertEquals(148, ds_simrel);
 			assertEquals(280, orp_simrel);
@@ -253,7 +257,7 @@ public class SparkDedupTest implements Serializable {
 		// entities simrels supposed to be equal to the number of previous step (no rels in whitelist)
 		if (CHECK_CARDINALITIES) {
 			assertEquals(720, orgs_simrel);
-			assertEquals(566, pubs_simrel);
+			assertEquals(567, pubs_simrel);
 			assertEquals(148, ds_simrel);
 			assertEquals(280, orp_simrel);
 			assertEquals(115, sw_simrel.count());
@@ -622,10 +626,10 @@ public class SparkDedupTest implements Serializable {
 
 		if (CHECK_CARDINALITIES) {
 			assertEquals(87, orgs_deduprecord);
-			assertEquals(96, pubs.count());
+			assertEquals(95, pubs.count());
 			assertEquals(47, sw_deduprecord);
 			assertEquals(97, ds_deduprecord);
-			assertEquals(92, orp_deduprecord);
+			assertEquals(93, orp_deduprecord);
 		}
 
 		verifyRoot_1(mapper, pubs);
@@ -763,13 +767,13 @@ public class SparkDedupTest implements Serializable {
 		System.out.println("otherresearchproduct = " + otherresearchproduct);
 
 		if (CHECK_CARDINALITIES) {
-			assertEquals(930, publications);
+			assertEquals(931, publications);
 			assertEquals(840, organizations);
 			assertEquals(100, projects);
 			assertEquals(100, datasource);
 			assertEquals(196, softwares);
 			assertEquals(389, dataset);
-			assertEquals(520, otherresearchproduct);
+			assertEquals(521, otherresearchproduct);
 		}
 
 		long deletedOrgs = jsc
@@ -830,6 +834,30 @@ public class SparkDedupTest implements Serializable {
 
 	@Test
 	@Order(7)
+	void copyRelationsForBrokerTest() throws Exception {
+
+		ArgumentApplicationParser parser = new ArgumentApplicationParser(
+				IOUtils
+						.toString(
+								SparkCopyRelationsForBroker.class
+										.getResourceAsStream(
+												"/eu/dnetlib/dhp/oa/dedup/copyRelationsForBroker_parameters.json")));
+
+		parser
+				.parseArgument(
+						new String[] {
+								"-i", testGraphBasePath, "-w", testOutputBasePath, "-o", relationsOutputPath
+						});
+
+		new SparkCopyRelationsForBroker(parser, spark).run(isLookUpService);
+
+		final Dataset<Row> outputRels = spark.read().text(relationsOutputPath);
+		assertEquals(11, outputRels.count());
+
+	}
+
+	@Test
+	@Order(8)
 	void propagateRelationTest() throws Exception {
 
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
@@ -875,7 +903,7 @@ public class SparkDedupTest implements Serializable {
 	}
 
 	@Test
-	@Order(8)
+	@Order(9)
 	void testCleanedPropagatedRelations() throws Exception {
 		Dataset<Row> df_before = spark
 			.read()
