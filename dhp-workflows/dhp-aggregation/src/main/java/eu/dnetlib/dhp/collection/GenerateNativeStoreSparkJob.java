@@ -119,16 +119,27 @@ public class GenerateNativeStoreSparkJob {
 			.orElse(Boolean.TRUE);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
+		final boolean runValidation = Optional
+				.ofNullable(parser.get("runValidation"))
+				.map(Boolean::valueOf)
+				.orElse(Boolean.TRUE);
+		log.info("runValidation: {}", runValidation);
+
 		final SparkConf conf = new SparkConf();
 
-		final Pair<ValidationType, AbstractOpenAireProfile> validator = getValidationType(api.getCompatibilityLevel());
+		final Pair<ValidationType, AbstractOpenAireProfile> validator = getValidationType(api.getCompatibilityLevel(), runValidation);
 
 		runWithSparkSession(
 			conf, isSparkSessionManaged, spark -> createNativeMDStore(
 				spark, provenance, dateOfCollection, xpath, encoding, validator, currentVersion, readMdStoreVersion));
 	}
 
-	private static Pair<ValidationType, AbstractOpenAireProfile> getValidationType(final String compatibilityLevel) {
+	private static Pair<ValidationType, AbstractOpenAireProfile> getValidationType(final String compatibilityLevel, boolean runValidation) {
+		if (!runValidation) {
+			log.info("Skipping validation, returning empty validators map");
+			return null;
+		}
+
 		switch (compatibilityLevel) {
 			case "openaire2.0":
 				return Pair.of(ValidationType.openaire2_0, new DataArchiveGuidelinesV2Profile());

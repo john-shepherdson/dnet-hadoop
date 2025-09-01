@@ -52,5 +52,11 @@
     "paramLongName": "workflowId",
     "paramDescription": "the identifier of the dnet Workflow",
     "paramRequired": false
+  },
+  {
+    "paramName": "rv",
+    "paramLongName": "runValidation",
+    "paramDescription": "Should create the validation report",
+    "paramRequired": false
   }
 ]

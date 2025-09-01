@@ -41,6 +41,11 @@
             <name>collectionMode</name>
             <description>Should be REFRESH or INCREMENTAL</description>
         </property>
+        <property>
+            <name>runValidation</name>
+            <value>false</value>
+            <description>Should create the validation report</description>
+        </property>
 
         <property>
             <name>collection_java_xmx</name>
@@ -163,6 +168,7 @@
             <arg>--xpath</arg><arg>${identifierPath}</arg>
             <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
             <arg>--readMdStoreVersion</arg><arg>${wf:actionData('BeginRead')['mdStoreReadLockVersion']}</arg>
+            <arg>--runValidation</arg><arg>${runValidation}</arg>
         </spark>
         <ok to="collection_mode_end"/>
         <error to="FailCollection"/>
