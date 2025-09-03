@@ -9,6 +9,6 @@
 		"paramName": "broker",
 		"paramLongName": "brokerApiBaseUrl",
 		"paramDescription": "the url of the broker service api",
-		"paramRequired": true
+		"paramRequired": false
 	}
 ]

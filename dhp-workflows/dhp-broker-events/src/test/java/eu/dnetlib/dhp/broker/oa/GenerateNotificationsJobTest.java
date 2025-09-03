@@ -12,9 +12,9 @@ import org.junit.jupiter.api.Test;
 
 import eu.dnetlib.dhp.broker.model.ConditionParams;
 import eu.dnetlib.dhp.broker.model.Event;
-import eu.dnetlib.dhp.broker.model.MappedFields;
+import eu.dnetlib.dhp.broker.model.OaMappedFields;
 import eu.dnetlib.dhp.broker.model.Subscription;
-import eu.dnetlib.dhp.broker.oa.util.NotificationGroup;
+import eu.dnetlib.dhp.broker.oa.util.OaNotificationGroup;
 
 class GenerateNotificationsJobTest {
 
@@ -29,10 +29,9 @@ class GenerateNotificationsJobTest {
 		final Subscription s = new Subscription();
 		s.setTopic("ENRICH/MISSING/PID");
 		s
-			.setConditions(
-				"[{\"field\":\"targetDatasourceName\",\"fieldType\":\"STRING\",\"operator\":\"EXACT\",\"listParams\":[{\"value\":\"reposiTUm\"}]},{\"field\":\"trust\",\"fieldType\":\"FLOAT\",\"operator\":\"RANGE\",\"listParams\":[{\"value\":\"0\",\"otherValue\":\"1\"}]}]");
-		subscriptions = Arrays.asList(s);
-		conditionsMap = GenerateNotificationsJob.prepareConditionsMap(subscriptions);
+				.setConditions("[{\"field\":\"targetDatasourceName\",\"fieldType\":\"STRING\",\"operator\":\"EXACT\",\"listParams\":[{\"value\":\"reposiTUm\"}]},{\"field\":\"trust\",\"fieldType\":\"FLOAT\",\"operator\":\"RANGE\",\"listParams\":[{\"value\":\"0\",\"otherValue\":\"1\"}]}]");
+		this.subscriptions = Arrays.asList(s);
+		this.conditionsMap = GenerateNotificationsJob.prepareConditionsMap(this.subscriptions);
 	}
 
 	@Test
@@ -40,8 +39,8 @@ class GenerateNotificationsJobTest {
 		final Event event = new Event();
 		event.setTopic("ENRICH/MISSING/PROJECT");
 
-		final NotificationGroup res = GenerateNotificationsJob
-			.generateNotifications(event, subscriptions, conditionsMap, 0);
+		final OaNotificationGroup res = GenerateNotificationsJob
+				.generateNotifications(event, this.subscriptions, this.conditionsMap, 0);
 		assertEquals(0, res.getData().size());
 	}
 
@@ -49,12 +48,12 @@ class GenerateNotificationsJobTest {
 	void testGenerateNotifications_topic_match() {
 		final Event event = new Event();
 		event.setTopic("ENRICH/MISSING/PID");
-		event.setMap(new MappedFields());
+		event.setMap(new OaMappedFields());
 		event.getMap().setTargetDatasourceName("reposiTUm");
 		event.getMap().setTrust(0.8f);
 
-		final NotificationGroup res = GenerateNotificationsJob
-			.generateNotifications(event, subscriptions, conditionsMap, 0);
+		final OaNotificationGroup res = GenerateNotificationsJob
+				.generateNotifications(event, this.subscriptions, this.conditionsMap, 0);
 		assertEquals(1, res.getData().size());
 	}
 
@@ -62,12 +61,12 @@ class GenerateNotificationsJobTest {
 	void testGenerateNotifications_topic_no_match() {
 		final Event event = new Event();
 		event.setTopic("ENRICH/MISSING/PID");
-		event.setMap(new MappedFields());
+		event.setMap(new OaMappedFields());
 		event.getMap().setTargetDatasourceName("Puma");
 		event.getMap().setTrust(0.8f);
 
-		final NotificationGroup res = GenerateNotificationsJob
-			.generateNotifications(event, subscriptions, conditionsMap, 0);
+		final OaNotificationGroup res = GenerateNotificationsJob
+				.generateNotifications(event, this.subscriptions, this.conditionsMap, 0);
 		assertEquals(0, res.getData().size());
 	}
 
@@ -77,15 +76,15 @@ class GenerateNotificationsJobTest {
 		event.setTopic("ENRICH/MISSING/PROJECT");
 
 		// warm up
-		GenerateNotificationsJob.generateNotifications(event, subscriptions, conditionsMap, 0);
+		GenerateNotificationsJob.generateNotifications(event, this.subscriptions, this.conditionsMap, 0);
 
 		final long start = System.currentTimeMillis();
 		for (int i = 0; i < N_TIMES; i++) {
-			GenerateNotificationsJob.generateNotifications(event, subscriptions, conditionsMap, 0);
+			GenerateNotificationsJob.generateNotifications(event, this.subscriptions, this.conditionsMap, 0);
 		}
 		final long end = System.currentTimeMillis();
 		System.out
-			.println(String.format("no topic - repeated %s times - execution time: %s ms ", N_TIMES, end - start));
+				.println(String.format("no topic - repeated %s times - execution time: %s ms ", N_TIMES, end - start));
 
 	}
 
@@ -93,41 +92,40 @@ class GenerateNotificationsJobTest {
 	void testGenerateNotifications_topic_match_repeated() {
 		final Event event = new Event();
 		event.setTopic("ENRICH/MISSING/PID");
-		event.setMap(new MappedFields());
+		event.setMap(new OaMappedFields());
 		event.getMap().setTargetDatasourceName("reposiTUm");
 		event.getMap().setTrust(0.8f);
 
 		// warm up
-		GenerateNotificationsJob.generateNotifications(event, subscriptions, conditionsMap, 0);
+		GenerateNotificationsJob.generateNotifications(event, this.subscriptions, this.conditionsMap, 0);
 
 		final long start = System.currentTimeMillis();
 		for (int i = 0; i < N_TIMES; i++) {
-			GenerateNotificationsJob.generateNotifications(event, subscriptions, conditionsMap, 0);
+			GenerateNotificationsJob.generateNotifications(event, this.subscriptions, this.conditionsMap, 0);
 		}
 		final long end = System.currentTimeMillis();
 		System.out
-			.println(String.format("topic match - repeated %s times - execution time: %s ms ", N_TIMES, end - start));
+				.println(String.format("topic match - repeated %s times - execution time: %s ms ", N_TIMES, end - start));
 	}
 
 	@Test
 	void testGenerateNotifications_topic_no_match_repeated() {
 		final Event event = new Event();
 		event.setTopic("ENRICH/MISSING/PID");
-		event.setMap(new MappedFields());
+		event.setMap(new OaMappedFields());
 		event.getMap().setTargetDatasourceName("Puma");
 		event.getMap().setTrust(0.8f);
 
 		// warm up
-		GenerateNotificationsJob.generateNotifications(event, subscriptions, conditionsMap, 0);
+		GenerateNotificationsJob.generateNotifications(event, this.subscriptions, this.conditionsMap, 0);
 
 		final long start = System.currentTimeMillis();
 		for (int i = 0; i < N_TIMES; i++) {
-			GenerateNotificationsJob.generateNotifications(event, subscriptions, conditionsMap, 0);
+			GenerateNotificationsJob.generateNotifications(event, this.subscriptions, this.conditionsMap, 0);
 		}
 		final long end = System.currentTimeMillis();
 		System.out
-			.println(
-				String.format("topic no match - repeated %s times - execution time: %s ms ", N_TIMES, end - start));
+				.println(String.format("topic no match - repeated %s times - execution time: %s ms ", N_TIMES, end - start));
 	}
 
 }
