@@ -65,7 +65,7 @@ public class IndexNotificationsJob {
 			feeder.parallelBulkIndex(files, 4, fileSystem, new ConvertJSONWithId("\"notificationId\":\"((\\d|\\w)*)\"", index));
 
 			log.info("*** Deleting old notifications");
-			feeder.deleteUsingDateBefore(index, "date", date - 1000);
+			feeder.deleteUsingDateBefore(index, "date", date - 1000, true);
 
 			feeder.refreshIndex(index);
 		}

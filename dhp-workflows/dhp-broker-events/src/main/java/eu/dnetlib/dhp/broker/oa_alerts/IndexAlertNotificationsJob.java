@@ -51,7 +51,7 @@ public class IndexAlertNotificationsJob {
 
 		try (final BrokerIndexClient feeder = new BrokerIndexClient(indexHost)) {
 			log.info("*** Clean old notifications");
-			feeder.deleteUsingExactField(index, "map.datasourceId", dsId);
+			feeder.deleteUsingExactField(index, "map.datasourceId", dsId, true);
 
 			final FileSystem fileSystem = FileSystem.get(new Configuration());
 			final List<Path> files = ClusterUtils.listFiles(notificationsPath, fileSystem, ".gz");

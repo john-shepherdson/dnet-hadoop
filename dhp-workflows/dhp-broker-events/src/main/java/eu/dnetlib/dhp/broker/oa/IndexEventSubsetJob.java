@@ -57,7 +57,7 @@ public class IndexEventSubsetJob {
 			feeder.parallelBulkIndex(files, 4, fileSystem, new ConvertJSONWithId("\"eventId\":\"((\\d|\\w)*)\"", index));
 
 			log.info("*** Deleting old events");
-			feeder.deleteUsingDateBefore(index, "creationDate", date - 1000);
+			feeder.deleteUsingDateBefore(index, "creationDate", date - 1000, true);
 
 			feeder.refreshIndex(index);
 		}
