@@ -57,7 +57,7 @@ public class IndexAlertNotificationsJob {
 			final List<Path> files = ClusterUtils.listFiles(notificationsPath, fileSystem, ".gz");
 
 			log.info("*** Start indexing");
-			feeder.parallelBulkIndex(files, 4, fileSystem, new ConvertJSONWithId("\"notificationId\":\"((\\d|\\w)*)\"", index));
+			feeder.parallelBulkIndex(files, 4, fileSystem, new ConvertJSONWithId("\"notificationId\":\"((\\d|\\w|-)*)\"", index));
 
 			feeder.refreshIndex(index);
 		}

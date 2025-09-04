@@ -62,7 +62,7 @@ public class IndexNotificationsJob {
 			final List<Path> files = ClusterUtils.listFiles(notificationsPath, fileSystem, ".gz");
 
 			log.info("*** Start indexing");
-			feeder.parallelBulkIndex(files, 4, fileSystem, new ConvertJSONWithId("\"notificationId\":\"((\\d|\\w)*)\"", index));
+			feeder.parallelBulkIndex(files, 4, fileSystem, new ConvertJSONWithId("\"notificationId\":\"((\\d|\\w|-)*)\"", index));
 
 			log.info("*** Deleting old notifications");
 			feeder.deleteUsingDateBefore(index, "date", date - 1000, true);
