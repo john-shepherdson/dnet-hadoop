@@ -6,6 +6,10 @@
             <description>the path where the graph is stored</description>
         </property>
         <property>
+            <name>rawRelsInputPath</name>
+            <description>the path where the raw relations are stored</description>
+        </property>
+        <property>
             <name>outputDir</name>
             <description>the path where the generated data will be stored</description>
         </property>
@@ -42,26 +46,6 @@
             <description>the elasticsearch host</description>
         </property>
         <property>
-            <name>esBatchWriteRetryCount</name>
-            <value>8</value>
-            <description>an ES configuration property</description>
-        </property>
-		<property>
-            <name>esBatchWriteRetryWait</name>
-            <value>60s</value>
-            <description>an ES configuration property</description>
-        </property>
-		<property>
-            <name>esBatchSizeEntries</name>
-            <value>200</value>
-            <description>an ES configuration property</description>
-        </property>
-		<property>
-            <name>esNodesWanOnly</name>
-            <value>true</value>
-            <description>an ES configuration property</description>
-        </property>
-        <property>
         	<name>maxIndexedEventsForDsAndTopic</name>
         	<description>the max number of events for each couple (ds/topic)</description>
         </property>
@@ -81,17 +65,11 @@
         	<name>brokerDbPassword</name>
         	<description>the password of the broker database</description>
         </property>
-        <property>
-            <name>sparkMaxExecutorsForIndexing</name>
-            <value>8</value>
-            <description>Max number of workers for ElasticSearch indexing</description>
-        </property>
-
 
         <!-- General oozie workflow properties -->
         <property>
             <name>sparkClusterOpts</name>
-            <value>--conf spark.extraListeners= --conf spark.sql.queryExecutionListeners= --conf spark.yarn.historyServer.address=http://iis-cdh5-test-gw.ocean.icm.edu.pl:18089 --conf spark.eventLog.dir=hdfs://nameservice1/user/spark/spark2ApplicationHistory --conf spark.executorEnv.JAVA_HOME=/srv/java/openjdk-17 --conf spark.yarn.appMasterEnv.JAVA_HOME=/srv/java/openjdk-17 --conf spark.sql.warehouse.dir=/user/hive/warehouse --conf spark.oozie.action.sharelib.for.spark=spark342 --conf spark.eventLog.compression.codec=lz4 --conf spark.shuffle.mapStatus.compression.codec=lz4 --conf spark.shuffle.useOldFetchProtocol=true --conf spark.eventLog.enabled=true</value>
+            <value>--conf spark.extraListeners= --conf spark.sql.queryExecutionListeners= --conf spark.yarn.historyServer.address=http://iis-cdh5-test-gw.ocean.icm.edu.pl:18089 --conf spark.eventLog.dir=hdfs://nameservice1/user/spark/spark2ApplicationHistory --conf spark.executorEnv.JAVA_HOME=/srv/java/openjdk-17 --conf spark.yarn.appMasterEnv.JAVA_HOME=/srv/java/openjdk-17 --conf spark.sql.warehouse.dir=/user/hive/warehouse --conf spark.eventLog.compression.codec=lz4 --conf spark.shuffle.mapStatus.compression.codec=lz4 --conf spark.shuffle.useOldFetchProtocol=true --conf spark.eventLog.enabled=true</value>
             <description>spark cluster-wide options</description>
         </property>
         <property>
@@ -117,10 +95,6 @@
             <property>
                 <name>oozie.launcher.mapred.job.queue.name</name>
                 <value>${oozieLauncherQueueName}</value>
-            </property>
-            <property>
-                <name>oozie.action.sharelib.for.spark</name>
-                <value>${oozieActionShareLibForSpark2}</value>
             </property>
         </configuration>
     </global>
@@ -171,6 +145,7 @@
                 ${sparkApplicationOpts}
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--rawRelsPath</arg><arg>${rawRelsInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="wait_entities_and_rels"/>
@@ -190,6 +165,7 @@
                 ${sparkApplicationOpts}
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--rawRelsPath</arg><arg>${rawRelsInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="wait_entities_and_rels"/>
@@ -210,6 +186,7 @@
                 ${sparkApplicationOpts}
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--rawRelsPath</arg><arg>${rawRelsInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="wait_entities_and_rels"/>
@@ -229,6 +206,7 @@
                 ${sparkApplicationOpts}
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--rawRelsPath</arg><arg>${rawRelsInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="wait_entities_and_rels"/>
@@ -248,6 +226,7 @@
                 ${sparkApplicationOpts}
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--rawRelsPath</arg><arg>${rawRelsInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="wait_entities_and_rels"/>
@@ -267,6 +246,7 @@
                 ${sparkApplicationOpts}
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--rawRelsPath</arg><arg>${rawRelsInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="wait_entities_and_rels"/>
@@ -288,6 +268,7 @@
                 ${sparkApplicationOpts}
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--rawRelsPath</arg><arg>${rawRelsInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="join_entities_step1"/>
@@ -307,6 +288,7 @@
                 ${sparkApplicationOpts}
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--rawRelsPath</arg><arg>${rawRelsInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="join_entities_step2"/>
@@ -326,6 +308,7 @@
                 ${sparkApplicationOpts}
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--rawRelsPath</arg><arg>${rawRelsInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="join_entities_step3"/>
@@ -345,6 +328,7 @@
                 ${sparkApplicationOpts}
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--rawRelsPath</arg><arg>${rawRelsInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="join_entities_step4"/>
@@ -364,6 +348,7 @@
                 ${sparkApplicationOpts}
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--rawRelsPath</arg><arg>${rawRelsInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="prepare_groups"/>
@@ -383,6 +368,7 @@
                 ${sparkApplicationOpts}
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--rawRelsPath</arg><arg>${rawRelsInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="generate_events"/>
@@ -408,10 +394,29 @@
 			<arg>--datasourceIdBlacklist</arg><arg>${datasourceIdBlacklist}</arg>
 			<arg>--topicWhitelist</arg><arg>${topicWhitelist}</arg>
         </spark>
-        <ok to="index_event_subset"/>
+        <ok to="generate_event_subset"/>
         <error to="Kill"/>
     </action>
     
+     <action name="generate_event_subset">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>GenerateEventSubsetJob</name>
+            <class>eu.dnetlib.dhp.broker.oa.GenerateEventSubsetJob</class>
+            <jar>dhp-broker-events-${projectVersion}.jar</jar>
+            <spark-opts>
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
+            </spark-opts>
+            <arg>--outputDir</arg><arg>${outputDir}</arg>
+            <arg>--maxEventsForTopic</arg><arg>${maxIndexedEventsForDsAndTopic}</arg>
+        </spark>
+        <ok to="index_event_subset"/>
+        <error to="Kill"/>
+    </action>
+
      <action name="index_event_subset">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
@@ -423,17 +428,10 @@
                 ${sparkClusterOpts}
                 ${sparkResourceOpts}
                 ${sparkApplicationOpts}
-                --conf spark.dynamicAllocation.maxExecutors=${sparkMaxExecutorsForIndexing}
             </spark-opts>
             <arg>--outputDir</arg><arg>${outputDir}</arg>
             <arg>--index</arg><arg>${esEventIndexName}</arg>
             <arg>--esHost</arg><arg>${esIndexHost}</arg>
-            <arg>--esBatchWriteRetryCount</arg><arg>${esBatchWriteRetryCount}</arg>
-            <arg>--esBatchWriteRetryWait</arg><arg>${esBatchWriteRetryWait}</arg>
-            <arg>--esBatchSizeEntries</arg><arg>${esBatchSizeEntries}</arg>
-            <arg>--esNodesWanOnly</arg><arg>${esNodesWanOnly}</arg>
-            <arg>--maxEventsForTopic</arg><arg>${maxIndexedEventsForDsAndTopic}</arg>
-            <arg>--brokerApiBaseUrl</arg><arg>${brokerApiBaseUrl}</arg>
         </spark>
         <ok to="stats"/>
         <error to="Kill"/>
@@ -491,15 +489,10 @@
                 ${sparkClusterOpts}
                 ${sparkResourceOpts}
                 ${sparkApplicationOpts}
-                --conf spark.dynamicAllocation.maxExecutors=${sparkMaxExecutorsForIndexing}
             </spark-opts>
             <arg>--outputDir</arg><arg>${outputDir}</arg>
             <arg>--index</arg><arg>${esNotificationsIndexName}</arg>
             <arg>--esHost</arg><arg>${esIndexHost}</arg>
-            <arg>--esBatchWriteRetryCount</arg><arg>${esBatchWriteRetryCount}</arg>
-            <arg>--esBatchWriteRetryWait</arg><arg>${esBatchWriteRetryWait}</arg>
-            <arg>--esBatchSizeEntries</arg><arg>${esBatchSizeEntries}</arg>
-            <arg>--esNodesWanOnly</arg><arg>${esNodesWanOnly}</arg>
             <arg>--brokerApiBaseUrl</arg><arg>${brokerApiBaseUrl}</arg>
         </spark>
         <ok to="End"/>

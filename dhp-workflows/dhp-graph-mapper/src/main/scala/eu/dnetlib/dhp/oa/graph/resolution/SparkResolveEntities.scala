@@ -38,7 +38,6 @@ object SparkResolveEntities {
         .builder()
         .config(conf)
         .appName(getClass.getSimpleName)
-        .master(parser.get("master"))
         .getOrCreate()
 
     val graphBasePath = parser.get("graphBasePath")

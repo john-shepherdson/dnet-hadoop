@@ -256,7 +256,6 @@ object SparkProduceHostedByMap {
         .builder()
         .config(conf)
         .appName(getClass.getSimpleName)
-        .master(parser.get("master"))
         .getOrCreate()
 
     val datasourcePath = parser.get("datasourcePath")

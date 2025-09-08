@@ -4,7 +4,6 @@ package eu.dnetlib.dhp.actionmanager.partition;
 import static eu.dnetlib.dhp.common.ThrowingSupport.rethrowAsRuntimeException;
 import static org.apache.spark.sql.functions.*;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
-import static scala.collection.JavaConversions.mutableSeqAsJavaList;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -159,8 +158,8 @@ public class PartitionActionSetsByPayloadTypeJobTest {
 						.stream()
 						.map(
 							row -> new AbstractMap.SimpleEntry<>(
-								row.<String> getAs("clazz"),
-								mutableSeqAsJavaList(row.<Seq<String>> getAs("payload_list"))))
+								row.getString(row.fieldIndex("clazz")),
+								row.<String> getList(row.fieldIndex("payload_list"))))
 						.collect(
 							Collectors
 								.toMap(

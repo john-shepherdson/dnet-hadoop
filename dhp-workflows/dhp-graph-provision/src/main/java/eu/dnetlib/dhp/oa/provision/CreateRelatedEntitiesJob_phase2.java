@@ -191,7 +191,7 @@ public class CreateRelatedEntitiesJob_phase2 {
 
 		return spark
 			.read()
-			.load(toSeq(paths))
+			.load(toSeq(paths).toSeq())
 			.as(Encoders.kryo(RelatedEntityWrapper.class))
 			.filter((FilterFunction<RelatedEntityWrapper>) e -> e.getRelation().getSource().startsWith(idPrefix))
 			.map(

@@ -1,89 +1,52 @@
-<workflow-app name="Index Scholexplorer Infospace" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="Index_Scholix_Workflow" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>sourcePath</name>
-            <description>the sourcePath of the json RDDs</description>
+            <description>the path of scholix dump</description>
         </property>
         <property>
             <name>index</name>
             <description>the index name</description>
         </property>
         <property>
-            <name>esCluster</name>
-            <description>the Index cluster</description>
+            <name>indexHost</name>
+            <description>the index Host</description>
+        </property>
+        <property>
+            <name>JAVA_HOME</name>
+            <value>/srv/java/openjdk-17</value>
+            <description>Used to configure the Java home location</description>
         </property>
     </parameters>
 
-    <start to="indexSummary"/>
+    <start to="indexScholixV8"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-    <action name="DropAndCreateIndex">
+    <action name="indexScholixV8">
         <java>
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <main-class>eu.dnetlib.dhp.sx.provision.DropAndCreateESIndex</main-class>
-            <arg>-i</arg><arg>${index}</arg>
-            <arg>-c</arg><arg>${esCluster}</arg>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+                <property>
+                    <name>oozie.action.java.home</name>
+                    <value>${JAVA_HOME}</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.sx.provision.SparkIndexCollectionES8</main-class>
+            <java-opts> -Xmx6g </java-opts>
+            <arg>--namenode</arg><arg>${nameNode}</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
+            <arg>--index</arg><arg>${index}</arg>
+            <arg>--indexHost</arg><arg>${indexHost}</arg>
         </java>
-        <ok to="indexSummary"/>
-        <error to="Kill"/>
-    </action>
-
-
-    <action name="indexSummary">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>Index summary</name>
-            <class>eu.dnetlib.dhp.sx.provision.SparkIndexCollectionOnES</class>
-            <jar>dhp-graph-provision-${projectVersion}.jar</jar>
-            <spark-opts>
-                --executor-memory=${sparkExecutorMemory}
-                --conf spark.dynamicAllocation.maxExecutors="16"
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-            </spark-opts>
-            <arg>--master</arg><arg>yarn</arg>
-            <arg>--sourcePath</arg><arg>/user/sandro.labruzzo/scholix_new/summary_json</arg>
-            <arg>--index</arg><arg>summary</arg>
-            <arg>--idPath</arg><arg>id</arg>
-            <arg>--cluster</arg><arg>cluster1</arg>
-        </spark>
-        <ok to="indexScholix"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="indexScholix">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>Index summary</name>
-            <class>eu.dnetlib.dhp.sx.provision.SparkIndexCollectionOnES</class>
-            <jar>dhp-graph-provision-${projectVersion}.jar</jar>
-            <spark-opts>
-                --executor-memory=${sparkExecutorMemory}
-                --conf spark.dynamicAllocation.maxExecutors="48"
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-            </spark-opts>
-            <arg>--master</arg><arg>yarn</arg>
-            <arg>--sourcePath</arg><arg>/user/sandro.labruzzo/scholix_new/scholix</arg>
-            <arg>--index</arg><arg>scholix</arg>
-            <arg>--idPath</arg><arg>identifier</arg>
-            <arg>--cluster</arg><arg>cluster1</arg>
-        </spark>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
-
     <end name="End"/>
+
 </workflow-app>

@@ -31,8 +31,7 @@ public class SparkIndexCollectionOnES {
 		parser.parseArgument(args);
 
 		SparkConf conf = new SparkConf()
-			.setAppName(SparkIndexCollectionOnES.class.getSimpleName())
-			.setMaster(parser.get("master"));
+			.setAppName(SparkIndexCollectionOnES.class.getSimpleName());
 
 		final String sourcePath = parser.get("sourcePath");
 		final String index = parser.get("index");

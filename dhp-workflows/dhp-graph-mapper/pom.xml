@@ -33,10 +33,10 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <args>
+                    <!-- <args>
                         <arg>-Xmax-classfile-name</arg>
                         <arg>200</arg>
-                    </args>
+                    </args> -->
                     <failOnMultipleScalaVersions>true</failOnMultipleScalaVersions>
                     <scalaCompatVersion>${scala.binary.version}</scalaCompatVersion>
                     <scalaVersion>${scala.version}</scalaVersion>
@@ -129,7 +129,6 @@
             <artifactId>jsonschema-generator</artifactId>
             <scope>test</scope>
         </dependency>
-
 
     </dependencies>
 

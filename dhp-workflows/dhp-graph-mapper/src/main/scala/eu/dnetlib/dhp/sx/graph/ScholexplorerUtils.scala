@@ -345,9 +345,9 @@ object ScholexplorerUtils {
 
     s.setTarget(t)
     val spublishers: Seq[ScholixEntityId] =
-      if (s.getPublisher != null && !s.getPublisher.isEmpty) s.getPublisher.asScala else List()
+      if (s.getPublisher != null && !s.getPublisher.isEmpty) s.getPublisher.asScala.toList else List()
     val tpublishers: Seq[ScholixEntityId] =
-      if (t.getPublisher != null && !t.getPublisher.isEmpty) t.getPublisher.asScala else List()
+      if (t.getPublisher != null && !t.getPublisher.isEmpty) t.getPublisher.asScala.toList else List()
     val mergedPublishers = spublishers.union(tpublishers).distinct.take(10).toList
     s.setPublisher(mergedPublishers.asJava)
     mapper.writeValueAsString(s)

@@ -35,7 +35,6 @@ object SparkConvertObjectToJson {
         .builder()
         .config(conf)
         .appName(getClass.getSimpleName)
-        .master(parser.get("master"))
         .getOrCreate()
 
     val sourcePath = parser.get("sourcePath")
