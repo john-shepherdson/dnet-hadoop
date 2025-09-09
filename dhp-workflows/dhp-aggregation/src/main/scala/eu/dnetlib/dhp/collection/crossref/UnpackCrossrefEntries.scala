@@ -43,7 +43,6 @@ object UnpackCrossrefEntries {
         .mkString
     )
     parser.parseArgument(args)
-    val master = parser.get("master")
     val sourcePath = parser.get("sourcePath")
     val targetPath = parser.get("targetPath")
 
@@ -51,7 +50,6 @@ object UnpackCrossrefEntries {
       .builder()
       .config(conf)
       .appName(UnpackCrossrefEntries.getClass.getSimpleName)
-      .master(master)
       .getOrCreate()
     val sc: SparkContext = spark.sparkContext
 

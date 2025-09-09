@@ -181,7 +181,6 @@ object SparkCreateBaselineDataFrame {
         .builder()
         .config(conf)
         .appName(SparkEBILinksToOaf.getClass.getSimpleName)
-        .master(parser.get("master"))
         .getOrCreate()
 
     val sc = spark.sparkContext

@@ -16,6 +16,6 @@
     "paramName": "m",
     "paramLongName": "master",
     "paramDescription": "the master name",
-    "paramRequired": true
+    "paramRequired": false
   }
 ]

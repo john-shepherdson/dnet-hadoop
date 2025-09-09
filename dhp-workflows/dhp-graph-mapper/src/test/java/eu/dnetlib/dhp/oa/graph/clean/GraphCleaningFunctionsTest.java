@@ -316,6 +316,37 @@ public class GraphCleaningFunctionsTest {
 		assertEquals("Best publisher in the world", p_cleaned.getPublisher().getValue());
 	}
 
+    @Test
+    void testCleaning_person() throws Exception {
+
+        assertNotNull(vocabularies);
+        assertNotNull(mapping);
+
+        String json = IOUtils
+                .toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/graph/person/person.json"));
+        Person p_in = MAPPER.readValue(json, Person.class);
+
+        assertTrue(p_in instanceof Person);
+
+        Person p_out = OafCleaner.apply(GraphCleaningFunctions.fixVocabularyNames(p_in), mapping);
+
+        assertNotNull(p_out);
+
+        Optional<StructuredProperty> pid = p_out.getPid()
+                .stream()
+                .filter(p -> p.getQualifier() != null && ModelConstants.ORCID.equals(p.getQualifier().getClassid()))
+                .findFirst();
+        assertTrue(pid.isPresent());
+
+        Person p_cleaned = GraphCleaningFunctions.cleanup(p_out, vocabularies);
+
+        pid = p_cleaned.getPid()
+                .stream()
+                .filter(p -> p.getQualifier() != null && ModelConstants.ORCID.equals(p.getQualifier().getClassid()))
+                .findFirst();
+        assertTrue(pid.isPresent());
+    }
+
 	private static void verify_keyword(Publication p_cleaned, String subject) {
 		Optional<Subject> s1 = p_cleaned
 			.getSubject()
