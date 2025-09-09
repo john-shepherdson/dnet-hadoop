@@ -15,7 +15,8 @@ public class Constraint implements Serializable {
 	private String field;
 	private Object value;
 	private String jsonpath;
-//	private String element;
+
+
 	@JsonIgnore
 	private Selection selection;
 
@@ -67,7 +68,11 @@ public class Constraint implements Serializable {
 	}
 
 	public boolean verifyCriteria(Object metadata) {
-		return selection.apply(metadata);
+		try {
+			return selection.apply(metadata);
+		}catch (Exception e){
+			return false;
+		}
 	}
 
 }

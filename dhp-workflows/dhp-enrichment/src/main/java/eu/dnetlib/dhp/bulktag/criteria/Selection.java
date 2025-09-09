@@ -1,9 +1,10 @@
 
 package eu.dnetlib.dhp.bulktag.criteria;
 
+import java.io.IOException;
 import java.io.Serializable;
 
 public interface Selection extends Serializable {
 
-	boolean apply(Object value);
+	boolean apply(Object value) throws IOException;
 }

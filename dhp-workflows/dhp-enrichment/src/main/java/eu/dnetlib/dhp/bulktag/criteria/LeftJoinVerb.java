@@ -1,22 +1,28 @@
 
 package eu.dnetlib.dhp.bulktag.criteria;
 
-import java.io.Serializable;
-import java.util.List;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ReadContext;
 
-//Verifica che almeno un valore in una lista sia uguale al valore dato oppure che esista un valore indipendentemente da un valore dato
-//per esempio esiste una data
-@VerbClass("exist")
-public class ExistVerb implements Selection, JsonPathAware, Serializable {
+import java.io.Serializable;
+import java.util.List;
+
+//applica una left join
+//serve una estensione con spark per l'esecuzione della join
+@VerbClass("left_join")
+public class LeftJoinVerb implements Selection, JoinPathAware, JsonPathAware, Serializable {
+	private String leftEntity;
+	private String rightEntity;
+	private String joinEntity;
+	private String semantics;
 	private String jsonPath;
 	private Object params ;
+	private String referenceGraph;
 
-	public ExistVerb() {
+	public LeftJoinVerb() {
 	}
 
-	public ExistVerb(final Object param) {
+	public LeftJoinVerb(final Object param) {
 		this.params = param;
 	}
 
@@ -88,6 +94,20 @@ public class ExistVerb implements Selection, JsonPathAware, Serializable {
 
 	public void setParam(Object param) {
 		this.params = param;
+	}
+
+	@Override
+	public void setReferenceGraph(String referenceGraph) {
+		this.referenceGraph = referenceGraph;
+	}
+
+	@Override
+	public void setJoinEntities(String leftEntity, String rightEntity, String joinEntity, String semantics) {
+		this.leftEntity = leftEntity;
+		this.rightEntity = rightEntity;
+		this.joinEntity = joinEntity;
+		this.semantics = semantics;
+
 	}
 
 	@Override
