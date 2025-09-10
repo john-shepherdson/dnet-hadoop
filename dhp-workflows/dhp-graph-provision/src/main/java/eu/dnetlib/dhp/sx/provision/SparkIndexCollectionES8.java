@@ -82,7 +82,7 @@ public class SparkIndexCollectionES8 {
         }
 
         try (ESFeeder feeder = new ESFeeder(indexHost)) {
-            Function<String, BulkOperation> converter = index.equalsIgnoreCase("summary")
+            Function<String, BulkOperation> converter = index.contains("summary")
                     ? new ConvertScholixResourceToES(index)
                     : new ConvertJSONWithId("\"identifier\":\"((\\d|\\w)*)\"", index);
             feeder.parallelBulkIndex(files, threadCount, fileSystem, converter);
