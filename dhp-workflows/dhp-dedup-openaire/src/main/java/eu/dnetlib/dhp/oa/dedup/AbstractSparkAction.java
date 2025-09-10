@@ -4,12 +4,10 @@ package eu.dnetlib.dhp.oa.dedup;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import com.clearspring.analytics.util.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
@@ -40,6 +38,15 @@ abstract class AbstractSparkAction implements Serializable {
 
 	protected static final String TYPE_VALUE_SEPARATOR = "###";
 	protected static final String SP_SEPARATOR = "@@@";
+
+	protected static final List<String> BROKER_REL_CLASSES = Arrays.asList(
+			ModelConstants.IS_PRODUCED_BY,
+			ModelConstants.PRODUCES,
+			ModelConstants.IS_REFERENCED_BY,
+			ModelConstants.REFERENCES,
+			ModelConstants.IS_RELATED_TO,
+			ModelConstants.IS_SUPPLEMENT_TO,
+			ModelConstants.IS_SUPPLEMENTED_BY);
 
 	protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
 		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -146,6 +153,11 @@ abstract class AbstractSparkAction implements Serializable {
 
 	protected boolean isOpenorgsDedupRel(Relation rel) {
 		return isOpenorgs(rel) && isOpenOrgsDedupMergeRelation(rel);
+	}
+
+	protected boolean isNeededByBrokerRel(Relation rel) {
+		return
+				BROKER_REL_CLASSES.contains(rel.getRelClass());
 	}
 
 	private boolean isCollectedFromOpenOrgs(List<KeyValue> c) {

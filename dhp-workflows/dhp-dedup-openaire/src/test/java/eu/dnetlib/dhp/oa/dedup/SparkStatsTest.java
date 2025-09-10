@@ -55,6 +55,7 @@ public class SparkStatsTest implements Serializable {
 
 		final SparkConf conf = new SparkConf();
 		conf.set("spark.sql.shuffle.partitions", "200");
+		conf.set("spark.driver.host", "127.0.0.1");
 		spark = SparkSession
 			.builder()
 			.appName(SparkDedupTest.class.getSimpleName())
@@ -149,7 +150,7 @@ public class SparkStatsTest implements Serializable {
 			.count();
 
 		long pubs_blocks = spark
-			.read()
+				.read()
 			.load(testOutputBasePath + "/" + testActionSetId + "/publication_blockstats")
 			.count();
 
@@ -167,6 +168,8 @@ public class SparkStatsTest implements Serializable {
 			.read()
 			.load(testOutputBasePath + "/" + testActionSetId + "/otherresearchproduct_blockstats")
 			.count();
+
+
 
 		assertEquals(406, orgs_blocks);
 		assertEquals(221, pubs_blocks);

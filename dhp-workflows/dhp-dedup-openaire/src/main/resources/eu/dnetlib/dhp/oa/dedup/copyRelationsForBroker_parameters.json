@@ -1,0 +1,26 @@
+[
+  {
+    "paramName": "i",
+    "paramLongName": "graphBasePath",
+    "paramDescription": "the base path of the raw graph",
+    "paramRequired": true
+  },
+  {
+    "paramName": "w",
+    "paramLongName": "workingPath",
+    "paramDescription": "path of the working directory",
+    "paramRequired": true
+  },
+  {
+    "paramName": "o",
+    "paramLongName": "relationsOutputPath",
+    "paramDescription": "path of the output directory for the copied relations",
+    "paramRequired": true
+  },
+  {
+    "paramName": "np",
+    "paramLongName": "numPartitions",
+    "paramDescription": "number of partitions for the similarity relations intermediate phases",
+    "paramRequired": false
+  }
+]

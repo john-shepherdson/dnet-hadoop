@@ -1,4 +1,4 @@
 [
-  {"paramName":"mt",  "paramLongName":"master",             "paramDescription": "should be local or yarn",                                  "paramRequired": true},
+  {"paramName":"mt",  "paramLongName":"master",             "paramDescription": "should be local or yarn",                                  "paramRequired": false},
   {"paramName":"w",   "paramLongName":"workingPath",         "paramDescription": "the path of the sequencial file to read",                  "paramRequired": true}
 ]

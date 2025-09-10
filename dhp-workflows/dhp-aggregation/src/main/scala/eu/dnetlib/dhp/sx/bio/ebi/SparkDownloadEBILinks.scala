@@ -78,7 +78,6 @@ object SparkDownloadEBILinks {
         .builder()
         .config(conf)
         .appName(SparkEBILinksToOaf.getClass.getSimpleName)
-        .master(parser.get("master"))
         .getOrCreate()
 
     import spark.implicits._

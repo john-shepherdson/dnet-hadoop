@@ -30,11 +30,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.broker.model.ConditionParams;
 import eu.dnetlib.dhp.broker.model.Event;
-import eu.dnetlib.dhp.broker.model.MappedFields;
-import eu.dnetlib.dhp.broker.model.Notification;
+import eu.dnetlib.dhp.broker.model.OaMappedFields;
+import eu.dnetlib.dhp.broker.model.OaNotification;
 import eu.dnetlib.dhp.broker.model.Subscription;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
-import eu.dnetlib.dhp.broker.oa.util.NotificationGroup;
+import eu.dnetlib.dhp.broker.oa.util.OaNotificationGroup;
 import eu.dnetlib.dhp.broker.oa.util.SubscriptionUtils;
 
 public class GenerateNotificationsJob {
@@ -44,10 +44,9 @@ public class GenerateNotificationsJob {
 	public static void main(final String[] args) throws Exception {
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
-			IOUtils
-				.toString(
-					GenerateNotificationsJob.class
-						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/generate_notifications.json")));
+				IOUtils
+						.toString(GenerateNotificationsJob.class
+								.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/generate_notifications.json")));
 		parser.parseArgument(args);
 
 		final SparkConf conf = new SparkConf();
@@ -76,44 +75,40 @@ public class GenerateNotificationsJob {
 
 			log.info("ConditionsMap: " + new ObjectMapper().writeValueAsString(conditionsMap));
 
-			final Encoder<NotificationGroup> ngEncoder = Encoders.bean(NotificationGroup.class);
-			final Encoder<Notification> nEncoder = Encoders.bean(Notification.class);
-			final Dataset<Notification> notifications = ClusterUtils
-				.readPath(spark, eventsPath, Event.class)
-				.map(
-					(MapFunction<Event, NotificationGroup>) e -> generateNotifications(
-						e, subscriptions, conditionsMap, startTime),
-					ngEncoder)
-				.flatMap((FlatMapFunction<NotificationGroup, Notification>) g -> g.getData().iterator(), nEncoder);
+			final Encoder<OaNotificationGroup> ngEncoder = Encoders.bean(OaNotificationGroup.class);
+			final Encoder<OaNotification> nEncoder = Encoders.bean(OaNotification.class);
+			final Dataset<OaNotification> notifications = ClusterUtils
+					.readPath(spark, eventsPath, Event.class)
+					.map((MapFunction<Event, OaNotificationGroup>) e -> generateNotifications(e, subscriptions, conditionsMap, startTime), ngEncoder)
+					.flatMap((FlatMapFunction<OaNotificationGroup, OaNotification>) g -> g.getData().iterator(), nEncoder);
 
-			ClusterUtils.save(notifications, notificationsPath, Notification.class, total);
+			ClusterUtils.save(notifications, notificationsPath, OaNotification.class, total);
 		}
 	}
 
 	protected static Map<String, Map<String, List<ConditionParams>>> prepareConditionsMap(
-		final List<Subscription> subscriptions) {
+			final List<Subscription> subscriptions) {
 		final Map<String, Map<String, List<ConditionParams>>> map = new HashMap<>();
 		subscriptions.forEach(s -> map.put(s.getSubscriptionId(), s.conditionsAsMap()));
 		return map;
 	}
 
-	protected static NotificationGroup generateNotifications(final Event e,
-		final List<Subscription> subscriptions,
-		final Map<String, Map<String, List<ConditionParams>>> conditionsMap,
-		final long date) {
-		final List<Notification> list = subscriptions
-			.stream()
-			.filter(
-				s -> StringUtils.isBlank(s.getTopic()) || s.getTopic().equals("*") || s.getTopic().equals(e.getTopic()))
-			.filter(s -> verifyConditions(e.getMap(), conditionsMap.get(s.getSubscriptionId())))
-			.map(s -> generateNotification(s, e, date))
-			.collect(Collectors.toList());
+	protected static OaNotificationGroup generateNotifications(final Event e,
+			final List<Subscription> subscriptions,
+			final Map<String, Map<String, List<ConditionParams>>> conditionsMap,
+			final long date) {
+		final List<OaNotification> list = subscriptions
+				.stream()
+				.filter(s -> StringUtils.isBlank(s.getTopic()) || "*".equals(s.getTopic()) || s.getTopic().equals(e.getTopic()))
+				.filter(s -> verifyConditions(e.getMap(), conditionsMap.get(s.getSubscriptionId())))
+				.map(s -> generateNotification(s, e, date))
+				.collect(Collectors.toList());
 
-		return new NotificationGroup(list);
+		return new OaNotificationGroup(list);
 	}
 
-	private static Notification generateNotification(final Subscription s, final Event e, final long date) {
-		final Notification n = new Notification();
+	private static OaNotification generateNotification(final Subscription s, final Event e, final long date) {
+		final OaNotification n = new OaNotification();
 		n.setNotificationId("ntf-" + DigestUtils.md5Hex(s.getSubscriptionId() + "@@@" + e.getEventId()));
 		n.setSubscriptionId(s.getSubscriptionId());
 		n.setEventId(e.getEventId());
@@ -125,52 +120,43 @@ public class GenerateNotificationsJob {
 		return n;
 	}
 
-	private static boolean verifyConditions(final MappedFields map,
-		final Map<String, List<ConditionParams>> conditions) {
-		if (conditions.containsKey("targetDatasourceName")
-			&& !SubscriptionUtils
-				.verifyExact(map.getTargetDatasourceName(), conditions.get("targetDatasourceName").get(0).getValue())) {
+	private static boolean verifyConditions(final OaMappedFields map,
+			final Map<String, List<ConditionParams>> conditions) {
+		if ((conditions.containsKey("targetDatasourceName")
+				&& !SubscriptionUtils
+						.verifyExact(map.getTargetDatasourceName(), conditions.get("targetDatasourceName").get(0).getValue()))
+				|| (conditions.containsKey("trust")
+						&& !SubscriptionUtils
+								.verifyFloatRange(map.getTrust(), conditions.get("trust").get(0).getValue(), conditions.get("trust").get(0).getOtherValue()))) {
 			return false;
 		}
 
-		if (conditions.containsKey("trust")
-			&& !SubscriptionUtils
-				.verifyFloatRange(
-					map.getTrust(), conditions.get("trust").get(0).getValue(),
-					conditions.get("trust").get(0).getOtherValue())) {
-			return false;
-		}
-
-		if (conditions.containsKey("targetDateofacceptance") && !conditions
-			.get("targetDateofacceptance")
-			.stream()
-			.anyMatch(
-				c -> SubscriptionUtils
-					.verifyDateRange(map.getTargetDateofacceptance(), c.getValue(), c.getOtherValue()))) {
-			return false;
-		}
-
-		if (conditions.containsKey("targetResultTitle")
-			&& !conditions
-				.get("targetResultTitle")
+		if ((conditions.containsKey("targetDateofacceptance") && !conditions
+				.get("targetDateofacceptance")
 				.stream()
-				.anyMatch(c -> SubscriptionUtils.verifySimilar(map.getTargetResultTitle(), c.getValue()))) {
+				.anyMatch(c -> SubscriptionUtils
+						.verifyDateRange(map.getTargetDateofacceptance(), c.getValue(), c.getOtherValue())))
+				|| (conditions.containsKey("targetResultTitle")
+						&& !conditions
+								.get("targetResultTitle")
+								.stream()
+								.anyMatch(c -> SubscriptionUtils.verifySimilar(map.getTargetResultTitle(), c.getValue())))) {
 			return false;
 		}
 
 		if (conditions.containsKey("targetAuthors")
-			&& !conditions
-				.get("targetAuthors")
-				.stream()
-				.allMatch(c -> SubscriptionUtils.verifyListSimilar(map.getTargetAuthors(), c.getValue()))) {
+				&& !conditions
+						.get("targetAuthors")
+						.stream()
+						.allMatch(c -> SubscriptionUtils.verifyListSimilar(map.getTargetAuthors(), c.getValue()))) {
 			return false;
 		}
 
 		return !conditions.containsKey("targetSubjects")
-			|| conditions
-				.get("targetSubjects")
-				.stream()
-				.allMatch(c -> SubscriptionUtils.verifyListExact(map.getTargetSubjects(), c.getValue()));
+				|| conditions
+						.get("targetSubjects")
+						.stream()
+						.allMatch(c -> SubscriptionUtils.verifyListExact(map.getTargetSubjects(), c.getValue()));
 
 	}
 
@@ -184,7 +170,7 @@ public class GenerateNotificationsJob {
 			try (final CloseableHttpResponse response = client.execute(req)) {
 				final String s = IOUtils.toString(response.getEntity().getContent());
 				return mapper
-					.readValue(s, mapper.getTypeFactory().constructCollectionType(List.class, Subscription.class));
+						.readValue(s, mapper.getTypeFactory().constructCollectionType(List.class, Subscription.class));
 			}
 		}
 	}
