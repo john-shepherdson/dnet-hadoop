@@ -39,7 +39,7 @@ class SparkCreateScholexplorerDump(propertyPath: String, args: Array[String], lo
       "Obsoletes",
       "Describes",
       "Requires",
-      "IsMetadataOf",
+      "IsMetadataOf"
   )
 
   /** Here all the spark applications runs this method
@@ -53,8 +53,25 @@ class SparkCreateScholexplorerDump(propertyPath: String, args: Array[String], lo
     generateBidirectionalRelations(sourcePath, targetPath, spark)
     generateScholixResource(sourcePath, targetPath, spark)
     generateFlatScholix(targetPath, spark)
+    generateSummary(targetPath, spark)
   }
 
+  def generateSummary(outputPath: String, spark: SparkSession): Unit = {
+    import spark.implicits._
+    implicit val scholixEncoder: Encoder[ScholixFlat] = Encoders.bean(classOf[ScholixFlat])
+
+    val scholix = spark.read.schema(scholixEncoder.schema).json(s"$outputPath/scholix")
+
+    val sid = scholix.selectExpr("sourceId as id").distinct()
+    val tid = scholix.selectExpr("targetId as id").distinct()
+    val ids = sid.union(tid).distinct()
+    val resource = spark.read.load(s"$outputPath/resource")
+    resource.join(ids, resource("dnetIdentifier") === ids("id"), "leftsemi")
+      .write
+      .option("compression", "gzip")
+      .mode(SaveMode.Overwrite)
+      .json(s"$outputPath/summary_json")
+  }
   def generateScholixResource(inputPath: String, outputPath: String, spark: SparkSession): Unit = {
     val entityMap: Map[String, StructType] = Map(
       "publication"          -> Encoders.bean(classOf[Publication]).schema,
