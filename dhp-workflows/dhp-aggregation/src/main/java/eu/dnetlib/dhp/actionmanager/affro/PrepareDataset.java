@@ -25,6 +25,7 @@ import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.ForeachFunction;
 import org.apache.spark.sql.*;
+import org.apache.spark.sql.catalyst.encoders.AgnosticEncoders;
 import org.apache.spark.sql.catalyst.encoders.RowEncoder;
 import org.apache.spark.sql.types.DataTypes;
 import org.slf4j.Logger;
@@ -70,6 +71,12 @@ public class PrepareDataset implements Serializable {
         final String publishersPath = parser.get("publishersPath");
         log.info("publishersPath: {}", publishersPath);
 
+        final String datacitePath = parser.get("datacipePath");
+        log.info("datacitePath: {}", datacitePath);
+
+        final String crossrefPath = parser.get("crossrefPath");
+        log.info("crossrefPath: {}", crossrefPath);
+
         final String iisPath = parser.get("iisPath");
         log.info("iisPath: {}", iisPath);
 
@@ -79,7 +86,9 @@ public class PrepareDataset implements Serializable {
         final String workingDir = parser.get("outputPath");
         log.info("workingDir: {}", workingDir);
 
-
+        final Boolean importIIS = Optional.ofNullable(parser.get("importiis"))
+                .map(Boolean::valueOf)
+                .orElse(Boolean.FALSE);
 
         final Boolean startFromScratch = Optional
                 .ofNullable(parser.get("applyOnAll"))
@@ -99,14 +108,16 @@ public class PrepareDataset implements Serializable {
                 spark -> {
                     Constants.removeOutputDir(spark, workingDir );
                     prepareDataset(
-                            spark, oalexPath, oairePath, iisPath, publishersPath, workingDir, oldMatches,
-                            startFromScratch);
+                            spark, oalexPath, oairePath, iisPath, publishersPath,
+                            datacitePath, crossrefPath, workingDir, oldMatches,
+                            startFromScratch, importIIS);
                 });
     }
 
     private static void prepareDataset(SparkSession spark, String oalexPath, String oairePath, String iisPath,
-                                       String publishersPath, String workingDir, String oldMatches,
-                                       Boolean startFromScratch) {
+                                       String publishersPath, String datacitePath, String crossrefPath,
+                                       String workingDir, String oldMatches,
+                                       Boolean startFromScratch, Boolean importIIS) {
         // start with oalex. read from the snapshot in the schema needed for this task
         // Function to compute MD5 hash with prefix
         spark
@@ -122,6 +133,43 @@ public class PrepareDataset implements Serializable {
                 .udf()
                 .register(
                         "selectId", (String doi, String id) -> StringUtils.isNotEmpty(id) ? id : "50|doi_________::" + DHPUtils.md5(StringUtils.substringAfter(doi,"doi.org/")), DataTypes.StringType);
+
+        spark
+                .udf()
+                .register(
+                        "concat", (String firstName, String familyName) -> familyName + ", " + firstName , DataTypes.StringType);
+
+
+        Dataset<Row> datacite = spark.read().option("mode", "PERMISSIVE")
+                .parquet(datacitePath)
+                .withColumn("json_parsed", from_json(col("json"), DATACITE_INPUT_SCHEMA))
+                .select(
+                        col("json_parsed.attributes.doi").alias("doi"),
+                        explode(col("json_parsed.attributes.creators")).alias("author")
+                )
+                .filter(col("doi").isNotNull())
+                .withColumn("fullname", col("author.name"))
+                .select(col("doi"), col("fullname"), explode(col("author.affiliation")).alias("raw_affiliation_string"))
+                .filter("raw_affiliation_string IS NOT NULL AND TRIM(raw_affiliation_string) != '' AND LOWER(raw_affiliation_string) NOT IN ('unknown', 'none')")
+                .withColumn("corresponding", lit(null))
+                .withColumn("contributor_roles", lit(null))
+                .withColumn("id",  expr("md5HashWithPrefix(doi)"))
+                .select(col("id"), col("fullname"), col("raw_affiliation_string"), col("corresponding"), col("contributor_roles"))
+                .as(RowEncoder.apply(DATASET_SCHEMA));
+        datacite.write().mode(SaveMode.Overwrite).option("compression","gzip").json(workingDir + "exploded/datacite");
+
+
+        Dataset<Row> crossref = spark.read().schema(CROSSREF_INPUT_SCHEMA).json(crossrefPath)
+                .withColumn("id", expr("md5HashWithPrefix(DOI)"))
+                .select(col("id"), explode(col("author").alias("author")))
+                .withColumn("raw_affiliation_string", explode(col("author.affiliation")))
+                .withColumn("fullname", expr("concat(author.given, author.family)"))
+                .withColumn("corresponding", lit(null))
+                .withColumn("contributor_roles", lit(null))
+                .select(col("id"), col("fullname"), col("raw_affiliation_string"), col("corresponding"), col("contributor_roles"))
+                .as(RowEncoder.apply(DATASET_SCHEMA));
+        crossref.write().mode(SaveMode.Overwrite).option("compression","gzip").json(workingDir + "exploded/crossref");
+
 
         //the output model for all the datasets will be:
         //id : the openaire identifier for the resource
@@ -165,28 +213,28 @@ public class PrepareDataset implements Serializable {
                     .withColumn("contributor_roles", lit(null))
                     .select(col("id"), col("fullname"), col("raw_affiliation_string"), col("corresponding"), col("contributor_roles"));
         oaire.write().mode(SaveMode.Overwrite).option("compression","gzip").json(workingDir + "exploded/oaire");
-
-        Dataset<Row> iis =
-                spark.sql(IIS_QUERY)
+if(importIIS) {
+    Dataset<Row> iis =
+            spark.sql(IIS_QUERY)
 //        spark.read().schema(Encoders.bean(IISModel.class).schema())
 //                .json(iisPath)
-                .as(Encoders.bean(IISModel.class))
-                  .filter((FilterFunction<IISModel>) value -> Optional.ofNullable(value.getAuthors()).isPresent() &&
-                  !value.getAuthors().isEmpty() &&
-                          Optional.ofNullable(value.getAffiliations()).isPresent() &&
-                          !value.getAffiliations().isEmpty())
+                    .as(Encoders.bean(IISModel.class))
+                    .filter((FilterFunction<IISModel>) value -> Optional.ofNullable(value.getAuthors()).isPresent() &&
+                            !value.getAuthors().isEmpty() &&
+                            Optional.ofNullable(value.getAffiliations()).isPresent() &&
+                            !value.getAffiliations().isEmpty())
 
-                .flatMap((FlatMapFunction<IISModel, Row>) value -> {
-                    List<Row> ret = new ArrayList<>();
-                    value.getAuthors().stream().forEach(author -> ret.addAll(
-                            getAuthorLines(value.getId(), author, value.getAffiliations())));
-                    return ret.iterator();
-                    }
-                , RowEncoder.apply(DATASET_SCHEMA))
-                        .filter("raw_affiliation_string IS NOT NULL AND TRIM(raw_affiliation_string) != '' AND LOWER(raw_affiliation_string) NOT IN ('unknown', 'none')")
-                .select(col("id"), col("fullname"), col("raw_affiliation_string"), col("corresponding"), col("contributor_roles"));
-        iis.write().mode(SaveMode.Overwrite).option("compression","gzip").json(workingDir + "exploded/iis");
-
+                    .flatMap((FlatMapFunction<IISModel, Row>) value -> {
+                                List<Row> ret = new ArrayList<>();
+                                value.getAuthors().stream().forEach(author -> ret.addAll(
+                                        getAuthorLines(value.getId(), author, value.getAffiliations())));
+                                return ret.iterator();
+                            }
+                            , RowEncoder.apply(DATASET_SCHEMA))
+                    .filter("raw_affiliation_string IS NOT NULL AND TRIM(raw_affiliation_string) != '' AND LOWER(raw_affiliation_string) NOT IN ('unknown', 'none')")
+                    .select(col("id"), col("fullname"), col("raw_affiliation_string"), col("corresponding"), col("contributor_roles"));
+    iis.write().mode(SaveMode.Overwrite).option("compression", "gzip").json(workingDir + "exploded/iis");
+}
         Dataset<Row> publishers = spark.read().schema(PUBLISHER_SCHEMA).json(publishersPath)
                 .filter( col("success").equalTo(true))
                 .withColumn("authors", col("parsing_output.authors"))
@@ -208,7 +256,7 @@ public class PrepareDataset implements Serializable {
                 .select("id","fullname","raw_affiliation_string","corresponding","contributor_roles");
         publishers.write().mode(SaveMode.Overwrite).option("compression","gzip").json(workingDir + "exploded/publishers");
 
-        Dataset<Row> inputDataset = oalex.union(oaire).union(publishers).union(iis)
+        Dataset<Row> inputDataset = oalex.union(oaire).union(publishers)//.union(iis)
                 .distinct()
                 ;
 

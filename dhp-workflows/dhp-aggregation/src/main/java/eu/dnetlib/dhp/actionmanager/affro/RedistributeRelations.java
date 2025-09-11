@@ -1,12 +1,10 @@
 package eu.dnetlib.dhp.actionmanager.affro;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.dhp.actionmanager.Constants;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SaveMode;
@@ -84,20 +82,28 @@ public class RedistributeRelations implements Serializable {
                 new AggregateResultUDF(),
                 RESULT_MATCHED_SCHEMA
         );
-        String [] entities = {"iis","oalex","oaire","publishers"};
+
+        spark.udf().register(
+                "aggregateResultNoAuthor",
+                new AggregateResultNoAuthorUDF(),
+                RESULT_MATCHED_SCHEMA
+        );
+
+        String [] entities = {//"iis",
+                 "oalex","oaire","publishers"};
         for (String datasource : entities)
-            redistributeFroDatasource(spark, explodedPath + datasource, matchingsPath, outputPath + datasource);
+            redistributeForDatasource(spark, explodedPath , matchingsPath, outputPath, datasource);
 
 
     }
 
-    private static void redistributeFroDatasource(SparkSession spark, String explodedPath, String matchingsPath, String outputPath) {
+    private static void redistributeForDatasource(SparkSession spark, String explodedPath, String matchingsPath, String outputPath, String datasource) {
         Dataset<Row> exploded = spark.read().schema(eu.dnetlib.dhp.actionmanager.affro.Constants.DATASET_SCHEMA)
-                .json(explodedPath);
+                .json(explodedPath + datasource);
 
 
         Dataset<Row> matchings = spark.read().schema(eu.dnetlib.dhp.actionmanager.affro.Constants.AFFILIATION_SCHEMA)
-                .json(matchingsPath);
+                .json(matchingsPath + datasource);
 
         int numSalts = 100;
 
@@ -135,14 +141,27 @@ public class RedistributeRelations implements Serializable {
                 .agg(collect_list(struct(joined.col("*"))).alias("group"))
                 .withColumn("aggAuthor", expr("aggregateAuthor(group)"))
                 .select("aggAuthor.*");
+        if(!datasource.equals("oaire") ) {
 
-        Dataset<Row> resultDf = groupedDf
-                .groupBy("id")
-                .agg(collect_list(struct(groupedDf.col("*"))).alias("group"))
-                .withColumn("result", expr("aggregateResult(group)"))
-                .select("result.*");
 
-        resultDf.write().mode(SaveMode.Overwrite).option("compression","gzip").json(outputPath);
+            Dataset<Row> resultDf = groupedDf
+                    .groupBy("id")
+                    .agg(collect_list(struct(groupedDf.col("*"))).alias("group"))
+                    .withColumn("result", expr("aggregateResult(group)"))
+                    .select("result.*");
+
+            resultDf.write().mode(SaveMode.Overwrite).option("compression","gzip").json(outputPath);
+        }
+        else {
+            Dataset<Row> resultDf = groupedDf
+                    .groupBy("id")
+                    .agg(collect_list(struct(joined.col("*"))).alias("group"))
+                    .withColumn("result", expr("aggregateResultNoAuthor(group)"))
+                    .select("result.*");
+
+            resultDf.write().mode(SaveMode.Overwrite).option("compression","gzip").json(outputPath);
+        }
+
     }
 
 

@@ -56,7 +56,7 @@
         </configuration>
     </global>
 
-    <start to="atomicactions"/>
+    <start to="run-affro"/>
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
@@ -155,7 +155,7 @@
 <!--            <arg>&#45;&#45;outputPath</arg><arg>${datasetPath}</arg>-->
 
         </spark>
-        <ok to="atomicactions"/>
+        <ok to="End"/>
         <error to="Kill"/>
     </action>
     <action name="atomicactions">

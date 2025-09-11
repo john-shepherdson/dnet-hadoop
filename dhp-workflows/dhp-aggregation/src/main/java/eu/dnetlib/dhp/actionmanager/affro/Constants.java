@@ -99,20 +99,21 @@ public class Constants implements Serializable {
            ;
 
     public final static StructType MATCHING_SCHEMA = new StructType()
-            .add("Provenance", StringType)
-            .add("PID", StringType)
-            .add("Value", StringType)
-            .add("Confidence", DataTypes.DoubleType)
-            .add("Status", StringType)
-            .add("Country", StringType)
+            .add("provenance", StringType)
+            .add("pid", StringType)
+            .add("value", StringType)
+            .add("confidence", DataTypes.DoubleType)
+            .add("status", StringType)
+            .add("country", StringType)
+            .add("name", StringType)
             ;
 
 
     public final static ArrayType MATCHING_ARRAY_SCHEMA =  DataTypes.createArrayType(MATCHING_SCHEMA);
 
     public final static StructType AFFILIATION_SCHEMA = new StructType()
-            .add("Affiliation", StringType)
-            .add("Matchings", MATCHING_ARRAY_SCHEMA)
+            .add("affiliation", StringType)
+            .add("matchings", MATCHING_ARRAY_SCHEMA)
             ;
 
 //    public final static StructType JOINED_SCHEMA = new StructType()
@@ -133,7 +134,7 @@ public class Constants implements Serializable {
             .add("affiliations", DataTypes.createArrayType(
                     new StructType()
                             .add("raw_affiliation_string", StringType)
-                            .add("Matchings", MATCHING_ARRAY_SCHEMA)
+                            .add("matchings", MATCHING_ARRAY_SCHEMA)
             ))
             .add("corresponding", DataTypes.BooleanType)
             .add("contributor_roles", DataTypes.createArrayType(new StructType()
@@ -160,6 +161,31 @@ public class Constants implements Serializable {
                     ))
             .add("organizations",MATCHING_ARRAY_SCHEMA);
 
+    public final static StructType DATACITE_CREATOR_SCHEMA = new StructType()
+            .add("name", StringType, true)
+            .add("givenName", StringType, true)
+            .add("familyName", StringType, true)
+            .add("nameType", StringType, true)
+            .add("affiliation", DataTypes.createArrayType(StringType), true)
+            .add("nameIdentifiers", DataTypes.createArrayType(StringType), true)
+            ;
 
+    public final static StructType DATACITE_ATTRIBUTES_SCHEMA = new StructType()
+            .add("doi", StringType)
+            .add("creators", DATACITE_CREATOR_SCHEMA)
+            ;
+    public final static StructType DATACITE_INPUT_SCHEMA = new StructType()
+            .add("doi", StringType)
+            .add("attributes", DATACITE_ATTRIBUTES_SCHEMA);
+
+
+    public static StructType CROSSREF_AUTHOR_SCHEMA = new StructType()
+            .add("given", StringType)
+            .add("family", StringType)
+            .add("affiliation", DataTypes.createArrayType(StringType));
+
+    public static final StructType CROSSREF_INPUT_SCHEMA = new StructType()
+            .add("DOI", StringType)
+            .add("author", DataTypes.createArrayType(CROSSREF_AUTHOR_SCHEMA));
 
 }

@@ -3,8 +3,6 @@ package eu.dnetlib.dhp.actionmanager.affro;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.RowFactory;
 import org.apache.spark.sql.api.java.UDF1;
-import org.apache.spark.sql.types.DataTypes;
-import org.apache.spark.sql.types.StructType;
 import scala.collection.mutable.WrappedArray;
 
 import java.util.ArrayList;
@@ -12,9 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.apache.spark.sql.types.DataTypes.StringType;
-
-public class AggregateResultUDF implements UDF1<WrappedArray<Row>, Row> {
+public class AggregateResultNoAuthorUDF implements UDF1<WrappedArray<Row>, Row> {
 //    public final static StructType RESULT_MATCHED_SCHEMA = new StructType()
 //            .add("id", StringType)
 //            .add("authors", DataTypes.createArrayType(
@@ -29,12 +25,10 @@ public class AggregateResultUDF implements UDF1<WrappedArray<Row>, Row> {
 
         for (int i = 0; i < group.length(); i++) {
             Row entry = group.apply(i);
-            String authorName = entry.getAs("fullname");
 
             // affiliations: WrappedArray<Row> → List<Row>
             WrappedArray<Row> affArray = entry.getAs("affiliations");
-            Row author = RowFactory.create(authorName, affArray, entry.getAs("corresponding"), entry.getAs("contributor_roles"));
-            authors.add(author);
+
             if (id == null) id = entry.getAs("id");
             List<Row> matchList = new ArrayList<>();
             for (int j = 0; j < affArray.length(); j++) {
@@ -59,7 +53,7 @@ public class AggregateResultUDF implements UDF1<WrappedArray<Row>, Row> {
 
         for (List<Row> group : inputGroups) {
             for (Row row : group) {
-                if (!"active".equalsIgnoreCase(row.getAs("status"))) continue;
+                if (!"active".equalsIgnoreCase(row.getAs("Status"))) continue;
 
                 String value = row.getAs("value");
                 Double confidence = Double.valueOf(row.getAs("confidence").toString());

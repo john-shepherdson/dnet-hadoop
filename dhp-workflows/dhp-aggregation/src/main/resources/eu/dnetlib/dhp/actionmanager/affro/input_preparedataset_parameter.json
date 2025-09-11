@@ -58,5 +58,23 @@
     "paramLongName": "workingDir",
     "paramDescription": "the workingDir",
     "paramRequired": false
+  },
+  {
+    "paramName": "iiis",
+    "paramLongName": "importiis",
+    "paramDescription": "if to import results from the iis",
+    "paramRequired": false
+  },
+  {
+    "paramName": "crp",
+    "paramLongName": "crossrefPath",
+    "paramDescription": "the path to get crossref data",
+    "paramRequired": false
+  },
+  {
+    "paramName": "dcp",
+    "paramLongName": "datacitePath",
+    "paramDescription": "the path for datacite data",
+    "paramRequired": false
   }
 ]
