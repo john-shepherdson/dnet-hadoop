@@ -90,7 +90,7 @@ public class RedistributeRelations implements Serializable {
         );
 
         String [] entities = {//"iis",
-                 "oalex","oaire","publishers"};
+                 "oalex","oaire","publishers", "crossref", "datacite"};
         for (String datasource : entities)
             redistributeForDatasource(spark, explodedPath , matchingsPath, outputPath, datasource);
 
@@ -141,8 +141,7 @@ public class RedistributeRelations implements Serializable {
                 .agg(collect_list(struct(joined.col("*"))).alias("group"))
                 .withColumn("aggAuthor", expr("aggregateAuthor(group)"))
                 .select("aggAuthor.*");
-        if(!datasource.equals("oaire") ) {
-
+        if(!datasource.equals("oaire") && !datasource.equalsIgnoreCase("crossref") ) {
 
             Dataset<Row> resultDf = groupedDf
                     .groupBy("id")
