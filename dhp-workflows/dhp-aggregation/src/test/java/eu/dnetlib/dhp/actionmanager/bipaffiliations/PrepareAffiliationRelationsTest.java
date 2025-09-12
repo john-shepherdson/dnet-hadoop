@@ -195,19 +195,18 @@ public class PrepareAffiliationRelationsTest {
 			.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/newTest/datacite")
 			.getPath();
 
-		String publisherAffiliationRelationPath = getClass()
-			.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/newTest/publishers")
-			.getPath();
-
 		String pubmedAffiliationRelationPath = getClass()
 			.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/newTest/pubmed")
 			.getPath();
-		String webcrawlAffiliationRelationPath = getClass()
-			.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/newTest/webCrawl_IE")
-			.getPath();
+
 		String openapsAffiliationRelationPath = getClass()
 			.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/newTest/openapc.json")
 			.getPath();
+
+		String inputPaths = getClass()
+				.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/newTest/inputPaths")
+				.getPath();
+
 		String outputPath = workingDir.toString() + "/actionSet";
 
 		PrepareAffiliationRelations
@@ -218,8 +217,7 @@ public class PrepareAffiliationRelationsTest {
 					"-pubmedInputPath", pubmedAffiliationRelationPath,
 					"-openapcInputPath", openapsAffiliationRelationPath,
 					"-dataciteInputPath", dataciteAffiliationRelationPath,
-					"-webCrawlInputPath", webcrawlAffiliationRelationPath,
-					"-publisherInputPath", publisherAffiliationRelationPath,
+					"-inputPaths", inputPaths,
 					"-outputPath", outputPath
 				});
 

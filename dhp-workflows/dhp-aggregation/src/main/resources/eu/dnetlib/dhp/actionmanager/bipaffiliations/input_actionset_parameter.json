@@ -30,23 +30,12 @@
     "paramRequired": true
   },
   {
-  "paramName": "wip",
-  "paramLongName": "webCrawlInputPath",
+  "paramName": "ip",
+  "paramLongName": "inputPaths",
   "paramDescription": "the path to get the input data from Web Crawl",
   "paramRequired": true
   },
-  {
-    "paramName": "pub",
-    "paramLongName": "publisherInputPath",
-    "paramDescription": "the path to get the input data from publishers",
-    "paramRequired": true
-  },
-  {
-    "paramName": "gip",
-    "paramLongName": "graphInputPath",
-    "paramDescription": "the path to get the input data from the graph",
-    "paramRequired": true
-  },
+
   {
     "paramName": "o",
     "paramLongName": "outputPath",
