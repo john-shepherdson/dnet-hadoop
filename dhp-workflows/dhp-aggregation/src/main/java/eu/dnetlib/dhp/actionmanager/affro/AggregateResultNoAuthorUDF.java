@@ -53,7 +53,7 @@ public class AggregateResultNoAuthorUDF implements UDF1<WrappedArray<Row>, Row> 
 
         for (List<Row> group : inputGroups) {
             for (Row row : group) {
-                if (!"active".equalsIgnoreCase(row.getAs("Status"))) continue;
+                if (!"active".equalsIgnoreCase(row.getAs("status"))) continue;
 
                 String value = row.getAs("value");
                 Double confidence = Double.valueOf(row.getAs("confidence").toString());
