@@ -154,7 +154,7 @@ public class RedistributeRelations implements Serializable {
         else {
             Dataset<Row> resultDf = groupedDf
                     .groupBy("id")
-                    .agg(collect_list(struct(joined.col("*"))).alias("group"))
+                    .agg(collect_list(struct(groupedDf.col("*"))).alias("group"))
                     .withColumn("result", expr("aggregateResultNoAuthor(group)"))
                     .select("result.*");
 
