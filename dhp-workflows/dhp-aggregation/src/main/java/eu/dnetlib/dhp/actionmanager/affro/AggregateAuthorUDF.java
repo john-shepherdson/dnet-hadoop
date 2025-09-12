@@ -29,7 +29,7 @@ public class AggregateAuthorUDF implements UDF1<WrappedArray<Row>, Row> {
             if(corresponding == null) corresponding = entry.getAs("corresponding");
             if(contributor_roles == null) contributor_roles = entry.getAs("contributor_roles");
             String rawAffString = entry.getAs("raw_affiliation_string");
-            WrappedArray<Row> matchArray = entry.getAs("Matchings");
+            WrappedArray<Row> matchArray = entry.getAs("matchings");
 
             List<Row> matchList = new ArrayList<>();
             for (int j = 0; j < matchArray.length(); j++) {
@@ -51,17 +51,18 @@ public class AggregateAuthorUDF implements UDF1<WrappedArray<Row>, Row> {
 
         //for (List<Row> group : inputGroups) {
             for (Row row : inputGroups) {
-                if (!"active".equalsIgnoreCase(row.getAs("Status"))) continue;
+                if (!"active".equalsIgnoreCase(row.getAs("status"))) continue;
 
-                String value = row.getAs("Value");
+                String value = row.getAs("value");
                 double confidence = 0.0;
-                if (row.getAs("Confidence") != null)
-                    confidence = row.getAs("Confidence");
-                String provenance = row.getAs("Provenance");
-                String pid = row.getAs("PID");
-                String country = row.getAs("Country");
+                if (row.getAs("confidence") != null)
+                    confidence = row.getAs("confidence");
+                String provenance = row.getAs("provenance");
+                String pid = row.getAs("pid");
+                String country = row.getAs("country");
+                String name = row.getAs("name");
 
-                Tuple newValue = new Tuple(confidence, provenance, pid, country);
+                Tuple newValue = new Tuple(confidence, provenance, pid, country, name);
                 // Update only if confidence is higher
                 if (!valueMap.containsKey(value) )
                     valueMap.put(value, newValue);
@@ -73,7 +74,7 @@ public class AggregateAuthorUDF implements UDF1<WrappedArray<Row>, Row> {
         List<Row> result = new ArrayList<>();
         for (Map.Entry<String, Tuple> entry : valueMap.entrySet()) {
             Tuple t = entry.getValue();
-            result.add(RowFactory.create(t.provenance, t.pid, entry.getKey(), t.confidence, "active", t.country));
+            result.add(RowFactory.create(t.provenance, t.pid, entry.getKey(), t.confidence, "active", t.country, t.name));
         }
 
         return result;
@@ -85,12 +86,14 @@ public class AggregateAuthorUDF implements UDF1<WrappedArray<Row>, Row> {
         String provenance;
         String pid;
         String country;
+        String name;
 
-        public Tuple(double confidence, String provenance, String pid, String country) {
+        public Tuple(double confidence, String provenance, String pid, String country, String name) {
             this.confidence = confidence;
             this.provenance = provenance;
             this.pid = pid;
             this.country = country;
+            this.name = name;
         }
     }
 

@@ -90,7 +90,7 @@ public class RedistributeRelations implements Serializable {
         );
 
         String [] entities = {//"iis",
-                 "oalex","oaire","publishers", "crossref", "datacite"};
+                "publishers", "oalex","oaire"};//, "crossref", "datacite"};
         for (String datasource : entities)
             redistributeForDatasource(spark, explodedPath , matchingsPath, outputPath, datasource);
 
@@ -103,7 +103,7 @@ public class RedistributeRelations implements Serializable {
 
 
         Dataset<Row> matchings = spark.read().schema(eu.dnetlib.dhp.actionmanager.affro.Constants.AFFILIATION_SCHEMA)
-                .json(matchingsPath + datasource);
+                .json(matchingsPath);
 
         int numSalts = 100;
 
@@ -120,12 +120,12 @@ public class RedistributeRelations implements Serializable {
                 .join(saltedMatchings,
                         explodedWithSalt.col("raw_affiliation_string").equalTo(saltedMatchings.col("Affiliation"))
                                 .and(explodedWithSalt.col("salt").equalTo(saltedMatchings.col("salt"))))
-                .filter(col("Matchings").isNotNull().and(size(col("Matchings")).gt(0)))
+                .filter(col("matchings").isNotNull().and(size(col("matchings")).gt(0)))
                 .select(
                         explodedWithSalt.col("id"),
                         explodedWithSalt.col("fullname"),
                         explodedWithSalt.col("raw_affiliation_string"),
-                        col("Matchings"),
+                        col("matchings"),
                         col("corresponding"),
                         col("contributor_roles"))
                 .withColumn("key", expr("insertKey(id, fullname)"));
@@ -149,7 +149,7 @@ public class RedistributeRelations implements Serializable {
                     .withColumn("result", expr("aggregateResult(group)"))
                     .select("result.*");
 
-            resultDf.write().mode(SaveMode.Overwrite).option("compression","gzip").json(outputPath);
+            resultDf.write().mode(SaveMode.Overwrite).option("compression","gzip").json(outputPath + datasource);
         }
         else {
             Dataset<Row> resultDf = groupedDf
@@ -158,7 +158,7 @@ public class RedistributeRelations implements Serializable {
                     .withColumn("result", expr("aggregateResultNoAuthor(group)"))
                     .select("result.*");
 
-            resultDf.write().mode(SaveMode.Overwrite).option("compression","gzip").json(outputPath);
+            resultDf.write().mode(SaveMode.Overwrite).option("compression","gzip").json(outputPath + datasource);
         }
 
     }

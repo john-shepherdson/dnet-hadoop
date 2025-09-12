@@ -56,7 +56,7 @@
         </configuration>
     </global>
 
-    <start to="run-affro"/>
+    <start to="redistributerelations"/>
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
@@ -147,7 +147,7 @@
                 --conf spark.sql.shuffle.partitions=20000
             </spark-opts>
             <arg>--explodedResultPath</arg><arg>${workingDir}/exploded/</arg>
-            <arg>--matchingsPath</arg><arg>${affroDataset}/matches</arg>
+            <arg>--matchingsPath</arg><arg>${affroDataset}/matchings</arg>
             <arg>--outputPath</arg><arg>${datasetPath}/</arg>
 
             <!--            <arg>&#45;&#45;explodedResultPath</arg><arg>${workingDir}/exploded</arg>-->
