@@ -32,6 +32,8 @@ class CrossrefMappingTest extends AbstractVocabularyTest {
       .convert(input, vocabularies, TransformationType.All)
       .foreach(record => {
         Assertions.assertNotNull(record)
+        println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(record))
+
       })
 
   }
