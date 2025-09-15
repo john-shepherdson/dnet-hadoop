@@ -116,7 +116,7 @@
             <arg>--pubmedInputPath</arg><arg>${pubmedInputPath}</arg>
             <arg>--openapcInputPath</arg><arg>${openapcInputPath}</arg>
             <arg>--dataciteInputPath</arg><arg>${dataciteInputPath}</arg>
-            <arg>--inputPaths</arg><arg>${datasetPath}</arg>
+            <arg>--inputPaths</arg><arg>${inputPaths}</arg>
             <arg>--outputPath</arg><arg>${outputPath}</arg>
         </spark>
         <ok to="End"/>

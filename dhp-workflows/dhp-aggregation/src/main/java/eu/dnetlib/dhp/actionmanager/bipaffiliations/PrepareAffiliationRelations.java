@@ -149,13 +149,7 @@ public class PrepareAffiliationRelations implements Serializable {
 		Dataset<Row> df = spark.read().schema(
 						"`id` STRING, `organizations` ARRAY<STRUCT<`pid`:STRING, `value`:STRING, `name` :STRING, `confidence`:DOUBLE, `status`:STRING, `country` :STRING>>").json(datasetPath)
 				.select("id","organizations")
-				.withColumn("matching", functions.explode(new Column("organizations")))
-				.select(new Column("id").as("id"),
-						new Column("matching.pid").as("pidtype"),
-						new Column("matching.value").as("pidvalue"),
-						new Column("matching.confidence").as("confidence"),
-						new Column("matching.status").as("status"))
-				.where("status = 'active'");
+				.withColumn("matching", functions.explode(new Column("organizations")));
 
 		return getTextTextJavaPairRDDNew(
 				collectedfromOpenAIRE, df.selectExpr("id", "matching"), dataprovenance, false);
@@ -179,22 +173,6 @@ public class PrepareAffiliationRelations implements Serializable {
 
 	}
 
-	private static JavaPairRDD<Text, Text> prepareAffiliationRelationFromPublisherNewModel(SparkSession spark,
-		String inputPath,
-		List<KeyValue> collectedfrom,
-		String dataprovenance) {
-
-		Dataset<Row> df = spark
-			.read()
-			.schema(
-				"`doi` STRING, `matchings` ARRAY<STRUCT<`pid`:STRING, `value`:STRING, `name` :STRING, `confidence`:DOUBLE, `status`:STRING, `country` :STRING>>")
-			.json(inputPath)
-			.where("doi is not null");
-
-		return getTextTextJavaPairRDDNew(
-			collectedfrom, df.selectExpr("doi", "matchings"), dataprovenance, true);
-
-	}
 
 	private static <I extends Result> JavaPairRDD<Text, Text> prepareAffiliationRelationsCrossref(SparkSession spark,
 																								  String inputPath,
@@ -301,7 +279,7 @@ public class PrepareAffiliationRelations implements Serializable {
 		// unroll nested arrays
 		if (isDoi)
 			df = df
-
+					.withColumn("matching", functions.explode(new Column("matchings")))
 				.select(
 					new Column("doi").as("id"),
 					new Column("matching.pid").as("pidtype"),
