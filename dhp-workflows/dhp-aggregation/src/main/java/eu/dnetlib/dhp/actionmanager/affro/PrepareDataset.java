@@ -4,6 +4,7 @@ package eu.dnetlib.dhp.actionmanager.affro;
 import static eu.dnetlib.dhp.actionmanager.affro.Constants.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+import static eu.dnetlib.dhp.utils.DHPUtils.MAPPER;
 import static org.apache.spark.sql.functions.*;
 
 import java.io.Serializable;
@@ -16,6 +17,7 @@ import eu.dnetlib.dhp.actionmanager.affro.beans.Author;
 import eu.dnetlib.dhp.actionmanager.affro.beans.IISModel;
 import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
+import eu.dnetlib.dhp.schema.mdstore.MDStoreVersion;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
@@ -71,14 +73,23 @@ public class PrepareDataset implements Serializable {
         final String publishersPath = parser.get("publishersPath");
         log.info("publishersPath: {}", publishersPath);
 
-        final String datacitePath = parser.get("datacipePath");
-        log.info("datacitePath: {}", datacitePath);
+        final String dataciteMDVersion = parser.get("datacipeMDVersion");
+        log.info("datacipeMDVersion: {}", dataciteMDVersion);
+        final MDStoreVersion dataciteMdStoreVersion = MAPPER.readValue(dataciteMDVersion, MDStoreVersion.class);
+        final String dataciteBasePath = dataciteMdStoreVersion.getHdfsPath();
+        log.info("dataciteBasePath: {}", dataciteBasePath);
 
-        final String crossrefPath = parser.get("crossrefPath");
-        log.info("crossrefPath: {}", crossrefPath);
+        final String crossrefMDVersion = parser.get("crossrefMDVersion");
+        log.info("crossrefMDVersion: {}", crossrefMDVersion);
+        final MDStoreVersion crossrefMdStoreVersion = MAPPER.readValue(crossrefMDVersion, MDStoreVersion.class);
+        final String crossrefBasePath = crossrefMdStoreVersion.getHdfsPath();
+        log.info("crossrefBasePath: {}", crossrefBasePath);
 
-        final String iisPath = parser.get("iisPath");
-        log.info("iisPath: {}", iisPath);
+        final String pubmedMDVersion = parser.get("pubmedMDVersion");
+        log.info("pubmedMDVersion: {}", pubmedMDVersion);
+        final MDStoreVersion pubmedMdStoreVersion = MAPPER.readValue(pubmedMDVersion, MDStoreVersion.class);
+        final String pubmedBasePath = pubmedMdStoreVersion.getHdfsPath();
+        log.info("pubmedBasePath: {}", pubmedBasePath);
 
         final String oldMatches = parser.get("oldMatches");
         log.info("oldMatches: {}", oldMatches);
@@ -109,7 +120,7 @@ public class PrepareDataset implements Serializable {
                     Constants.removeOutputDir(spark, workingDir );
                     prepareDataset(
                             spark, oalexPath, oairePath, iisPath, publishersPath,
-                            datacitePath, crossrefPath, workingDir, oldMatches,
+                            datacitePath, crossrefBasePath, workingDir, oldMatches,
                             startFromScratch, importIIS);
                 });
     }

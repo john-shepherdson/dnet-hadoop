@@ -29,6 +29,24 @@
 "paramDescription": "the path to get the input data from Datacite",
 "paramRequired": false
 },
+  {
+    "paramName": "crmd",
+    "paramLongName": "mdStoreCRInputId",
+    "paramDescription": "the path to get the input data from Datacite",
+    "paramRequired": false
+  },
+  {
+    "paramName": "dtcmd",
+    "paramLongName": "mdStoreDTCInputId",
+    "paramDescription": "the path to get the input data from Datacite",
+    "paramRequired": false
+  },
+  {
+    "paramName": "pmmd",
+    "paramLongName": "mdStorePMInputId",
+    "paramDescription": "the path to get the input data from Datacite",
+    "paramRequired": false
+  },
 {
 "paramName": "om",
 "paramLongName": "oldMatches",

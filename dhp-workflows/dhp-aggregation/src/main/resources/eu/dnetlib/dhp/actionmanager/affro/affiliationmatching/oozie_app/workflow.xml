@@ -68,7 +68,108 @@
         <ok to="preparedataset"/>
         <error to="Kill"/>
     </action>
-
+    <action name="BeginReadCrossref">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>READ_LOCK</arg>
+            <arg>--mdStoreID</arg><arg>${mdStoreCRInputId}</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+            <capture-output/>
+        </java>
+        <ok to="OKReadUnlockCrossref"/>
+        <error to="ReadUnlockCrossref"/>
+    </action>
+    <action name="OKReadUnlockCrossref">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>READ_UNLOCK</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+            <arg>--readMDStoreId</arg><arg>${wf:actionData('BeginReadCrossref')['mdStoreReadLockVersion']}</arg>
+            <capture-output/>
+        </java>
+        <ok to="BeginReadDatacite"/>
+        <error to="Kill"/>
+    </action>
+    <action name="BeginReadDatacite">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>READ_LOCK</arg>
+            <arg>--mdStoreID</arg><arg>${mdStoreDTCInputId}</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+            <capture-output/>
+        </java>
+        <ok to="OKReadUnlockCrossref"/>
+        <error to="ReadUnlockDatacite"/>
+    </action>
+    <action name="OKReadUnlockCrossref">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>READ_UNLOCK</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+            <arg>--readMDStoreId</arg><arg>${wf:actionData('BeginReadDatacite')['mdStoreReadLockVersion']}</arg>
+            <capture-output/>
+        </java>
+        <ok to="BeginReadPubmed"/>
+        <error to="Kill"/>
+    </action>
+    <action name="BeginReadPubmed">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>READ_LOCK</arg>
+            <arg>--mdStoreID</arg><arg>${mdStorePMInputId}</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+            <capture-output/>
+        </java>
+        <ok to="OKReadUnlockPubmed"/>
+        <error to="Kill"/>
+    </action>
+    <action name="OKReadUnlockPubmed">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>READ_UNLOCK</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+            <arg>--readMDStoreId</arg><arg>${wf:actionData('BeginReadPubmed')['mdStoreReadLockVersion']}</arg>
+            <capture-output/>
+        </java>
+        <ok to="preparedataset"/>
+        <error to="Kill"/>
+    </action>
     <action name="preparedataset">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
@@ -81,9 +182,13 @@
                 ${sparkResourceOpts}
                 ${sparkApplicationOpts}
             </spark-opts>
+            <arg>--dataciteMDVersion</arg><arg>${wf:actionData('BeginReadDatacite')['mdStoreReadLockVersion']}</arg>
+            <arg>--pubmedMDVersion</arg><arg>${wf:actionData('BeginReadPubmed')['mdStoreReadLockVersion']}</arg>
+            <arg>--crossrefMDVersion</arg><arg>${wf:actionData('BeginReadCrossref')['mdStoreReadLockVersion']}</arg>
             <arg>--oalexPath</arg><arg>${oalexPath}</arg>
             <arg>--oairePath</arg><arg>${oairePath}</arg>
             <arg>--publishersPath</arg><arg>${publishersPath}</arg>
+            <arg>--iisPath</arg><arg>${iisPath}</arg>
             <arg>--oldMatches</arg><arg>${affroDataset}/matchings</arg>
             <arg>--applyOnAll</arg><arg>${applyOnAll}</arg>
             <arg>--outputPath</arg><arg>${workingDir}/</arg>
@@ -180,6 +285,56 @@
         <ok to="End"/>
         <error to="Kill"/>
     </action>
-
+    <action name="ReadUnlockCrossref">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>READ_UNLOCK</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+            <arg>--readMDStoreId</arg><arg>${wf:actionData('BeginReadCrossref')['mdStoreReadLockVersion']}</arg>
+            <capture-output/>
+        </java>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+    <action name="ReadUnlockDatacite">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>READ_UNLOCK</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+            <arg>--readMDStoreId</arg><arg>${wf:actionData('BeginReadDatacite')['mdStoreReadLockVersion']}</arg>
+            <capture-output/>
+        </java>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+    <action name="ReadUnlockPubmed">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>READ_UNLOCK</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+            <arg>--readMDStoreId</arg><arg>${wf:actionData('BeginReadPubmed')['mdStoreReadLockVersion']}</arg>
+            <capture-output/>
+        </java>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
     <end name="End"/>
 </workflow-app>
