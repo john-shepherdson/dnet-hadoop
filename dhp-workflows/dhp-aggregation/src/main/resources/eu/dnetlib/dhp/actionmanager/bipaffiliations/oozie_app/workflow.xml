@@ -124,9 +124,7 @@
             <arg>--pubmedInputPath</arg><arg>${pubmedInputPath}</arg>
             <arg>--openapcInputPath</arg><arg>${openapcInputPath}</arg>
             <arg>--dataciteInputPath</arg><arg>${dataciteInputPath}</arg>
-            <arg>--webCrawlInputPath</arg><arg>${webCrawlInputPath}</arg>
-            <arg>--publisherInputPath</arg><arg>${publisherInputPath}</arg>
-            <arg>--graphInputPath</arg><arg>${graphInputPath}</arg>
+            <arg>--inputPaths</arg><arg>${datasetPath}</arg>
             <arg>--outputPath</arg><arg>${outputPath}</arg>
         </spark>
         <ok to="End"/>
