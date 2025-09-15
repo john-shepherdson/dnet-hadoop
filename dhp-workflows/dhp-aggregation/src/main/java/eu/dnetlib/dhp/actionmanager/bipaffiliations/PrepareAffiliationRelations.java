@@ -77,14 +77,17 @@ public class PrepareAffiliationRelations implements Serializable {
 		final String dataciteInputPath = parser.get("dataciteInputPath");
 		log.info("dataciteInputPath: {}", dataciteInputPath);
 
-		final String webcrawlInputPath = parser.get("webCrawlInputPath");
-		log.info("webcrawlInputPath: {}", webcrawlInputPath);
+		final String inputPaths = parser.get("inputPaths");
+		log.info("inputPaths: {}", inputPaths);
 
-		final String publisherInputPath = parser.get("publisherInputPath");
-		log.info("publisherInputPath: {}", publisherInputPath);
-
-		final String graphInputPath = parser.get("graphInputPath");
-		log.info("graphInputPath: {}", graphInputPath);
+//		final String webcrawlInputPath = parser.get("webCrawlInputPath");
+//		log.info("webcrawlInputPath: {}", webcrawlInputPath);
+//
+//		final String publisherInputPath = parser.get("publisherInputPath");
+//		log.info("publisherInputPath: {}", publisherInputPath);
+//
+//		final String graphInputPath = parser.get("graphInputPath");
+//		log.info("graphInputPath: {}", graphInputPath);
 
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
@@ -97,60 +100,83 @@ public class PrepareAffiliationRelations implements Serializable {
 			spark -> {
 				Constants.removeOutputDir(spark, outputPath);
 				createActionSet(
-					spark, crossrefInputPath, pubmedInputPath, openapcInputPath, dataciteInputPath, webcrawlInputPath,
-					publisherInputPath, graphInputPath, outputPath);
+					spark, crossrefInputPath, pubmedInputPath, openapcInputPath, dataciteInputPath, inputPaths,
+					 outputPath);
 			});
 	}
 
 	private static void createActionSet(SparkSession spark, String crossrefInputPath, String pubmedInputPath,
-		String openapcInputPath, String dataciteInputPath, String webcrawlInputPath, String publisherlInputPath,
-		String graphInputPath, String outputPath) {
+		String openapcInputPath, String dataciteInputPath, String inputPaths, String outputPath) {
 		List<KeyValue> collectedfromOpenAIRE = OafMapperUtils
 			.listKeyValues(OPENAIRE_DATASOURCE_ID, OPENAIRE_DATASOURCE_NAME);
 
-		JavaPairRDD<Text, Text> crossrefRelations = prepareAffiliationRelationsNewModel(
+		JavaPairRDD<Text, Text> crossrefRelations = prepareAffiliationRelationsCrossref(
 			spark, crossrefInputPath, collectedfromOpenAIRE, BIP_INFERENCE_PROVENANCE + ":crossref");
 
-		JavaPairRDD<Text, Text> pubmedRelations = prepareAffiliationRelationFromPublisherNewModel(
+		JavaPairRDD<Text, Text> pubmedRelations = prepareAffiliationRelationFromPublisherOldModel(
 			spark, pubmedInputPath, collectedfromOpenAIRE, BIP_INFERENCE_PROVENANCE + ":pubmed");
 
-		JavaPairRDD<Text, Text> openAPCRelations = prepareAffiliationRelationsNewModel(
+		JavaPairRDD<Text, Text> openAPCRelations = prepareAffiliationRelationsOpenAPC(
 			spark, openapcInputPath, collectedfromOpenAIRE, BIP_INFERENCE_PROVENANCE + ":openapc");
 
-		JavaPairRDD<Text, Text> dataciteRelations = prepareAffiliationRelationFromPublisherNewModel(
+		JavaPairRDD<Text, Text> dataciteRelations = prepareAffiliationRelationFromPublisherOldModel(
 			spark, dataciteInputPath, collectedfromOpenAIRE, BIP_INFERENCE_PROVENANCE + ":datacite");
 
-		JavaPairRDD<Text, Text> webCrawlRelations = prepareAffiliationRelationsNewModel(
-			spark, webcrawlInputPath, collectedfromOpenAIRE, BIP_INFERENCE_PROVENANCE + ":rawaff");
 
-		JavaPairRDD<Text, Text> publisherRelations = prepareAffiliationRelationFromPublisherNewModel(
-			spark, publisherlInputPath, collectedfromOpenAIRE, BIP_INFERENCE_PROVENANCE + ":webcrawl");
+		JavaPairRDD<Text, Text> oalexRelations = prepareAffiliationRelationsGraph(
+				spark, inputPaths + "/oalex", collectedfromOpenAIRE, BIP_INFERENCE_PROVENANCE + ":rawaff");
 
-		JavaPairRDD<Text, Text> graphRelations = prepareAffiliationRelationFromGraph(
-			spark, graphInputPath, collectedfromOpenAIRE, BIP_INFERENCE_PROVENANCE + ":graph");
+		JavaPairRDD<Text, Text> publisherRelations = prepareAffiliationRelationsGraph(
+				spark, inputPaths + "/publishers", collectedfromOpenAIRE, BIP_INFERENCE_PROVENANCE + ":webcrawl");
+
+		JavaPairRDD<Text, Text> oaireRelations = prepareAffiliationRelationsGraph(
+				spark, inputPaths + "/oaire", collectedfromOpenAIRE, BIP_INFERENCE_PROVENANCE + ":graph");
+
+
 
 		crossrefRelations
 			.union(pubmedRelations)
 			.union(openAPCRelations)
 			.union(dataciteRelations)
-			.union(webCrawlRelations)
+			.union(oalexRelations)
 			.union(publisherRelations)
-			.union(graphRelations)
+			.union(oaireRelations)
 			.saveAsHadoopFile(
 				outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, BZip2Codec.class);
 	}
 
-	private static JavaPairRDD<Text, Text> prepareAffiliationRelationFromGraph(SparkSession spark,
-		String graphInputPath, List<KeyValue> collectedfromOpenAIRE, String dataprovenance) {
-		Dataset<Row> df = spark
-			.read()
-			.schema(
-				"`id` STRING, `Organizations` ARRAY<STRUCT<`PID`:STRING, `Value`:STRING,`Confidence`:DOUBLE, `Status`:STRING>>")
-			.json(graphInputPath)
-			.where("id is not null");
+	private static JavaPairRDD<Text, Text> prepareAffiliationRelationsGraph(SparkSession spark, String datasetPath, List<KeyValue> collectedfromOpenAIRE, String dataprovenance) {
+		Dataset<Row> df = spark.read().schema(
+						"`id` STRING, `organizations` ARRAY<STRUCT<`pid`:STRING, `value`:STRING, `name` :STRING, `confidence`:DOUBLE, `status`:STRING, `country` :STRING>>").json(datasetPath)
+				.select("id","organizations")
+				.withColumn("matching", functions.explode(new Column("organizations")))
+				.select(new Column("id").as("id"),
+						new Column("matching.pid").as("pidtype"),
+						new Column("matching.value").as("pidvalue"),
+						new Column("matching.confidence").as("confidence"),
+						new Column("matching.status").as("status"))
+				.where("status = 'active'");
 
 		return getTextTextJavaPairRDDNew(
-			collectedfromOpenAIRE, df.selectExpr("id", "Organizations as Matchings"), dataprovenance, false);
+				collectedfromOpenAIRE, df.selectExpr("id", "matching"), dataprovenance, false);
+	}
+
+
+	private static JavaPairRDD<Text, Text> prepareAffiliationRelationFromPublisherOldModel(SparkSession spark,
+																						   String inputPath,
+																						   List<KeyValue> collectedfrom,
+																						   String dataprovenance) {
+
+		Dataset<Row> df = spark
+				.read()
+				.schema(
+						"`DOI` STRING, `Organizations` ARRAY<STRUCT<`PID`:STRING, `Value`:STRING,`Confidence`:DOUBLE, `Status`:STRING>>")
+				.json(inputPath)
+				.where("DOI is not null");
+
+		return getTextTextJavaPairRDDOld(
+				collectedfrom, df.selectExpr("DOI", "Organizations as Matchings"), dataprovenance, true);
+
 	}
 
 	private static JavaPairRDD<Text, Text> prepareAffiliationRelationFromPublisherNewModel(SparkSession spark,
@@ -161,18 +187,18 @@ public class PrepareAffiliationRelations implements Serializable {
 		Dataset<Row> df = spark
 			.read()
 			.schema(
-				"`DOI` STRING, `Organizations` ARRAY<STRUCT<`PID`:STRING, `Value`:STRING,`Confidence`:DOUBLE, `Status`:STRING>>")
+				"`doi` STRING, `matchings` ARRAY<STRUCT<`pid`:STRING, `value`:STRING, `name` :STRING, `confidence`:DOUBLE, `status`:STRING, `country` :STRING>>")
 			.json(inputPath)
-			.where("DOI is not null");
+			.where("doi is not null");
 
 		return getTextTextJavaPairRDDNew(
-			collectedfrom, df.selectExpr("DOI", "Organizations as Matchings"), dataprovenance, true);
+			collectedfrom, df.selectExpr("doi", "matchings"), dataprovenance, true);
 
 	}
 
-	private static <I extends Result> JavaPairRDD<Text, Text> prepareAffiliationRelationsNewModel(SparkSession spark,
-		String inputPath,
-		List<KeyValue> collectedfrom, String dataprovenance) {
+	private static <I extends Result> JavaPairRDD<Text, Text> prepareAffiliationRelationsCrossref(SparkSession spark,
+																								  String inputPath,
+																								  List<KeyValue> collectedfrom, String dataprovenance) {
 		// load and parse affiliation relations from HDFS
 		Dataset<Row> df = spark
 			.read()
@@ -181,32 +207,118 @@ public class PrepareAffiliationRelations implements Serializable {
 			.json(inputPath)
 			.where("DOI is not null");
 
+		return getTextTextJavaPairRDDOld(collectedfrom, df, dataprovenance, true);
+	}
+
+	private static <I extends Result> JavaPairRDD<Text, Text> prepareAffiliationRelationsOpenAPC(SparkSession spark,
+																								  String inputPath,
+																								  List<KeyValue> collectedfrom, String dataprovenance) {
+		// load and parse affiliation relations from HDFS
+		Dataset<Row> df = spark
+				.read()
+				.schema(
+						"`doi` STRING, `matchings` ARRAY<STRUCT<`pid`:STRING, `value`:STRING,`confidence`:DOUBLE, `status`:STRING>>")
+				.json(inputPath)
+				.where("doi is not null");
+
 		return getTextTextJavaPairRDDNew(collectedfrom, df, dataprovenance, true);
 	}
 
+	private static JavaPairRDD<Text, Text> getTextTextJavaPairRDDOld(List<KeyValue> collectedfrom, Dataset<Row> df,
+																	 String dataprovenance, boolean isDoi) {
+		// unroll nested arrays
+		if (isDoi)
+			df = df
+					.withColumn("matching", functions.explode(new Column("Matchings")))
+					.select(
+							new Column("DOI").as("id"),
+							new Column("matching.PID").as("pidtype"),
+							new Column("matching.Value").as("pidvalue"),
+							new Column("matching.Confidence").as("confidence"),
+							new Column("matching.Status").as("status"))
+					.where(functions.col("status").equalTo("active"))
+					.where(functions.col("pidvalue").notEqual(""));
+		else
+			df = df
+					.withColumn("matching", functions.explode(new Column("Matchings")))
+					.select(
+							new Column("id").as("id"),
+							new Column("matching.PID").as("pidtype"),
+							new Column("matching.Value").as("pidvalue"),
+							new Column("matching.Confidence").as("confidence"),
+							new Column("matching.Status").as("status"))
+					.where(functions.col("status").equalTo("active"))
+					.where(functions.col("pidvalue").notEqual(""));
+
+		// prepare action sets for affiliation relations
+		return df
+				.toJavaRDD()
+				.flatMap((FlatMapFunction<Row, Relation>) row -> {
+
+					// DOI to OpenAIRE id
+					String resultId = row.getAs("id");
+					if (isDoi)
+						resultId = ID_PREFIX
+								+ IdentifierFactory.md5(DoiCleaningRule.clean(removePrefix(resultId)));
+
+					// Organization to OpenAIRE identifier
+					String affId = null;
+					if (row.getAs("pidtype").equals("ROR"))
+						// ROR id to OpenIARE id
+						affId = GenerateRorActionSetJob.calculateOpenaireId(row.getAs("pidvalue"));
+					else
+						// getting the OpenOrgs identifier for the organization
+						affId = calculateOpenOrgsId(row.getAs("pidvalue"));
+
+					Qualifier qualifier = OafMapperUtils
+							.qualifier(
+									BIP_AFFILIATIONS_CLASSID,
+									BIP_AFFILIATIONS_CLASSNAME,
+									ModelConstants.DNET_PROVENANCE_ACTIONS,
+									ModelConstants.DNET_PROVENANCE_ACTIONS);
+
+					// format data info; setting `confidence` into relation's `trust`
+					DataInfo dataInfo = OafMapperUtils
+							.dataInfo(
+									false,
+									dataprovenance,
+									true,
+									false,
+									qualifier,
+									Double.toString(row.getAs("confidence")));
+
+					// return bi-directional relations
+					return getAffiliationRelationPair(resultId, affId, collectedfrom, dataInfo).iterator();
+
+				})
+				.map(p -> new AtomicAction(Relation.class, p))
+				.mapToPair(
+						aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
+								new Text(OBJECT_MAPPER.writeValueAsString(aa))));
+	}
 	private static JavaPairRDD<Text, Text> getTextTextJavaPairRDDNew(List<KeyValue> collectedfrom, Dataset<Row> df,
 		String dataprovenance, boolean isDoi) {
 		// unroll nested arrays
 		if (isDoi)
 			df = df
-				.withColumn("matching", functions.explode(new Column("Matchings")))
+
 				.select(
-					new Column("DOI").as("id"),
-					new Column("matching.PID").as("pidtype"),
-					new Column("matching.Value").as("pidvalue"),
-					new Column("matching.Confidence").as("confidence"),
-					new Column("matching.Status").as("status"))
+					new Column("doi").as("id"),
+					new Column("matching.pid").as("pidtype"),
+					new Column("matching.value").as("pidvalue"),
+					new Column("matching.confidence").as("confidence"),
+					new Column("matching.status").as("status"))
 				.where(functions.col("status").equalTo("active"))
 				.where(functions.col("pidvalue").notEqual(""));
 		else
 			df = df
-				.withColumn("matching", functions.explode(new Column("Matchings")))
+
 				.select(
 					new Column("id").as("id"),
-					new Column("matching.PID").as("pidtype"),
-					new Column("matching.Value").as("pidvalue"),
-					new Column("matching.Confidence").as("confidence"),
-					new Column("matching.Status").as("status"))
+					new Column("matching.pid").as("pidtype"),
+					new Column("matching.value").as("pidvalue"),
+					new Column("matching.confidence").as("confidence"),
+					new Column("matching.status").as("status"))
 				.where(functions.col("status").equalTo("active"))
 				.where(functions.col("pidvalue").notEqual(""));
 
@@ -223,7 +335,7 @@ public class PrepareAffiliationRelations implements Serializable {
 
 				// Organization to OpenAIRE identifier
 				String affId = null;
-				if (row.getAs("pidtype").equals("ROR"))
+				if ("ROR".equalsIgnoreCase(row.getAs("pidtype")))
 					// ROR id to OpenIARE id
 					affId = GenerateRorActionSetJob.calculateOpenaireId(row.getAs("pidvalue"));
 				else
