@@ -17,6 +17,11 @@
             <value>/srv/java/openjdk-17</value>
             <description>Used to configure the Java home location</description>
         </property>
+        <property>
+            <name>threadCount</name>
+            <value>10</value>
+            <description>Used to configure the number of Thread for indexing</description>
+        </property>
     </parameters>
 
     <start to="indexScholixV8"/>
@@ -43,6 +48,7 @@
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--index</arg><arg>${index}</arg>
             <arg>--indexHost</arg><arg>${indexHost}</arg>
+            <arg>--threadCount</arg><arg>${threadCount}</arg>
         </java>
         <ok to="End"/>
         <error to="Kill"/>
