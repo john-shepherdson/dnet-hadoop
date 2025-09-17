@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.sx.provision;
 
 import static eu.dnetlib.dhp.utils.DHPUtils.getHadoopConfiguration;
 
+import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.index.es.ConvertJSONWithId;
 import eu.dnetlib.dhp.index.es.ESFeeder;
@@ -17,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 
 public class SparkIndexCollectionES8 {
     private static final Logger log = LoggerFactory.getLogger(SparkIndexCollectionES8.class);
@@ -49,14 +51,27 @@ public class SparkIndexCollectionES8 {
         final String indexHost = argumentParser.get("indexHost");
         log.info("indexHost is {}", indexHost);
 
+        final String tc = argumentParser.get("threadCount");
+        log.info("threadCount is {}", tc);
+
+        int threadCount = 10;
+
+        if (tc != null && !tc.isEmpty()) {
+            try {
+                threadCount = Integer.parseInt(tc);
+            } catch (NumberFormatException e) {
+                log.warn("Invalid thread count provided, using default: {}", threadCount);
+            }
+        }
+
         final FileSystem fileSystem = FileSystem.get(getHadoopConfiguration(hdfsuri));
 
-        new SparkIndexCollectionES8(fileSystem).run(sourcePath, index, indexHost);
+        new SparkIndexCollectionES8(fileSystem).run(sourcePath, index, indexHost,threadCount);
 
     }
 
-    public void run(final String sourcePath, final String index, final String indexHost)
-            throws IOException, InterruptedException {
+    public void run(final String sourcePath, final String index, final String indexHost, int threadCount)
+            throws IOException {
         RemoteIterator<LocatedFileStatus> ls = fileSystem.listFiles(new Path(sourcePath), false);
         List<Path> files = new java.util.ArrayList<>();
         while (ls.hasNext()) {
@@ -67,14 +82,13 @@ public class SparkIndexCollectionES8 {
         }
 
         try (ESFeeder feeder = new ESFeeder(indexHost)) {
-            long start = System.currentTimeMillis();
-            feeder.parallelBulkIndex(files, 20, fileSystem, new ConvertJSONWithId("\"identifier\":\"((\\d|\\w)*)\"", "scholix"));
-            long end = System.currentTimeMillis();
-            System.out.println("Time Indexing Scholix: " + (end - start) / 1000 + "s");
-        } catch (Throwable e) {
+            Function<String, BulkOperation> converter = index.contains("summary")
+                    ? new ConvertScholixResourceToES(index)
+                    : new ConvertJSONWithId("\"identifier\":\"((\\d|\\w)*)\"", index);
+            feeder.parallelBulkIndex(files, threadCount, fileSystem, converter);
+       } catch (Throwable e) {
             throw new RuntimeException(e);
         }
-
     }
 
 }
