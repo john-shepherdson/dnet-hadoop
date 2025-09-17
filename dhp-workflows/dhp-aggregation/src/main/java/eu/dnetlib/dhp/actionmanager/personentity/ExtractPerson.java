@@ -375,7 +375,7 @@ public class ExtractPerson implements Serializable {
 
 	// ORCID
 	private static void extractInfoForActionSetFromORCID(SparkSession spark, String inputPath, String workingDir) {
-		writePerson(spark, inputPath, workingDir);
+		 writePerson(spark, inputPath, workingDir);
 		writeAffiliations(spark, inputPath, workingDir);
 	}
 

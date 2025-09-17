@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.logging.Filter;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.schema.oaf.rel.CoAuthorship;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
@@ -387,8 +388,8 @@ public class SparkExtractPersonRelationsAndAddIndicators {
 							(MapFunction<Result, Coauthors>) SparkExtractPersonRelationsAndAddIndicators::getAuthorsPidList,
 							Encoders.bean(Coauthors.class))
 						.flatMap(
-							(FlatMapFunction<Coauthors, Relation>) c -> new CoAuthorshipIterator(c.getCoauthors()),
-							Encoders.bean(Relation.class))
+							(FlatMapFunction<Coauthors, CoAuthorship>) c -> new CoAuthorshipIterator(c.getCoauthors()),
+							Encoders.bean(CoAuthorship.class))
 						.distinct()
 						.write()
 						.mode(SaveMode.Append)

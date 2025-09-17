@@ -79,6 +79,8 @@ public class CreatePersonAS {
 				"/eu/dnetlib/dhp/actionmanager/person/")
 			.getPath();
 
+		System.out.println(System.getProperty("jdk.module.add.opens"));
+
 		ExtractPerson
 			.main(
 				new String[] {

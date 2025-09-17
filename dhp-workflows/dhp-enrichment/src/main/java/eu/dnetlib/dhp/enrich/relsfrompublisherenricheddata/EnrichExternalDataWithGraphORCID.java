@@ -6,6 +6,7 @@ import static eu.dnetlib.dhp.common.enrichment.Constants.PROPAGATION_DATA_INFO_T
 import java.util.*;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.schema.oaf.rel.CoAuthorship;
 import org.apache.commons.collections.ArrayStack;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.api.java.function.FilterFunction;
@@ -198,18 +199,19 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 
 		Dataset<Row> graph = spark.read().parquet(workingDir + "/graph_authors");
 
-		Dataset<Relation> coAuthorshipRels = graph
+		Dataset<CoAuthorship> coAuthorshipRels = graph
 			.joinWith(matched, graph.col("id").equalTo(matched.col("id")))
 			.flatMap(
-				(FlatMapFunction<Tuple2<Row, Row>, Relation>) EnrichExternalDataWithGraphORCID::coAuthorshipRels,
-				Encoders.bean(Relation.class));
+				(FlatMapFunction<Tuple2<Row, Row>, CoAuthorship>) EnrichExternalDataWithGraphORCID::coAuthorshipRels,
+				Encoders.bean(CoAuthorship.class));
 
 		// need to merge the relations with same source target and semantics
-		mergeOldAndNewRelations(spark, targetPath, redirectedRels.union(coAuthorshipRels))
-			.write()
-			.mode(SaveMode.Overwrite)
-			.option("compression", "gzip")
-			.json(workingDir + "/relation");
+		//TODO adjust this part wrt the new implementation
+//		mergeOldAndNewRelations(spark, targetPath, redirectedRels.union(coAuthorshipRels))
+//			.write()
+//			.mode(SaveMode.Overwrite)
+//			.option("compression", "gzip")
+//			.json(workingDir + "/relation");
 
 		// write the new relations in the relation folder
 		spark
@@ -278,7 +280,7 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 
 	}
 
-	private static Iterator<Relation> coAuthorshipRels(Tuple2<Row, Row> t2) {
+	private static Iterator<CoAuthorship> coAuthorshipRels(Tuple2<Row, Row> t2) {
 
 		List<String> authorsList1 = t2
 			._1()
@@ -295,7 +297,7 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 			.collect(Collectors.toList());
 		authorsList1.addAll(authorsList2);
 
-		List<Relation> relList = new ArrayList<>();
+		List<CoAuthorship> relList = new ArrayList<>();
 		new CoAuthorshipIterator(authorsList1).forEachRemaining(r -> relList.add(r));
 		return relList.iterator();
 
