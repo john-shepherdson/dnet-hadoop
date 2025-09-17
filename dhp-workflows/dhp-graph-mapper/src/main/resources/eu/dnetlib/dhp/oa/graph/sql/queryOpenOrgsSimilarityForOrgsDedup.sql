@@ -11,7 +11,7 @@ SELECT
 	'isSimilarTo'                                         AS relclass
 FROM oa_duplicates d
 LEFT OUTER JOIN organizations o ON (d.local_id=o.id)
-WHERE d.reltype = 'is_similar' AND o.status = 'approved'
+WHERE d.status = 'is_similar' AND o.status = 'approved'
 
 UNION ALL
 
@@ -45,7 +45,7 @@ SELECT
 	'isDifferentFrom'                                     AS relclass
 FROM oa_duplicates d
 LEFT OUTER JOIN organizations o ON (d.local_id=o.id)
-WHERE d.reltype = 'is_different' AND o.status = 'approved'
+WHERE d.status = 'is_different' AND o.status = 'approved'
 
 UNION ALL
 
@@ -60,4 +60,4 @@ SELECT
     ''                                                    AS inferenceprovenance,
     'isDifferentFrom'                                     AS relclass
 FROM oa_conflicts c
-WHERE c.reltype = 'is_different'
+WHERE c.status = 'is_different'
