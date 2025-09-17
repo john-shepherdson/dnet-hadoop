@@ -188,4 +188,8 @@ public class Constants implements Serializable {
             .add("DOI", StringType)
             .add("author", DataTypes.createArrayType(CROSSREF_AUTHOR_SCHEMA));
 
+    public static final StructType OPENAPC_INPUT_SCHEMA = new StructType()
+            .add("doi", StringType)
+            .add("matchings", MATCHING_ARRAY_SCHEMA);
+
 }

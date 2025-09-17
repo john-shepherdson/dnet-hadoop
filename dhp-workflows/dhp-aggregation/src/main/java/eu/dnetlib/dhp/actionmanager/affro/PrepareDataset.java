@@ -27,7 +27,7 @@ import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.ForeachFunction;
 import org.apache.spark.sql.*;
-import org.apache.spark.sql.catalyst.encoders.AgnosticEncoders;
+
 import org.apache.spark.sql.catalyst.encoders.RowEncoder;
 import org.apache.spark.sql.types.DataTypes;
 import org.slf4j.Logger;
@@ -73,23 +73,19 @@ public class PrepareDataset implements Serializable {
         final String publishersPath = parser.get("publishersPath");
         log.info("publishersPath: {}", publishersPath);
 
-        final String dataciteMDVersion = parser.get("datacipeMDVersion");
-        log.info("datacipeMDVersion: {}", dataciteMDVersion);
-        final MDStoreVersion dataciteMdStoreVersion = MAPPER.readValue(dataciteMDVersion, MDStoreVersion.class);
-        final String dataciteBasePath = dataciteMdStoreVersion.getHdfsPath();
-        log.info("dataciteBasePath: {}", dataciteBasePath);
+        final String dataciteInputPath = parser.get("dataciteInputPath");
+        log.info("dataciteInputPath: {}", dataciteInputPath);
 
-        final String crossrefMDVersion = parser.get("crossrefMDVersion");
-        log.info("crossrefMDVersion: {}", crossrefMDVersion);
-        final MDStoreVersion crossrefMdStoreVersion = MAPPER.readValue(crossrefMDVersion, MDStoreVersion.class);
-        final String crossrefBasePath = crossrefMdStoreVersion.getHdfsPath();
-        log.info("crossrefBasePath: {}", crossrefBasePath);
 
-        final String pubmedMDVersion = parser.get("pubmedMDVersion");
-        log.info("pubmedMDVersion: {}", pubmedMDVersion);
-        final MDStoreVersion pubmedMdStoreVersion = MAPPER.readValue(pubmedMDVersion, MDStoreVersion.class);
-        final String pubmedBasePath = pubmedMdStoreVersion.getHdfsPath();
-        log.info("pubmedBasePath: {}", pubmedBasePath);
+        final String crossrefInputPath = parser.get("crossrefInputPath");
+        log.info("crossrefInputPath: {}", crossrefInputPath);
+
+
+        final String pubmedInputPath = parser.get("pubmedInputPath");
+        log.info("pubmedInputPath: {}", pubmedInputPath);
+
+        final String iisPath = parser.get("iisPath");
+        log.info("iisPath: {}", iisPath);
 
         final String oldMatches = parser.get("oldMatches");
         log.info("oldMatches: {}", oldMatches);
@@ -119,14 +115,15 @@ public class PrepareDataset implements Serializable {
                 spark -> {
                     Constants.removeOutputDir(spark, workingDir );
                     prepareDataset(
-                            spark, oalexPath, oairePath, iisPath, publishersPath,
-                            datacitePath, crossrefBasePath, workingDir, oldMatches,
+                            spark, oalexPath, oairePath, iisPath , publishersPath,
+                            dataciteInputPath, crossrefInputPath, pubmedInputPath, workingDir, oldMatches,
                             startFromScratch, importIIS);
                 });
     }
 
     private static void prepareDataset(SparkSession spark, String oalexPath, String oairePath, String iisPath,
                                        String publishersPath, String datacitePath, String crossrefPath,
+                                       String pubmedPath,
                                        String workingDir, String oldMatches,
                                        Boolean startFromScratch, Boolean importIIS) {
         // start with oalex. read from the snapshot in the schema needed for this task
@@ -151,60 +148,15 @@ public class PrepareDataset implements Serializable {
                         "concat", (String firstName, String familyName) -> familyName + ", " + firstName , DataTypes.StringType);
 
 
-        Dataset<Row> datacite = spark.read().option("mode", "PERMISSIVE")
-                .parquet(datacitePath)
-                .withColumn("json_parsed", from_json(col("json"), DATACITE_INPUT_SCHEMA))
-                .select(
-                        col("json_parsed.attributes.doi").alias("doi"),
-                        explode(col("json_parsed.attributes.creators")).alias("author")
-                )
-                .filter(col("doi").isNotNull())
-                .withColumn("fullname", col("author.name"))
-                .select(col("doi"), col("fullname"), explode(col("author.affiliation")).alias("raw_affiliation_string"))
-                .filter("raw_affiliation_string IS NOT NULL AND TRIM(raw_affiliation_string) != '' AND LOWER(raw_affiliation_string) NOT IN ('unknown', 'none')")
-                .withColumn("corresponding", lit(null))
-                .withColumn("contributor_roles", lit(null))
-                .withColumn("id",  expr("md5HashWithPrefix(doi)"))
-                .select(col("id"), col("fullname"), col("raw_affiliation_string"), col("corresponding"), col("contributor_roles"))
-                .as(RowEncoder.apply(DATASET_SCHEMA));
+        Dataset<Row> datacite = getSelectGraphSchemaData(spark.read().schema(GRAPH_SCHEMA)
+                .json(datacitePath));
         datacite.write().mode(SaveMode.Overwrite).option("compression","gzip").json(workingDir + "exploded/datacite");
 
-
-        Dataset<Row> crossref = spark.read().schema(CROSSREF_INPUT_SCHEMA).json(crossrefPath)
-                .withColumn("id", expr("md5HashWithPrefix(DOI)"))
-                .select(col("id"), explode(col("author").alias("author")))
-                .withColumn("raw_affiliation_string", explode(col("author.affiliation")))
-                .withColumn("fullname", expr("concat(author.given, author.family)"))
-                .withColumn("corresponding", lit(null))
-                .withColumn("contributor_roles", lit(null))
-                .select(col("id"), col("fullname"), col("raw_affiliation_string"), col("corresponding"), col("contributor_roles"))
-                .as(RowEncoder.apply(DATASET_SCHEMA));
+        Dataset<Row> crossref = getSelectGraphSchemaData(spark.read().schema(GRAPH_SCHEMA).json(crossrefPath));
         crossref.write().mode(SaveMode.Overwrite).option("compression","gzip").json(workingDir + "exploded/crossref");
 
-
-        //the output model for all the datasets will be:
-        //id : the openaire identifier for the resource
-        //authors.fullname the fullname of the author
-        //authors.raw_affiliation_strings the list of raw_affiliation_strings associated to the author
-        //todo decide if we want also to include authors.pid not from oalex but from the other sources
-        Dataset<Row> oalex = spark
-                .read()
-                .schema(OALEX_SCHEMA)
-                .json(oalexPath)
-                .filter(col("doi").isNotNull())
-                .withColumn("id",  expr("md5HashWithPrefix(doi)"))
-                .select(col("id"),
-                 explode( col("authorships")).alias("author"))
-                .withColumn("fullname", col("author.author.display_name"))
-                .withColumn("raw_affiliation_strings", col("author.raw_affiliation_strings"))
-                .select(col("id"), col("fullname"),
-                         explode(col("raw_affiliation_strings")).alias("raw_affiliation_string"))
-                .filter("raw_affiliation_string IS NOT NULL AND TRIM(raw_affiliation_string) != '' AND LOWER(raw_affiliation_string) NOT IN ('unknown', 'none')")
-                .withColumn("corresponding", lit(null))
-                .withColumn("contributor_roles", lit(null))
-                .select(col("id"), col("fullname"), col("raw_affiliation_string"), col("corresponding"), col("contributor_roles"))
-                .as(RowEncoder.apply(DATASET_SCHEMA));
-        oalex.write().mode(SaveMode.Overwrite).option("compression","gzip").json(workingDir + "exploded/oalex");
+        Dataset<Row> pubmed = getSelectGraphSchemaData(spark.read().schema(GRAPH_SCHEMA).json(pubmedPath));
+        pubmed.write().mode(SaveMode.Overwrite).option("compression","gzip").json(workingDir + "exploded/pubmed");
 
         Dataset<Row> oaire_entities =
                 spark.createDataFrame(Collections.emptyList(), GRAPH_SCHEMA);
@@ -214,60 +166,41 @@ public class PrepareDataset implements Serializable {
 
             }
         }
-            Dataset<Row> oaire = oaire_entities
-                    .select(col("id"), explode(col("author")).alias("author"))
-                    .select(col("id"), col("author"), explode(col("author.rawAffiliationString")).alias("raw_affiliation_string"))
-                    .filter("raw_affiliation_string IS NOT NULL AND TRIM(raw_affiliation_string) != '' AND LOWER(raw_affiliation_string) NOT IN ('unknown', 'none')")
-                    .withColumn("fullname", col("author.fullName"))
-                    .drop("author")
-                    .withColumn("corresponding", lit(null))
-                    .withColumn("contributor_roles", lit(null))
-                    .select(col("id"), col("fullname"), col("raw_affiliation_string"), col("corresponding"), col("contributor_roles"));
+        Dataset<Row> oaire = getSelectGraphSchemaData(oaire_entities);
         oaire.write().mode(SaveMode.Overwrite).option("compression","gzip").json(workingDir + "exploded/oaire");
+
+
+        //the output model for all the datasets will be:
+        //id : the openaire identifier for the resource
+        //authors.fullname the fullname of the author
+        //authors.raw_affiliation_strings the list of raw_affiliation_strings associated to the author
+        //todo decide if we want also to include authors.pid not from oalex but from the other sources
+        Dataset<Row> oalex = getSelectOalexSchemaData(spark
+                .read()
+                .schema(OALEX_SCHEMA)
+                .json(oalexPath));
+        oalex.write().mode(SaveMode.Overwrite).option("compression","gzip").json(workingDir + "exploded/oalex");
+
+        Dataset<Row> inputDataset = spark.createDataFrame(Collections.emptyList(), DATASET_SCHEMA);
 if(importIIS) {
-    Dataset<Row> iis =
-            spark.sql(IIS_QUERY)
+    Dataset<Row> iis = getSelectIISData(spark.sql(IIS_QUERY)
+            .as(Encoders.bean(IISModel.class)));
+
 //        spark.read().schema(Encoders.bean(IISModel.class).schema())
 //                .json(iisPath)
-                    .as(Encoders.bean(IISModel.class))
-                    .filter((FilterFunction<IISModel>) value -> Optional.ofNullable(value.getAuthors()).isPresent() &&
-                            !value.getAuthors().isEmpty() &&
-                            Optional.ofNullable(value.getAffiliations()).isPresent() &&
-                            !value.getAffiliations().isEmpty())
 
-                    .flatMap((FlatMapFunction<IISModel, Row>) value -> {
-                                List<Row> ret = new ArrayList<>();
-                                value.getAuthors().stream().forEach(author -> ret.addAll(
-                                        getAuthorLines(value.getId(), author, value.getAffiliations())));
-                                return ret.iterator();
-                            }
-                            , RowEncoder.apply(DATASET_SCHEMA))
-                    .filter("raw_affiliation_string IS NOT NULL AND TRIM(raw_affiliation_string) != '' AND LOWER(raw_affiliation_string) NOT IN ('unknown', 'none')")
-                    .select(col("id"), col("fullname"), col("raw_affiliation_string"), col("corresponding"), col("contributor_roles"));
+
     iis.write().mode(SaveMode.Overwrite).option("compression", "gzip").json(workingDir + "exploded/iis");
+    inputDataset = iis;
 }
-        Dataset<Row> publishers = spark.read().schema(PUBLISHER_SCHEMA).json(publishersPath)
-                .filter( col("success").equalTo(true))
-                .withColumn("authors", col("parsing_output.authors"))
-                .select( col("id"), col("doi"),
-                        explode(col("authors")).alias("author"))
-                .withColumn("graphId" , col("id"))
-                .drop(col("id"))
-                .withColumn("fullname", col("author.name.full"))
-                .withColumn("raw_affiliation_strings",  col("author.raw_affiliations"))
-                .withColumn("corresponding", col("author.corresponding"))
-                .withColumn("contributor_roles", col("author.contributor_roles"))
-                .drop(col("author"))
-                .select(col("graphId"),col("doi"),col("fullname"), explode(col("raw_affiliation_strings")).alias("raw_affiliation_string")
-                ,col("corresponding"), col("contributor_roles"))
-                .filter("raw_affiliation_string IS NOT NULL AND TRIM(raw_affiliation_string) != '' AND LOWER(raw_affiliation_string) NOT IN ('unknown', 'none')")
-                .withColumn("id",  expr("selectId(doi, graphId)"))
-                .drop(col("graphId"))
-                .drop(col("doi"))
-                .select("id","fullname","raw_affiliation_string","corresponding","contributor_roles");
+        Dataset<Row> publishers = getSelectPublisherSchemaData(spark.read().schema(PUBLISHER_SCHEMA).json(publishersPath));
         publishers.write().mode(SaveMode.Overwrite).option("compression","gzip").json(workingDir + "exploded/publishers");
 
-        Dataset<Row> inputDataset = oalex.union(oaire).union(publishers)//.union(iis)
+
+        inputDataset = inputDataset.union(oalex).union(oaire).union(publishers)
+                .union(crossref)
+                .union(datacite)
+                .union(pubmed)
                 .distinct()
                 ;
 
@@ -297,6 +230,75 @@ if(importIIS) {
                 .option("compression", "gzip")
                 .json(workingDir+"/toMatch" );
 
+    }
+
+    private static Dataset<Row> getSelectPublisherSchemaData(Dataset<Row> dataset_entities) {
+        return dataset_entities.filter( col("success").equalTo(true))
+                .withColumn("authors", col("parsing_output.authors"))
+                .select( col("id"), col("doi"),
+                        explode(col("authors")).alias("author"))
+                .withColumn("graphId" , col("id"))
+                .drop(col("id"))
+                .withColumn("fullname", col("author.name.full"))
+                .withColumn("raw_affiliation_strings",  col("author.raw_affiliations"))
+                .withColumn("corresponding", col("author.corresponding"))
+                .withColumn("contributor_roles", col("author.contributor_roles"))
+                .drop(col("author"))
+                .select(col("graphId"),col("doi"),col("fullname"), explode(col("raw_affiliation_strings")).alias("raw_affiliation_string")
+                        ,col("corresponding"), col("contributor_roles"))
+                .filter("raw_affiliation_string IS NOT NULL AND TRIM(raw_affiliation_string) != '' AND LOWER(raw_affiliation_string) NOT IN ('unknown', 'none')")
+                .withColumn("id",  expr("selectId(doi, graphId)"))
+                .drop(col("graphId"))
+                .drop(col("doi"))
+                .select("id","fullname","raw_affiliation_string","corresponding","contributor_roles");
+    }
+
+    private static Dataset<Row> getSelectGraphSchemaData(Dataset<Row> dataset_entities) {
+        return dataset_entities
+                .select(col("id"), explode(col("author")).alias("author"))
+                .select(col("id"), col("author"), explode(col("author.rawAffiliationString")).alias("raw_affiliation_string"))
+                .filter("raw_affiliation_string IS NOT NULL AND TRIM(raw_affiliation_string) != '' AND LOWER(raw_affiliation_string) NOT IN ('unknown', 'none')")
+                .withColumn("fullname", col("author.fullName"))
+                .drop("author")
+                .withColumn("corresponding", lit(null))
+                .withColumn("contributor_roles", lit(null))
+                .select(col("id"), col("fullname"), col("raw_affiliation_string"), col("corresponding"), col("contributor_roles"))
+                .as(RowEncoder.apply(DATASET_SCHEMA));
+    }
+
+    private static Dataset<Row> getSelectOalexSchemaData(Dataset<Row> dataset_entities){
+        return dataset_entities.filter(col("doi").isNotNull())
+                .withColumn("id",  expr("md5HashWithPrefix(doi)"))
+                .select(col("id"),
+                        explode( col("authorships")).alias("author"))
+                .withColumn("fullname", col("author.author.display_name"))
+                .withColumn("raw_affiliation_strings", col("author.raw_affiliation_strings"))
+                .select(col("id"), col("fullname"),
+                        explode(col("raw_affiliation_strings")).alias("raw_affiliation_string"))
+                .filter("raw_affiliation_string IS NOT NULL AND TRIM(raw_affiliation_string) != '' AND LOWER(raw_affiliation_string) NOT IN ('unknown', 'none')")
+                .withColumn("corresponding", lit(null))
+                .withColumn("contributor_roles", lit(null))
+                .select(col("id"), col("fullname"), col("raw_affiliation_string"), col("corresponding"), col("contributor_roles"))
+                .as(RowEncoder.apply(DATASET_SCHEMA));
+    }
+
+    private static Dataset<Row> getSelectIISData(Dataset<IISModel> dataset_entities){
+        return dataset_entities
+
+                .filter((FilterFunction<IISModel>) value -> Optional.ofNullable(value.getAuthors()).isPresent() &&
+                        !value.getAuthors().isEmpty() &&
+                        Optional.ofNullable(value.getAffiliations()).isPresent() &&
+                        !value.getAffiliations().isEmpty())
+
+                .flatMap((FlatMapFunction<IISModel, Row>) value -> {
+                            List<Row> ret = new ArrayList<>();
+                            value.getAuthors().stream().forEach(author -> ret.addAll(
+                                    getAuthorLines(value.getId(), author, value.getAffiliations())));
+                            return ret.iterator();
+                        }
+                        , RowEncoder.apply(DATASET_SCHEMA))
+                .filter("raw_affiliation_string IS NOT NULL AND TRIM(raw_affiliation_string) != '' AND LOWER(raw_affiliation_string) NOT IN ('unknown', 'none')")
+                .select(col("id"), col("fullname"), col("raw_affiliation_string"), col("corresponding"), col("contributor_roles"));
     }
 
     private static List<Row> getAuthorLines(String id, Author author, List<Affiliation> affiliations) {

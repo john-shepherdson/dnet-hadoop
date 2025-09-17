@@ -90,7 +90,7 @@ public class RedistributeRelations implements Serializable {
         );
 
         String [] entities = {//"iis",
-                "publishers", "oalex","oaire"};//, "crossref", "datacite"};
+                "publishers", "oalex","oaire", "crossref", "datacite", "pubmed"};
         for (String datasource : entities)
             redistributeForDatasource(spark, explodedPath , matchingsPath, outputPath, datasource);
 

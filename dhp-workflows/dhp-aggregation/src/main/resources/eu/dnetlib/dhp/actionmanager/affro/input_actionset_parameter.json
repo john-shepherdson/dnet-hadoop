@@ -5,30 +5,14 @@
     "paramDescription": "when true will stop SparkSession after job execution",
     "paramRequired": false
   },
-  {
-    "paramName": "cip",
-    "paramLongName": "crossrefInputPath",
-    "paramDescription": "the path to get the input data from Crossref",
-    "paramRequired": true
-  },
-  {
-    "paramName": "pip",
-    "paramLongName": "pubmedInputPath",
-    "paramDescription": "the path to get the input data from Pubmed",
-    "paramRequired": true
-  },
+
   {
     "paramName": "oip",
     "paramLongName": "openapcInputPath",
     "paramDescription": "the path to get the input data from OpenAPC",
     "paramRequired": true
   },
-  {
-    "paramName": "dip",
-    "paramLongName": "dataciteInputPath",
-    "paramDescription": "the path to get the input data from Datacite",
-    "paramRequired": true
-  },
+
   {
   "paramName": "ip",
   "paramLongName": "inputPaths",
@@ -40,5 +24,11 @@
     "paramLongName": "outputPath",
     "paramDescription": "the path of the new ActionSet",
     "paramRequired": true
+  },
+  {
+    "paramName": "iis",
+    "paramLongName": "importIIS",
+    "paramDescription": "the path of the new ActionSet",
+    "paramRequired": false
   }
 ]
