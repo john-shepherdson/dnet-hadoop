@@ -15,6 +15,11 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.schema.oaf.rel.AuthorAffiliation;
+import eu.dnetlib.dhp.schema.oaf.rel.Authorship;
+import eu.dnetlib.dhp.schema.oaf.rel.CoAuthorship;
+import eu.dnetlib.dhp.schema.oaf.rel.ProjectParticipation;
+import eu.dnetlib.dhp.schema.oaf.rel.beans.*;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -25,10 +30,13 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.BZip2Codec;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
+import org.apache.hadoop.yarn.webapp.hamlet.Hamlet;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.*;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.StructType;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,11 +53,13 @@ import eu.dnetlib.dhp.common.person.CoAuthorshipIterator;
 import eu.dnetlib.dhp.common.person.Coauthors;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.*;
 import eu.dnetlib.dhp.utils.DHPUtils;
 import scala.Tuple2;
+import scala.collection.mutable.WrappedArray;
+
+import static org.apache.spark.sql.functions.*;
 
 public class ExtractPerson implements Serializable {
 	private static final Logger log = LoggerFactory.getLogger(ExtractPerson.class);
@@ -110,84 +120,167 @@ public class ExtractPerson implements Serializable {
 
 	// PUBLISHER
 	private static void extractInfoForActionSetFromPublisher(SparkSession spark, String inputPath, String workingDir) {
+		StructType schema = new StructType()
+				.add("id", DataTypes.StringType)
+				.add("authors", DataTypes.createArrayType(
+						new StructType()
+								.add("corresponding", DataTypes.StringType)
+								.add("contributor_roles", DataTypes.createArrayType(
+										new StructType()
+												.add("schema", DataTypes.StringType)
+												.add("value", DataTypes.StringType)
+												.add("name", DataTypes.StringType)))
+								.add("affiliations", DataTypes.createArrayType(
+										new StructType()
+												.add("raw_affiliation_string", DataTypes.StringType)
+												.add("Matchings", DataTypes.createArrayType(
+														new StructType()
+																.add("pid", DataTypes.StringType)
+																.add("value", DataTypes.StringType)
+																.add("name", DataTypes.StringType)
+																.add("confidence", DataTypes.DoubleType)
+																.add("status", DataTypes.StringType)
+																.add("country", DataTypes.StringType)))))
+								.add("pids", DataTypes.createArrayType(
+										new StructType()
+												.add("schema", DataTypes.StringType)
+												.add("value", DataTypes.StringType)))
+				));
+
 		// Read the publishers output
 		Dataset<Row> df = spark
 			.read()
-			.schema(
-				"`doi` STRING, " +
-					"`authors` ARRAY<STRUCT<`corresponding` : STRING, " +
-					"`contributor_roles` : ARRAY<STRUCT<`schema`:STRING, `value`:STRING, `name`: STRING>> ," +
-					"`name` : STRUCT<`full`:STRING, `first` : STRING, `last`: STRING, `type`: STRING>,  " +
-					"`matchings`: ARRAY<STRUCT<`pid`:STRING, `value`:STRING, `name`: STRING, `confidence`:DOUBLE, `status`:STRING, `country`: STRING>>, " +
-					"`pids` : ARRAY<STRUCT<`schema`:STRING , `value`: STRING>>>>")
+			.schema(schema)
 			.json(inputPath)
-			.where("doi is not null");
+			.where("id is not null");
 
-//Select the relevant information
+
+        //Select the relevant information
 		Dataset<Row> allAuthors = df
-			.selectExpr("doi", "explode(authors) as author")
-			.selectExpr(
-				"doi", "author.contributor_roles as roles",
-				"author.corresponding as corresponding", "author.matchings as affs",
-				"explode(author.pids) as pid")
-			.where("lower(pid.Schema) = 'orcid'");
+				.withColumn("author", explode(col("authors")))
+				.select(col("id"),
+						col("author.contributor_roles").as("roles"),
+						col("author.corresponding").as("corresponding"),
+						col("author.affiliations").as("affiliations"),
+						col("author.pids").as("pids"))
+				.withColumn("pid", explode(col("pids")))
+				.drop("pids")
+				.filter(lower(col("pid.schema")).equalTo("orcid"));
 
-		Dataset<Row> authors = allAuthors
-			.selectExpr("explode (affs) as affiliation", "doi", "corresponding", "roles", "pid.value as orcid")
-			.where("affiliation.status = 'active'")
-			.selectExpr(
-				"affiliation.value as orgid", "affiliation.pid as orgpid", "affiliation.confidence as trust", "doi",
-				"corresponding", "roles", "orcid");
 
-		authors = authors
-			.where("roles is null")
-			.selectExpr("*", " '' AS roleschema", " '' AS rolevalue", " '' AS rolename")
-			.drop("roles")
-			.unionAll(
-				authors
-					.where("roles is not null")
-					.selectExpr("orgid", "orgpid", "trust", "DOI", "corresponding", "explode(roles) as role", "orcid")
-					.selectExpr("*", "role.Schema as roleschema", "role.Value as rolevalue")
-					.drop("role"));
+		writeAuthorshipRelations(workingDir + "/authorship", allAuthors);
 
-		// create the relation dataset with possible redundant relations
-		Dataset<Relation> relations = authors
-			.flatMap(
-				(FlatMapFunction<Row, Relation>) a -> Arrays
-					.asList(getAuthorshipRelation(a), getAffiliationRelation(a))
-					.iterator(),
-				Encoders.bean(Relation.class))
-			.unionAll(
-				allAuthors
-					.selectExpr("doi", "pid.Value as orcid")
-					.groupByKey((MapFunction<Row, String>) r -> r.getAs("doi"), Encoders.STRING())
-
-					.mapGroups(
-						(MapGroupsFunction<String, Row, Coauthors>) (k, it) -> extractCoAuthorsRow(it),
-						Encoders.bean(Coauthors.class))
-					.flatMap(
-						(FlatMapFunction<Coauthors, Relation>) c -> new CoAuthorshipIterator(c.getCoauthors()),
-						Encoders.bean(Relation.class))
-					.groupByKey((MapFunction<Relation, String>) r -> r.getSource() + r.getTarget(), Encoders.STRING())
-					.mapGroups(
-						(MapGroupsFunction<String, Relation, Relation>) (k, it) -> it.next(),
-						Encoders.bean(Relation.class)));
-
-		// produce one dataset with only one relation per source, target and semantics. Eventually extend the list of
-		// properties
-
-		relations
-			.groupByKey(
-				(MapFunction<Relation, String>) r -> r.getSource() + r.getRelClass() + r.getTarget(), Encoders.STRING())
-			.mapGroups(
-				(MapGroupsFunction<String, Relation, Relation>) (k, it) -> mergeRelation(it),
-				Encoders.bean(Relation.class))
-			.write()
-			.mode(SaveMode.Overwrite)
-			.option("compression", "gzip")
-			.json(workingDir + "/publishers");
+		writeCoAuthorshipRelations(workingDir, allAuthors);
 
 	}
+
+	private static void writeCoAuthorshipRelations(String workingDir, Dataset<Row> allAuthors) {
+		allAuthors
+				.selectExpr("id", "pid.value as orcid")
+				.groupByKey((MapFunction<Row, String>) r -> r.getAs("id"), Encoders.STRING())
+				.mapGroups(
+						(MapGroupsFunction<String, Row, Coauthors>) (k, it) -> extractCoAuthorsRow(it),
+						Encoders.bean(Coauthors.class))
+				.flatMap(
+						(FlatMapFunction<Coauthors, CoAuthorship>) c -> new CoAuthorshipIterator(c.getCoauthors()),
+						Encoders.bean(CoAuthorship.class))
+				.groupByKey((MapFunction<CoAuthorship, String>) r -> r.getAuthor1() + r.getAuthor2(), Encoders.STRING())
+				.mapGroups(
+						(MapGroupsFunction<String, CoAuthorship, CoAuthorship>) (k, it) -> {
+							CoAuthorship ca = it.next();
+							it.forEachRemaining(a -> ca.setCoauthoredProducts(ca.getCoauthoredProducts() + a.getCoauthoredProducts()));
+							return ca;
+						},
+						Encoders.bean(CoAuthorship.class))
+				.write()
+				.mode(SaveMode.Overwrite)
+				.option("compression","gzip")
+				.json(workingDir + "/coauthorship");
+	}
+
+	private static void writeAuthorshipRelations(String outputPath, Dataset<Row> allAuthors) {
+		allAuthors.map(
+				(MapFunction<Row, Authorship>) row -> {
+					String id = row.getAs("id");
+					Boolean corresponding = row.getAs("corresponding");
+
+					// orcid è garantito perché filtriamo prima
+					Row pid = row.getAs("pid");
+					String orcid = pid.getAs("value");
+
+					// --- Gestione Affiliazioni (senza explode) ---
+					WrappedArray<Row> affRows = row.getAs("affiliations");
+					List<DeclaredAffiliation> declaredAffiliations = new ArrayList<>();
+					if (affRows != null) {
+						for(int i =0; i< affRows.length(); i++){
+							Row aff = affRows.apply(i);
+							String rawAff = aff.getAs("raw_affiliation_string");
+
+							// Matchings non esplosi
+							WrappedArray<Row> matchingRows = aff.getAs("Matchings");
+							List<MatchingOrganization> mos = new ArrayList<>();
+							Set<String> insertedPids = new HashSet<>();
+							if (matchingRows != null) {
+								for (int j = 0 ; j < matchingRows.length(); j++){
+									Row m = matchingRows.apply(j);
+									String status = m.getAs("status");
+									String pidValue = m.getAs("value");
+									if ("active".equalsIgnoreCase(status) && !insertedPids.contains(pidValue)) {
+										insertedPids.add(m.getAs("value"));
+										MatchingOrganization mo = new MatchingOrganization();
+										if("ROR".equalsIgnoreCase(m.getAs("pid"))){
+											mo.setRor(pidValue);
+										}else {
+											mo.setOpenOrgs(m.getAs("value"));
+										}
+										mo.setProvenance("affro");
+										mo.setCountry(m.getAs("country"));
+										mo.setTrust(m.getAs("confidence"));
+										mo.setResolvedOrganizationName(m.getAs("name"));
+
+										mos.add(mo);
+									}
+								}
+							}
+
+							if (!mos.isEmpty()) {
+								DeclaredAffiliation da = new DeclaredAffiliation();
+								da.setRawAffiliation(rawAff);
+								da.setMatchingOrganization(mos);
+								declaredAffiliations.add(da);
+							}
+						}
+					}
+
+					// --- Gestione Roles (senza explode) ---
+					WrappedArray<Row> roleRows = row.getAs("roles");
+					List<AuthorshipRoles> roles = new ArrayList<>();
+					if (roleRows != null) {
+						for(int i = 0; i < roleRows.length(); i++){
+							Row role = roleRows.apply(i);
+							AuthorshipRoles r = AuthorshipRoles.fromString(role.getAs("name"));
+							roles.add(r);
+						}
+					}
+
+					// --- Costruzione Authorship ---
+					Authorship authorship = new Authorship();
+					authorship.setProduct(id);
+					authorship.setPerson(orcid);
+					authorship.setCorresponding(corresponding);
+					authorship.setDeclaredAffiliations(declaredAffiliations);
+					authorship.setRoles(roles);
+
+					return authorship;
+				},
+				Encoders.bean(Authorship.class)
+		).write()
+				.mode(SaveMode.Overwrite)
+				.option("compression", "gzip")
+				.json(outputPath);
+		;
+	}
+
 
 	private static Relation mergeRelation(Iterator<Relation> it) {
 		Relation r = it.next();
@@ -199,68 +292,7 @@ public class ExtractPerson implements Serializable {
 		return r;
 	}
 
-	private static @NotNull Relation getAuthorshipRelation(Row a) {
-		String target = DOI_PREFIX
-			+ IdentifierFactory
-				.md5(PidCleaner.normalizePidValue(PidType.doi.toString(), a.getAs("doi")));
-		;
-		String source = PERSON_PREFIX + SEPARATOR + IdentifierFactory.md5(a.getAs("orcid"));
 
-		Relation relation = OafMapperUtils
-			.getRelation(
-				source, target, ModelConstants.RESULT_PERSON_RELTYPE,
-				ModelConstants.RESULT_PERSON_SUBRELTYPE,
-				ModelConstants.RESULT_PERSON_HASAUTHORED,
-				OafMapperUtils.listKeyValues(OPENAIRE_DATASOURCE_ID, OPENAIRE_DATASOURCE_NAME),
-				null,
-				null);
-
-		final Double trust = a.getAs("trust");
-
-		if (StringUtils.isNotBlank(a.getAs("orgid"))) {
-			KeyValue kv = new KeyValue();
-			kv.setKey("declared_affiliation");
-			if (((String) a.getAs("orgpid")).equalsIgnoreCase("ror"))
-				kv.setValue(a.getAs("orgid"));
-			else
-				kv
-					.setValue(
-						OPENORGS_PREFIX
-							+ IdentifierFactory.md5(PidCleaner.normalizePidValue("OPENORGS", a.getAs("orgid"))));
-			kv
-				.setDataInfo(
-					OafMapperUtils
-						.dataInfo(
-							false, "openaire", true, false, null,
-							String.valueOf(trust)));
-
-			if (!Optional.ofNullable(relation.getProperties()).isPresent())
-				relation.setProperties(new ArrayList<>());
-			relation.getProperties().add(kv);
-
-		}
-		if (Optional.ofNullable(a.getAs("corresponding")).isPresent() &&
-			a.getAs("corresponding").equals("true")) {
-			KeyValue kv = new KeyValue();
-			kv.setKey("corresponding");
-			kv.setValue("true");
-			if (!Optional.ofNullable(relation.getProperties()).isPresent())
-				relation.setProperties(new ArrayList<>());
-			relation.getProperties().add(kv);
-		}
-
-		if (StringUtils.isNotBlank(a.getAs("roleschema"))) {
-			KeyValue kv = new KeyValue();
-			kv.setKey("role");
-			String role = (String) a.getAs("roleschema")
-				+ (String) a.getAs("rolevalue");
-			kv.setValue(role);
-			if (!Optional.ofNullable(relation.getProperties()).isPresent())
-				relation.setProperties(new ArrayList<>());
-			relation.getProperties().add(kv);
-		}
-		return relation;
-	}
 
 	private static @NotNull Relation getAffiliationRelation(Row a) {
 
@@ -304,7 +336,7 @@ public class ExtractPerson implements Serializable {
 
 	}
 
-	public static Relation getRelationWithProject(ResultSet rs) {
+	public static ProjectParticipation getRelationWithProject(ResultSet rs) {
 		try {
 			return getProjectRelation(
 				rs.getString("project"), rs.getString("pid"),
@@ -314,37 +346,25 @@ public class ExtractPerson implements Serializable {
 		}
 	}
 
-	private static Relation getProjectRelation(String project, String orcid, String role) {
+	private static ProjectParticipation getProjectRelation(String project, String orcid, String role) {
 
 		String source = PERSON_PREFIX + SEPARATOR + IdentifierFactory.md5(orcid);
 
 		String target = PROJECT_ID_PREFIX + StringUtils.substringBefore(project, SEPARATOR) + SEPARATOR
 			+ IdentifierFactory.md5(StringUtils.substringAfter(project, SEPARATOR));
-		List<KeyValue> properties = new ArrayList<>();
-
-		Relation relation = OafMapperUtils
-			.getRelation(
-				source, target, ModelConstants.PROJECT_PERSON_RELTYPE, ModelConstants.PROJECT_PERSON_SUBRELTYPE,
-				ModelConstants.PROJECT_PERSON_PARTICIPATES,
-				collectedfromOpenAIRE,
-				FUNDERDATAINFO,
-				null);
-		relation.setValidated(true);
+		ProjectParticipation pp = new ProjectParticipation();
+		pp.setPerson(source);
+		pp.setProject(target);
 
 		if (StringUtils.isNotBlank(role)) {
-			KeyValue kv = new KeyValue();
-			kv.setKey("role");
-			kv.setValue(role);
-			properties.add(kv);
+			pp.setRoleInProject(ProjectRoles.mapStringToEnum(role));
 		}
 
-		if (!properties.isEmpty())
-			relation.setProperties(properties);
-		return relation;
+		return pp;
 
 	}
 
-	protected static void writeRelation(final Relation relation, BufferedWriter writer) {
+	protected static void writeRelation(final ProjectParticipation relation, BufferedWriter writer) {
 		try {
 			writer.write(OBJECT_MAPPER.writeValueAsString(relation));
 			writer.newLine();
@@ -356,8 +376,6 @@ public class ExtractPerson implements Serializable {
 	// ORCID
 	private static void extractInfoForActionSetFromORCID(SparkSession spark, String inputPath, String workingDir) {
 		writePerson(spark, inputPath, workingDir);
-		// writeAuthorship(spark, inputPath, workingDir);
-		// writeCoAuthorship(spark, inputPath, workingDir);
 		writeAffiliations(spark, inputPath, workingDir);
 	}
 
@@ -379,62 +397,12 @@ public class ExtractPerson implements Serializable {
 			.filter((FilterFunction<Employment>) e -> Optional.ofNullable(e.getAffiliationId()).isPresent())
 			.filter((FilterFunction<Employment>) e -> e.getAffiliationId().getSchema().equalsIgnoreCase("ror"))
 			.map(
-				(MapFunction<Employment, Relation>) ExtractPerson::getAffiliationRelation,
-				Encoders.bean(Relation.class))
+				(MapFunction<Employment, AuthorAffiliation>) ExtractPerson::getAffiliationRelation,
+				Encoders.bean(AuthorAffiliation.class))
 			.write()
 			.option("compression", "gzip")
 			.mode(SaveMode.Overwrite)
 			.json(workingDir + "/affiliation");
-	}
-
-	private static void writeCoAuthorship(SparkSession spark, String inputPath, String workingDir) {
-		Dataset<Relation> coauthorship = spark
-			.read()
-			.parquet(inputPath + "Works")
-			.as(Encoders.bean(Work.class))
-			.flatMap(
-				(FlatMapFunction<Work, Tuple2<String, String>>) work -> work
-					.getPids()
-					.stream()
-					.filter(p -> isRelevantSchema(p.getSchema()))
-					.map(p -> new Tuple2<>(p.getValue(), work.getOrcid()))
-					.collect(Collectors.toList())
-					.iterator(),
-				Encoders.tuple(Encoders.STRING(), Encoders.STRING()))
-			.groupByKey((MapFunction<Tuple2<String, String>, String>) Tuple2::_1, Encoders.STRING())
-			.mapGroups(
-				(MapGroupsFunction<String, Tuple2<String, String>, Coauthors>) (k, it) -> extractCoAuthors(it),
-				Encoders.bean(Coauthors.class))
-			.flatMap(
-				(FlatMapFunction<Coauthors, Relation>) c -> new CoAuthorshipIterator(c.getCoauthors()),
-				Encoders.bean(Relation.class))
-			.groupByKey((MapFunction<Relation, String>) r -> r.getSource() + r.getTarget(), Encoders.STRING())
-			.mapGroups(
-				(MapGroupsFunction<String, Relation, Relation>) (k, it) -> it.next(), Encoders.bean(Relation.class));
-
-		coauthorship
-			.write()
-			.option("compression", "gzip")
-			.mode(SaveMode.Overwrite)
-			.json(workingDir + "/coauthorship");
-	}
-
-	private static void writeAuthorship(SparkSession spark, String inputPath, String workingDir) {
-		Dataset<Work> works = spark
-			.read()
-			.parquet(inputPath + "Works")
-			.as(Encoders.bean(Work.class))
-			.filter(
-				(FilterFunction<Work>) ExtractPerson::isAllowedPidType);
-		works
-			.flatMap(
-				(FlatMapFunction<Work, Relation>) ExtractPerson::getAuthorshipRelationIterator,
-				Encoders.bean(Relation.class))
-			.write()
-			.option("compression", "gzip")
-			.mode(SaveMode.Overwrite)
-			.json(workingDir + "/authorship");
-
 	}
 
 	private static void writePerson(SparkSession spark, String inputPath, String workingDir) {
@@ -451,36 +419,6 @@ public class ExtractPerson implements Serializable {
 			.mode(SaveMode.Overwrite)
 			.json(workingDir + "/people");
 
-	}
-
-	private static boolean isRelevantSchema(String schema) {
-		return schema.equalsIgnoreCase("doi") ||
-			schema.equalsIgnoreCase("pmc") ||
-			schema.equalsIgnoreCase("pmid") ||
-			schema.equalsIgnoreCase("arxiv");
-	}
-
-	private static @NotNull Iterator<Relation> getAuthorshipRelationIterator(Work w) {
-
-		if (Optional.ofNullable(w.getPids()).isPresent())
-			return w
-				.getPids()
-				.stream()
-				.map(pid -> getRelation(w.getOrcid(), pid))
-				.filter(Objects::nonNull)
-				.collect(Collectors.toList())
-				.iterator();
-
-		List<Relation> ret = new ArrayList<>();
-		return ret.iterator();
-	}
-
-	private static boolean isAllowedPidType(Work w) {
-		return Optional.ofNullable(w.getPids()).isPresent() &&
-			w
-				.getPids()
-				.stream()
-				.anyMatch(p -> isRelevantSchema(p.getSchema()));
 	}
 
 	private static @NotNull Person getPerson(Author op) {
@@ -553,15 +491,6 @@ public class ExtractPerson implements Serializable {
 			return spark.emptyDataset(Encoders.bean(Relation.class));
 	}
 
-	private static Coauthors extractCoAuthors(Iterator<Tuple2<String, String>> it) {
-		Coauthors coauth = new Coauthors();
-		List<String> coauthors = new ArrayList<>();
-		while (it.hasNext())
-			coauthors.add(it.next()._2());
-		coauth.setCoauthors(coauthors);
-
-		return coauth;
-	}
 
 	private static Coauthors extractCoAuthorsRow(Iterator<Row> it) {
 		Coauthors coauth = new Coauthors();
@@ -573,79 +502,31 @@ public class ExtractPerson implements Serializable {
 		return coauth;
 	}
 
-	private static Relation getAffiliationRelation(Employment row) {
+	private static AuthorAffiliation getAffiliationRelation(Employment row) {
+		AuthorAffiliation aa = new AuthorAffiliation();
+
 		String source = PERSON_PREFIX + SEPARATOR + IdentifierFactory.md5(row.getOrcid());
 		String target = ROR_PREFIX
 			+ IdentifierFactory.md5(PidCleaner.normalizePidValue("ROR", row.getAffiliationId().getValue()));
-		List<KeyValue> properties = new ArrayList<>();
+		aa.setPerson(source);
+		aa.setOrganization(target);
 
-		Relation relation = OafMapperUtils
-			.getRelation(
-				source, target, ModelConstants.ORG_PERSON_RELTYPE, ModelConstants.ORG_PERSON_SUBRELTYPE,
-				ModelConstants.ORG_PERSON_PARTICIPATES,
-				Arrays.asList(OafMapperUtils.keyValue(ORCID_KEY, ModelConstants.ORCID_DS)),
-				ORCIDDATAINFO,
-				null);
-		relation.setValidated(true);
-
+		Period p =new Period();
 		if (Optional.ofNullable(row.getStartDate()).isPresent() && StringUtils.isNotBlank(row.getStartDate())) {
-			KeyValue kv = new KeyValue();
-			kv.setKey("startDate");
-			kv.setValue(row.getStartDate());
-			properties.add(kv);
+
+			p.setStartDate(row.getStartDate());
+
 		}
 		if (Optional.ofNullable(row.getEndDate()).isPresent() && StringUtils.isNotBlank(row.getEndDate())) {
-			KeyValue kv = new KeyValue();
-			kv.setKey("endDate");
-			kv.setValue(row.getEndDate());
-			properties.add(kv);
-		}
+			p.setEndDate(row.getEndDate());
 
-		if (properties.size() > 0)
-			relation.setProperties(properties);
-		return relation;
+		}
+		aa.setPeriod(Collections.singletonList(p));
+
+		return aa;
 
 	}
 
-	private static Relation getRelation(String orcid, eu.dnetlib.dhp.collection.orcid.model.Pid pid) {
-		String target;
-		String source = PERSON_PREFIX + SEPARATOR + IdentifierFactory.md5(orcid);
-		switch (pid.getSchema()) {
-			case "doi":
-				target = DOI_PREFIX
-					+ IdentifierFactory
-						.md5(PidCleaner.normalizePidValue(PidType.doi.toString(), pid.getValue()));
-				break;
-			case "pmid":
-				target = PMID_PREFIX
-					+ IdentifierFactory
-						.md5(PidCleaner.normalizePidValue(PidType.pmid.toString(), pid.getValue()));
-				break;
-			case "arxiv":
-				target = ARXIV_PREFIX
-					+ IdentifierFactory
-						.md5(PidCleaner.normalizePidValue(PidType.arXiv.toString(), pid.getValue()));
-				break;
-			case "pmcid":
-				target = PMCID_PREFIX
-					+ IdentifierFactory
-						.md5(PidCleaner.normalizePidValue(PidType.pmc.toString(), pid.getValue()));
-				break;
-
-			default:
-				return null;
-		}
-		Relation relation = OafMapperUtils
-			.getRelation(
-				source, target, ModelConstants.RESULT_PERSON_RELTYPE,
-				ModelConstants.RESULT_PERSON_SUBRELTYPE,
-				ModelConstants.RESULT_PERSON_HASAUTHORED,
-				Collections.singletonList(OafMapperUtils.keyValue(ORCID_KEY, ModelConstants.ORCID_DS)),
-				ORCIDDATAINFO,
-				null);
-		relation.setValidated(true);
-		return relation;
-	}
 
 	// ACTION SET
 	private static void createActionSet(SparkSession spark, String outputPath, String workingDir) {
@@ -659,30 +540,43 @@ public class ExtractPerson implements Serializable {
 					.readValue(value, Person.class),
 				Encoders.bean(Person.class));
 
-		Dataset<Relation> relations = // getRelations(spark, workingDir + "/coauthorship")
-			// .union(
-			// getRelations(spark, workingDir + "/authorship"))
-			// .union(
-			getRelations(spark, workingDir + "/affiliation")// )
-				.union(
-					getRelations(spark, workingDir + "/project"))
-				.union(
-					getRelations(spark, workingDir + "/publishers"));
+		Dataset<Authorship> authorshipDataset = spark.read().textFile(workingDir + "/authorship")
+				.map((MapFunction<String, Authorship>) values -> OBJECT_MAPPER.readValue(values, Authorship.class),
+						Encoders.bean(Authorship.class));
+
+		Dataset<CoAuthorship> coAuthorshipDataset = spark.read().textFile(workingDir + "/coauthorship")
+				.map((MapFunction<String, CoAuthorship>) values -> OBJECT_MAPPER.readValue(values, CoAuthorship.class),
+						Encoders.bean(CoAuthorship.class));
+
+		Dataset<AuthorAffiliation> authorAffiliationDataset = spark.read().textFile(workingDir + "/affiliation")
+				.map((MapFunction<String, AuthorAffiliation>) values -> OBJECT_MAPPER.readValue(values, AuthorAffiliation.class),
+						Encoders.bean(AuthorAffiliation.class));
+
+		Dataset<ProjectParticipation> projectParticipationDataset = spark.read().textFile(workingDir + "/project")
+				.map((MapFunction<String, ProjectParticipation>) values -> OBJECT_MAPPER.readValue(values, ProjectParticipation.class),
+						Encoders.bean(ProjectParticipation.class));
 
 		people
 			.toJavaRDD()
 			.map(p -> new AtomicAction(p.getClass(), p))
 			.union(
-				relations
-					.groupByKey(
-						(MapFunction<Relation, String>) r -> r.getSource() + r.getRelClass() + r.getTarget(),
-						Encoders.STRING())
-					.mapGroups(
-						(MapGroupsFunction<String, Relation, Relation>) (k, it) -> mergeRelation(it),
-						Encoders.bean(Relation.class))
-					.toJavaRDD()
-					.map(r -> new AtomicAction(r.getClass(), r)))
-			.mapToPair(
+					authorshipDataset
+							.toJavaRDD()
+									.map(r -> new AtomicAction(r.getClass(), r))
+			)
+			.union(coAuthorshipDataset
+								.toJavaRDD()
+								.map(r -> new AtomicAction(r.getClass(), r))
+			)
+				.union(authorAffiliationDataset
+						.toJavaRDD()
+						.map(r -> new AtomicAction(r.getClass(), r))
+				)
+				.union(projectParticipationDataset
+						.toJavaRDD()
+						.map(r -> new AtomicAction(r.getClass(), r))
+				)
+				.mapToPair(
 				aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
 					new Text(OBJECT_MAPPER.writeValueAsString(aa))))
 			.saveAsHadoopFile(

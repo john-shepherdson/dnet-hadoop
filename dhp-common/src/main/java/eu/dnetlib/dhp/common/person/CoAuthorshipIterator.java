@@ -10,10 +10,11 @@ import java.util.List;
 
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.rel.CoAuthorship;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 
-public class CoAuthorshipIterator implements Iterator<Relation> {
+public class CoAuthorshipIterator implements Iterator<CoAuthorship> {
 	private int firstIndex;
 	private int secondIndex;
 	private boolean firstRelation;
@@ -25,8 +26,8 @@ public class CoAuthorshipIterator implements Iterator<Relation> {
 	}
 
 	@Override
-	public Relation next() {
-		Relation rel = null;
+	public CoAuthorship next() {
+		CoAuthorship rel = null;
 		if (firstRelation) {
 			rel = getRelation(authors.get(firstIndex), authors.get(secondIndex));
 			firstRelation = Boolean.FALSE;
@@ -51,18 +52,14 @@ public class CoAuthorshipIterator implements Iterator<Relation> {
 
 	}
 
-	private Relation getRelation(String orcid1, String orcid2) {
+	private CoAuthorship getRelation(String orcid1, String orcid2) {
+		CoAuthorship coAuthorship = new CoAuthorship();
+
 		String source = PERSON_PREFIX + SEPARATOR + IdentifierFactory.md5(orcid1);
 		String target = PERSON_PREFIX + SEPARATOR + IdentifierFactory.md5(orcid2);
-		Relation relation = OafMapperUtils
-			.getRelation(
-				source, target, ModelConstants.PERSON_PERSON_RELTYPE,
-				ModelConstants.PERSON_PERSON_SUBRELTYPE,
-				ModelConstants.PERSON_PERSON_HASCOAUTHORED,
-				Collections.singletonList(OafMapperUtils.keyValue(ORCID_KEY, ModelConstants.ORCID_DS)),
-				ORCIDDATAINFO,
-				null);
-		relation.setValidated(true);
-		return relation;
+		coAuthorship.setAuthor1(source);
+		coAuthorship.setAuthor2(target);
+		coAuthorship.setCoauthoredProducts(1);
+		return coAuthorship;
 	}
 }
