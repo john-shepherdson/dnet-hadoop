@@ -237,7 +237,7 @@ if(importIIS) {
                 .withColumn("authors", col("parsing_output.authors"))
                 .select( col("id"), col("doi"),
                         explode(col("authors")).alias("author"))
-                .withColumn("graphId" , col("id"))
+                .withColumn("graphId" ,expr("addResultPrefix(id)"))
                 .drop(col("id"))
                 .withColumn("fullname", col("author.name.full"))
                 .withColumn("raw_affiliation_strings",  col("author.raw_affiliations"))
