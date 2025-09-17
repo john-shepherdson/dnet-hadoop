@@ -196,12 +196,13 @@ public class GenerateRorActionSetJob {
 
 		if ("Child".equals(rorRel.getType())) {
 			return OafMapperUtils
-					.getRelation(orgId, relatedId, ORG_ORG_RELTYPE, RELATIONSHIP, ModelConstants.IS_CHILD_OF, ROR_COLLECTED_FROM, ROR_DATA_INFO, now.getTime());
+					.getRelation(orgId, relatedId, ORG_ORG_RELTYPE, RELATIONSHIP, ModelConstants.IS_PARENT_OF, ROR_COLLECTED_FROM, ROR_DATA_INFO, now
+							.getTime());
 		}
 
 		if ("Parent".equals(rorRel.getType())) {
 			return OafMapperUtils
-					.getRelation(orgId, relatedId, ORG_ORG_RELTYPE, RELATIONSHIP, ModelConstants.IS_PARENT_OF, ROR_COLLECTED_FROM, ROR_DATA_INFO, now
+					.getRelation(orgId, relatedId, ORG_ORG_RELTYPE, RELATIONSHIP, ModelConstants.IS_CHILD_OF, ROR_COLLECTED_FROM, ROR_DATA_INFO, now
 							.getTime());
 		}
 
