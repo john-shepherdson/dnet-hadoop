@@ -38,6 +38,7 @@ public class Constants implements Serializable {
                     .add("schema", StringType)
                     .add("name", StringType)
                     .add("value", StringType)))
+            .add("pids", DataTypes.createArrayType(PID_SCHEMA))
             ;
 
 
@@ -59,13 +60,13 @@ public class Constants implements Serializable {
                             .createArrayType(
                                     new StructType()
                                             .add("fullname", StringType)
-//                                            .add("pid", DataTypes.createArrayType(
-//                                                    new StructType()
-//                                                            .add("value", StringType)
-//                                                            .add("qualifier", new StructType()
-//                                                                    .add("classid", StringType)
-//                                                            )
-//                                            ))
+                                            .add("pid", DataTypes.createArrayType(
+                                                    new StructType()
+                                                            .add("value", StringType)
+                                                            .add("qualifier", new StructType()
+                                                                    .add("classid", StringType)
+                                                            )
+                                            ))
                                             .add("rawAffiliationString", DataTypes.createArrayType(StringType))));
 
     public final static StructType AUTHOR_SCHEMA = new StructType()
@@ -79,8 +80,8 @@ public class Constants implements Serializable {
                     .add("schema", StringType)
                     .add("name", StringType)
                     .add("value", StringType)))
-            .add("raw_affiliations", DataTypes.createArrayType(StringType));
-//            .add("pids", DataTypes.createArrayType(PID_SCHEMA));
+            .add("raw_affiliations", DataTypes.createArrayType(StringType))
+            .add("pids", DataTypes.createArrayType(PID_SCHEMA));
 
     public final static String IIS_QUERY = "SELECT id, authors, affiliations FROM mh.extracted_document_metadata_prod";
 
@@ -116,11 +117,6 @@ public class Constants implements Serializable {
             .add("matchings", MATCHING_ARRAY_SCHEMA)
             ;
 
-//    public final static StructType JOINED_SCHEMA = new StructType()
-//            .add("id", StringType)
-//            .add("fullname", StringType)
-//            .add("raw_affiliation_string", StringType)
-//            .add("Matchings", MATCHING_ARRAY_SCHEMA);
 
     public final static StructType AFFILIATION_STRING_SCHEMA = new StructType()
             .add("raw_affiliation_string", StringType)
@@ -140,7 +136,8 @@ public class Constants implements Serializable {
             .add("contributor_roles", DataTypes.createArrayType(new StructType()
                     .add("schema", StringType)
                     .add("name", StringType)
-                    .add("value", StringType)));
+                    .add("value", StringType)))
+            .add("pids", PID_SCHEMA);
 
 
     public final static StructType RESULT_MATCHED_SCHEMA = new StructType()

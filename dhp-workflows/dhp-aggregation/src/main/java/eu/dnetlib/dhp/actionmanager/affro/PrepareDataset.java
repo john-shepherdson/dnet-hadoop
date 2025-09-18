@@ -135,12 +135,7 @@ public class PrepareDataset implements Serializable {
         spark
                 .udf()
                 .register(
-                        "addResultPrefix", (String id) -> "50|" + id, DataTypes.StringType);
-
-        spark
-                .udf()
-                .register(
-                        "selectId", (String doi, String id) -> StringUtils.isNotEmpty(id) ? id : "50|doi_________::" + DHPUtils.md5(StringUtils.substringAfter(doi,"doi.org/")), DataTypes.StringType);
+                        "selectId", (String doi, String id) -> StringUtils.isNotEmpty(id) ? "50|" + id : "50|doi_________::" + DHPUtils.md5(StringUtils.substringAfter(doi,"doi.org/")), DataTypes.StringType);
 
         spark
                 .udf()
@@ -182,17 +177,17 @@ public class PrepareDataset implements Serializable {
         oalex.write().mode(SaveMode.Overwrite).option("compression","gzip").json(workingDir + "exploded/oalex");
 
         Dataset<Row> inputDataset = spark.createDataFrame(Collections.emptyList(), DATASET_SCHEMA);
-if(importIIS) {
-    Dataset<Row> iis = getSelectIISData(spark.sql(IIS_QUERY)
-            .as(Encoders.bean(IISModel.class)));
+        if(importIIS) {
+            Dataset<Row> iis = getSelectIISData(spark.sql(IIS_QUERY)
+                    .as(Encoders.bean(IISModel.class)));
 
-//        spark.read().schema(Encoders.bean(IISModel.class).schema())
-//                .json(iisPath)
+        //        spark.read().schema(Encoders.bean(IISModel.class).schema())
+        //                .json(iisPath)
 
 
-    iis.write().mode(SaveMode.Overwrite).option("compression", "gzip").json(workingDir + "exploded/iis");
-    inputDataset = iis;
-}
+            iis.write().mode(SaveMode.Overwrite).option("compression", "gzip").json(workingDir + "exploded/iis");
+            inputDataset = iis;
+        }
         Dataset<Row> publishers = getSelectPublisherSchemaData(spark.read().schema(PUBLISHER_SCHEMA).json(publishersPath));
         publishers.write().mode(SaveMode.Overwrite).option("compression","gzip").json(workingDir + "exploded/publishers");
 
@@ -237,20 +232,22 @@ if(importIIS) {
                 .withColumn("authors", col("parsing_output.authors"))
                 .select( col("id"), col("doi"),
                         explode(col("authors")).alias("author"))
-                .withColumn("graphId" ,expr("addResultPrefix(id)"))
+                .withColumn("graphId" ,expr("selectId(doi, graphId)"))
                 .drop(col("id"))
+                .drop(col("doi"))
                 .withColumn("fullname", col("author.name.full"))
                 .withColumn("raw_affiliation_strings",  col("author.raw_affiliations"))
                 .withColumn("corresponding", col("author.corresponding"))
                 .withColumn("contributor_roles", col("author.contributor_roles"))
+                .withColumn("pids", col("author.pids"))
                 .drop(col("author"))
                 .select(col("graphId"),col("doi"),col("fullname"), explode(col("raw_affiliation_strings")).alias("raw_affiliation_string")
-                        ,col("corresponding"), col("contributor_roles"))
+                        ,col("corresponding"), col("contributor_roles"), col("pids"))
                 .filter("raw_affiliation_string IS NOT NULL AND TRIM(raw_affiliation_string) != '' AND LOWER(raw_affiliation_string) NOT IN ('unknown', 'none')")
-                .withColumn("id",  expr("selectId(doi, graphId)"))
+                .withColumn("id",  col("graphId"))
                 .drop(col("graphId"))
-                .drop(col("doi"))
-                .select("id","fullname","raw_affiliation_string","corresponding","contributor_roles");
+                .select("id","fullname","raw_affiliation_string","corresponding","contributor_roles", "pids")
+                .as(RowEncoder.apply(DATASET_SCHEMA));
     }
 
     private static Dataset<Row> getSelectGraphSchemaData(Dataset<Row> dataset_entities) {
@@ -262,7 +259,18 @@ if(importIIS) {
                 .drop("author")
                 .withColumn("corresponding", lit(null))
                 .withColumn("contributor_roles", lit(null))
-                .select(col("id"), col("fullname"), col("raw_affiliation_string"), col("corresponding"), col("contributor_roles"))
+                .withColumn(
+                        "pids",
+                        functions.transform(
+                                col("pid"),
+                                x -> struct(
+                                        x.getField("value").alias("value"),
+                                        x.getField("qualifier").getField("classid").alias("schema")
+                                )
+                        )
+                )
+                .select(col("id"), col("fullname"), col("raw_affiliation_string"), col("corresponding"), col("contributor_roles"), col("pids"))
+
                 .as(RowEncoder.apply(DATASET_SCHEMA));
     }
 
@@ -278,7 +286,11 @@ if(importIIS) {
                 .filter("raw_affiliation_string IS NOT NULL AND TRIM(raw_affiliation_string) != '' AND LOWER(raw_affiliation_string) NOT IN ('unknown', 'none')")
                 .withColumn("corresponding", lit(null))
                 .withColumn("contributor_roles", lit(null))
-                .select(col("id"), col("fullname"), col("raw_affiliation_string"), col("corresponding"), col("contributor_roles"))
+                .withColumn(
+                        "pids",
+                        lit(null).cast(PID_SCHEMA)
+                )
+                .select(col("id"), col("fullname"), col("raw_affiliation_string"), col("corresponding"), col("contributor_roles"), col("pids"))
                 .as(RowEncoder.apply(DATASET_SCHEMA));
     }
 
@@ -298,7 +310,12 @@ if(importIIS) {
                         }
                         , RowEncoder.apply(DATASET_SCHEMA))
                 .filter("raw_affiliation_string IS NOT NULL AND TRIM(raw_affiliation_string) != '' AND LOWER(raw_affiliation_string) NOT IN ('unknown', 'none')")
-                .select(col("id"), col("fullname"), col("raw_affiliation_string"), col("corresponding"), col("contributor_roles"));
+                .withColumn(
+                        "pids",
+                        lit(null).cast(PID_SCHEMA)
+                )
+                .select(col("id"), col("fullname"), col("raw_affiliation_string"), col("corresponding"), col("contributor_roles"), col("pids"))
+                .as(RowEncoder.apply(DATASET_SCHEMA));
     }
 
     private static List<Row> getAuthorLines(String id, Author author, List<Affiliation> affiliations) {

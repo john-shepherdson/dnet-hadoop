@@ -15,12 +15,7 @@ import java.util.Map;
 import static org.apache.spark.sql.types.DataTypes.StringType;
 
 public class AggregateResultUDF implements UDF1<WrappedArray<Row>, Row> {
-//    public final static StructType RESULT_MATCHED_SCHEMA = new StructType()
-//            .add("id", StringType)
-//            .add("authors", DataTypes.createArrayType(
-//                    AUTHOR_AGGREGATED_SCHEMA
-//            ))
-//            .add("organizations",MATCHING_ARRAY_SCHEMA);
+
     @Override
     public Row call(WrappedArray<Row> group) {
         List<Row> authors = new ArrayList<>();
@@ -33,7 +28,7 @@ public class AggregateResultUDF implements UDF1<WrappedArray<Row>, Row> {
 
             // affiliations: WrappedArray<Row> → List<Row>
             WrappedArray<Row> affArray = entry.getAs("affiliations");
-            Row author = RowFactory.create(authorName, affArray, entry.getAs("corresponding"), entry.getAs("contributor_roles"));
+            Row author = RowFactory.create(authorName, affArray, entry.getAs("corresponding"), entry.getAs("contributor_roles"), entry.getAs("pids"));
             authors.add(author);
             if (id == null) id = entry.getAs("id");
             List<Row> matchList = new ArrayList<>();
