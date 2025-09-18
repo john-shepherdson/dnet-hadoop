@@ -7,6 +7,10 @@ import java.nio.file.Path;
 import java.util.List;
 
 import eu.dnetlib.dhp.schema.oaf.rel.Authorship;
+import eu.dnetlib.dhp.schema.oaf.rel.CoAuthorship;
+import eu.dnetlib.dhp.schema.oaf.rel.beans.AuthorshipRoles;
+import eu.dnetlib.dhp.schema.oaf.rel.beans.DeclaredAffiliation;
+import eu.dnetlib.dhp.schema.oaf.rel.beans.MatchingOrganization;
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.spark.SparkConf;
@@ -69,6 +73,455 @@ public class CreatePersonAS {
 	public static void afterAll() throws IOException {
 		FileUtils.deleteDirectory(workingDir.toFile());
 		spark.stop();
+	}
+
+	@Test
+	void testAuthorship() throws Exception {
+
+		String inputPath = getClass()
+				.getResource(
+						"/eu/dnetlib/dhp/actionmanager/person/")
+				.getPath();
+
+		ExtractPerson
+				.main(
+						new String[] {
+								"-isSparkSessionManaged",
+								Boolean.FALSE.toString(),
+								"-inputPath",
+								inputPath,
+								"-outputPath",
+								workingDir.toString() + "/actionSet1",
+								"-workingDir",
+								workingDir.toString() + "/working",
+								"-postgresUrl", "noneed",
+								"-postgresUser", "noneed",
+								"-postgresPassword", "noneed",
+								"-publisherInputPath", getClass()
+								.getResource("/eu/dnetlib/dhp/actionmanager/personpublisher/ieee.json")
+								.getPath()
+
+						});
+
+		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
+
+		JavaRDD<Authorship> relations = sc
+				.sequenceFile(workingDir.toString() + "/actionSet1", Text.class, Text.class)
+				.filter(v -> "eu.dnetlib.dhp.schema.oaf.rel.Authorship".equalsIgnoreCase(v._1().toString()))
+				.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
+				.map(aa -> ((Authorship) aa.getPayload()));
+
+		Assertions.assertEquals(1, relations.count());
+
+		Authorship authorship = relations.first();
+		Assertions.assertEquals("50|doi_________::0000ff82d4cf57dc2c7c8f9b4c6b593d", authorship.getProduct());
+		Assertions.assertEquals("30|orcid_______::" + DHPUtils.md5("0000-0002-5534-7920"), authorship.getPerson());
+		Assertions.assertEquals(0, authorship.getRoles().size());
+		Assertions.assertEquals(1, authorship.getDeclaredAffiliations().size());
+		Assertions.assertFalse(authorship.getCorresponding());
+
+		DeclaredAffiliation declaredAffiliation = authorship.getDeclaredAffiliations().get(0);
+		Assertions.assertEquals("Architecture, Energy and Environment Research Group, Faculty of Engineering, University of Nottingham, University Park, Nottingham NG7 2RD, UK", declaredAffiliation.getRawAffiliation());
+		Assertions.assertEquals(1, declaredAffiliation.getMatchingOrganization().size());
+
+		MatchingOrganization matchingOrganization = declaredAffiliation.getMatchingOrganization().get(0);
+		Assertions.assertEquals("https://ror.org/01ee9ar58", matchingOrganization.getRor());
+		Assertions.assertNull(matchingOrganization.getOpenOrgs());
+		Assertions.assertEquals(1, matchingOrganization.getTrust());
+		Assertions.assertEquals("affro", matchingOrganization.getProvenance());
+		Assertions.assertEquals("united kingdom", matchingOrganization.getCountry());
+		Assertions.assertEquals("University of Nottingham", matchingOrganization.getResolvedOrganizationName());
+
+	}
+
+	@Test
+	void testAuthorship2() throws Exception {
+
+		String inputPath = getClass()
+				.getResource(
+						"/eu/dnetlib/dhp/actionmanager/person/")
+				.getPath();
+
+		ExtractPerson
+				.main(
+						new String[] {
+								"-isSparkSessionManaged",
+								Boolean.FALSE.toString(),
+								"-inputPath",
+								inputPath,
+								"-outputPath",
+								workingDir.toString() + "/actionSet1",
+								"-workingDir",
+								workingDir.toString() + "/working",
+								"-postgresUrl", "noneed",
+								"-postgresUser", "noneed",
+								"-postgresPassword", "noneed",
+								"-publisherInputPath", getClass()
+								.getResource("/eu/dnetlib/dhp/actionmanager/personpublisher/ieee2.json")
+								.getPath()
+
+						});
+
+		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
+
+		JavaRDD<Authorship> relations = sc
+				.sequenceFile(workingDir.toString() + "/actionSet1", Text.class, Text.class)
+				.filter(v -> "eu.dnetlib.dhp.schema.oaf.rel.Authorship".equalsIgnoreCase(v._1().toString()))
+				.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
+				.map(aa -> ((Authorship) aa.getPayload()));
+
+		Assertions.assertEquals(1, relations.count());
+
+		Authorship authorship = relations.first();
+		Assertions.assertEquals("50|doi_________::0000ff82d4cf57dc2c7c8f9b4c6b593d", authorship.getProduct());
+		Assertions.assertEquals("30|orcid_______::" + DHPUtils.md5("0000-0002-5534-7920"), authorship.getPerson());
+		Assertions.assertEquals(0, authorship.getRoles().size());
+		Assertions.assertEquals(1, authorship.getDeclaredAffiliations().size());
+		Assertions.assertFalse(authorship.getCorresponding());
+
+		DeclaredAffiliation declaredAffiliation = authorship.getDeclaredAffiliations().get(0);
+		Assertions.assertEquals("Architecture, Energy and Environment Research Group, Faculty of Engineering, University of Nottingham, University Park, Nottingham NG7 2RD, UK", declaredAffiliation.getRawAffiliation());
+		Assertions.assertEquals(1, declaredAffiliation.getMatchingOrganization().size());
+
+		MatchingOrganization matchingOrganization = declaredAffiliation.getMatchingOrganization().get(0);
+		Assertions.assertEquals("https://ror.org/01ee9ar58", matchingOrganization.getRor());
+		Assertions.assertNull(matchingOrganization.getOpenOrgs());
+		Assertions.assertEquals(1, matchingOrganization.getTrust());
+		Assertions.assertEquals("affro", matchingOrganization.getProvenance());
+		Assertions.assertEquals("united kingdom", matchingOrganization.getCountry());
+		Assertions.assertEquals("University of Nottingham", matchingOrganization.getResolvedOrganizationName());
+
+	}
+
+	@Test
+	void testAuthorship3() throws Exception {
+
+		String inputPath = getClass()
+				.getResource(
+						"/eu/dnetlib/dhp/actionmanager/person/")
+				.getPath();
+
+		ExtractPerson
+				.main(
+						new String[] {
+								"-isSparkSessionManaged",
+								Boolean.FALSE.toString(),
+								"-inputPath",
+								inputPath,
+								"-outputPath",
+								workingDir.toString() + "/actionSet1",
+								"-workingDir",
+								workingDir.toString() + "/working",
+								"-postgresUrl", "noneed",
+								"-postgresUser", "noneed",
+								"-postgresPassword", "noneed",
+								"-publisherInputPath", getClass()
+								.getResource("/eu/dnetlib/dhp/actionmanager/personpublisher/ieee3.json")
+								.getPath()
+
+						});
+
+		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
+
+		JavaRDD<Authorship> relations = sc
+				.sequenceFile(workingDir.toString() + "/actionSet1", Text.class, Text.class)
+				.filter(v -> "eu.dnetlib.dhp.schema.oaf.rel.Authorship".equalsIgnoreCase(v._1().toString()))
+				.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
+				.map(aa -> ((Authorship) aa.getPayload()));
+
+		Assertions.assertEquals(1, relations.count());
+
+		Authorship authorship = relations.first();
+		Assertions.assertEquals("50|doi_________::0000ff82d4cf57dc2c7c8f9b4c6b593d", authorship.getProduct());
+		Assertions.assertEquals("30|orcid_______::" + DHPUtils.md5("0000-0002-5534-7920"), authorship.getPerson());
+		Assertions.assertEquals(0, authorship.getRoles().size());
+		Assertions.assertEquals(2, authorship.getDeclaredAffiliations().size());
+		Assertions.assertFalse(authorship.getCorresponding());
+
+		Assertions.assertEquals(1, authorship.getDeclaredAffiliations().stream().filter(da -> "Architecture, Energy and Environment Research Group, Faculty of Engineering, University of Nottingham, University Park, Nottingham NG7 2RD, UK".equals(da.getRawAffiliation())).findFirst().get().getMatchingOrganization().size());
+		MatchingOrganization matchingOrganization = authorship.getDeclaredAffiliations().stream().filter(da -> "Architecture, Energy and Environment Research Group, Faculty of Engineering, University of Nottingham, University Park, Nottingham NG7 2RD, UK".equals(da.getRawAffiliation())).findFirst().get().getMatchingOrganization().get(0);
+		Assertions.assertEquals("https://ror.org/01ee9ar58", matchingOrganization.getRor());
+		Assertions.assertNull(matchingOrganization.getOpenOrgs());
+		Assertions.assertEquals(1, matchingOrganization.getTrust());
+		Assertions.assertEquals("affro", matchingOrganization.getProvenance());
+		Assertions.assertEquals("united kingdom", matchingOrganization.getCountry());
+		Assertions.assertEquals("University of Nottingham", matchingOrganization.getResolvedOrganizationName());
+
+		Assertions.assertEquals(1, authorship.getDeclaredAffiliations().stream().filter(da -> "Istanbul Aydin University Faculty of Engineering, Mechanical Engineering Department, TR-34668 Istanbul, Turkey".equals(da.getRawAffiliation())).findFirst().get().getMatchingOrganization().size());
+		matchingOrganization = authorship.getDeclaredAffiliations().stream().filter(da -> "Istanbul Aydin University Faculty of Engineering, Mechanical Engineering Department, TR-34668 Istanbul, Turkey".equals(da.getRawAffiliation())).findFirst().get().getMatchingOrganization().get(0);
+		Assertions.assertEquals("https://ror.org/00qsyw664", matchingOrganization.getRor());
+		Assertions.assertNull(matchingOrganization.getOpenOrgs());
+		Assertions.assertEquals(0.7745966692414834, matchingOrganization.getTrust());
+		Assertions.assertEquals("affro", matchingOrganization.getProvenance());
+		Assertions.assertEquals("turkey", matchingOrganization.getCountry());
+		Assertions.assertEquals("Istanbul Aydın University", matchingOrganization.getResolvedOrganizationName());
+
+	}
+
+	@Test
+	void testAuthorship4() throws Exception {
+
+		String inputPath = getClass()
+				.getResource(
+						"/eu/dnetlib/dhp/actionmanager/person/")
+				.getPath();
+
+		ExtractPerson
+				.main(
+						new String[] {
+								"-isSparkSessionManaged",
+								Boolean.FALSE.toString(),
+								"-inputPath",
+								inputPath,
+								"-outputPath",
+								workingDir.toString() + "/actionSet1",
+								"-workingDir",
+								workingDir.toString() + "/working",
+								"-postgresUrl", "noneed",
+								"-postgresUser", "noneed",
+								"-postgresPassword", "noneed",
+								"-publisherInputPath", getClass()
+								.getResource("/eu/dnetlib/dhp/actionmanager/personpublisher/ieee4.json")
+								.getPath()
+
+						});
+
+		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
+
+		JavaRDD<Authorship> relations = sc
+				.sequenceFile(workingDir.toString() + "/actionSet1", Text.class, Text.class)
+				.filter(v -> "eu.dnetlib.dhp.schema.oaf.rel.Authorship".equalsIgnoreCase(v._1().toString()))
+				.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
+				.map(aa -> ((Authorship) aa.getPayload()));
+
+		Assertions.assertEquals(1, relations.count());
+
+		Authorship authorship = relations.first();
+		Assertions.assertEquals("50|doi_________::0000ff82d4cf57dc2c7c8f9b4c6b593d", authorship.getProduct());
+		Assertions.assertEquals("30|orcid_______::" + DHPUtils.md5("0000-0002-5534-7920"), authorship.getPerson());
+		Assertions.assertEquals(0, authorship.getRoles().size());
+		Assertions.assertEquals(2, authorship.getDeclaredAffiliations().size());
+		Assertions.assertFalse(authorship.getCorresponding());
+
+		Assertions.assertEquals(2, authorship.getDeclaredAffiliations().stream().filter(da -> "Architecture, Energy and Environment Research Group, Faculty of Engineering, University of Nottingham, University Park, Nottingham NG7 2RD, UK".equals(da.getRawAffiliation())).findFirst().get().getMatchingOrganization().size());
+		List<MatchingOrganization> matchingOrganizations = authorship.getDeclaredAffiliations().stream().filter(da -> "Architecture, Energy and Environment Research Group, Faculty of Engineering, University of Nottingham, University Park, Nottingham NG7 2RD, UK".equals(da.getRawAffiliation())).findFirst().get().getMatchingOrganization();
+
+		MatchingOrganization matchingOrganization = matchingOrganizations.stream().filter(mo -> "https://ror.org/01ee9ar58".equalsIgnoreCase(mo.getRor())).findFirst().get();
+		Assertions.assertNull(matchingOrganization.getOpenOrgs());
+		Assertions.assertEquals(1, matchingOrganization.getTrust());
+		Assertions.assertEquals("affro", matchingOrganization.getProvenance());
+		Assertions.assertEquals("united kingdom", matchingOrganization.getCountry());
+		Assertions.assertEquals("University of Nottingham", matchingOrganization.getResolvedOrganizationName());
+
+		matchingOrganization= matchingOrganizations.stream().filter(mo -> !"https://ror.org/01ee9ar58".equalsIgnoreCase(mo.getRor())).findFirst().get();
+		Assertions.assertEquals("https://ror.org/00excyz84", matchingOrganization.getRor());
+		Assertions.assertNull(matchingOrganization.getOpenOrgs());
+		Assertions.assertEquals(1, matchingOrganization.getTrust());
+		Assertions.assertEquals("affro", matchingOrganization.getProvenance());
+		Assertions.assertEquals("cyprus", matchingOrganization.getCountry());
+		Assertions.assertEquals("Eastern Mediterranean University", matchingOrganization.getResolvedOrganizationName());
+
+		Assertions.assertEquals(1, authorship.getDeclaredAffiliations().stream().filter(da -> "Istanbul Aydin University Faculty of Engineering, Mechanical Engineering Department, TR-34668 Istanbul, Turkey".equals(da.getRawAffiliation())).findFirst().get().getMatchingOrganization().size());
+		matchingOrganization = authorship.getDeclaredAffiliations().stream().filter(da -> "Istanbul Aydin University Faculty of Engineering, Mechanical Engineering Department, TR-34668 Istanbul, Turkey".equals(da.getRawAffiliation())).findFirst().get().getMatchingOrganization().get(0);
+		Assertions.assertEquals("https://ror.org/00qsyw664", matchingOrganization.getRor());
+		Assertions.assertNull(matchingOrganization.getOpenOrgs());
+		Assertions.assertEquals(0.7745966692414834, matchingOrganization.getTrust());
+		Assertions.assertEquals("affro", matchingOrganization.getProvenance());
+		Assertions.assertEquals("turkey", matchingOrganization.getCountry());
+		Assertions.assertEquals("Istanbul Aydın University", matchingOrganization.getResolvedOrganizationName());
+
+	}
+
+	@Test
+	void testAuthorship5() throws Exception {
+
+		String inputPath = getClass()
+				.getResource(
+						"/eu/dnetlib/dhp/actionmanager/person/")
+				.getPath();
+
+		ExtractPerson
+				.main(
+						new String[] {
+								"-isSparkSessionManaged",
+								Boolean.FALSE.toString(),
+								"-inputPath",
+								inputPath,
+								"-outputPath",
+								workingDir.toString() + "/actionSet1",
+								"-workingDir",
+								workingDir.toString() + "/working",
+								"-postgresUrl", "noneed",
+								"-postgresUser", "noneed",
+								"-postgresPassword", "noneed",
+								"-publisherInputPath", getClass()
+								.getResource("/eu/dnetlib/dhp/actionmanager/personpublisher/ieee5.json")
+								.getPath()
+
+						});
+
+		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
+
+		JavaRDD<Authorship> relations = sc
+				.sequenceFile(workingDir.toString() + "/actionSet1", Text.class, Text.class)
+				.filter(v -> "eu.dnetlib.dhp.schema.oaf.rel.Authorship".equalsIgnoreCase(v._1().toString()))
+				.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
+				.map(aa -> ((Authorship) aa.getPayload()));
+
+		Assertions.assertEquals(2, relations.count());
+
+		relations.foreach(authorship -> Assertions.assertEquals("50|doi_________::0000ff82d4cf57dc2c7c8f9b4c6b593d", authorship.getProduct()));
+
+		Authorship authorship = relations.filter(r -> ("30|orcid_______::" + DHPUtils.md5("0000-0002-5534-7920")).equalsIgnoreCase(r.getPerson())).first();
+		Assertions.assertEquals(0, authorship.getRoles().size());
+		Assertions.assertEquals(2, authorship.getDeclaredAffiliations().size());
+		Assertions.assertFalse(authorship.getCorresponding());
+
+		Assertions.assertEquals(2, authorship.getDeclaredAffiliations().stream().filter(da -> "Architecture, Energy and Environment Research Group, Faculty of Engineering, University of Nottingham, University Park, Nottingham NG7 2RD, UK".equals(da.getRawAffiliation())).findFirst().get().getMatchingOrganization().size());
+		List<MatchingOrganization> matchingOrganizations = authorship.getDeclaredAffiliations().stream().filter(da -> "Architecture, Energy and Environment Research Group, Faculty of Engineering, University of Nottingham, University Park, Nottingham NG7 2RD, UK".equals(da.getRawAffiliation())).findFirst().get().getMatchingOrganization();
+
+		MatchingOrganization matchingOrganization = matchingOrganizations.stream().filter(mo -> "https://ror.org/01ee9ar58".equalsIgnoreCase(mo.getRor())).findFirst().get();
+		Assertions.assertNull(matchingOrganization.getOpenOrgs());
+		Assertions.assertEquals(1, matchingOrganization.getTrust());
+		Assertions.assertEquals("affro", matchingOrganization.getProvenance());
+		Assertions.assertEquals("united kingdom", matchingOrganization.getCountry());
+		Assertions.assertEquals("University of Nottingham", matchingOrganization.getResolvedOrganizationName());
+
+		matchingOrganization= matchingOrganizations.stream().filter(mo -> !"https://ror.org/01ee9ar58".equalsIgnoreCase(mo.getRor())).findFirst().get();
+		Assertions.assertEquals("https://ror.org/00excyz84", matchingOrganization.getRor());
+		Assertions.assertNull(matchingOrganization.getOpenOrgs());
+		Assertions.assertEquals(1, matchingOrganization.getTrust());
+		Assertions.assertEquals("affro", matchingOrganization.getProvenance());
+		Assertions.assertEquals("cyprus", matchingOrganization.getCountry());
+		Assertions.assertEquals("Eastern Mediterranean University", matchingOrganization.getResolvedOrganizationName());
+
+		Assertions.assertEquals(1, authorship.getDeclaredAffiliations().stream().filter(da -> "Istanbul Aydin University Faculty of Engineering, Mechanical Engineering Department, TR-34668 Istanbul, Turkey".equals(da.getRawAffiliation())).findFirst().get().getMatchingOrganization().size());
+		matchingOrganization = authorship.getDeclaredAffiliations().stream().filter(da -> "Istanbul Aydin University Faculty of Engineering, Mechanical Engineering Department, TR-34668 Istanbul, Turkey".equals(da.getRawAffiliation())).findFirst().get().getMatchingOrganization().get(0);
+		Assertions.assertEquals("https://ror.org/00qsyw664", matchingOrganization.getRor());
+		Assertions.assertNull(matchingOrganization.getOpenOrgs());
+		Assertions.assertEquals(0.7745966692414834, matchingOrganization.getTrust());
+		Assertions.assertEquals("affro", matchingOrganization.getProvenance());
+		Assertions.assertEquals("turkey", matchingOrganization.getCountry());
+		Assertions.assertEquals("Istanbul Aydın University", matchingOrganization.getResolvedOrganizationName());
+
+		authorship = relations.filter(r -> !("30|orcid_______::" + DHPUtils.md5("0000-0002-5534-7920")).equalsIgnoreCase(r.getPerson())).first();
+		Assertions.assertEquals("30|orcid_______::" + DHPUtils.md5("0000-0003-1981-9107"), authorship.getPerson());
+		Assertions.assertEquals(0, authorship.getRoles().size());
+		Assertions.assertEquals(1, authorship.getDeclaredAffiliations().size());
+		Assertions.assertFalse(authorship.getCorresponding());
+
+		DeclaredAffiliation declaredAffiliation = authorship.getDeclaredAffiliations().get(0);
+		Assertions.assertEquals("Istanbul Aydin University Faculty of Engineering, Mechanical Engineering Department, TR-34668 Istanbul, Turkey", declaredAffiliation.getRawAffiliation());
+		Assertions.assertEquals(1, declaredAffiliation.getMatchingOrganization().size());
+
+		matchingOrganization = declaredAffiliation.getMatchingOrganization().get(0);
+		Assertions.assertNull(matchingOrganization.getOpenOrgs());
+		Assertions.assertEquals("affro", matchingOrganization.getProvenance());
+		Assertions.assertNull(matchingOrganization.getOpenOrgs());
+		Assertions.assertEquals(0.7745966692414834, matchingOrganization.getTrust());
+		Assertions.assertEquals("affro", matchingOrganization.getProvenance());
+		Assertions.assertEquals("turkey", matchingOrganization.getCountry());
+		Assertions.assertEquals("Istanbul Aydın University", matchingOrganization.getResolvedOrganizationName());
+
+	}
+
+	@Test
+	void testAuthorship6() throws Exception {
+
+		String inputPath = getClass()
+				.getResource(
+						"/eu/dnetlib/dhp/actionmanager/person/")
+				.getPath();
+
+		ExtractPerson
+				.main(
+						new String[] {
+								"-isSparkSessionManaged",
+								Boolean.FALSE.toString(),
+								"-inputPath",
+								inputPath,
+								"-outputPath",
+								workingDir.toString() + "/actionSet1",
+								"-workingDir",
+								workingDir.toString() + "/working",
+								"-postgresUrl", "noneed",
+								"-postgresUser", "noneed",
+								"-postgresPassword", "noneed",
+								"-publisherInputPath", getClass()
+								.getResource("/eu/dnetlib/dhp/actionmanager/personpublisher/ieee6.json")
+								.getPath()
+
+						});
+
+		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
+
+		JavaRDD<Authorship> relations = sc
+				.sequenceFile(workingDir.toString() + "/actionSet1", Text.class, Text.class)
+				.filter(v -> "eu.dnetlib.dhp.schema.oaf.rel.Authorship".equalsIgnoreCase(v._1().toString()))
+				.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
+				.map(aa -> ((Authorship) aa.getPayload()));
+
+		Assertions.assertEquals(2, relations.count());
+
+		Authorship authorship = relations.filter(r -> ("30|orcid_______::" + DHPUtils.md5("0000-0002-5534-7920")).equalsIgnoreCase(r.getPerson())).first();
+		Assertions.assertEquals(2, authorship.getRoles().size());
+		Assertions.assertEquals(2, authorship.getDeclaredAffiliations().size());
+		Assertions.assertTrue(authorship.getCorresponding());
+
+		Assertions.assertNull(authorship.getRoles().get(0).getRole());
+		Assertions.assertEquals("I wrote the software for the work", authorship.getRoles().get(0).getText());
+        Assertions.assertNull(authorship.getRoles().get(0).getSchema());
+        Assertions.assertNull(authorship.getRoles().get(0).getValue());
+
+		Assertions.assertEquals(AuthorshipRoles.CONCEPTUALIZATION, authorship.getRoles().get(1).getRole());
+		Assertions.assertEquals("Conceptualization", authorship.getRoles().get(1).getText());
+		Assertions.assertEquals("CRediT", authorship.getRoles().get(1).getSchema());
+		Assertions.assertEquals("http://credit.niso.org/contributor-roles/conceptualization", authorship.getRoles().get(1).getValue());
+
+
+	}
+
+	@Test
+	void testCoAuthorship() throws Exception {
+
+		String inputPath = getClass()
+				.getResource(
+						"/eu/dnetlib/dhp/actionmanager/person/")
+				.getPath();
+
+		ExtractPerson
+				.main(
+						new String[] {
+								"-isSparkSessionManaged",
+								Boolean.FALSE.toString(),
+								"-inputPath",
+								inputPath,
+								"-outputPath",
+								workingDir.toString() + "/actionSet1",
+								"-workingDir",
+								workingDir.toString() + "/working",
+								"-postgresUrl", "noneed",
+								"-postgresUser", "noneed",
+								"-postgresPassword", "noneed",
+								"-publisherInputPath", getClass()
+								.getResource("/eu/dnetlib/dhp/actionmanager/personpublisher/ieee7.json")
+								.getPath()
+
+						});
+
+		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
+
+		JavaRDD<CoAuthorship> relations = sc
+				.sequenceFile(workingDir.toString() + "/actionSet1", Text.class, Text.class)
+				.filter(v -> "eu.dnetlib.dhp.schema.oaf.rel.CoAuthorship".equalsIgnoreCase(v._1().toString()))
+				.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
+				.map(aa -> ((CoAuthorship) aa.getPayload()));
+
+		Assertions.assertEquals(2, relations.count());
+
+		relations.foreach(r -> System.out.println(OBJECT_MAPPER.writeValueAsString(r)));
+
+
 	}
 
 	@Test

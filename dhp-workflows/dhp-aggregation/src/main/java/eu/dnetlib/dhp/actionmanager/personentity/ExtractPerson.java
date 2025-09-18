@@ -146,7 +146,6 @@ public class ExtractPerson implements Serializable {
 				.withColumn("orcid", expr("removeLeadingOrcidUrl(pid.value)"))
 				.drop("pid");
 
-
 		writeAuthorshipRelations(workingDir + "/authorship", allAuthors);
 
 		writeCoAuthorshipRelations(workingDir, allAuthors);
@@ -154,7 +153,7 @@ public class ExtractPerson implements Serializable {
 	}
 
 	private static void writeCoAuthorshipRelations(String workingDir, Dataset<Row> allAuthors) {
-		allAuthors
+		Dataset<CoAuthorship> tmp = allAuthors
 				.selectExpr("id", "orcid")
 				.groupByKey((MapFunction<Row, String>) r -> r.getAs("id"), Encoders.STRING())
 				.mapGroups(
@@ -162,8 +161,9 @@ public class ExtractPerson implements Serializable {
 						Encoders.bean(Coauthors.class))
 				.flatMap(
 						(FlatMapFunction<Coauthors, CoAuthorship>) c -> new CoAuthorshipIterator(c.getCoauthors()),
-						Encoders.bean(CoAuthorship.class))
-				.groupByKey((MapFunction<CoAuthorship, String>) r -> r.getAuthor1() + r.getAuthor2(), Encoders.STRING())
+						Encoders.bean(CoAuthorship.class));
+
+				tmp.groupByKey((MapFunction<CoAuthorship, String>) r -> r.getAuthor1() + r.getAuthor2(), Encoders.STRING())
 				.mapGroups(
 						(MapGroupsFunction<String, CoAuthorship, CoAuthorship>) (k, it) -> {
 							CoAuthorship ca = it.next();
@@ -191,6 +191,7 @@ public class ExtractPerson implements Serializable {
 					// --- Gestione Affiliazioni (senza explode) ---
 					WrappedArray<Row> affRows = row.getAs("affiliations");
 					List<DeclaredAffiliation> declaredAffiliations = new ArrayList<>();
+					Set<String> insertedPids = new HashSet<>();
 					if (affRows != null) {
 						for(int i =0; i< affRows.length(); i++){
 							Row aff = affRows.apply(i);
@@ -199,7 +200,7 @@ public class ExtractPerson implements Serializable {
 							// Matchings non esplosi
 							WrappedArray<Row> matchingRows = aff.getAs("Matchings");
 							List<MatchingOrganization> mos = new ArrayList<>();
-							Set<String> insertedPids = new HashSet<>();
+
 							if (matchingRows != null) {
 								for (int j = 0 ; j < matchingRows.length(); j++){
 									Row m = matchingRows.apply(j);
@@ -234,12 +235,23 @@ public class ExtractPerson implements Serializable {
 
 					// --- Gestione Roles (senza explode) ---
 					WrappedArray<Row> roleRows = row.getAs("roles");
-					List<AuthorshipRoles> roles = new ArrayList<>();
+					List<Role> roles = new ArrayList<>();
 					if (roleRows != null) {
 						for(int i = 0; i < roleRows.length(); i++){
 							Row role = roleRows.apply(i);
-							AuthorshipRoles r = AuthorshipRoles.fromString(role.getAs("name"));
-							roles.add(r);
+							Role authorRole = new Role();
+							String schema = role.getAs("schema");
+							if(StringUtils.isNotBlank(schema) && "Credit".equalsIgnoreCase(schema)){
+								AuthorshipRoles r = AuthorshipRoles.fromString(role.getAs("name"));
+								if(r != null){
+									authorRole.setRole(r);
+									authorRole.setValue(role.getAs("value"));
+									authorRole.setSchema(schema);
+								}
+							}
+							authorRole.setText(role.getAs("name"));
+
+							roles.add(authorRole);
 						}
 					}
 
