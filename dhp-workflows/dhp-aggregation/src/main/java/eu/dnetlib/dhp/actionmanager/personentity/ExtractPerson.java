@@ -120,32 +120,10 @@ public class ExtractPerson implements Serializable {
 
 	// PUBLISHER
 	private static void extractInfoForActionSetFromPublisher(SparkSession spark, String inputPath, String workingDir) {
-		StructType schema = new StructType()
-				.add("id", DataTypes.StringType)
-				.add("authors", DataTypes.createArrayType(
-						new StructType()
-								.add("corresponding", DataTypes.StringType)
-								.add("contributor_roles", DataTypes.createArrayType(
-										new StructType()
-												.add("schema", DataTypes.StringType)
-												.add("value", DataTypes.StringType)
-												.add("name", DataTypes.StringType)))
-								.add("affiliations", DataTypes.createArrayType(
-										new StructType()
-												.add("raw_affiliation_string", DataTypes.StringType)
-												.add("Matchings", DataTypes.createArrayType(
-														new StructType()
-																.add("pid", DataTypes.StringType)
-																.add("value", DataTypes.StringType)
-																.add("name", DataTypes.StringType)
-																.add("confidence", DataTypes.DoubleType)
-																.add("status", DataTypes.StringType)
-																.add("country", DataTypes.StringType)))))
-								.add("pids", DataTypes.createArrayType(
-										new StructType()
-												.add("schema", DataTypes.StringType)
-												.add("value", DataTypes.StringType)))
-				));
+
+		spark
+				.udf().register(
+						"removeLeadingOrcidUrl", (String pid) -> StringUtils.startsWith(pid, "https") ? StringUtils.substringAfter(pid, "orcid.org/") : pid, DataTypes.StringType);
 
 		// Read the publishers output
 		Dataset<Row> df = spark
@@ -153,7 +131,6 @@ public class ExtractPerson implements Serializable {
 			.schema(schema)
 			.json(inputPath)
 			.where("id is not null");
-
 
         //Select the relevant information
 		Dataset<Row> allAuthors = df
@@ -165,7 +142,9 @@ public class ExtractPerson implements Serializable {
 						col("author.pids").as("pids"))
 				.withColumn("pid", explode(col("pids")))
 				.drop("pids")
-				.filter(lower(col("pid.schema")).equalTo("orcid"));
+				.filter(lower(col("pid.schema")).equalTo("orcid"))
+				.withColumn("orcid", expr("removeLeadingOrcidUrl(pid.value)"))
+				.drop("pid");
 
 
 		writeAuthorshipRelations(workingDir + "/authorship", allAuthors);
@@ -176,7 +155,7 @@ public class ExtractPerson implements Serializable {
 
 	private static void writeCoAuthorshipRelations(String workingDir, Dataset<Row> allAuthors) {
 		allAuthors
-				.selectExpr("id", "pid.value as orcid")
+				.selectExpr("id", "orcid")
 				.groupByKey((MapFunction<Row, String>) r -> r.getAs("id"), Encoders.STRING())
 				.mapGroups(
 						(MapGroupsFunction<String, Row, Coauthors>) (k, it) -> extractCoAuthorsRow(it),
@@ -189,6 +168,8 @@ public class ExtractPerson implements Serializable {
 						(MapGroupsFunction<String, CoAuthorship, CoAuthorship>) (k, it) -> {
 							CoAuthorship ca = it.next();
 							it.forEachRemaining(a -> ca.setCoauthoredProducts(ca.getCoauthoredProducts() + a.getCoauthoredProducts()));
+							ca.setCollectedfrom(OPENAIRE_COLLECTED_FROM);
+							ca.setDataInfo(OPENAIRE_DATAINFO);
 							return ca;
 						},
 						Encoders.bean(CoAuthorship.class))
@@ -199,14 +180,13 @@ public class ExtractPerson implements Serializable {
 	}
 
 	private static void writeAuthorshipRelations(String outputPath, Dataset<Row> allAuthors) {
+
 		allAuthors.map(
 				(MapFunction<Row, Authorship>) row -> {
 					String id = row.getAs("id");
-					Boolean corresponding = row.getAs("corresponding");
+					Boolean corresponding = Boolean.valueOf(row.getAs("corresponding"));
 
-					// orcid è garantito perché filtriamo prima
-					Row pid = row.getAs("pid");
-					String orcid = pid.getAs("value");
+					String orcid = PERSON_PREFIX + SEPARATOR + IdentifierFactory.md5(row.getAs("orcid"));
 
 					// --- Gestione Affiliazioni (senza explode) ---
 					WrappedArray<Row> affRows = row.getAs("affiliations");
@@ -270,7 +250,8 @@ public class ExtractPerson implements Serializable {
 					authorship.setCorresponding(corresponding);
 					authorship.setDeclaredAffiliations(declaredAffiliations);
 					authorship.setRoles(roles);
-
+					authorship.setCollectedfrom(OPENAIRE_COLLECTED_FROM);
+					authorship.setDataInfo(OPENAIRE_DATAINFO);
 					return authorship;
 				},
 				Encoders.bean(Authorship.class)
@@ -279,36 +260,6 @@ public class ExtractPerson implements Serializable {
 				.option("compression", "gzip")
 				.json(outputPath);
 		;
-	}
-
-
-	private static Relation mergeRelation(Iterator<Relation> it) {
-		Relation r = it.next();
-
-		while (it.hasNext()) {
-			Relation r1 = it.next();
-			r = MergeUtils.mergeRelation(r, r1);
-		}
-		return r;
-	}
-
-
-
-	private static @NotNull Relation getAffiliationRelation(Row a) {
-
-		String source = PERSON_PREFIX + SEPARATOR + IdentifierFactory.md5(a.getAs("orcid"));
-		String target = ROR_PREFIX
-			+ IdentifierFactory.md5(PidCleaner.normalizePidValue("ROR", a.getAs("orgid")));
-
-		return OafMapperUtils
-			.getRelation(
-				source, target, ModelConstants.ORG_PERSON_RELTYPE,
-				ModelConstants.ORG_PERSON_SUBRELTYPE,
-				ModelConstants.ORG_PERSON_PARTICIPATES,
-				OafMapperUtils.listKeyValues(OPENAIRE_DATASOURCE_ID, OPENAIRE_DATASOURCE_NAME),
-				null,
-				null);
-
 	}
 
 	// PROJECT
@@ -360,6 +311,8 @@ public class ExtractPerson implements Serializable {
 			pp.setRoleInProject(ProjectRoles.mapStringToEnum(role));
 		}
 
+		pp.setCollectedfrom(OPENAIRE_COLLECTED_FROM);
+		pp.setDataInfo(FUNDERDATAINFO);
 		return pp;
 
 	}
@@ -376,7 +329,7 @@ public class ExtractPerson implements Serializable {
 	// ORCID
 	private static void extractInfoForActionSetFromORCID(SparkSession spark, String inputPath, String workingDir) {
 		 writePerson(spark, inputPath, workingDir);
-		writeAffiliations(spark, inputPath, workingDir);
+		 writeAffiliations(spark, inputPath, workingDir);
 	}
 
 	private static void writeAffiliations(SparkSession spark, String inputPath, String workingDir) {
@@ -478,19 +431,6 @@ public class ExtractPerson implements Serializable {
 		return person;
 	}
 
-	private static Dataset<Relation> getRelations(SparkSession spark, String path) {
-		if (HdfsSupport.exists(path, spark.sparkContext().hadoopConfiguration()))
-			return spark
-				.read()
-				.textFile(path)
-				.map(
-					(MapFunction<String, Relation>) value -> OBJECT_MAPPER
-						.readValue(value, Relation.class),
-					Encoders.bean(Relation.class));// spark.read().json(path).as(Encoders.bean(Relation.class));
-		else
-			return spark.emptyDataset(Encoders.bean(Relation.class));
-	}
-
 
 	private static Coauthors extractCoAuthorsRow(Iterator<Row> it) {
 		Coauthors coauth = new Coauthors();
@@ -523,6 +463,9 @@ public class ExtractPerson implements Serializable {
 		}
 		aa.setPeriod(Collections.singletonList(p));
 
+		aa.setCollectedfrom(Arrays.asList(OafMapperUtils.keyValue(ORCID_KEY, ModelConstants.ORCID_DS)));
+		aa.setDataInfo(ORCIDDATAINFO);
+
 		return aa;
 
 	}
@@ -552,9 +495,9 @@ public class ExtractPerson implements Serializable {
 				.map((MapFunction<String, AuthorAffiliation>) values -> OBJECT_MAPPER.readValue(values, AuthorAffiliation.class),
 						Encoders.bean(AuthorAffiliation.class));
 
-		Dataset<ProjectParticipation> projectParticipationDataset = spark.read().textFile(workingDir + "/project")
-				.map((MapFunction<String, ProjectParticipation>) values -> OBJECT_MAPPER.readValue(values, ProjectParticipation.class),
-						Encoders.bean(ProjectParticipation.class));
+//		Dataset<ProjectParticipation> projectParticipationDataset = spark.read().textFile(workingDir + "/project")
+//				.map((MapFunction<String, ProjectParticipation>) values -> OBJECT_MAPPER.readValue(values, ProjectParticipation.class),
+//						Encoders.bean(ProjectParticipation.class));
 
 		people
 			.toJavaRDD()
@@ -572,10 +515,10 @@ public class ExtractPerson implements Serializable {
 						.toJavaRDD()
 						.map(r -> new AtomicAction(r.getClass(), r))
 				)
-				.union(projectParticipationDataset
-						.toJavaRDD()
-						.map(r -> new AtomicAction(r.getClass(), r))
-				)
+//				.union(projectParticipationDataset
+//						.toJavaRDD()
+//						.map(r -> new AtomicAction(r.getClass(), r))
+//				)
 				.mapToPair(
 				aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
 					new Text(OBJECT_MAPPER.writeValueAsString(aa))))

@@ -1,8 +1,6 @@
 
 package eu.dnetlib.dhp.common.person;
 
-import java.util.List;
-
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
@@ -26,6 +24,20 @@ public class Constants {
 					ModelConstants.DNET_PROVENANCE_ACTIONS,
 					ModelConstants.DNET_PROVENANCE_ACTIONS),
 			"0.91");
+
+	public static final DataInfo OPENAIRE_DATAINFO = OafMapperUtils
+			.dataInfo(
+					false,
+					null,
+					false,
+					false,
+					OafMapperUtils
+							.qualifier(
+									"sysimport:crosswalk:actionset",
+									"",
+									ModelConstants.DNET_PROVENANCE_ACTIONS,
+									ModelConstants.DNET_PROVENANCE_ACTIONS),
+					"0.91");
 
 	public static final String OPENAIRE_PREFIX = "openaire____";
 	public static final String SEPARATOR = "::";
