@@ -26,7 +26,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import eu.dnetlib.dhp.actionmanager.opencitations.CreateOpenCitationsASTest;
 import eu.dnetlib.dhp.actionmanager.raid.model.RAiDEntity;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
