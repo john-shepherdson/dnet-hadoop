@@ -419,14 +419,14 @@ public class CleanGraphSparkJobTest {
         assertNotNull(p_in.getPid());
         assertEquals(2, p_in.getPid().size());
 
-        Optional<String> orcid = p_in.getPid()
+        Optional<StructuredProperty> orcid = p_in.getPid()
                 .stream()
                 .filter(pid -> ModelConstants.ORCID.equals(pid.getQualifier().getClassid()))
-                .map(StructuredProperty::getValue)
                 .findFirst();
 
         assertTrue(orcid.isPresent());
-        assertEquals("0000-0002-7914-4394", orcid.get());
+        assertEquals("orcid", orcid.get().getQualifier().getClassid());
+        assertEquals("0000-0002-7914-4394", orcid.get().getValue());
 
         new CleanGraphSparkJob(
                 args(
@@ -447,10 +447,10 @@ public class CleanGraphSparkJobTest {
         orcid = p.getPid()
                 .stream()
                 .filter(pid -> ModelConstants.ORCID.equals(pid.getQualifier().getClassid()))
-                .map(StructuredProperty::getValue)
                 .findFirst();
         assertTrue(orcid.isPresent());
-        assertEquals("0000-0002-7914-4394", orcid.get());
+        assertEquals("orcid", orcid.get().getQualifier().getClassid());
+        assertEquals("0000-0002-7914-4394", orcid.get().getValue());
     }
 
 	@Test

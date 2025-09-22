@@ -76,11 +76,11 @@ public class CreateASTest {
 
 		String inputPath = getClass()
 			.getResource(
-				"/eu/dnetlib/dhp/actionmanager/webcrawl/input/")
+				"/eu/dnetlib/dhp/actionmanager/webcrawl/input")
 			.getPath();
 		String blackListPath = getClass()
 			.getResource(
-				"/eu/dnetlib/dhp/actionmanager/webcrawl/blackList/")
+				"/eu/dnetlib/dhp/actionmanager/webcrawl/blackListRemove")
 			.getPath();
 
 		CreateActionSetFromWebEntries
@@ -91,14 +91,14 @@ public class CreateASTest {
 					"-sourcePath",
 					inputPath,
 					"-outputPath",
-					workingDir.toString() + "/actionSet1",
+					workingDir.toString() + "/actionSet_testNumberofRelations",
 					"-blackListPath", blackListPath
 				});
 
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
 		JavaRDD<Relation> tmp = sc
-			.sequenceFile(workingDir.toString() + "/actionSet1", Text.class, Text.class)
+			.sequenceFile(workingDir.toString() + "/actionSet_testNumberofRelations", Text.class, Text.class)
 			.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
 			.map(aa -> ((Relation) aa.getPayload()));
 
@@ -116,11 +116,11 @@ public class CreateASTest {
 
 		String inputPath = getClass()
 			.getResource(
-				"/eu/dnetlib/dhp/actionmanager/webcrawl/input/")
+				"/eu/dnetlib/dhp/actionmanager/webcrawl/input")
 			.getPath();
 		String blackListPath = getClass()
 			.getResource(
-				"/eu/dnetlib/dhp/actionmanager/webcrawl/blackList/")
+				"/eu/dnetlib/dhp/actionmanager/webcrawl/blackListRemove")
 			.getPath();
 
 		CreateActionSetFromWebEntries
@@ -131,14 +131,14 @@ public class CreateASTest {
 					"-sourcePath",
 					inputPath,
 					"-outputPath",
-					workingDir.toString() + "/actionSet1",
+					workingDir.toString() + "/actionSet_testRelations",
 					"-blackListPath", blackListPath
 				});
 
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
 		JavaRDD<Relation> tmp = sc
-			.sequenceFile(workingDir.toString() + "/actionSet1", Text.class, Text.class)
+			.sequenceFile(workingDir.toString() + "/actionSet_testRelations", Text.class, Text.class)
 			.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
 			.map(aa -> ((Relation) aa.getPayload()));
 
@@ -270,11 +270,11 @@ public class CreateASTest {
 
 		String inputPath = getClass()
 			.getResource(
-				"/eu/dnetlib/dhp/actionmanager/webcrawl")
+				"/eu/dnetlib/dhp/actionmanager/webcrawl/input")
 			.getPath();
 		String blackListPath = getClass()
 			.getResource(
-				"/eu/dnetlib/dhp/actionmanager/webcrawl/blackList/")
+				"/eu/dnetlib/dhp/actionmanager/webcrawl/blackListRemove")
 			.getPath();
 
 		CreateActionSetFromWebEntries
@@ -285,14 +285,14 @@ public class CreateASTest {
 					"-sourcePath",
 					inputPath,
 					"-outputPath",
-					workingDir.toString() + "/actionSet1",
+					workingDir.toString() + "/actionSet_testRelationsCollectedFrom",
 					"-blackListPath", blackListPath
 				});
 
-		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<Relation> tmp = sc
-			.sequenceFile(workingDir.toString() + "/actionSet1", Text.class, Text.class)
+			.sequenceFile(workingDir.toString() + "/actionSet_testRelationsCollectedFrom", Text.class, Text.class)
 			.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
 			.map(aa -> ((Relation) aa.getPayload()));
 

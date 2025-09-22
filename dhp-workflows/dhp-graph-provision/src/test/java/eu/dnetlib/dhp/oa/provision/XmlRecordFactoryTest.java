@@ -100,7 +100,7 @@ public class XmlRecordFactoryTest {
 		assertEquals("true", doc.valueOf("//*[local-name() = 'result']/isindiamondjournal/text()"));
 		assertEquals("true", doc.valueOf("//*[local-name() = 'result']/publiclyfunded/text()"));
 
-		assertEquals(15, doc.selectNodes("//*[local-name() = 'result']/*[local-name() = 'subject']").size());
+		assertEquals(16, doc.selectNodes("//*[local-name() = 'result']/*[local-name() = 'subject']").size());
 	}
 
 	@Test
