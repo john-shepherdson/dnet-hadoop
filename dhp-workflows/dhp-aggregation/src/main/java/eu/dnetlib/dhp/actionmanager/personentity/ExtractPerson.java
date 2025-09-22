@@ -508,9 +508,9 @@ public class ExtractPerson implements Serializable {
 				.map((MapFunction<String, AuthorAffiliation>) values -> OBJECT_MAPPER.readValue(values, AuthorAffiliation.class),
 						Encoders.bean(AuthorAffiliation.class));
 
-//		Dataset<ProjectParticipation> projectParticipationDataset = spark.read().textFile(workingDir + "/project")
-//				.map((MapFunction<String, ProjectParticipation>) values -> OBJECT_MAPPER.readValue(values, ProjectParticipation.class),
-//						Encoders.bean(ProjectParticipation.class));
+		Dataset<ProjectParticipation> projectParticipationDataset = spark.read().textFile(workingDir + "/project")
+				.map((MapFunction<String, ProjectParticipation>) values -> OBJECT_MAPPER.readValue(values, ProjectParticipation.class),
+						Encoders.bean(ProjectParticipation.class));
 
 		people
 			.toJavaRDD()
@@ -528,10 +528,10 @@ public class ExtractPerson implements Serializable {
 						.toJavaRDD()
 						.map(r -> new AtomicAction(r.getClass(), r))
 				)
-//				.union(projectParticipationDataset
-//						.toJavaRDD()
-//						.map(r -> new AtomicAction(r.getClass(), r))
-//				)
+				.union(projectParticipationDataset
+						.toJavaRDD()
+						.map(r -> new AtomicAction(r.getClass(), r))
+				)
 				.mapToPair(
 				aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
 					new Text(OBJECT_MAPPER.writeValueAsString(aa))))
