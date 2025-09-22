@@ -15,6 +15,9 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
@@ -130,7 +133,7 @@ public class GroupEntitiesSparkJobTest {
 						r.getCollectedfrom().stream().anyMatch(kv -> kv.getValue().equalsIgnoreCase("zenodo")))
 				.count());
 
-		Dataset<Result> output = spark
+		List<Result> output = spark
 			.read()
 			.textFile(
 				DHPUtils
@@ -138,33 +141,38 @@ public class GroupEntitiesSparkJobTest {
 						HdfsSupport
 							.listFiles(outputPath.toString(), spark.sparkContext().hadoopConfiguration()))
 					.toSeq())
-			.map((MapFunction<String, Result>) s -> mapper.readValue(s, Result.class), Encoders.bean(Result.class));
+			.map((MapFunction<String, Result>) s -> mapper.readValue(s, Result.class), Encoders.bean(Result.class))
+            .collectAsList();
 
-		assertEquals(3, output.count());
+		assertEquals(3, output.size());
 
-		List<String> resultTypes = output
-			.map((MapFunction<Result, String>) value -> value.getResulttype().getClassid(), Encoders.STRING())
-			.distinct()
-			.collectAsList();
+		Set<String> resultTypes = output
+                .stream()
+			.map(value -> value.getResulttype().getClassid())
+			.collect(Collectors.toSet());
 
-		assertEquals(2, resultTypes.size());
+		assertEquals(1, resultTypes.size());
 
 		assertEquals(
-			2,
+			3,
 			output
-				.map((MapFunction<Result, String>) r -> r.getResulttype().getClassid(), Encoders.STRING())
-				.filter((FilterFunction<String>) s -> s.equals("publication"))
+                .stream()
+				.map(r -> r.getResulttype().getClassid())
+				.filter(s -> s.equals("publication"))
 				.count());
 		assertEquals(
-			1,
+			0,
 			output
-				.map((MapFunction<Result, String>) r -> r.getResulttype().getClassid(), Encoders.STRING())
-				.filter((FilterFunction<String>) s -> s.equals("dataset"))
+                .stream()
+				.map(r -> r.getResulttype().getClassid())
+				.filter(s -> s.equals("dataset"))
 				.count());
 
 		Result result = output
-			.filter("id = '50|doi_________::09821844208a5cd6300b2bfb13bca1b9'")
-			.first();
+            .stream()
+			.filter(r -> "50|doi_________::09821844208a5cd6300b2bfb13bca1b9".equals(r.getId()))
+			.findFirst()
+            .get();
 
 		result.getInstance().forEach(instance -> {
 			Optional<InstanceTypeMapping> coarType = instance
@@ -179,9 +187,12 @@ public class GroupEntitiesSparkJobTest {
 			assertEquals("research article", coarType.get().getTypeLabel());
 		});
 
-		final Dataset<Result> filtered = output.filter("id = '50|DansKnawCris::203a27996ddc0fd1948258e5b7dec61c'");
-		assertEquals(1, filtered.count());
-		result = filtered.first();
+		final List<Result> filtered = output
+                .stream()
+                .filter(r -> "50|DansKnawCris::203a27996ddc0fd1948258e5b7dec61c".equals(r.getId()))
+                .collect(Collectors.toList());
+		assertEquals(1, filtered.size());
+		result = filtered.get(0);
 
 		result
 			.getInstance()

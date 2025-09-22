@@ -8,8 +8,8 @@ import static org.mockito.Mockito.lenient;
 import java.io.IOException;
 import java.util.List;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.io.IOUtils;
-import org.dom4j.DocumentException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -50,8 +50,8 @@ class GenerateEntitiesApplicationTest {
 		Result software = getResult("odf_software.xml", Software.class);
 		Result orp = getResult("oaf_orp.xml", OtherResearchProduct.class);
 
-		verifyMerge(publication, dataset, Dataset.class, ModelConstants.DATASET_RESULTTYPE_CLASSID);
-		verifyMerge(dataset, publication, Dataset.class, ModelConstants.DATASET_RESULTTYPE_CLASSID);
+		verifyMerge(publication, dataset, Publication.class, ModelConstants.PUBLICATION_RESULTTYPE_CLASSID);
+		verifyMerge(dataset, publication, Publication.class, ModelConstants.PUBLICATION_RESULTTYPE_CLASSID);
 
 		verifyMerge(publication, software, Publication.class, ModelConstants.PUBLICATION_RESULTTYPE_CLASSID);
 		verifyMerge(software, publication, Publication.class, ModelConstants.PUBLICATION_RESULTTYPE_CLASSID);
@@ -71,9 +71,11 @@ class GenerateEntitiesApplicationTest {
 
 	protected <T extends Result> void verifyMerge(Result r1, Result r2, Class<T> clazz,
 		String resultType) {
-		final Result merge = MergeUtils.checkedMerge(r1, r2, true);
-		assertTrue(clazz.isAssignableFrom(merge.getClass()));
+
+        final Result merge = MergeUtils.mergeGroup(Lists.newArrayList(r1, r2).iterator());
+		//final Result merge = MergeUtils.checkedMerge(r1, r2, true);
 		assertEquals(resultType, merge.getResulttype().getClassid());
+        assertTrue(clazz.isAssignableFrom(merge.getClass()));
 	}
 
 	protected <T extends Result> Result getResult(String xmlFileName, Class<T> clazz)
