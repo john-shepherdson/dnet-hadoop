@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+import eu.dnetlib.dhp.schema.oaf.rel.AuthorAffiliation;
 import eu.dnetlib.dhp.schema.oaf.rel.Authorship;
 import eu.dnetlib.dhp.schema.oaf.rel.CoAuthorship;
 import eu.dnetlib.dhp.schema.oaf.rel.beans.AuthorshipRoles;
@@ -519,7 +520,56 @@ public class CreatePersonAS {
 
 		Assertions.assertEquals(2, relations.count());
 
-		relations.foreach(r -> System.out.println(OBJECT_MAPPER.writeValueAsString(r)));
+		relations.foreach(r -> Assertions.assertEquals(2, r.getCoauthoredProducts()));
+
+
+
+
+	}
+
+	@Test
+	void testAffiliation() throws Exception {
+
+		String inputPath = getClass()
+				.getResource(
+						"/eu/dnetlib/dhp/actionmanager/person/")
+				.getPath();
+
+		ExtractPerson
+				.main(
+						new String[] {
+								"-isSparkSessionManaged",
+								Boolean.FALSE.toString(),
+								"-inputPath",
+								inputPath,
+								"-outputPath",
+								workingDir.toString() + "/actionSet1",
+								"-workingDir",
+								workingDir.toString() + "/working",
+								"-postgresUrl", "noneed",
+								"-postgresUser", "noneed",
+								"-postgresPassword", "noneed",
+								"-publisherInputPath", getClass()
+								.getResource("/eu/dnetlib/dhp/actionmanager/personpublisher/ieee7.json")
+								.getPath()
+
+						});
+
+		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
+
+		JavaRDD<AuthorAffiliation> relations = sc
+				.sequenceFile(workingDir.toString() + "/actionSet1", Text.class, Text.class)
+				.filter(v -> "eu.dnetlib.dhp.schema.oaf.rel.AuthorAffiliation".equalsIgnoreCase(v._1().toString()))
+				.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
+				.map(aa -> ((AuthorAffiliation) aa.getPayload()));
+
+
+
+		Assertions.assertEquals(1, relations.count());
+		Assertions.assertEquals(null, relations.first().getPeriod().get(0).getStartDate());
+		Assertions.assertEquals("2010-07-01", relations.first().getPeriod().get(0).getEndDate());
+		Assertions.assertEquals("30|orcid_______::" + DHPUtils.md5("0000-0001-6544-2588"), relations.first().getPerson());
+		Assertions.assertEquals("20|ror_________::" + DHPUtils.md5("https://ror.org/01dw0ab98"), relations.first().getOrganization());
 
 
 	}
@@ -659,12 +709,6 @@ public class CreatePersonAS {
 
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
-		JavaRDD<Relation> relations = sc
-			.sequenceFile(workingDir.toString() + "/actionSet1", Text.class, Text.class)
-			.filter(v -> "eu.dnetlib.dhp.schema.oaf.Relation".equalsIgnoreCase(v._1().toString()))
-			.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
-			.map(aa -> ((Relation) aa.getPayload()));
-//
 		JavaRDD<Person> people = sc
 			.sequenceFile(workingDir.toString() + "/actionSet1", Text.class, Text.class)
 			.filter(v -> "eu.dnetlib.dhp.schema.oaf.Person".equalsIgnoreCase(v._1().toString()))

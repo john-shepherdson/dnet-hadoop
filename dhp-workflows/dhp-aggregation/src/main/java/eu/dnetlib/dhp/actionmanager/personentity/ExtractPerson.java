@@ -349,6 +349,7 @@ public class ExtractPerson implements Serializable {
 			.read()
 			.parquet(inputPath + "Employments")
 			.as(Encoders.bean(Employment.class));
+
 		Dataset<Author> authors = spark
 			.read()
 			.parquet(inputPath + "Authors")
