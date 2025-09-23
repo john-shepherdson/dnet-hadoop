@@ -216,7 +216,7 @@ public class PrepareAffiliationRelations implements Serializable {
 			.json(inputPath)
 			.where("doi is not null")
 				.withColumn("id",  expr("md5HashWithPrefix(doi)"))
-				.withColumn("matching", functions.explode(new Column("organizations"))), collectedfrom, dataprovenance ));
+				.withColumn("matching", functions.explode(new Column("organizations"))), collectedfrom, dataprovenance );
 
 
 	}
