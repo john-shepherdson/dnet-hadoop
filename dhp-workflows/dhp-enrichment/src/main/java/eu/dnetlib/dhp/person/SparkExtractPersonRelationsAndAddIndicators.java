@@ -8,7 +8,11 @@ import java.util.*;
 import java.util.logging.Filter;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.schema.oaf.rel.Authorship;
 import eu.dnetlib.dhp.schema.oaf.rel.CoAuthorship;
+import eu.dnetlib.dhp.schema.oaf.rel.beans.AuthorshipRoles;
+import eu.dnetlib.dhp.schema.oaf.rel.beans.DeclaredAffiliation;
+import eu.dnetlib.dhp.schema.oaf.rel.beans.Role;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
@@ -17,6 +21,9 @@ import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.MapGroupsFunction;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.types.DataType;
+import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.StructType;
 import org.postgresql.shaded.com.ongres.scram.common.bouncycastle.pbkdf2.EncodableDigest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +38,7 @@ import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import scala.Tuple2;
+import static org.apache.spark.sql.functions.*;
 
 public class SparkExtractPersonRelationsAndAddIndicators {
 
@@ -72,6 +80,9 @@ public class SparkExtractPersonRelationsAndAddIndicators {
 		final String workingPath = parser.get("outputPath");
 		log.info("workingPath: {}", workingPath);
 
+		final String matchingDataset = parser.get("matchingDataset");
+		log.info("matchingDataset: {}", matchingDataset);
+
 		SparkConf conf = new SparkConf();
 		runWithSparkSession(
 			conf,
@@ -81,7 +92,7 @@ public class SparkExtractPersonRelationsAndAddIndicators {
 				extractRelations(
 					spark,
 					sourcePath,
-					workingPath);
+					workingPath, matchingDataset);
 				addIndicators(spark, sourcePath, workingPath);
 				removeIsolatedPerson(spark, sourcePath, workingPath);
 			});
@@ -196,51 +207,6 @@ public class SparkExtractPersonRelationsAndAddIndicators {
 			.option("compression", "gzip")
 			.json(workingPath + "/orcidIndicators");
 
-//		Dataset<Relation> relations = spark.read().schema(Encoders.bean(Relation.class).schema())
-//				.json(sourcePath + "relation")
-//				.as(Encoders.bean(Relation.class))
-//				.filter((FilterFunction<Relation>) r -> !r.getDataInfo().getDeletedbyinference() && r.getRelClass().equalsIgnoreCase(ModelConstants.CITES));
-//
-//		Dataset<OrcidIndicators> citations = resultSubset.joinWith(relations, resultSubset.col("id").equalTo(relations.col("target")))
-//				.flatMap((FlatMapFunction<Tuple2<ResultSubset, Relation>, OrcidIndicators>) t2 -> {
-//					List<OrcidIndicators> oi = new ArrayList<>();
-//					t2._1().getAuthor()
-//							.forEach(a -> {
-//										List<StructuredProperty> orcid = a.getPid().stream()
-//												.filter(p -> p.getQualifier().getClassid().equalsIgnoreCase("orcid"))
-//												.collect(Collectors.toList());
-//										if (!orcid.isEmpty())
-//											oi.add(OrcidIndicators.newInstance(t2._1().getId(), orcid.get(0).getValue()));
-//										else
-//											oi.add(OrcidIndicators.newInstance(t2._1().getId(), a.getPid().stream()
-//													.filter(p -> p.getQualifier().getClassid().equalsIgnoreCase("orcid_pending"))
-//													.collect(Collectors.toList()).get(0).getValue()));
-//									}
-//							);
-//					return oi.iterator();
-//				}, Encoders.bean(OrcidIndicators.class))
-//				.groupByKey((MapFunction<OrcidIndicators, String>) oi -> oi.getOrcid(), Encoders.STRING())
-//				.mapGroups((MapGroupsFunction<String, OrcidIndicators, OrcidIndicators>) (k, it) -> {
-//							OrcidIndicators oi = it.next();
-//							it.forEachRemaining(e -> oi.setCitations(oi.getCitations() + e.getCitations()));
-//							return oi;
-//						}, Encoders.bean(OrcidIndicators.class)
-//				);
-//
-//		downloads.joinWith(citations, downloads.col("orcid").equalTo(citations.col("orcid")),"full")
-//				.map((MapFunction<Tuple2<OrcidIndicators, OrcidIndicators>, OrcidIndicators>) t2 -> {
-//					if(t2._1() == null)
-//						return t2._2();
-//					if(t2._2() == null)
-//						return t2._1();
-//					t2._1().setCitations(t2._2().getCitations());
-//					return t2._1();
-//
-//				}, Encoders.bean(OrcidIndicators.class))
-//				.write()
-//				.mode(SaveMode.Overwrite)
-//				.option("compression","gzip")
-//				.json(workingPath + "/orcidIndicators");
 
 		Dataset<Person> person = spark
 			.read()
@@ -253,13 +219,6 @@ public class SparkExtractPersonRelationsAndAddIndicators {
 			.schema(Encoders.bean(OrcidIndicators.class).schema())
 			.json(workingPath + "/orcidIndicators")
 			.as(Encoders.bean(OrcidIndicators.class));
-//				.groupByKey((MapFunction<OrcidIndicators, String>) OrcidIndicators::getOrcid,Encoders.STRING() )
-//				.mapGroups((MapGroupsFunction<String, OrcidIndicators, OrcidIndicators>) (k,it) -> {
-//					OrcidIndicators acc = it.next();
-//					it.forEachRemaining(oi -> acc.addIndicators(oi.getDownloads(),oi.getCitations()));
-//					return acc;
-//
-//				},Encoders.bean(OrcidIndicators.class));
 
 		person
 			.joinWith(orcidIndicators, person.col("id").equalTo(orcidIndicators.col("orcid")), "left")
@@ -331,7 +290,7 @@ public class SparkExtractPersonRelationsAndAddIndicators {
 			.json(sourcePath + "person");
 	}
 
-	private static void extractRelations(SparkSession spark, String sourcePath, String workingPath) {
+	private static void extractRelations(SparkSession spark, String sourcePath, String workingPath, String matchingDataset) {
 
 		ModelSupport.entityTypes
 			.keySet()
@@ -374,13 +333,13 @@ public class SparkExtractPersonRelationsAndAddIndicators {
 
 					resultWithOrcids
 						.flatMap(
-							(FlatMapFunction<Result, Relation>) SparkExtractPersonRelationsAndAddIndicators::getAuthorshipRelations,
-							Encoders.bean(Relation.class))
+							(FlatMapFunction<Result, Authorship>) SparkExtractPersonRelationsAndAddIndicators::getAuthorshipRelations,
+							Encoders.bean(Authorship.class))
 						.distinct()
 						.write()
 						.mode(SaveMode.Append)
 						.option("compression", "gzip")
-						.json(workingPath);
+						.json(workingPath + "/authorship");
 
 					// 3. create co_authorship relations between the pairs of authors with orcid/orcid_pending pids
 					resultWithOrcids
@@ -390,25 +349,54 @@ public class SparkExtractPersonRelationsAndAddIndicators {
 						.flatMap(
 							(FlatMapFunction<Coauthors, CoAuthorship>) c -> new CoAuthorshipIterator(c.getCoauthors()),
 							Encoders.bean(CoAuthorship.class))
-						.distinct()
+							.groupByKey((MapFunction<CoAuthorship, String>) r -> r.getAuthor1() + "::" + r.getAuthor2(), Encoders.STRING() )
+							.mapGroups((MapGroupsFunction<String, CoAuthorship, CoAuthorship>) (k,it) -> {
+								CoAuthorship ca = it.next();
+								it.forEachRemaining(r -> ca.setCoauthoredProducts(ca.getCoauthoredProducts() + r.getCoauthoredProducts() ));
+								return ca;
+							} , Encoders.bean(CoAuthorship.class))
 						.write()
 						.mode(SaveMode.Append)
 						.option("compression", "gzip")
-						.json(workingPath);
+						.json(workingPath + "/coauthorship");
 
 				});
 
 		spark
 			.read()
-			.schema(Encoders.bean(Relation.class).schema())
+			.schema(Encoders.bean(Authorship.class).schema())
 			.json(workingPath)
-			.as(Encoders.bean(Relation.class))
-			.distinct()
+			.as(Encoders.bean(Authorship.class))
+				.groupByKey((MapFunction<Authorship, String>) a -> a.getPerson() + "::"  + a.getProduct(), Encoders.STRING())
+				.mapGroups((MapGroupsFunction<String, Authorship, Authorship>) (k,it) -> {
+					Authorship authorship = it.next();
+					while(it.hasNext())
+						authorship = mergeAuthorship(authorship, it.next());
+
+					return  authorship;
+		}, Encoders.bean(Authorship.class))
 			.write()
 			.mode(SaveMode.Append)
 			.option("compression", "gzip")
 			.json(sourcePath + "relation");
 
+	}
+
+	private static Authorship mergeAuthorship(Authorship acc, Authorship toMerge){
+		if(acc == null)
+			return toMerge;
+		if(toMerge == null)
+			return acc;
+		if(acc.getRoles().isEmpty())
+			acc.setRoles(toMerge.getRoles());
+		else{
+			if(Optional.ofNullable(toMerge.getRoles()).isPresent())
+					toMerge.getRoles().forEach(role -> addRole(acc.getRoles(),role));
+		}
+	}
+
+	private static void addRole(List<Role> roles, Role role){
+		
 	}
 
 	private static Coauthors getAuthorsPidList(Result r) {
@@ -446,15 +434,14 @@ public class SparkExtractPersonRelationsAndAddIndicators {
 
 	}
 
-	private static Iterator<Relation> getAuthorshipRelations(Result r) {
-		List<Relation> relationList = new ArrayList<>();
+
+	private static Iterator<Authorship> getAuthorshipRelations(Result r) {
+		List<Authorship> relationList = new ArrayList<>();
 		List<StructuredProperty> orcids = new ArrayList<>();
+
 		for (Author a : r.getAuthor()) {
-			orcids = a
-				.getPid()
-				.stream()
-				.filter(p -> p.getQualifier().getClassid().equalsIgnoreCase("orcid"))
-				.collect(Collectors.toList());
+			orcids = a.getPid().stream().filter(p -> p.getQualifier().getClassid().equalsIgnoreCase("orcid"))
+					.collect(Collectors.toList());
 			if (orcids.isEmpty())
 				orcids = a
 					.getPid()
@@ -462,26 +449,27 @@ public class SparkExtractPersonRelationsAndAddIndicators {
 					.filter(p -> p.getQualifier().getClassid().equalsIgnoreCase("orcid_pending"))
 					.collect(Collectors.toList());
 			if (!orcids.isEmpty())
-				relationList.add(getRelation(orcids.get(0).getValue(), r.getId()));
+				relationList.add(getAuthorshipRelation(orcids.get(0).getValue(), r.getId(), a.getRank(), a.getRawAffiliationString()));
 
 		}
 		return relationList.iterator();
 	}
 
-	private static Relation getRelation(String orcid, String resultId) {
-
+	private static Authorship getAuthorshipRelation(String orcid, String resultId, Integer rank, List<String> rawAffiliations) {
 		String source = PERSON_PREFIX + "::" + IdentifierFactory.md5(orcid);
-
-		Relation relation = OafMapperUtils
-			.getRelation(
-				source, resultId, ModelConstants.RESULT_PERSON_RELTYPE,
-				ModelConstants.RESULT_PERSON_SUBRELTYPE,
-				ModelConstants.RESULT_PERSON_HASAUTHORED,
-				null, // collectedfrom = null
-				DATAINFO,
-				null);
-
-		return relation;
+		Authorship authorship = new Authorship();
+		authorship.setPerson(source);
+		authorship.setProduct(resultId);
+		authorship.setRank(rank);
+		authorship.setDataInfo(DATAINFO);
+		authorship.setDeclaredAffiliations(rawAffiliations.stream().map(rawAffiliation -> {
+			DeclaredAffiliation da = new DeclaredAffiliation();
+			da.setRawAffiliation(rawAffiliation);
+			return da;
+		}).collect(Collectors.toList()));
+		return authorship;
 	}
+
+
 
 }
