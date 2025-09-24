@@ -114,26 +114,26 @@ public class ExtractPerson implements Serializable {
 		Dataset<Row> df = spark
 			.read()
 			.schema(
-				"`DOI` STRING, " +
-					"`Authors` ARRAY<STRUCT<`Corresponding` : STRING, " +
-					"`Contributor_roles` : ARRAY<STRUCT<`Schema`:STRING, `Value`:STRING>> ," +
-					"`Name` : STRUCT<`Full`:STRING, `First` : STRING, `Last`: STRING>,  " +
-					"`Matchings`: ARRAY<STRUCT<`PID`:STRING, `Value`:STRING,`Confidence`:DOUBLE, `Status`:STRING>>, " +
-					"`PIDs` : ARRAY<STRUCT<`Schema`:STRING , `Value`: STRING>>>>")
+				"`doi` STRING, " +
+					"`authors` ARRAY<STRUCT<`corresponding` : STRING, " +
+					"`contributor_roles` : ARRAY<STRUCT<`schema`:STRING, `value`:STRING>> ," +
+					"`name` : STRUCT<`full`:STRING, `first` : STRING, `last`: STRING>,  " +
+					"`matchings`: ARRAY<STRUCT<`PID`:STRING, `Value`:STRING,`Confidence`:DOUBLE, `Status`:STRING>>, " +
+					"`pids` : ARRAY<STRUCT<`schema`:STRING , `value`: STRING>>>>")
 			.json(inputPath)
-			.where("DOI is not null");
+			.where("doi is not null");
 
 //Select the relevant information
 		Dataset<Row> allAuthors = df
-			.selectExpr("DOI", "explode(Authors) as author")
+			.selectExpr("doi", "explode(authors) as author")
 			.selectExpr(
-				"DOI", "author.Contributor_roles as roles",
-				"author.Corresponding as corresponding", "author.Matchings as affs",
-				"explode(author.PIDs) as pid")
-			.where("pid.Schema = 'ORCID'");
+				"doi", "author.contributor_roles as roles",
+				"author.corresponding as corresponding", "author.matchings as affs",
+				"explode(author.pids) as pid")
+			.where("pid.schema = 'orcid'");
 
 		Dataset<Row> authors = allAuthors
-			.selectExpr("explode (affs) as affiliation", "DOI", "corresponding", "roles", "pid.Value as orcid")
+			.selectExpr("explode (affs) as affiliation", "doi", "corresponding", "roles", "pid.value as orcid")
 			.where("affiliation.Status = 'active'")
 			.selectExpr(
 				"affiliation.Value as orgid", "affiliation.PID as orgpid", "affiliation.Confidence as trust", "DOI",
@@ -146,8 +146,8 @@ public class ExtractPerson implements Serializable {
 			.unionAll(
 				authors
 					.where("roles is not null")
-					.selectExpr("orgid", "orgpid", "trust", "DOI", "corresponding", "explode(roles) as role", "orcid")
-					.selectExpr("*", "role.Schema as roleschema", "role.Value as rolevalue")
+					.selectExpr("orgid", "orgpid", "trust", "doi", "corresponding", "explode(roles) as role", "orcid")
+					.selectExpr("*", "role.schema as roleschema", "role.value as rolevalue")
 					.drop("role"));
 
 		// create the relation dataset with possible redundant relations
@@ -159,8 +159,8 @@ public class ExtractPerson implements Serializable {
 				Encoders.bean(Relation.class))
 			.unionAll(
 				allAuthors
-					.selectExpr("DOI", "pid.Value as orcid")
-					.groupByKey((MapFunction<Row, String>) r -> r.getAs("DOI"), Encoders.STRING())
+					.selectExpr("doi", "pid.value as orcid")
+					.groupByKey((MapFunction<Row, String>) r -> r.getAs("doi"), Encoders.STRING())
 
 					.mapGroups(
 						(MapGroupsFunction<String, Row, Coauthors>) (k, it) -> extractCoAuthorsRow(it),
@@ -202,7 +202,7 @@ public class ExtractPerson implements Serializable {
 	private static @NotNull Relation getAuthorshipRelation(Row a) {
 		String target = DOI_PREFIX
 			+ IdentifierFactory
-				.md5(PidCleaner.normalizePidValue(PidType.doi.toString(), a.getAs("DOI")));
+				.md5(PidCleaner.normalizePidValue(PidType.doi.toString(), a.getAs("doi")));
 		;
 		String source = PERSON_PREFIX + SEPARATOR + IdentifierFactory.md5(a.getAs("orcid"));
 
