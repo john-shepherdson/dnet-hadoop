@@ -40,7 +40,6 @@ public class Constants {
 	public static final String PROJECT_ID_PREFIX = ModelSupport.getIdPrefix(Project.class)
 		+ IdentifierFactory.ID_PREFIX_SEPARATOR;
 
-
 	public static final StructType PUBLISHER_INPUT_SCHEMA = new StructType()
 			.add("doi", DataTypes.StringType)
 			.add(
@@ -53,7 +52,8 @@ public class Constants {
 															.createArrayType(
 																	new StructType()
 																			.add("schema", DataTypes.StringType)
-																			.add("value", DataTypes.StringType)))
+																			.add("value", DataTypes.StringType)
+																			.add("name", DataTypes.StringType)))
 											.add(
 													"name", new StructType()
 															.add("full", DataTypes.StringType)

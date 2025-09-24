@@ -137,13 +137,13 @@ public class ExtractPerson implements Serializable {
 
 		authors = authors
 			.where("roles is null")
-			.selectExpr("*", " '' AS roleschema", " '' AS rolevalue")
+			.selectExpr("*", " '' AS roleschema", " '' AS rolevalue", "'' AS rolename")
 			.drop("roles")
 			.unionAll(
 				authors
 					.where("roles is not null")
 					.selectExpr("orgid", "orgpid", "trust", "doi", "corresponding", "explode(roles) as role", "orcid")
-					.selectExpr("*", "role.schema as roleschema", "role.value as rolevalue")
+					.selectExpr("*", "role.schema as roleschema", "role.value as rolevalue", "role.name as rolename")
 					.drop("role"));
 
 		// create the relation dataset with possible redundant relations
@@ -248,12 +248,18 @@ public class ExtractPerson implements Serializable {
 			relation.getProperties().add(kv);
 		}
 
+		KeyValue kv = new KeyValue();
 		if (StringUtils.isNotBlank(a.getAs("roleschema"))) {
-			KeyValue kv = new KeyValue();
 			kv.setKey("role");
 			String role = (String) a.getAs("roleschema")
 				+ (String) a.getAs("rolevalue");
 			kv.setValue(role);
+			if (!Optional.ofNullable(relation.getProperties()).isPresent())
+				relation.setProperties(new ArrayList<>());
+			relation.getProperties().add(kv);
+		}else if(StringUtils.isNotBlank(a.getAs("rolename"))){
+			kv.setKey("role");
+			kv.setValue(a.getAs("rolename"));
 			if (!Optional.ofNullable(relation.getProperties()).isPresent())
 				relation.setProperties(new ArrayList<>());
 			relation.getProperties().add(kv);
