@@ -15,6 +15,7 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.common.person.Constants;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -113,13 +114,8 @@ public class ExtractPerson implements Serializable {
 		// Read the publishers output
 		Dataset<Row> df = spark
 			.read()
-			.schema(
-				"`doi` STRING, " +
-					"`authors` ARRAY<STRUCT<`corresponding` : STRING, " +
-					"`contributor_roles` : ARRAY<STRUCT<`schema`:STRING, `value`:STRING>> ," +
-					"`name` : STRUCT<`full`:STRING, `first` : STRING, `last`: STRING>,  " +
-					"`matchings`: ARRAY<STRUCT<`PID`:STRING, `Value`:STRING,`Confidence`:DOUBLE, `Status`:STRING>>, " +
-					"`pids` : ARRAY<STRUCT<`schema`:STRING , `value`: STRING>>>>")
+			.schema(PUBLISHER_INPUT_SCHEMA)
+
 			.json(inputPath)
 			.where("doi is not null");
 
@@ -199,26 +195,7 @@ public class ExtractPerson implements Serializable {
 		return r;
 	}
 
-	public static String removePrefixUrl(String pid) {
-		if (pid == null) {
-			return null;
-		}
 
-		String trimmed = pid.trim();
-
-		// removes prefix for DOI
-		if (trimmed.matches("(?i)^https?://(dx\\.)?doi\\.org/.*")) {
-			return trimmed.replaceFirst("(?i)^https?://(dx\\.)?doi\\.org/", "");
-		}
-
-		// removes prefix for ORCID
-		if (trimmed.matches("(?i)^https?://orcid\\.org/.*")) {
-			return trimmed.replaceFirst("(?i)^https?://orcid\\.org/", "");
-		}
-
-		// if there is no known prefix to remove the string is returned as it is
-		return trimmed;
-	}
 
 
 	private static @NotNull Relation getAuthorshipRelation(Row a) {

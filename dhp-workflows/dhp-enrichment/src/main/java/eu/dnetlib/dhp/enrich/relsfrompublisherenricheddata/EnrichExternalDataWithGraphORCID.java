@@ -6,6 +6,7 @@ import static eu.dnetlib.dhp.common.enrichment.Constants.PROPAGATION_DATA_INFO_T
 import java.util.*;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.common.person.Constants;
 import org.apache.commons.collections.ArrayStack;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.api.java.function.FilterFunction;
@@ -108,53 +109,21 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 			.selectExpr("_1 as id", "_2.orcidAuthorList as orcid_authors");// in this case the id is the doi
 
 		orcidDnet.write().mode(SaveMode.Overwrite).option("compression", "gzip").parquet(targetPath + "/graph_authors");
-		StructType schema = new StructType()
-			.add("DOI", DataTypes.StringType)
-			.add(
-				"Authors", DataTypes
-					.createArrayType(
-						new StructType()
-							.add("Corresponding", DataTypes.StringType)
-							.add(
-								"Contributor_roles", DataTypes
-									.createArrayType(
-										new StructType()
-											.add("Schema", DataTypes.StringType)
-											.add("Value", DataTypes.StringType)))
-							.add(
-								"Name", new StructType()
-									.add("Full", DataTypes.StringType)
-									.add("First", DataTypes.StringType)
-									.add("Last", DataTypes.StringType))
-							.add(
-								"Matchings", DataTypes
-									.createArrayType(
-										new StructType()
-											.add("PID", DataTypes.StringType)
-											.add("Value", DataTypes.StringType)
-											.add("Confidence", DataTypes.DoubleType)
-											.add("Status", DataTypes.StringType)))
-							.add(
-								"PIDs", DataTypes
-									.createArrayType(
-										new StructType()
-											.add("Schema", DataTypes.StringType)
-											.add("Value", DataTypes.StringType)))));
 
 		Dataset<Row> df = spark
 			.read()
-			.schema(schema)
+			.schema(Constants.PUBLISHER_INPUT_SCHEMA)
 			.json(graphPath) // the path to the publisher files
-			.where("DOI is not null");
+			.where("doi is not null");
 
 		Dataset<Row> authors = df
-			.selectExpr("DOI as doi", "explode(Authors) as author")
+			.selectExpr("doi", "explode(authors) as author")
 			.selectExpr(
-				"doi", "author.Name.Full as fullname",
-				"author.Name.First as firstname",
-				"author.Name.Last as lastname",
-				"author.PIDs as pids",
-				"author.Matchings as affiliations")
+				"doi", "author.name.full as fullname",
+				"author.name.first as firstname",
+				"author.name.last as lastname",
+				"author.pids as pids",
+				"author.matchings as affiliations")
 			.map(
 				(MapFunction<Row, Tuple2<String, Author>>) a -> new Tuple2<>(a.getAs("doi"), getAuthor(a)),
 				Encoders.tuple(Encoders.STRING(), Encoders.bean(Author.class)))
@@ -365,7 +334,6 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 				.filter(
 					p -> {
 						Row qualifier = p.getAs("qualifier");
-						Row dataInfo = p.getAs("dataInfo");
 						return ModelConstants.ORCID.equalsIgnoreCase(qualifier.getAs("classid"))
 							|| ModelConstants.ORCID_PENDING.equalsIgnoreCase(qualifier.getAs("classid"));
 					})
@@ -375,9 +343,9 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 					p -> relationList
 						.add(
 							getRelations(
-								r.getAs("doi"),
+								Constants.removePrefixUrl(r.getAs("doi")),
 								author.getList(author.fieldIndex("rawAffiliationString")),
-								p.getAs("value"))));
+								Constants.removePrefixUrl(p.getAs("value")))));
 
 		});
 
@@ -386,8 +354,8 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 
 	private static Relation getRelations(String doi, List<String> rawAffiliationString, String orcid) {
 		Relation rel = OafMapperUtils
-			.getRelation(
-				"30|orcid_______::" + DHPUtils.md5(orcid), "50|doi_________::" + DHPUtils.md5(doi),
+			.getRelation(Constants.PERSON_PREFIX + Constants.SEPARATOR
+				+ DHPUtils.md5(orcid), "50|doi_________::" + DHPUtils.md5(doi),
 				ModelConstants.RESULT_PERSON_RELTYPE, ModelConstants.RESULT_PERSON_SUBRELTYPE,
 				ModelConstants.RESULT_PERSON_HASAUTHORED,
 				null, DATAINFO, null);
@@ -456,11 +424,11 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 	private static @Nullable StructuredProperty getPid(Row pid) {
 		return OafMapperUtils
 			.structuredProperty(
-				pid.getAs("Value"),
+				Constants.removePrefixUrl(pid.getAs("value")),
 				OafMapperUtils
 					.qualifier(
-						pid.getAs("Schema"),
-						pid.getAs("Schema"),
+						pid.getAs("schema"),
+						pid.getAs("schema"),
 						ModelConstants.DNET_PID_TYPES,
 						ModelConstants.DNET_PID_TYPES),
 				null);
