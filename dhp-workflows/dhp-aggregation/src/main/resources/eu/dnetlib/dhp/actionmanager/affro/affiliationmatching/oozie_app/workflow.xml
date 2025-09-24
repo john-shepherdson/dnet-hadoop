@@ -71,7 +71,7 @@
         </configuration>
     </global>
 
-    <start to="BeginReadCrossref"/>
+    <start to="preparedataset"/>
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
@@ -298,7 +298,7 @@
             <arg>--readMDStoreId</arg><arg>${wf:actionData('BeginReadPubmed')['mdStoreReadLockVersion']}</arg>
             <capture-output/>
         </java>
-        <ok to="Kill"/>
+        <ok to="preparedataset"/>
         <error to="Kill"/>
     </action>
 
@@ -388,7 +388,7 @@
             <arg>--outputPath</arg><arg>${datasetPath}/</arg>
 
         </spark>
-        <ok to="End"/>
+        <ok to="atomicactions"/>
         <error to="Kill"/>
     </action>
     <action name="atomicactions">

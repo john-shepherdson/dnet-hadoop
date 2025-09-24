@@ -113,7 +113,7 @@ public class PrepareDataset implements Serializable {
                 conf,
                 isSparkSessionManaged,
                 spark -> {
-                    Constants.removeOutputDir(spark, workingDir );
+
                     prepareDataset(
                             spark, oalexPath, oairePath, iisPath , publishersPath,
                             dataciteInputPath, crossrefInputPath, pubmedInputPath, workingDir, oldMatches,
@@ -131,7 +131,7 @@ public class PrepareDataset implements Serializable {
         spark
                 .udf()
                 .register(
-                        "md5HashWithPrefix", (String doi) -> "50|doi_________::" + DHPUtils.md5(doi), DataTypes.StringType);
+                        "md5HashWithPrefix", (String doi) -> doi.startsWith("https://doi.org/") ? "50|doi_________::" + DHPUtils.md5(StringUtils.substringAfter(doi, "https://doi.org/")) : "50|doi_________::" + DHPUtils.md5(doi), DataTypes.StringType);
         spark
                 .udf()
                 .register(

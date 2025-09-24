@@ -85,14 +85,19 @@
   },
   {
     "paramName": "crp",
-    "paramLongName": "crossrefPath",
+    "paramLongName": "crossrefInputPath",
     "paramDescription": "the path to get crossref data",
     "paramRequired": false
   },
   {
     "paramName": "dcp",
-    "paramLongName": "datacitePath",
+    "paramLongName": "dataciteInputPath",
     "paramDescription": "the path for datacite data",
     "paramRequired": false
+  },
+  {"paramName": "pmdp",
+  "paramLongName": "pubmedInputPath",
+  "paramDescription": "the path for datacite data",
+  "paramRequired": false
   }
 ]
