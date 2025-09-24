@@ -136,7 +136,7 @@ public class ExtractPerson implements Serializable {
 			.selectExpr("explode (affs) as affiliation", "doi", "corresponding", "roles", "pid.value as orcid")
 			.where("affiliation.Status = 'active'")
 			.selectExpr(
-				"affiliation.Value as orgid", "affiliation.PID as orgpid", "affiliation.Confidence as trust", "DOI",
+				"affiliation.Value as orgid", "affiliation.PID as orgpid", "affiliation.Confidence as trust", "doi",
 				"corresponding", "roles", "orcid");
 
 		authors = authors
@@ -199,12 +199,34 @@ public class ExtractPerson implements Serializable {
 		return r;
 	}
 
+	public static String removePrefixUrl(String pid) {
+		if (pid == null) {
+			return null;
+		}
+
+		String trimmed = pid.trim();
+
+		// removes prefix for DOI
+		if (trimmed.matches("(?i)^https?://(dx\\.)?doi\\.org/.*")) {
+			return trimmed.replaceFirst("(?i)^https?://(dx\\.)?doi\\.org/", "");
+		}
+
+		// removes prefix for ORCID
+		if (trimmed.matches("(?i)^https?://orcid\\.org/.*")) {
+			return trimmed.replaceFirst("(?i)^https?://orcid\\.org/", "");
+		}
+
+		// if there is no known prefix to remove the string is returned as it is
+		return trimmed;
+	}
+
+
 	private static @NotNull Relation getAuthorshipRelation(Row a) {
 		String target = DOI_PREFIX
 			+ IdentifierFactory
-				.md5(PidCleaner.normalizePidValue(PidType.doi.toString(), a.getAs("doi")));
+				.md5(PidCleaner.normalizePidValue(PidType.doi.toString(), removePrefixUrl(a.getAs("doi"))));
 		;
-		String source = PERSON_PREFIX + SEPARATOR + IdentifierFactory.md5(a.getAs("orcid"));
+		String source = PERSON_PREFIX + SEPARATOR + IdentifierFactory.md5(removePrefixUrl(a.getAs("orcid")));
 
 		Relation relation = OafMapperUtils
 			.getRelation(
@@ -264,7 +286,7 @@ public class ExtractPerson implements Serializable {
 
 	private static @NotNull Relation getAffiliationRelation(Row a) {
 
-		String source = PERSON_PREFIX + SEPARATOR + IdentifierFactory.md5(a.getAs("orcid"));
+		String source = PERSON_PREFIX + SEPARATOR + IdentifierFactory.md5(removePrefixUrl(a.getAs("orcid")));
 		String target = ROR_PREFIX
 			+ IdentifierFactory.md5(PidCleaner.normalizePidValue("ROR", a.getAs("orgid")));
 
@@ -557,7 +579,7 @@ public class ExtractPerson implements Serializable {
 		Coauthors coauth = new Coauthors();
 		List<String> coauthors = new ArrayList<>();
 		while (it.hasNext())
-			coauthors.add(it.next()._2());
+			coauthors.add(removePrefixUrl(it.next()._2()));
 		coauth.setCoauthors(coauthors);
 
 		return coauth;
@@ -567,7 +589,7 @@ public class ExtractPerson implements Serializable {
 		Coauthors coauth = new Coauthors();
 		List<String> coauthors = new ArrayList<>();
 		while (it.hasNext())
-			coauthors.add(it.next().getAs("orcid"));
+			coauthors.add(removePrefixUrl(it.next().getAs("orcid")));
 		coauth.setCoauthors(coauthors);
 
 		return coauth;
