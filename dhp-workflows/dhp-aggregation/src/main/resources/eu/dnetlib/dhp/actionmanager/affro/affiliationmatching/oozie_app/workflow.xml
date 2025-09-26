@@ -325,6 +325,7 @@
             <arg>--applyOnAll</arg><arg>${applyOnAll}</arg>
             <arg>--outputPath</arg><arg>${workingDir}/</arg>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
+            <arg>--importiis</arg><arg>${importiis}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

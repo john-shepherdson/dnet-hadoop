@@ -4,6 +4,7 @@ package eu.dnetlib.dhp.actionmanager.affro;
 import static eu.dnetlib.dhp.actionmanager.affro.Constants.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+import static eu.dnetlib.dhp.common.person.Constants.removePrefixUrl;
 import static eu.dnetlib.dhp.utils.DHPUtils.MAPPER;
 import static org.apache.spark.sql.functions.*;
 
@@ -17,15 +18,13 @@ import eu.dnetlib.dhp.actionmanager.affro.beans.Author;
 import eu.dnetlib.dhp.actionmanager.affro.beans.IISModel;
 import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.mdstore.MDStoreVersion;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
-//import org.apache.spark.sql.*;
+
 
 import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.FlatMapFunction;
-import org.apache.spark.api.java.function.ForeachFunction;
 import org.apache.spark.sql.*;
 
 import org.apache.spark.sql.catalyst.encoders.RowEncoder;
@@ -131,11 +130,11 @@ public class PrepareDataset implements Serializable {
         spark
                 .udf()
                 .register(
-                        "md5HashWithPrefix", (String doi) -> doi.startsWith("https://doi.org/") ? "50|doi_________::" + DHPUtils.md5(StringUtils.substringAfter(doi, "https://doi.org/")) : "50|doi_________::" + DHPUtils.md5(doi), DataTypes.StringType);
+                        "md5HashWithPrefix", (String doi) ->  "50|doi_________::" + DHPUtils.md5(removePrefixUrl(doi)), DataTypes.StringType);
         spark
                 .udf()
                 .register(
-                        "selectId", (String doi, String id) -> StringUtils.isNotEmpty(id) ? "50|" + id : "50|doi_________::" + DHPUtils.md5(StringUtils.substringAfter(doi,"doi.org/")), DataTypes.StringType);
+                        "selectId", (String doi, String id) -> StringUtils.isNotEmpty(id) ? "50|" + id : "50|doi_________::" + DHPUtils.md5(removePrefixUrl(doi)), DataTypes.StringType);
 
         spark
                 .udf()
@@ -211,8 +210,8 @@ public class PrepareDataset implements Serializable {
                     .json(oldMatches);
         }
         Dataset<Row> affStrings = spark.read().schema(AFFILIATION_STRING_SCHEMA).json(workingDir + "/all_strings");
-        Dataset<Row> newToMatch =  affStrings.join(alreadyMatched, affStrings.col("raw_affiliation_string").equalTo(alreadyMatched.col("Affiliation")), "left")
-                .filter( col("Affiliation").isNull())
+        Dataset<Row> newToMatch =  affStrings.join(alreadyMatched, affStrings.col("raw_affiliation_string").equalTo(alreadyMatched.col("affiliation")), "left")
+                .filter( col("affiliation").isNull())
                 .select("raw_affiliation_string")
                 .distinct();
 
@@ -237,7 +236,7 @@ public class PrepareDataset implements Serializable {
                 .withColumn("contributor_roles", col("author.contributor_roles"))
                 .withColumn("pids", col("author.pids"))
                 .drop(col("author"))
-                .select(col("graphId"),col("doi"),col("fullname"), explode(col("raw_affiliation_strings")).alias("raw_affiliation_string")
+                .select(col("graphId"),col("fullname"), explode(col("raw_affiliation_strings")).alias("raw_affiliation_string")
                         ,col("corresponding"), col("contributor_roles"), col("pids"))
                 .filter("raw_affiliation_string IS NOT NULL AND TRIM(raw_affiliation_string) != '' AND LOWER(raw_affiliation_string) NOT IN ('unknown', 'none')")
                 .withColumn("id",  col("graphId"))

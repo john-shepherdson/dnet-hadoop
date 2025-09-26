@@ -13,11 +13,12 @@ import org.apache.spark.sql.types.*;
 public class Constants implements Serializable {
 
 
-    public final static ArrayType PID_SCHEMA = DataTypes.createArrayType(
-            new StructType()
-                    .add("schema", StringType)
-                    .add("value",StringType)
-    );
+    public final static StructType PID_STRUCT = new StructType()
+            .add("schema", StringType)
+            .add("value", StringType);
+
+
+    public final static ArrayType PID_SCHEMA = DataTypes.createArrayType(PID_STRUCT);
 
     public final static StructType IIS_SCHEMA = new StructType()
             .add("id", StringType)
@@ -38,7 +39,7 @@ public class Constants implements Serializable {
                     .add("schema", StringType)
                     .add("name", StringType)
                     .add("value", StringType)))
-            .add("pids", DataTypes.createArrayType(PID_SCHEMA))
+            .add("pids", PID_SCHEMA)
             ;
 
 
@@ -81,7 +82,7 @@ public class Constants implements Serializable {
                     .add("name", StringType)
                     .add("value", StringType)))
             .add("raw_affiliations", DataTypes.createArrayType(StringType))
-            .add("pids", DataTypes.createArrayType(PID_SCHEMA));
+            .add("pids", PID_SCHEMA);
 
     public final static String IIS_QUERY = "SELECT id, authors, affiliations FROM mh.extracted_document_metadata_prod";
 
@@ -188,5 +189,7 @@ public class Constants implements Serializable {
     public static final StructType OPENAPC_INPUT_SCHEMA = new StructType()
             .add("doi", StringType)
             .add("matchings", MATCHING_ARRAY_SCHEMA);
+
+
 
 }

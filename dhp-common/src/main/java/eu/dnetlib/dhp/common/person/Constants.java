@@ -35,4 +35,25 @@ public class Constants {
 		"orcid_______";
 	public static final String PROJECT_ID_PREFIX = ModelSupport.getIdPrefix(Project.class)
 		+ IdentifierFactory.ID_PREFIX_SEPARATOR;
+
+	public static String removePrefixUrl(String pid) {
+		if (pid == null) {
+			return null;
+		}
+
+		String trimmed = pid.trim();
+
+		// removes prefix for DOI
+		if (trimmed.matches("(?i)^https?://(dx\\.)?doi\\.org/.*")) {
+			return trimmed.replaceFirst("(?i)^https?://(dx\\.)?doi\\.org/", "");
+		}
+
+		// removes prefix for ORCID
+		if (trimmed.matches("(?i)^https?://orcid\\.org/.*")) {
+			return trimmed.replaceFirst("(?i)^https?://orcid\\.org/", "");
+		}
+
+		// if there is no known prefix to remove the string is returned as it is
+		return trimmed;
+	}
 }
