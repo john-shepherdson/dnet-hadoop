@@ -181,10 +181,6 @@ public class PrepareDataset implements Serializable {
             Dataset<Row> iis = getSelectIISData(spark.sql(IIS_QUERY)
                     .as(Encoders.bean(IISModel.class)));
 
-        //        spark.read().schema(Encoders.bean(IISModel.class).schema())
-        //                .json(iisPath)
-
-
             iis.write().mode(SaveMode.Overwrite).option("compression", "gzip").json(workingDir + "exploded/iis");
             inputDataset = iis;
         }
@@ -232,7 +228,7 @@ public class PrepareDataset implements Serializable {
                 .withColumn("authors", col("parsing_output.authors"))
                 .select( col("id"), col("doi"),
                         explode(col("authors")).alias("author"))
-                .withColumn("graphId" ,expr("selectId(doi, graphId)"))
+                .withColumn("graphId" ,expr("selectId(doi, id)"))
                 .drop(col("id"))
                 .drop(col("doi"))
                 .withColumn("fullname", col("author.name.full"))
@@ -251,22 +247,31 @@ public class PrepareDataset implements Serializable {
     }
 
     private static Dataset<Row> getSelectGraphSchemaData(Dataset<Row> dataset_entities) {
+
         return dataset_entities
                 .select(col("id"), explode(col("author")).alias("author"))
                 .select(col("id"), col("author"), explode(col("author.rawAffiliationString")).alias("raw_affiliation_string"))
                 .filter("raw_affiliation_string IS NOT NULL AND TRIM(raw_affiliation_string) != '' AND LOWER(raw_affiliation_string) NOT IN ('unknown', 'none')")
                 .withColumn("fullname", col("author.fullName"))
+                .withColumn("pid", col("author.pid"))
                 .drop("author")
                 .withColumn("corresponding", lit(null))
                 .withColumn("contributor_roles", lit(null))
                 .withColumn(
                         "pids",
-                        functions.transform(
-                                col("pid"),
-                                x -> struct(
-                                        x.getField("value").alias("value"),
-                                        x.getField("qualifier").getField("classid").alias("schema")
+                        when(col("pid").isNotNull(),
+                                transform(
+                                        col("pid"),
+                                        x -> struct(
+                                                x.getField("value").alias("value"),
+                                                x.getField("qualifier").getField("classid").alias("schema")
+                                        )
                                 )
+                        ).otherwise(
+                                array(struct(
+                                        lit(null).cast("string").alias("value"),
+                                        lit(null).cast("string").alias("schema")
+                                )).cast("array<struct<value:string,schema:string>>")
                         )
                 )
                 .select(col("id"), col("fullname"), col("raw_affiliation_string"), col("corresponding"), col("contributor_roles"), col("pids"))
