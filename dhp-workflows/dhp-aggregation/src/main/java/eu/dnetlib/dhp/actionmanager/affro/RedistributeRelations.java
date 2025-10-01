@@ -127,7 +127,8 @@ public class RedistributeRelations implements Serializable {
                         explodedWithSalt.col("raw_affiliation_string"),
                         col("matchings"),
                         col("corresponding"),
-                        col("contributor_roles"))
+                        col("contributor_roles"),
+                        col("pids"))
                 .withColumn("key", expr("insertKey(id, fullname)"));
 
 
@@ -141,7 +142,7 @@ public class RedistributeRelations implements Serializable {
                 .agg(collect_list(struct(joined.col("*"))).alias("group"))
                 .withColumn("aggAuthor", expr("aggregateAuthor(group)"))
                 .select("aggAuthor.*");
-        if(!datasource.equals("oaire") && !datasource.equalsIgnoreCase("crossref") ) {
+        if(!datasource.equals("oaire") && !datasource.equalsIgnoreCase("pubmed") ) {
 
             Dataset<Row> resultDf = groupedDf
                     .groupBy("id")

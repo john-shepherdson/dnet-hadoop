@@ -44,6 +44,7 @@ public class AggregateAuthorUDF implements UDF1<WrappedArray<Row>, Row> {
 
         }
 
+
         return RowFactory.create(id, fullname, affiliations, corresponding, contributor_roles, pids);
     }
 

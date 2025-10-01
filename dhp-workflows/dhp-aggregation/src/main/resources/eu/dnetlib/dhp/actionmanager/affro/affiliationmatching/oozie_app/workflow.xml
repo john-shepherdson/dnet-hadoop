@@ -71,7 +71,7 @@
         </configuration>
     </global>
 
-    <start to="preparedataset"/>
+    <start to="redistributerelations"/>
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
@@ -327,7 +327,7 @@
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
             <arg>--importiis</arg><arg>${importiis}</arg>
         </spark>
-        <ok to="End"/>
+        <ok to="run-affro"/>
         <error to="Kill"/>
     </action>
 

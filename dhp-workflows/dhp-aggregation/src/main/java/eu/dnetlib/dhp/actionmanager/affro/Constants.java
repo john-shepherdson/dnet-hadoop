@@ -156,6 +156,7 @@ public class Constants implements Serializable {
                                     .add("schema", StringType)
                                     .add("name", StringType)
                                     .add("value", StringType)))
+                            .add("pids", PID_SCHEMA)
                     ))
             .add("organizations",MATCHING_ARRAY_SCHEMA);
 
