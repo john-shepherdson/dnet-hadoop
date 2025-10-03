@@ -3,7 +3,7 @@
     "paramName": "mt",
     "paramLongName": "master",
     "paramDescription": "should be local or yarn",
-    "paramRequired": true
+    "paramRequired": false
   },
   {
     "paramName": "s",

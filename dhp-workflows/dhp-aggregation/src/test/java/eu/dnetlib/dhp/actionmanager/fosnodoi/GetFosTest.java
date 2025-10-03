@@ -20,8 +20,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.actionmanager.createunresolvedentities.GetFOSSparkJob;
-import eu.dnetlib.dhp.actionmanager.createunresolvedentities.PrepareTest;
-import eu.dnetlib.dhp.actionmanager.createunresolvedentities.ProduceTest;
 import eu.dnetlib.dhp.actionmanager.createunresolvedentities.model.FOSDataModel;
 
 /**
@@ -30,7 +28,7 @@ import eu.dnetlib.dhp.actionmanager.createunresolvedentities.model.FOSDataModel;
  */
 public class GetFosTest {
 
-	private static final Logger log = LoggerFactory.getLogger(ProduceTest.class);
+	private static final Logger log = LoggerFactory.getLogger(GetFosTest.class);
 
 	private static Path workingDir;
 	private static SparkSession spark;
@@ -39,13 +37,13 @@ public class GetFosTest {
 
 	@BeforeAll
 	public static void beforeAll() throws IOException {
-		workingDir = Files.createTempDirectory(PrepareTest.class.getSimpleName());
+		workingDir = Files.createTempDirectory(GetFosTest.class.getSimpleName());
 
 		fs = FileSystem.getLocal(new Configuration());
 		log.info("using work dir {}", workingDir);
 
 		SparkConf conf = new SparkConf();
-		conf.setAppName(ProduceTest.class.getSimpleName());
+		conf.setAppName(GetFosTest.class.getSimpleName());
 
 		conf.setMaster("local[*]");
 		conf.set("spark.driver.host", "localhost");
@@ -56,7 +54,7 @@ public class GetFosTest {
 
 		spark = SparkSession
 			.builder()
-			.appName(PrepareTest.class.getSimpleName())
+			.appName(GetFosTest.class.getSimpleName())
 			.config(conf)
 			.getOrCreate();
 	}

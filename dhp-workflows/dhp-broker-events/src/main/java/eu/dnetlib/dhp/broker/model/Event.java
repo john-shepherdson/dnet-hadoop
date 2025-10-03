@@ -24,15 +24,14 @@ public class Event implements Serializable {
 
 	private boolean instantMessage;
 
-	private MappedFields map;
+	private OaMappedFields map;
 
-	public Event() {
-	}
+	public Event() {}
 
 	public Event(final String producerId, final String eventId, final String topic, final String payload,
-		final Long creationDate, final Long expiryDate,
-		final boolean instantMessage,
-		final MappedFields map) {
+			final Long creationDate, final Long expiryDate,
+			final boolean instantMessage,
+			final OaMappedFields map) {
 		this.producerId = producerId;
 		this.eventId = eventId;
 		this.topic = topic;
@@ -99,11 +98,11 @@ public class Event implements Serializable {
 		this.instantMessage = instantMessage;
 	}
 
-	public MappedFields getMap() {
+	public OaMappedFields getMap() {
 		return this.map;
 	}
 
-	public void setMap(final MappedFields map) {
+	public void setMap(final OaMappedFields map) {
 		this.map = map;
 	}
 }

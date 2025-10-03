@@ -64,14 +64,10 @@ abstract class AbstractScalaApplication(
     require(parser != null)
 
     val conf: SparkConf = new SparkConf()
-    val master = parser.get("master")
-    log.info(s"Creating Spark session: Master: $master")
     val b = SparkSession
       .builder()
       .config(conf)
       .appName(getClass.getSimpleName)
-    if (StringUtils.isNotBlank(master))
-      b.master(master)
     b.getOrCreate()
   }
 

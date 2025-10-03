@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.broker.objects.OaBrokerMainEntity;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.broker.oa.util.BrokerConstants;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
 import eu.dnetlib.dhp.broker.oa.util.aggregators.simple.ResultAggregator;
 import eu.dnetlib.dhp.broker.oa.util.aggregators.simple.ResultGroup;
@@ -31,16 +30,15 @@ public class PrepareGroupsJob {
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
-			IOUtils
-				.toString(
-					PrepareGroupsJob.class
-						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/common_params.json")));
+				IOUtils
+						.toString(PrepareGroupsJob.class
+								.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/common_params.json")));
 		parser.parseArgument(args);
 
 		final Boolean isSparkSessionManaged = Optional
-			.ofNullable(parser.get("isSparkSessionManaged"))
-			.map(Boolean::valueOf)
-			.orElse(Boolean.TRUE);
+				.ofNullable(parser.get("isSparkSessionManaged"))
+				.map(Boolean::valueOf)
+				.orElse(Boolean.TRUE);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
 		final String graphPath = parser.get("graphPath");
@@ -61,24 +59,19 @@ public class PrepareGroupsJob {
 			final LongAccumulator total = spark.sparkContext().longAccumulator("total_groups");
 
 			final Dataset<OaBrokerMainEntity> results = ClusterUtils
-				.readPath(spark, workingDir + "/joinedEntities_step4", OaBrokerMainEntity.class);
+					.readPath(spark, workingDir + "/joinedEntities_step4", OaBrokerMainEntity.class);
 
-			final Dataset<Relation> mergedRels = ClusterUtils
-				.loadRelations(graphPath, spark)
-				.filter((FilterFunction<Relation>) r -> r.getRelClass().equals(BrokerConstants.IS_MERGED_IN_CLASS));
+			final Dataset<Relation> mergedRels = ClusterUtils.loadMergedRelations(graphPath, spark);
 
 			final TypedColumn<Tuple2<OaBrokerMainEntity, Relation>, ResultGroup> aggr = new ResultAggregator()
-				.toColumn();
+					.toColumn();
 
 			final Dataset<ResultGroup> dataset = results
-				.joinWith(mergedRels, results.col("openaireId").equalTo(mergedRels.col("source")), "inner")
-				.groupByKey(
-					(MapFunction<Tuple2<OaBrokerMainEntity, Relation>, String>) t -> t._2.getTarget(),
-					Encoders.STRING())
-				.agg(aggr)
-				.map(
-					(MapFunction<Tuple2<String, ResultGroup>, ResultGroup>) t -> t._2, Encoders.bean(ResultGroup.class))
-				.filter((FilterFunction<ResultGroup>) rg -> rg.getData().size() > 1);
+					.joinWith(mergedRels, results.col("openaireId").equalTo(mergedRels.col("source")), "inner")
+					.groupByKey((MapFunction<Tuple2<OaBrokerMainEntity, Relation>, String>) t -> t._2.getTarget(), Encoders.STRING())
+					.agg(aggr)
+					.map((MapFunction<Tuple2<String, ResultGroup>, ResultGroup>) t -> t._2, Encoders.bean(ResultGroup.class))
+					.filter((FilterFunction<ResultGroup>) rg -> rg.getData().size() > 1);
 
 			ClusterUtils.save(dataset, groupsPath, ResultGroup.class, total);
 

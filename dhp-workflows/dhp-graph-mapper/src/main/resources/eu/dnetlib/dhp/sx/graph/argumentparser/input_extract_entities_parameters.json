@@ -1,5 +1,5 @@
 [
-  {"paramName":"mt",  "paramLongName":"master",       "paramDescription": "should be local or yarn",  "paramRequired": true},
+  {"paramName":"mt",  "paramLongName":"master",       "paramDescription": "should be local or yarn",  "paramRequired": false},
   {"paramName":"w",   "paramLongName":"workingPath",  "paramDescription": "the work dir path",        "paramRequired": true},
   {"paramName":"e",   "paramLongName":"entity",       "paramDescription": "the work dir path",        "paramRequired": true}
 ]

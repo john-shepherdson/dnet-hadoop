@@ -27,7 +27,7 @@
 		"paramName": "m",
 		"paramLongName": "master",
 		"paramDescription": "should be yarn or local",
-		"paramRequired": true
+		"paramRequired": false
 	},
 	{
 		"paramName": "i",

@@ -10,7 +10,6 @@ import org.apache.spark.sql.types._
 import org.apache.spark.sql.{Column, Dataset, Row, SaveMode, functions}
 
 import java.util.stream.Collectors
-import scala.collection.mutable
 import scala.collection.JavaConverters._
 
 case class SparkDeduper(conf: DedupConfig) extends Serializable {
@@ -81,16 +80,17 @@ case class SparkDeduper(conf: DedupConfig) extends Serializable {
   }
 
   def clusterValuesUDF(cd: ClusteringDef) = {
-    udf[mutable.WrappedArray[String], mutable.WrappedArray[Any]](values => {
+    udf[Seq[String], Seq[Any]](values => {
       val valueList = values.flatMap {
-        case a: mutable.WrappedArray[Any] => a.map(_.toString)
-        case s: Any => Seq(s.toString)
-      }.asJava;
+        case a: Seq[_] => a.map(_.toString)
+        case s: Any => Some(s.toString)
+        case _ => None
+      }
 
-      mutable.WrappedArray.make(cd.clusteringFunction().apply(conf, valueList).asScala.toArray[String])
-
+      cd.clusteringFunction().apply(conf, valueList.asJava).asScala.toSeq
     })
   }
+
 
   val processBlocks: (Dataset[Row] => Dataset[Row]) = df => {
     df.filter(functions.size(new Column("block")).geq(new Literal(2, DataTypes.IntegerType)))
@@ -98,20 +98,23 @@ case class SparkDeduper(conf: DedupConfig) extends Serializable {
       .select(functions.explode(new Column("relations")).as("relation"))
   }
 
+  case class SimRelation(from: String, to: String)
+
   def processBlock(implicit sc: SparkContext) = {
     val accumulators = SparkReporter.constructAccumulator(conf, sc)
 
-    udf[Array[(String, String)], mutable.WrappedArray[Row]](block => {
+    udf[Seq[SimRelation], Seq[Any]](block => {
       val reporter = new SparkReporter(accumulators)
 
-      val mapDocuments = block.asJava.stream()
+      val mapDocuments = block.asInstanceOf[Seq[Row]].asJava.stream()
         .sorted(new RowDataOrderingComparator(model.orderingFieldPosition, model.identityFieldPosition))
         .limit(conf.getWf.getQueueMaxSize)
         .collect(Collectors.toList[Row]())
 
       new BlockProcessor(conf, model.identityFieldPosition, model.orderingFieldPosition).processSortedRows(mapDocuments, reporter)
 
-      reporter.getRelations.asScala.toArray
+
+      reporter.getRelations.asScala.map(r => SimRelation(r._1, r._2)).toSeq
     }).asNondeterministic()
   }
 

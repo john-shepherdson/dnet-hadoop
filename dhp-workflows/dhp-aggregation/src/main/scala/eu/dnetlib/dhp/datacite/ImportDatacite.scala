@@ -52,7 +52,6 @@ object ImportDatacite {
         .mkString
     )
     parser.parseArgument(args)
-    val master = parser.get("master")
 
     val hdfsuri = parser.get("namenode")
     log.info(s"namenode is $hdfsuri")
@@ -74,7 +73,6 @@ object ImportDatacite {
     val spark: SparkSession = SparkSession
       .builder()
       .appName(ImportDatacite.getClass.getSimpleName)
-      .master(master)
       .getOrCreate()
 
     // ====== Init HDFS File System Object

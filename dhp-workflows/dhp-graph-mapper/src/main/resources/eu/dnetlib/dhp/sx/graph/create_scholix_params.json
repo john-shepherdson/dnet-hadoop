@@ -1,5 +1,5 @@
 [
-  {"paramName":"mt",  "paramLongName":"master",     "paramDescription": "should be local or yarn",  "paramRequired": true},
+  {"paramName":"mt",  "paramLongName":"master",     "paramDescription": "should be local or yarn",  "paramRequired": false},
   {"paramName":"r",   "paramLongName":"relationPath", "paramDescription": "the relation resolved Path",           "paramRequired": true},
   {"paramName":"s",   "paramLongName":"summaryPath", "paramDescription": "the summary Path",           "paramRequired": true},
   {"paramName":"t",   "paramLongName":"targetPath", "paramDescription": "the target base path of the scholix", "paramRequired": true},

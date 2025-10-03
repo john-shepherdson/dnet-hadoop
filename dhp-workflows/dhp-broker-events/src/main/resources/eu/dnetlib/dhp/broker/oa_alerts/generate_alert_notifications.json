@@ -1,0 +1,32 @@
+[
+	{
+		"paramName": "p",
+		"paramLongName": "provenance",
+		"paramDescription": "the infos about the provenance of the collected records",
+		"paramRequired": true
+	},
+	{
+		"paramName": "a",
+		"paramLongName": "apidescriptor",
+		"paramDescription": "the JSON encoding of the API Descriptor",
+		"paramRequired": true
+	},
+	{
+	    "paramName": "i",
+	    "paramLongName": "mdstoreInputVersion",
+	    "paramDescription": "the mdStore version that contains the validation alerts",
+	    "paramRequired": true
+  	},
+	{
+		"paramName": "o",
+		"paramLongName": "outputDir",
+		"paramDescription": "the dir that contains the events folder",
+		"paramRequired": true
+	},
+	{
+		"paramName": "broker",
+		"paramLongName": "brokerApiBaseUrl",
+		"paramDescription": "the url of the broker service api",
+		"paramRequired": true
+	}
+]

@@ -21,38 +21,35 @@ public class EventFactory {
 	private static final String PRODUCER_ID = "OpenAIRE";
 
 	private static final String[] DATE_PATTERNS = {
-		"yyyy-MM-dd"
+			"yyyy-MM-dd"
 	};
 
-	private EventFactory() {
-	}
+	private EventFactory() {}
 
 	public static Event newBrokerEvent(final UpdateInfo<?> updateInfo) {
 
 		final Event res = new Event();
 
-		final MappedFields map = createMapFromResult(updateInfo);
+		final OaMappedFields map = createMapFromResult(updateInfo);
 
-		final String eventId = calculateEventId(
-			updateInfo.getTopicPath(), updateInfo.getTargetDs().getOpenaireId(), updateInfo
+		final String eventId = calculateEventId(updateInfo.getTopicPath(), updateInfo.getTargetDs().getOpenaireId(), updateInfo
 				.getTarget()
-				.getOpenaireId(),
-			updateInfo.getHighlightValueAsString());
+				.getOpenaireId(), updateInfo.getHighlightValueAsString());
 
 		res.setEventId(eventId);
 		res.setProducerId(PRODUCER_ID);
 		res.setPayload(updateInfo.asBrokerPayload().toJSON());
 		res.setMap(map);
 		res.setTopic(updateInfo.getTopicPath());
-		res.setCreationDate(0l);
+		res.setCreationDate(0L);
 		res.setExpiryDate(Long.MAX_VALUE);
 		res.setInstantMessage(false);
 
 		return res;
 	}
 
-	private static MappedFields createMapFromResult(final UpdateInfo<?> updateInfo) {
-		final MappedFields map = new MappedFields();
+	private static OaMappedFields createMapFromResult(final UpdateInfo<?> updateInfo) {
+		final OaMappedFields map = new OaMappedFields();
 
 		final OaBrokerMainEntity source = updateInfo.getSource();
 		final OaBrokerMainEntity target = updateInfo.getTarget();
@@ -76,45 +73,41 @@ public class EventFactory {
 		}
 
 		map
-			.setTargetSubjects(
-				target.getSubjects().stream().map(OaBrokerTypedValue::getValue).collect(Collectors.toList()));
+				.setTargetSubjects(target.getSubjects().stream().map(OaBrokerTypedValue::getValue).collect(Collectors.toList()));
 		map
-			.setTargetAuthors(
-				target.getCreators().stream().map(OaBrokerAuthor::getFullname).collect(Collectors.toList()));
+				.setTargetAuthors(target.getCreators().stream().map(OaBrokerAuthor::getFullname).collect(Collectors.toList()));
 
 		// PROVENANCE INFO
 		map.setTrust(updateInfo.getTrust());
 		map.setProvenanceResultId(source.getOpenaireId());
 
 		source
-			.getDatasources()
-			.stream()
-			.filter(ds -> ds.getRelType().equals(BrokerConstants.COLLECTED_FROM_REL))
-			.findFirst()
-			.ifPresent(ds -> {
-				map.setProvenanceDatasourceId(ds.getOpenaireId());
-				map.setProvenanceDatasourceName(ds.getName());
-				map.setProvenanceDatasourceType(ds.getType());
-			});
+				.getDatasources()
+				.stream()
+				.filter(ds -> BrokerConstants.COLLECTED_FROM_REL.equals(ds.getRelType()))
+				.findFirst()
+				.ifPresent(ds -> {
+					map.setProvenanceDatasourceId(ds.getOpenaireId());
+					map.setProvenanceDatasourceName(ds.getName());
+					map.setProvenanceDatasourceType(ds.getType());
+				});
 
 		return map;
 	}
 
 	private static String calculateEventId(final String topic,
-		final String dsId,
-		final String publicationId,
-		final String value) {
+			final String dsId,
+			final String publicationId,
+			final String value) {
 		return "event-"
-			+ DigestUtils.md5Hex(topic).substring(0, 4) + "-"
-			+ DigestUtils.md5Hex(dsId).substring(0, 4) + "-"
-			+ DigestUtils.md5Hex(publicationId).substring(0, 7) + "-"
-			+ DigestUtils.md5Hex(value).substring(0, 5);
+				+ DigestUtils.md5Hex(topic).substring(0, 4) + "-"
+				+ DigestUtils.md5Hex(dsId).substring(0, 4) + "-"
+				+ DigestUtils.md5Hex(publicationId).substring(0, 7) + "-"
+				+ DigestUtils.md5Hex(value).substring(0, 5);
 	}
 
 	private static long parseDateTolong(final String date) {
-		if (StringUtils.isBlank(date)) {
-			return -1;
-		}
+		if (StringUtils.isBlank(date)) { return -1; }
 		try {
 			return DateUtils.parseDate(date, DATE_PATTERNS).getTime();
 		} catch (final ParseException e) {

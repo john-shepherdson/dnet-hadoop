@@ -3,12 +3,9 @@ package eu.dnetlib.dhp.broker.model;
 
 import java.io.Serializable;
 
-public class Notification implements Serializable {
+public abstract class AbstractNotification<T> implements Serializable {
 
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = -1770420972526995727L;
+	private static final long serialVersionUID = 4819926735725740170L;
 
 	private String notificationId;
 
@@ -24,10 +21,10 @@ public class Notification implements Serializable {
 
 	private String payload;
 
-	private MappedFields map;
+	private T map;
 
 	public String getNotificationId() {
-		return notificationId;
+		return this.notificationId;
 	}
 
 	public void setNotificationId(final String notificationId) {
@@ -35,7 +32,7 @@ public class Notification implements Serializable {
 	}
 
 	public String getSubscriptionId() {
-		return subscriptionId;
+		return this.subscriptionId;
 	}
 
 	public void setSubscriptionId(final String subscriptionId) {
@@ -43,7 +40,7 @@ public class Notification implements Serializable {
 	}
 
 	public String getProducerId() {
-		return producerId;
+		return this.producerId;
 	}
 
 	public void setProducerId(final String producerId) {
@@ -51,7 +48,7 @@ public class Notification implements Serializable {
 	}
 
 	public String getEventId() {
-		return eventId;
+		return this.eventId;
 	}
 
 	public void setEventId(final String eventId) {
@@ -59,7 +56,7 @@ public class Notification implements Serializable {
 	}
 
 	public String getTopic() {
-		return topic;
+		return this.topic;
 	}
 
 	public void setTopic(final String topic) {
@@ -67,23 +64,23 @@ public class Notification implements Serializable {
 	}
 
 	public String getPayload() {
-		return payload;
+		return this.payload;
 	}
 
 	public void setPayload(final String payload) {
 		this.payload = payload;
 	}
 
-	public MappedFields getMap() {
-		return map;
+	public T getMap() {
+		return this.map;
 	}
 
-	public void setMap(final MappedFields map) {
+	public void setMap(final T map) {
 		this.map = map;
 	}
 
 	public Long getDate() {
-		return date;
+		return this.date;
 	}
 
 	public void setDate(final Long date) {

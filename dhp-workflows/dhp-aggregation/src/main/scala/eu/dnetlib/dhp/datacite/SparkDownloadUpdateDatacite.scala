@@ -25,7 +25,6 @@ object SparkDownloadUpdateDatacite {
         .mkString
     )
     parser.parseArgument(args)
-    val master = parser.get("master")
     val sourcePath = parser.get("sourcePath")
     val workingPath = parser.get("workingPath")
 
@@ -36,7 +35,6 @@ object SparkDownloadUpdateDatacite {
       .builder()
       .config(conf)
       .appName(getClass.getSimpleName)
-      .master(master)
       .getOrCreate()
 
     implicit val oafEncoder: Encoder[Oaf] = Encoders.kryo[Oaf]
