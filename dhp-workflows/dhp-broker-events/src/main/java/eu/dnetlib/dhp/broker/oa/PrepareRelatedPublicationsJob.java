@@ -31,20 +31,22 @@ public class PrepareRelatedPublicationsJob {
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
-			IOUtils
-				.toString(
-					PrepareRelatedPublicationsJob.class
-						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/common_params.json")));
+				IOUtils
+						.toString(PrepareRelatedPublicationsJob.class
+								.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/common_params.json")));
 		parser.parseArgument(args);
 
 		final Boolean isSparkSessionManaged = Optional
-			.ofNullable(parser.get("isSparkSessionManaged"))
-			.map(Boolean::valueOf)
-			.orElse(Boolean.TRUE);
+				.ofNullable(parser.get("isSparkSessionManaged"))
+				.map(Boolean::valueOf)
+				.orElse(Boolean.TRUE);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
 		final String graphPath = parser.get("graphPath");
 		log.info("graphPath: {}", graphPath);
+
+		final String rawRelsPath = parser.get("rawRelsPath");
+		log.info("rawRelsPath: {}", rawRelsPath);
 
 		final String workingDir = parser.get("workingDir");
 		log.info("workingDir: {}", workingDir);
@@ -61,28 +63,23 @@ public class PrepareRelatedPublicationsJob {
 			final LongAccumulator total = spark.sparkContext().longAccumulator("total_rels");
 
 			final Dataset<OaBrokerRelatedPublication> pubs = ClusterUtils
-				.readPath(spark, graphPath + "/publication", Publication.class)
-				.filter((FilterFunction<Publication>) p -> !ClusterUtils.isDedupRoot(p.getId()))
-				.map(
-					(MapFunction<Publication, OaBrokerRelatedPublication>) ConversionUtils::oafPublicationToBrokerPublication,
-					Encoders.bean(OaBrokerRelatedPublication.class));
+					.readPath(spark, graphPath + "/publication", Publication.class)
+					.filter((FilterFunction<Publication>) p -> !ClusterUtils.isDedupRoot(p.getId()))
+					.map((MapFunction<Publication, OaBrokerRelatedPublication>) ConversionUtils::oafPublicationToBrokerPublication, Encoders
+							.bean(OaBrokerRelatedPublication.class));
 
 			final Dataset<Relation> rels = ClusterUtils
-				.loadRelations(graphPath, spark)
-				.filter((FilterFunction<Relation>) r -> r.getDataInfo().getDeletedbyinference())
-				.filter((FilterFunction<Relation>) r -> r.getRelType().equals(ModelConstants.RESULT_RESULT))
-				.filter((FilterFunction<Relation>) r -> ClusterUtils.isValidResultResultClass(r.getRelClass()))
-				.filter((FilterFunction<Relation>) r -> !ClusterUtils.isDedupRoot(r.getSource()))
-				.filter((FilterFunction<Relation>) r -> !ClusterUtils.isDedupRoot(r.getTarget()));
+					.loadRawRelations(rawRelsPath, ModelConstants.RESULT_RESULT, spark)
+					.filter((FilterFunction<Relation>) r -> ClusterUtils.isValidResultResultClass(r.getRelClass()));
 
 			final Dataset<RelatedPublication> dataset = rels
-				.joinWith(pubs, pubs.col("openaireId").equalTo(rels.col("target")), "inner")
-				.map((MapFunction<Tuple2<Relation, OaBrokerRelatedPublication>, RelatedPublication>) t -> {
-					final RelatedPublication rel = new RelatedPublication(
-						t._1.getSource(), t._2);
-					rel.getRelPublication().setRelType(t._1.getRelClass());
-					return rel;
-				}, Encoders.bean(RelatedPublication.class));
+					.joinWith(pubs, pubs.col("openaireId").equalTo(rels.col("target")), "inner")
+					.map((MapFunction<Tuple2<Relation, OaBrokerRelatedPublication>, RelatedPublication>) t -> {
+						final RelatedPublication rel = new RelatedPublication(
+								t._1.getSource(), t._2);
+						rel.getRelPublication().setRelType(t._1.getRelClass());
+						return rel;
+					}, Encoders.bean(RelatedPublication.class));
 
 			ClusterUtils.save(dataset, relsPath, RelatedPublication.class, total);
 

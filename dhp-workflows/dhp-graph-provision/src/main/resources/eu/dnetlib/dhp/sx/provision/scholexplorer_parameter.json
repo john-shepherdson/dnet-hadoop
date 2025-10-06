@@ -1,0 +1,32 @@
+[
+  {
+    "paramName": "n",
+    "paramLongName": "namenode",
+    "paramDescription": "the namenode",
+    "paramRequired": true
+  },
+  {
+    "paramName": "s",
+    "paramLongName": "sourcePath",
+    "paramDescription": "the source Path",
+    "paramRequired": true
+  },
+  {
+    "paramName": "i",
+    "paramLongName": "index",
+    "paramDescription": "the index Name",
+    "paramRequired": true
+  },
+  {
+    "paramName": "ih",
+    "paramLongName": "indexHost",
+    "paramDescription": "the index host",
+    "paramRequired": true
+  },
+  {
+    "paramName": "tc",
+    "paramLongName": "threadCount",
+    "paramDescription": "the inumber of threads to use",
+    "paramRequired": false
+  }
+]

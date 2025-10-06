@@ -10,28 +10,12 @@
             <description>the elasticsearch index name for events</description>
         </property>
         <property>
-            <name>esIndexHost</name>
-            <description>the elasticsearch host</description>
+            <name>esNotificationsIndexName</name>
+            <description>the elasticsearch index name for notifications</description>
         </property>
         <property>
-            <name>esBatchWriteRetryCount</name>
-            <value>8</value>
-            <description>an ES configuration property</description>
-        </property>
-		<property>
-            <name>esBatchWriteRetryWait</name>
-            <value>60s</value>
-            <description>an ES configuration property</description>
-        </property>
-		<property>
-            <name>esBatchSizeEntries</name>
-            <value>200</value>
-            <description>an ES configuration property</description>
-        </property>
-		<property>
-            <name>esNodesWanOnly</name>
-            <value>true</value>
-            <description>an ES configuration property</description>
+            <name>esIndexHost</name>
+            <description>the elasticsearch host</description>
         </property>
         <property>
         	<name>maxIndexedEventsForDsAndTopic</name>
@@ -41,44 +25,23 @@
         	<name>brokerApiBaseUrl</name>
         	<description>the url of the broker service api</description>
         </property>
+      
+      
+        <!-- General oozie workflow properties -->
         <property>
-            <name>sparkDriverMemory</name>
-            <description>memory for driver process</description>
+            <name>sparkClusterOpts</name>
+            <value>--conf spark.extraListeners= --conf spark.sql.queryExecutionListeners= --conf spark.yarn.historyServer.address=http://iis-cdh5-test-gw.ocean.icm.edu.pl:18089 --conf spark.eventLog.dir=hdfs://nameservice1/user/spark/spark2ApplicationHistory --conf spark.executorEnv.JAVA_HOME=/srv/java/openjdk-17 --conf spark.yarn.appMasterEnv.JAVA_HOME=/srv/java/openjdk-17 --conf spark.sql.warehouse.dir=/user/hive/warehouse --conf spark.eventLog.compression.codec=lz4 --conf spark.shuffle.mapStatus.compression.codec=lz4 --conf spark.shuffle.useOldFetchProtocol=true --conf spark.eventLog.enabled=true</value>
+            <description>spark cluster-wide options</description>
         </property>
         <property>
-            <name>sparkExecutorMemory</name>
-            <description>memory for individual executor</description>
+            <name>sparkResourceOpts</name>
+            <value>--executor-memory=8G --conf spark.executor.memoryOverhead=4G --executor-cores=6 --driver-memory=9G --driver-cores=4 --conf spark.default.parallelism=3840 --conf spark.sql.shuffle.partitions=7680 --conf spark.sql.files.maxPartitionBytes=33554432 --conf spark.sql.adaptive.advisoryPartitionSizeInBytes=32m --conf spark.sql.adaptive.coalescePartitions.parallelismFirst=false --conf spark.sql.adaptive.forceOptimizeSkewedJoin=true --conf spark.sql.adaptive.skewJoin.skewedPartitionThresholdInBytes=64m --conf spark.sql.adaptive.skewJoin.skewedPartitionFactor=3.0 --conf spark.executor.extraJavaOptions="-XX:MaxDirectMemorySize=4g"</value>
+            <description>spark resource options</description>
         </property>
         <property>
-            <name>sparkExecutorCores</name>
-            <description>number of cores used by single executor</description>
-        </property>
-        <property>
-            <name>oozieActionShareLibForSpark2</name>
-            <description>oozie action sharelib for spark 2.*</description>
-        </property>
-        <property>
-            <name>spark2ExtraListeners</name>
-            <value>com.cloudera.spark.lineage.NavigatorAppListener</value>
-            <description>spark 2.* extra listeners classname</description>
-        </property>
-        <property>
-            <name>spark2SqlQueryExecutionListeners</name>
-            <value>com.cloudera.spark.lineage.NavigatorQueryListener</value>
-            <description>spark 2.* sql query execution listeners classname</description>
-        </property>
-        <property>
-            <name>spark2YarnHistoryServerAddress</name>
-            <description>spark 2.* yarn history server address</description>
-        </property>
-        <property>
-            <name>spark2EventLogDir</name>
-            <description>spark 2.* event log dir location</description>
-        </property>
-        <property>
-        	<name>sparkMaxExecutorsForIndexing</name>
-        	<value>8</value>
-        	<description>Max number of workers for ElasticSearch indexing</description>
+            <name>sparkApplicationOpts</name>
+            <value>--conf spark.sql.shuffle.partitions=7680</value>
+            <description>spark resource options</description>
         </property>
     </parameters>
 
@@ -94,20 +57,36 @@
                 <name>oozie.launcher.mapred.job.queue.name</name>
                 <value>${oozieLauncherQueueName}</value>
             </property>
-            <property>
-                <name>oozie.action.sharelib.for.spark</name>
-                <value>${oozieActionShareLibForSpark2}</value>
-            </property>
         </configuration>
     </global>
 
-    <start to="index_event_subset"/>
+    <start to="generate_event_subset"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
+    
+    
+    <action name="generate_event_subset">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>GenerateEventSubsetJob</name>
+            <class>eu.dnetlib.dhp.broker.oa.GenerateEventSubsetJob</class>
+            <jar>dhp-broker-events-${projectVersion}.jar</jar>
+            <spark-opts>
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
+            </spark-opts>
+            <arg>--outputDir</arg><arg>${outputDir}</arg>
+            <arg>--maxEventsForTopic</arg><arg>${maxIndexedEventsForDsAndTopic}</arg>
+        </spark>
+        <ok to="index_event_subset"/>
+        <error to="Kill"/>
+    </action>
         
-     <action name="index_event_subset">
+    <action name="index_event_subset">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
@@ -115,29 +94,38 @@
             <class>eu.dnetlib.dhp.broker.oa.IndexEventSubsetJob</class>
             <jar>dhp-broker-events-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.dynamicAllocation.maxExecutors=${sparkMaxExecutorsForIndexing}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
             </spark-opts>
             <arg>--outputDir</arg><arg>${outputDir}</arg>
             <arg>--index</arg><arg>${esEventIndexName}</arg>
             <arg>--esHost</arg><arg>${esIndexHost}</arg>
-            <arg>--esBatchWriteRetryCount</arg><arg>${esBatchWriteRetryCount}</arg>
-            <arg>--esBatchWriteRetryWait</arg><arg>${esBatchWriteRetryWait}</arg>
-            <arg>--esBatchSizeEntries</arg><arg>${esBatchSizeEntries}</arg>
-            <arg>--esNodesWanOnly</arg><arg>${esNodesWanOnly}</arg>
-            <arg>--maxEventsForTopic</arg><arg>${maxIndexedEventsForDsAndTopic}</arg>
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+   </action>
+    
+   <action name="index_notifications">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>IndexNotificationsOnESJob</name>
+            <class>eu.dnetlib.dhp.broker.oa.IndexNotificationsJob</class>
+            <jar>dhp-broker-events-${projectVersion}.jar</jar>
+            <spark-opts>
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
+            </spark-opts>
+            <arg>--outputDir</arg><arg>${outputDir}</arg>
+            <arg>--index</arg><arg>${esNotificationsIndexName}</arg>
+            <arg>--esHost</arg><arg>${esIndexHost}</arg>
             <arg>--brokerApiBaseUrl</arg><arg>${brokerApiBaseUrl}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
-    
    
 
     <end name="End"/>

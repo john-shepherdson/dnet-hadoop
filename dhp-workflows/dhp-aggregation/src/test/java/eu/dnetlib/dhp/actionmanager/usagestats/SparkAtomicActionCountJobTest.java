@@ -1,8 +1,6 @@
 
 package eu.dnetlib.dhp.actionmanager.usagestats;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,7 +24,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.oaf.Measure;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
-import eu.dnetlib.dhp.schema.oaf.Result;
 
 public class SparkAtomicActionCountJobTest {
 
@@ -73,12 +70,12 @@ public class SparkAtomicActionCountJobTest {
 			.getResource("/eu/dnetlib/dhp/actionmanager/usagestats/test2")
 			.getPath();
 
-		SparkAtomicActionUsageJob.writeActionSet(spark, usageScoresPath, workingDir.toString() + "/actionSet");
+		SparkAtomicActionUsageJob.writeActionSet(spark, usageScoresPath, workingDir.toString() + "/actionSet_testUsageStatsDb2");
 
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
 		JavaRDD<AtomicAction> tmp = sc
-			.sequenceFile(workingDir.toString() + "/actionSet", Text.class, Text.class)
+			.sequenceFile(workingDir.toString() + "/actionSet_testUsageStatsDb2", Text.class, Text.class)
 			.map(usm -> OBJECT_MAPPER.readValue(usm._2.getBytes(), AtomicAction.class));
 		// .map(aa -> (Result) aa.getPayload());
 
@@ -443,12 +440,12 @@ public class SparkAtomicActionCountJobTest {
 			.getResource("/eu/dnetlib/dhp/actionmanager/usagestats/test1")
 			.getPath();
 
-		SparkAtomicActionUsageJob.writeActionSet(spark, usageScoresPath, workingDir.toString() + "/actionSet");
+		SparkAtomicActionUsageJob.writeActionSet(spark, usageScoresPath, workingDir.toString() + "/actionSet_testMatch");
 
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
 		JavaRDD<AtomicAction> tmp = sc
-			.sequenceFile(workingDir.toString() + "/actionSet", Text.class, Text.class)
+			.sequenceFile(workingDir.toString() + "/actionSet_testMatch", Text.class, Text.class)
 			.map(usm -> OBJECT_MAPPER.readValue(usm._2.getBytes(), AtomicAction.class));
 		// .map(aa -> (Result) aa.getPayload());
 

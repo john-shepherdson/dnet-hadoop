@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.broker.objects.OaBrokerRelatedSoftware;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.broker.oa.util.BrokerConstants;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
 import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
 import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.RelatedSoftware;
@@ -33,20 +32,22 @@ public class PrepareRelatedSoftwaresJob {
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
-			IOUtils
-				.toString(
-					PrepareRelatedSoftwaresJob.class
-						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/common_params.json")));
+				IOUtils
+						.toString(PrepareRelatedSoftwaresJob.class
+								.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/common_params.json")));
 		parser.parseArgument(args);
 
 		final Boolean isSparkSessionManaged = Optional
-			.ofNullable(parser.get("isSparkSessionManaged"))
-			.map(Boolean::valueOf)
-			.orElse(Boolean.TRUE);
+				.ofNullable(parser.get("isSparkSessionManaged"))
+				.map(Boolean::valueOf)
+				.orElse(Boolean.TRUE);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
 		final String graphPath = parser.get("graphPath");
 		log.info("graphPath: {}", graphPath);
+
+		final String rawRelsPath = parser.get("rawRelsPath");
+		log.info("rawRelsPath: {}", rawRelsPath);
 
 		final String workingDir = parser.get("workingDir");
 		log.info("workingDir: {}", workingDir);
@@ -64,28 +65,17 @@ public class PrepareRelatedSoftwaresJob {
 
 			final Encoder<OaBrokerRelatedSoftware> obrsEncoder = Encoders.bean(OaBrokerRelatedSoftware.class);
 			final Dataset<OaBrokerRelatedSoftware> softwares = ClusterUtils
-				.readPath(spark, graphPath + "/software", Software.class)
-				.filter((FilterFunction<Software>) sw -> !ClusterUtils.isDedupRoot(sw.getId()))
-				.map(
-					(MapFunction<Software, OaBrokerRelatedSoftware>) ConversionUtils::oafSoftwareToBrokerSoftware,
-					obrsEncoder);
+					.readPath(spark, graphPath + "/software", Software.class)
+					.filter((FilterFunction<Software>) sw -> !ClusterUtils.isDedupRoot(sw.getId()))
+					.map((MapFunction<Software, OaBrokerRelatedSoftware>) ConversionUtils::oafSoftwareToBrokerSoftware, obrsEncoder);
 
-			final Dataset<Relation> rels;
-			rels = ClusterUtils
-				.loadRelations(graphPath, spark)
-				.filter((FilterFunction<Relation>) r -> r.getDataInfo().getDeletedbyinference())
-				.filter((FilterFunction<Relation>) r -> r.getRelType().equals(ModelConstants.RESULT_RESULT))
-				.filter((FilterFunction<Relation>) r -> !r.getRelClass().equals(BrokerConstants.IS_MERGED_IN_CLASS))
-				.filter((FilterFunction<Relation>) r -> !ClusterUtils.isDedupRoot(r.getSource()))
-				.filter((FilterFunction<Relation>) r -> !ClusterUtils.isDedupRoot(r.getTarget()));
+			final Dataset<Relation> rels = ClusterUtils.loadRawRelations(rawRelsPath, ModelConstants.RESULT_RESULT, spark);
 
 			final Encoder<RelatedSoftware> rsEncoder = Encoders.bean(RelatedSoftware.class);
 			final Dataset<RelatedSoftware> dataset = rels
-				.joinWith(softwares, softwares.col("openaireId").equalTo(rels.col("target")), "inner")
-				.map(
-					(MapFunction<Tuple2<Relation, OaBrokerRelatedSoftware>, RelatedSoftware>) t -> new RelatedSoftware(
-						t._1.getSource(), t._2),
-					rsEncoder);
+					.joinWith(softwares, softwares.col("openaireId").equalTo(rels.col("target")), "inner")
+					.map((MapFunction<Tuple2<Relation, OaBrokerRelatedSoftware>, RelatedSoftware>) t -> new RelatedSoftware(
+							t._1.getSource(), t._2), rsEncoder);
 
 			ClusterUtils.save(dataset, relsPath, RelatedSoftware.class, total);
 
