@@ -23,7 +23,7 @@ import scala.io.Source
 
 object DataciteToOAFTransformation {
 
-  val DOI_PREFIX = "50|doi_________::"
+  val DOI_PREFIX = "50|doi_________"
 
   case class HostedByMapType(
     openaire_id: String,
