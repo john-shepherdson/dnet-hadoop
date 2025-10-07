@@ -13,9 +13,11 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.io.Charsets;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -108,9 +110,11 @@ public class GenerateNativeStoreSparkJobTest extends AbstractVocabularyTest {
 				getClass().getResourceAsStream("/eu/dnetlib/dhp/collection/sequence_file"),
 				new FileOutputStream(mdStoreV1.getHdfsPath() + "/sequence_file"));
 
-        final String apiDescriptor = IOUtils.resourceToString(
-                "/eu/dnetlib/dhp/collection/apiDescriptor.json",
-                Charset.defaultCharset());
+        final String apiDescriptor =
+                IOUtils.toString(
+                        Objects.requireNonNull(
+                                getClass().getResourceAsStream("/eu/dnetlib/dhp/collection/apiDescriptor.json")),
+                        Charsets.UTF_8);
 
 		GenerateNativeStoreSparkJob
 			.main(
@@ -141,9 +145,11 @@ public class GenerateNativeStoreSparkJobTest extends AbstractVocabularyTest {
 				getClass().getResourceAsStream("/eu/dnetlib/dhp/collection/sequence_file"),
 				new FileOutputStream(mdStoreV2.getHdfsPath() + "/sequence_file"));
 
-        final String apiDescriptor = IOUtils.resourceToString(
-                "/eu/dnetlib/dhp/collection/apiDescriptor.json",
-                Charset.defaultCharset());
+        final String apiDescriptor =
+                IOUtils.toString(
+                    Objects.requireNonNull(
+                        getClass().getResourceAsStream("/eu/dnetlib/dhp/collection/apiDescriptor.json")),
+                Charsets.UTF_8);
 
 		MDStoreVersion mdStoreV1 = prepareVersion("/eu/dnetlib/dhp/collection/mdStoreVersion_1.json");
 
