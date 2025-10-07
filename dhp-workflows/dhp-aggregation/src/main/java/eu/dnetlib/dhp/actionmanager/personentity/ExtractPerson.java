@@ -15,6 +15,7 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.common.person.Constants;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -113,41 +114,36 @@ public class ExtractPerson implements Serializable {
 		// Read the publishers output
 		Dataset<Row> df = spark
 			.read()
-			.schema(
-				"`DOI` STRING, " +
-					"`Authors` ARRAY<STRUCT<`Corresponding` : STRING, " +
-					"`Contributor_roles` : ARRAY<STRUCT<`Schema`:STRING, `Value`:STRING>> ," +
-					"`Name` : STRUCT<`Full`:STRING, `First` : STRING, `Last`: STRING>,  " +
-					"`Matchings`: ARRAY<STRUCT<`PID`:STRING, `Value`:STRING,`Confidence`:DOUBLE, `Status`:STRING>>, " +
-					"`PIDs` : ARRAY<STRUCT<`Schema`:STRING , `Value`: STRING>>>>")
+			.schema(PUBLISHER_INPUT_SCHEMA)
+
 			.json(inputPath)
-			.where("DOI is not null");
+			.where("doi is not null");
 
 //Select the relevant information
 		Dataset<Row> allAuthors = df
-			.selectExpr("DOI", "explode(Authors) as author")
+			.selectExpr("doi", "explode(authors) as author")
 			.selectExpr(
-				"DOI", "author.Contributor_roles as roles",
-				"author.Corresponding as corresponding", "author.Matchings as affs",
-				"explode(author.PIDs) as pid")
-			.where("pid.Schema = 'ORCID'");
+				"doi", "author.contributor_roles as roles",
+				"author.corresponding as corresponding", "author.matchings as affs",
+				"explode(author.pids) as pid")
+			.where("pid.schema = 'orcid'");
 
 		Dataset<Row> authors = allAuthors
-			.selectExpr("explode (affs) as affiliation", "DOI", "corresponding", "roles", "pid.Value as orcid")
+			.selectExpr("explode (affs) as affiliation", "doi", "corresponding", "roles", "pid.value as orcid")
 			.where("affiliation.Status = 'active'")
 			.selectExpr(
-				"affiliation.Value as orgid", "affiliation.PID as orgpid", "affiliation.Confidence as trust", "DOI",
+				"affiliation.Value as orgid", "affiliation.PID as orgpid", "affiliation.Confidence as trust", "doi",
 				"corresponding", "roles", "orcid");
 
 		authors = authors
 			.where("roles is null")
-			.selectExpr("*", " '' AS roleschema", " '' AS rolevalue")
+			.selectExpr("*", " '' AS roleschema", " '' AS rolevalue", "'' AS rolename")
 			.drop("roles")
 			.unionAll(
 				authors
 					.where("roles is not null")
-					.selectExpr("orgid", "orgpid", "trust", "DOI", "corresponding", "explode(roles) as role", "orcid")
-					.selectExpr("*", "role.Schema as roleschema", "role.Value as rolevalue")
+					.selectExpr("orgid", "orgpid", "trust", "doi", "corresponding", "explode(roles) as role", "orcid")
+					.selectExpr("*", "role.schema as roleschema", "role.value as rolevalue", "role.name as rolename")
 					.drop("role"));
 
 		// create the relation dataset with possible redundant relations
@@ -159,8 +155,8 @@ public class ExtractPerson implements Serializable {
 				Encoders.bean(Relation.class))
 			.unionAll(
 				allAuthors
-					.selectExpr("DOI", "pid.Value as orcid")
-					.groupByKey((MapFunction<Row, String>) r -> r.getAs("DOI"), Encoders.STRING())
+					.selectExpr("doi", "pid.value as orcid")
+					.groupByKey((MapFunction<Row, String>) r -> r.getAs("doi"), Encoders.STRING())
 
 					.mapGroups(
 						(MapGroupsFunction<String, Row, Coauthors>) (k, it) -> extractCoAuthorsRow(it),
@@ -199,12 +195,15 @@ public class ExtractPerson implements Serializable {
 		return r;
 	}
 
+
+
+
 	private static @NotNull Relation getAuthorshipRelation(Row a) {
 		String target = DOI_PREFIX
 			+ IdentifierFactory
-				.md5(PidCleaner.normalizePidValue(PidType.doi.toString(), a.getAs("DOI")));
+				.md5(PidCleaner.normalizePidValue(PidType.doi.toString(), removePrefixUrl(a.getAs("doi"))));
 		;
-		String source = PERSON_PREFIX + SEPARATOR + IdentifierFactory.md5(a.getAs("orcid"));
+		String source = PERSON_PREFIX + SEPARATOR + IdentifierFactory.md5(removePrefixUrl(a.getAs("orcid")));
 
 		Relation relation = OafMapperUtils
 			.getRelation(
@@ -249,12 +248,18 @@ public class ExtractPerson implements Serializable {
 			relation.getProperties().add(kv);
 		}
 
+		KeyValue kv = new KeyValue();
 		if (StringUtils.isNotBlank(a.getAs("roleschema"))) {
-			KeyValue kv = new KeyValue();
 			kv.setKey("role");
 			String role = (String) a.getAs("roleschema")
 				+ (String) a.getAs("rolevalue");
 			kv.setValue(role);
+			if (!Optional.ofNullable(relation.getProperties()).isPresent())
+				relation.setProperties(new ArrayList<>());
+			relation.getProperties().add(kv);
+		}else if(StringUtils.isNotBlank(a.getAs("rolename"))){
+			kv.setKey("role");
+			kv.setValue(a.getAs("rolename"));
 			if (!Optional.ofNullable(relation.getProperties()).isPresent())
 				relation.setProperties(new ArrayList<>());
 			relation.getProperties().add(kv);
@@ -264,7 +269,7 @@ public class ExtractPerson implements Serializable {
 
 	private static @NotNull Relation getAffiliationRelation(Row a) {
 
-		String source = PERSON_PREFIX + SEPARATOR + IdentifierFactory.md5(a.getAs("orcid"));
+		String source = PERSON_PREFIX + SEPARATOR + IdentifierFactory.md5(removePrefixUrl(a.getAs("orcid")));
 		String target = ROR_PREFIX
 			+ IdentifierFactory.md5(PidCleaner.normalizePidValue("ROR", a.getAs("orgid")));
 
@@ -557,7 +562,7 @@ public class ExtractPerson implements Serializable {
 		Coauthors coauth = new Coauthors();
 		List<String> coauthors = new ArrayList<>();
 		while (it.hasNext())
-			coauthors.add(it.next()._2());
+			coauthors.add(removePrefixUrl(it.next()._2()));
 		coauth.setCoauthors(coauthors);
 
 		return coauth;
@@ -567,7 +572,7 @@ public class ExtractPerson implements Serializable {
 		Coauthors coauth = new Coauthors();
 		List<String> coauthors = new ArrayList<>();
 		while (it.hasNext())
-			coauthors.add(it.next().getAs("orcid"));
+			coauthors.add(removePrefixUrl(it.next().getAs("orcid")));
 		coauth.setCoauthors(coauthors);
 
 		return coauth;
