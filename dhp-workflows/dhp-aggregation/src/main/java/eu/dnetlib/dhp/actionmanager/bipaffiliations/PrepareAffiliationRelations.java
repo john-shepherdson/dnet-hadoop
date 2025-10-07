@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.actionmanager.bipaffiliations;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 import static org.apache.spark.sql.functions.expr;
+import static org.apache.spark.sql.types.DataTypes.StringType;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -23,6 +24,7 @@ import org.apache.spark.api.java.function.MapGroupsFunction;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.StructType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -208,7 +210,7 @@ public class PrepareAffiliationRelations implements Serializable {
 		spark
 				.udf()
 				.register(
-						"md5HashWithPrefix", (String doi) -> ID_PREFIX + IdentifierFactory.md5(DoiCleaningRule.clean(removePrefix(doi))), DataTypes.StringType);
+						"md5HashWithPrefix", (String doi) -> ID_PREFIX + IdentifierFactory.md5(DoiCleaningRule.clean(removePrefix(doi))), StringType);
 		// load and parse affiliation relations from HDFS
 		return getRels( spark
 				.read()
@@ -216,7 +218,7 @@ public class PrepareAffiliationRelations implements Serializable {
 				.json(inputPath)
 				.where("doi is not null")
 				.withColumn("id",  expr("md5HashWithPrefix(doi)"))
-				.withColumn("matching", functions.explode(new Column("organizations"))), collectedfrom, dataprovenance );
+				.withColumn("matching", functions.explode(new Column("matchings"))), collectedfrom, dataprovenance );
 
 
 	}

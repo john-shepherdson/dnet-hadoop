@@ -1,5 +1,7 @@
 package eu.dnetlib.dhp.actionmanager.bipaffiliations;
 
+import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.StructType;
 
 
 import static org.apache.spark.sql.types.DataTypes.StringType;
@@ -147,7 +149,7 @@ public class Constants implements Serializable {
                             .add("affiliations", DataTypes.createArrayType(
                                     new StructType()
                                             .add("raw_affiliation_string", StringType)
-                                            .add("Matchings", MATCHING_ARRAY_SCHEMA)
+                                            .add("Matchings", DataTypes.createArrayType(MATCHING_SCHEMA))
                             ))
                             .add("corresponding", DataTypes.BooleanType)
                             .add("contributor_roles", DataTypes.createArrayType(new StructType()
@@ -155,38 +157,10 @@ public class Constants implements Serializable {
                                     .add("name", StringType)
                                     .add("value", StringType)))
             ))
-            .add("organizations",MATCHING_ARRAY_SCHEMA);
-
-    public final static StructType DATACITE_CREATOR_SCHEMA = new StructType()
-            .add("name", StringType, true)
-            .add("givenName", StringType, true)
-            .add("familyName", StringType, true)
-            .add("nameType", StringType, true)
-            .add("affiliation", DataTypes.createArrayType(StringType), true)
-            .add("nameIdentifiers", DataTypes.createArrayType(StringType), true)
-            ;
-
-    public final static StructType DATACITE_ATTRIBUTES_SCHEMA = new StructType()
-            .add("doi", StringType)
-            .add("creators", DATACITE_CREATOR_SCHEMA)
-            ;
-    public final static StructType DATACITE_INPUT_SCHEMA = new StructType()
-            .add("doi", StringType)
-            .add("attributes", DATACITE_ATTRIBUTES_SCHEMA);
-
-
-    public static StructType CROSSREF_AUTHOR_SCHEMA = new StructType()
-            .add("given", StringType)
-            .add("family", StringType)
-            .add("affiliation", DataTypes.createArrayType(StringType));
-
-    public static final StructType CROSSREF_INPUT_SCHEMA = new StructType()
-            .add("DOI", StringType)
-            .add("author", DataTypes.createArrayType(CROSSREF_AUTHOR_SCHEMA));
+            .add("organizations",DataTypes.createArrayType(MATCHING_SCHEMA));
 
     public static final StructType OPENAPC_INPUT_SCHEMA = new StructType()
             .add("doi", StringType)
-            .add("matchings", MATCHING_ARRAY_SCHEMA);
-
+            .add("matchings", DataTypes.createArrayType(MATCHING_SCHEMA));
 }
 
