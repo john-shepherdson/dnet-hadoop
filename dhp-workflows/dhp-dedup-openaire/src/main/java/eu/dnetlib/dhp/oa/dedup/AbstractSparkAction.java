@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 
 import com.clearspring.analytics.util.Lists;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
@@ -118,6 +120,27 @@ abstract class AbstractSparkAction implements Serializable {
 
 	protected static <T> void saveParquet(Dataset<T> dataset, String outPath, SaveMode mode) {
 		dataset.write().option("compression", "gzip").mode(mode).parquet(outPath);
+	}
+
+	protected static void renameParquet(SparkSession spark, String path, String newPath) {
+		try {
+			FileSystem fs = FileSystem.get(spark.sparkContext().hadoopConfiguration());
+
+			Path srcPath = new Path(path);
+			Path dstPath = new Path(newPath);
+
+			// if destination path exists, delete it
+			if (fs.exists(dstPath)) {
+				fs.delete(dstPath, true);
+			}
+
+			if (!fs.rename(srcPath, dstPath)) {
+				throw new RuntimeException("Rename failed from " + path + " to " + newPath);
+			}
+
+		} catch (Exception e) {
+			throw new RuntimeException("Error during renameParquet: " + e.getMessage(), e);
+		}
 	}
 
 	protected static void removeOutputDir(SparkSession spark, String path) {
