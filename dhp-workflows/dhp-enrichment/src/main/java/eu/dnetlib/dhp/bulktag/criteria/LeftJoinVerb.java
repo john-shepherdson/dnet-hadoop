@@ -4,6 +4,7 @@ package eu.dnetlib.dhp.bulktag.criteria;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ReadContext;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 
@@ -33,6 +34,11 @@ public class LeftJoinVerb implements Selection, JoinPathAware, JsonPathAware, Se
 
 		return exist(value, jsonPath);
 
+	}
+
+	@Override
+	public boolean apply(Object value, Object otherEntityValue) throws IOException {
+		return false;
 	}
 
 	private boolean existAny(String jsonPath, Object value) {

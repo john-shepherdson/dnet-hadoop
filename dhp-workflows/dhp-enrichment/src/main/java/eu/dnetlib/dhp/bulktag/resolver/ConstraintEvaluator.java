@@ -7,6 +7,7 @@ import eu.dnetlib.dhp.bulktag.community.TaggingConstraints;
 import eu.dnetlib.dhp.bulktag.criteria.Selection;
 import eu.dnetlib.dhp.bulktag.criteria.VerbResolver;
 import eu.dnetlib.dhp.bulktag.criteria.VerbResolverFactory;
+import eu.dnetlib.dhp.schema.oaf.Result;
 import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.*;
@@ -14,10 +15,15 @@ import org.codehaus.jackson.map.ObjectMapper;
 import static org.apache.spark.sql.functions.*;
 
 
+import java.beans.IntrospectionException;
+import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class ConstraintEvaluator implements Serializable {
 
@@ -41,7 +47,7 @@ public class ConstraintEvaluator implements Serializable {
         });
     }
 
-    private void evaluate(SparkSession spark, TaggingConstraint tag) throws ClassNotFoundException {
+    private <R extends Result>  void evaluate(SparkSession spark, TaggingConstraint tag) throws ClassNotFoundException {
         if(tag.getRelatedEntity() != null){
             Dataset<Row> rels = spark.read()
                     .json(tags.getGraphPath() + "/relation")
@@ -58,7 +64,7 @@ public class ConstraintEvaluator implements Serializable {
             Dataset<Row> result = left
                     .join(rels, left.col("id").equalTo(rels.col("source")), "left")
                     .join(right, right.col("id").equalTo(rels.col("target")), "left")
-                    .select(left.col("*"), right.col("startDate")); // selezioni solo quello che ti serve
+                    .select(left.col("*"), right.col(tag.getRelatedEntity().getField())); // selezioni solo quello che ti serve
 
 //            Column[] leftCols = Arrays.stream(result.columns())
 //                    .filter(c -> !c.equals("startDate"))
@@ -69,11 +75,11 @@ public class ConstraintEvaluator implements Serializable {
             Dataset<Row> jsonDataset = result
                     // JSON della parte left (tutte le colonne tranne startDate)
                     .withColumn("left", to_json(struct(Arrays.stream(result.columns())
-                            .filter(c -> !c.equals("startDate"))
+                            .filter(c -> !c.equals(tag.getRelatedEntity().getField()))
                             .map(functions::col)
                             .toArray(Column[]::new))))
                     // JSON della parte right (solo startDate)
-                    .withColumn("right", to_json(struct(col("startDate"))));
+                    .withColumn("right", to_json(struct(col(tag.getRelatedEntity().getField()))));
 
             jsonDataset.map((MapFunction<Row, String>)e  -> {
                 String leftJson = e.getAs("left");
@@ -81,9 +87,58 @@ public class ConstraintEvaluator implements Serializable {
 
                 if(rightJson == null)
                     return leftJson;
-                if(tag.getCriteria().stream().anyMatch(c -> c.getConstraint().stream().allMatch(con -> con.verifyCriteria())))
+                if(tag.getCriteria().stream().anyMatch(c -> c.getConstraint().stream().allMatch(con -> {
+                    ObjectMapper mapper = new ObjectMapper();
+                    String className = tag.getEntityClass();
+                    Class<?> clazz = null;
+                    try {
+                        clazz = Class.forName(className);
+                    } catch (ClassNotFoundException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    try {
+                        Object leftInstance = mapper.readValue(leftJson, clazz);
+                        String fieldName =  con.getField();
+                        PropertyDescriptor pd = new PropertyDescriptor(fieldName, leftInstance.getClass());
+                        Object value = pd.getReadMethod().invoke(leftInstance);
+                        return con.verifyCriteria(value, rightJson);
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    } catch (IntrospectionException ex) {
+                        throw new RuntimeException(ex);
+                    } catch (InvocationTargetException ex) {
+                        throw new RuntimeException(ex);
+                    } catch (IllegalAccessException ex) {
+                        throw new RuntimeException(ex);
+                    }
+
+                }))){
+                    ObjectMapper mapper = new ObjectMapper();
+                    String className = tag.getEntityClass();
+                    Class<?> clazz = null;
+                    try {
+                        clazz = Class.forName(className);
+                    } catch (ClassNotFoundException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    try {
+                        Object leftInstance = mapper.readValue(leftJson, clazz);
+                        PropertyDescriptor pd = new PropertyDescriptor("id", leftInstance.getClass());
+                        return pd.getReadMethod().invoke(leftInstance) + "@@" + tag.getId();
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    } catch (IntrospectionException ex) {
+                        throw new RuntimeException(ex);
+                    } catch (InvocationTargetException ex) {
+                        throw new RuntimeException(ex);
+                    } catch (IllegalAccessException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+
                 return null;
-            }, Encoders.STRING());
+            }, Encoders.STRING())
+                    .filter(Objects::nonNull);
 
         }
 

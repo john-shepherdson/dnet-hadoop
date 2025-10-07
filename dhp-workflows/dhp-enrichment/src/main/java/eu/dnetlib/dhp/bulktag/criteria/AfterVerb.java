@@ -1,10 +1,14 @@
 package eu.dnetlib.dhp.bulktag.criteria;
 
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.ReadContext;
 import eu.dnetlib.dhp.bulktag.criteria.VerbClass;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,19 +32,37 @@ public class AfterVerb implements Selection, JsonPathAware, Serializable {
 
     @Override
     public boolean apply(Object value) { //qua devo passare il valore da confrontare
+       return false;
+    }
+
+    @Override
+    public boolean apply(Object value, Object otherEntityValue) throws IOException {
         if (value == null || (param == null && jsonPath == null)) {
             return false;
         }
 
         try {
-            // Caso 1: value è già una stringa data
-            LocalDate left = parseDate(value);
+            if(jsonPath != null){
+                ReadContext ctx;
+                ctx = JsonPath.parse((String)value);
 
-            // Caso 2: param può essere una stringa o un oggetto (es. Map con "startDate")
-            LocalDate right = extractDateFromParam(param);
+                // estraggo i valori usando il jsonpath
+                Object results = ctx.read(jsonPath);
 
-            return left.isAfter(right);
+                if (results == null || (results instanceof List<?> )) {
+                    return false;
+                }
 
+                if(results instanceof String date){
+                    LocalDate resultDate = parseDate(date);
+                    LocalDate projectDate = parseDate(otherEntityValue);
+                    return resultDate.isAfter(projectDate);
+                }
+                return false;
+
+            }
+
+            return false;
         } catch (Exception e) {
             System.err.println("AfterVerb: invalid comparison " + e.getMessage());
             return false;

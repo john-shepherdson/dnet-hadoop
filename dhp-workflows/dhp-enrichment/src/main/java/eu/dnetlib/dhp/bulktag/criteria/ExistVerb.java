@@ -1,6 +1,7 @@
 
 package eu.dnetlib.dhp.bulktag.criteria;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import com.jayway.jsonpath.JsonPath;
@@ -27,6 +28,11 @@ public class ExistVerb implements Selection, JsonPathAware, Serializable {
 
 		return exist(value, jsonPath);
 
+	}
+
+	@Override
+	public boolean apply(Object value, Object otherEntityValue) throws IOException {
+		return false;
 	}
 
 	private boolean existAny(String jsonPath, Object value) {

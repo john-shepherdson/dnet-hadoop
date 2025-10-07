@@ -41,6 +41,11 @@ public class ExistForAllVerb implements Selection, JsonPathAware, Serializable {
 
 	}
 
+	@Override
+	public boolean apply(Object value, Object otherEntityValue) throws IOException {
+		return false;
+	}
+
 
 	public Object getParam() {
 		return params;

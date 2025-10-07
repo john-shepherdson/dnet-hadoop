@@ -75,4 +75,12 @@ public class Constraint implements Serializable {
 		}
 	}
 
+	public boolean verifyCriteria(Object metadata, Object value) {
+		try {
+			return selection.apply(metadata, value);
+		}catch (Exception e){
+			return false;
+		}
+	}
+
 }

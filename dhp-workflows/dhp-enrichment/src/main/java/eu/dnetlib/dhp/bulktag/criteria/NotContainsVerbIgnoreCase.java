@@ -1,6 +1,7 @@
 
 package eu.dnetlib.dhp.bulktag.criteria;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 
@@ -37,6 +38,11 @@ public class NotContainsVerbIgnoreCase implements Selection, Serializable {
 							s.toLowerCase().contains(p.toLowerCase()));
 				return false;
 			});
+		return false;
+	}
+
+	@Override
+	public boolean apply(Object value, Object otherEntityValue) throws IOException {
 		return false;
 	}
 

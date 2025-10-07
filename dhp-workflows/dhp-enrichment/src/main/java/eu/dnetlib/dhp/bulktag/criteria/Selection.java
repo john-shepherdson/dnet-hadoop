@@ -7,4 +7,6 @@ import java.io.Serializable;
 public interface Selection extends Serializable {
 
 	boolean apply(Object value) throws IOException;
+
+	boolean apply(Object value, Object otherEntityValue) throws IOException;
 }

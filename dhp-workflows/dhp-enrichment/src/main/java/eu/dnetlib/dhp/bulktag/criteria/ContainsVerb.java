@@ -1,6 +1,7 @@
 
 package eu.dnetlib.dhp.bulktag.criteria;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +45,11 @@ public class ContainsVerb implements Selection, Serializable {
 			});
 
 
+		return false;
+	}
+
+	@Override
+	public boolean apply(Object value, Object otherEntityValue) throws IOException {
 		return false;
 	}
 
