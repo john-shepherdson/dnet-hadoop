@@ -30,7 +30,6 @@ object SparkCreateScholix {
         .builder()
         .config(conf)
         .appName(getClass.getSimpleName)
-        .master(parser.get("master"))
         .getOrCreate()
 
     val relationPath = parser.get("relationPath")

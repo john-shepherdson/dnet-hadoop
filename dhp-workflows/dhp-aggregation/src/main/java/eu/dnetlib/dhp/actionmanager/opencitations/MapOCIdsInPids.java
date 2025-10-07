@@ -22,7 +22,6 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FlatMapFunction;
-import org.apache.spark.api.java.function.ForeachFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.*;
 import org.slf4j.Logger;
@@ -36,7 +35,6 @@ import scala.Tuple2;
 
 /**
  * @author miriam.baglioni
- * @Date 29/02/24
  */
 public class MapOCIdsInPids implements Serializable {
 

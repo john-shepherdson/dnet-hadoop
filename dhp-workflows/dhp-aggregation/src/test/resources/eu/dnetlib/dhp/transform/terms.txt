@@ -291,7 +291,7 @@ dnet:countries @=@ dnet:countries @=@ KZ @=@ Kazakhstan
 dnet:countries @=@ dnet:countries @=@ KE @=@ Kenya
 dnet:countries @=@ dnet:countries @=@ KI @=@ Kiribati
 dnet:countries @=@ dnet:countries @=@ KR @=@ Korea (Republic of)
-dnet:countries @=@ dnet:countries @=@ KP @=@ Korea, Democatric People's Republic of
+dnet:countries @=@ dnet:countries @=@ KP @=@ Korea, Democratic People's Republic of
 dnet:countries @=@ dnet:countries @=@ XK @=@ Kosovo * UN resolution
 dnet:countries @=@ dnet:countries @=@ KW @=@ Kuwait
 dnet:countries @=@ dnet:countries @=@ KG @=@ Kyrgyzstan
@@ -558,7 +558,7 @@ dnet:access_modes @=@ dnet:access_modes @=@ OPEN @=@ Open Access
 dnet:access_modes @=@ dnet:access_modes @=@ OPEN SOURCE @=@ Open Source
 dnet:access_modes @=@ dnet:access_modes @=@ OTHER @=@ Other
 dnet:access_modes @=@ dnet:access_modes @=@ RESTRICTED @=@ Restricted
-dnet:access_modes @=@ dnet:access_modes @=@ UNKNOWN @=@ not available
+dnet:access_modes @=@ dnet:access_modes @=@ UNKNOWN @=@ unspecified
 dnet:result_typologies @=@ dnet:result_typologies @=@ dataset @=@ dataset
 dnet:result_typologies @=@ dnet:result_typologies @=@ other @=@ other
 dnet:result_typologies @=@ dnet:result_typologies @=@ publication @=@ publication
@@ -1069,12 +1069,15 @@ dnet:protocols @=@ dnet:protocols @=@ OpenDAP @=@ OpenDAP
 dnet:protocols @=@ dnet:protocols @=@ schemaorg @=@ Schema.org
 dnet:protocols @=@ dnet:protocols @=@ UNKNOWN @=@ UNKNOWN
 dnet:protocols @=@ dnet:protocols @=@ api @=@ api
+dnet:protocols @=@ dnet:protocols @=@ czechProjects @=@ czechProjects
 dnet:protocols @=@ dnet:protocols @=@ dataciteESPlugin @=@ dataciteESPlugin
 dnet:protocols @=@ dnet:protocols @=@ datasetsbyjournal @=@ datasetsbyjournal
 dnet:protocols @=@ dnet:protocols @=@ datasetsbyproject @=@ datasetsbyproject
+dnet:protocols @=@ dnet:protocols @=@ dblp @=@ dblp
 dnet:protocols @=@ dnet:protocols @=@ doi_resolver @=@ doi_resolver
 dnet:protocols @=@ dnet:protocols @=@ eosc_services @=@ eosc_services
 dnet:protocols @=@ dnet:protocols @=@ excelFile @=@ excelFile
+dnet:protocols @=@ dnet:protocols @=@ fairsharing @=@ fairsharing
 dnet:protocols @=@ dnet:protocols @=@ file @=@ file
 dnet:protocols @=@ dnet:protocols @=@ fileCSV @=@ fileCSV
 dnet:protocols @=@ dnet:protocols @=@ fileGzip @=@ fileGzip
@@ -1091,9 +1094,12 @@ dnet:protocols @=@ dnet:protocols @=@ httpList @=@ httpList
 dnet:protocols @=@ dnet:protocols @=@ jdbc @=@ jdbc
 dnet:protocols @=@ dnet:protocols @=@ oai @=@ oai
 dnet:protocols @=@ dnet:protocols @=@ oai_sets @=@ oai_sets
+dnet:protocols @=@ dnet:protocols @=@ omicsdi @=@ omicsdi
+dnet:protocols @=@ dnet:protocols @=@ osfPreprints @=@ osfPreprints
 dnet:protocols @=@ dnet:protocols @=@ other @=@ other
 dnet:protocols @=@ dnet:protocols @=@ re3data @=@ re3data
 dnet:protocols @=@ dnet:protocols @=@ remoteMdstore @=@ remoteMdstore
+dnet:protocols @=@ dnet:protocols @=@ research_fi @=@ research_fi
 dnet:protocols @=@ dnet:protocols @=@ rest @=@ rest
 dnet:protocols @=@ dnet:protocols @=@ rest_json2xml @=@ rest_json2xml
 dnet:protocols @=@ dnet:protocols @=@ sftp @=@ sftp
@@ -1101,7 +1107,8 @@ dnet:protocols @=@ dnet:protocols @=@ soap @=@ soap
 dnet:protocols @=@ dnet:protocols @=@ sparql @=@ sparql
 dnet:protocols @=@ dnet:protocols @=@ sword @=@ sword
 dnet:protocols @=@ dnet:protocols @=@ targz @=@ targz
-dnet:protocols @=@ dnet:protocols @=@ fairsharing @=@ fairsharing
+dnet:protocols @=@ dnet:protocols @=@ zenodoDump @=@ zenodoDump
+dnet:protocols @=@ dnet:protocols @=@ croris @=@ croris
 ec:funding_typologies @=@ ec:funding_typologies @=@ ec:frameworkprogram @=@ frameworkprogram
 ec:funding_typologies @=@ ec:funding_typologies @=@ ec:program @=@ program
 ec:funding_typologies @=@ ec:funding_typologies @=@ ec:specificprogram @=@ specificprogram
@@ -1172,6 +1179,7 @@ dnet:publication_resource @=@ dnet:publication_resource @=@ 0036 @=@ Project pro
 dnet:publication_resource @=@ dnet:publication_resource @=@ 0047 @=@ Protein
 dnet:publication_resource @=@ dnet:publication_resource @=@ 0017 @=@ Report
 dnet:publication_resource @=@ dnet:publication_resource @=@ 0014 @=@ Research
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0049 @=@ Research Activity
 dnet:publication_resource @=@ dnet:publication_resource @=@ 0048 @=@ Research Object
 dnet:publication_resource @=@ dnet:publication_resource @=@ 0015 @=@ Review
 dnet:publication_resource @=@ dnet:publication_resource @=@ 0029 @=@ Software
@@ -1182,24 +1190,31 @@ dnet:publication_resource @=@ dnet:publication_resource @=@ 0000 @=@ UNKNOWN
 dnet:publication_resource @=@ dnet:publication_resource @=@ 0042 @=@ Virtual Appliance
 dnet:provenanceActions @=@ dnet:provenanceActions @=@ sysimport:crosswalk:cris @=@ Harvested
 dnet:provenanceActions @=@ dnet:provenanceActions @=@ sysimport:actionset:orcidworks-no-doi @=@ Harvested
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ openapc::transformativeagreement @=@ Harvested
 dnet:provenanceActions @=@ dnet:provenanceActions @=@ sysimport:crosswalk:infospace @=@ Harvested
 dnet:provenanceActions @=@ dnet:provenanceActions @=@ sysimport:crosswalk @=@ Harvested
 dnet:provenanceActions @=@ dnet:provenanceActions @=@ sysimport:crosswalk:aggregator @=@ Harvested
 dnet:provenanceActions @=@ dnet:provenanceActions @=@ sysimport:crosswalk:datasetarchive @=@ Harvested
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ sysimport:crosswalk:opencitations @=@ Harvested
 dnet:provenanceActions @=@ dnet:provenanceActions @=@ sysimport:actionset @=@ Harvested
 dnet:provenanceActions @=@ dnet:provenanceActions @=@ sysimport:crosswalk:entityregistry @=@ Harvested
 dnet:provenanceActions @=@ dnet:provenanceActions @=@ sysimport:crosswalk:repository @=@ Harvested
 dnet:provenanceActions @=@ dnet:provenanceActions @=@ sysimport:mining:aggregator @=@ Inferred by OpenAIRE
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ subject:fos @=@ Inferred by OpenAIRE
 dnet:provenanceActions @=@ dnet:provenanceActions @=@ community:subject @=@ Inferred by OpenAIRE
 dnet:provenanceActions @=@ dnet:provenanceActions @=@ community:zenodocommunity @=@ Inferred by OpenAIRE
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ project:organization:semrel @=@ Inferred by OpenAIRE
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ result:organization:semrel @=@ Inferred by OpenAIRE
 dnet:provenanceActions @=@ dnet:provenanceActions @=@ iis @=@ Inferred by OpenAIRE
 dnet:provenanceActions @=@ dnet:provenanceActions @=@ sysimport:mining:entityregistry @=@ Inferred by OpenAIRE
 dnet:provenanceActions @=@ dnet:provenanceActions @=@ community:organization @=@ Inferred by OpenAIRE
 dnet:provenanceActions @=@ dnet:provenanceActions @=@ sysimport:mining:infospace @=@ Inferred by OpenAIRE
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ subject:sdg @=@ Inferred by OpenAIRE
 dnet:provenanceActions @=@ dnet:provenanceActions @=@ sysimport:dedup @=@ Inferred by OpenAIRE
 dnet:provenanceActions @=@ dnet:provenanceActions @=@ community:datasource @=@ Inferred by OpenAIRE
 dnet:provenanceActions @=@ dnet:provenanceActions @=@ propagation:project:semrel @=@ Inferred by OpenAIRE
 dnet:provenanceActions @=@ dnet:provenanceActions @=@ pubsrepository::institutional @=@ Inferred by OpenAIRE
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ sysimport:crasswalk:webcrawl @=@ Inferred by OpenAIRE
 dnet:provenanceActions @=@ dnet:provenanceActions @=@ sysimport:mining:cris @=@ Inferred by OpenAIRE
 dnet:provenanceActions @=@ dnet:provenanceActions @=@ result:organization:instrepo @=@ Inferred by OpenAIRE
 dnet:provenanceActions @=@ dnet:provenanceActions @=@ result:community:organization @=@ Inferred by OpenAIRE
@@ -1209,13 +1224,14 @@ dnet:provenanceActions @=@ dnet:provenanceActions @=@ authorpid:result @=@ Infer
 dnet:provenanceActions @=@ dnet:provenanceActions @=@ country:instrepos @=@ Inferred by OpenAIRE
 dnet:provenanceActions @=@ dnet:provenanceActions @=@ community:semrel @=@ Inferred by OpenAIRE
 dnet:provenanceActions @=@ dnet:provenanceActions @=@ result:project:semrel @=@ Inferred by OpenAIRE
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ result:community:semrel @=@ Inferred by OpenAIRE
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ result:organization:openaireinference @=@ Inferred by OpenAIRE
 dnet:provenanceActions @=@ dnet:provenanceActions @=@ user:claim @=@ Linked by user
 dnet:provenanceActions @=@ dnet:provenanceActions @=@ user:claim:pid @=@ Linked by user
 dnet:provenanceActions @=@ dnet:provenanceActions @=@ user:insert @=@ Linked by user
 dnet:provenanceActions @=@ dnet:provenanceActions @=@ user:claim:search @=@ Linked by user
 dnet:provenanceActions @=@ dnet:provenanceActions @=@ UNKNOWN @=@ UNKNOWN
-dnet:provenanceActions @=@ dnet:provenanceActions @=@ result:community:semrel @=@ Inferred by OpenAIRE
-dnet:provenanceActions @=@ dnet:provenanceActions @=@ result:organization:semrel @=@ Inferred by OpenAIRE
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ community:advconstraint @=@ Inferred by OpenAIRE
 dnet:datasource_typologies @=@ dnet:datasource_typologies @=@ crissystem @=@ CRIS System
 dnet:datasource_typologies @=@ dnet:datasource_typologies @=@ datarepository::unknown @=@ Data Repository
 dnet:datasource_typologies @=@ dnet:datasource_typologies @=@ aggregator::datarepository @=@ Data Repository Aggregator
@@ -1250,6 +1266,32 @@ wt:funding_typologies @=@ Wellcome Trust: Funding Typologies @=@ wt:fundingStrea
 dnet:review_levels @=@ dnet:review_levels @=@ 0000 @=@ UNKNOWN
 dnet:review_levels @=@ dnet:review_levels @=@ 0002 @=@ nonPeerReviewed
 dnet:review_levels @=@ dnet:review_levels @=@ 0001 @=@ peerReviewed
+base:normalized_types @=@ base:normalized_types @=@ Text @=@ Text
+base:normalized_types @=@ base:normalized_types @=@ Book @=@ Book
+base:normalized_types @=@ base:normalized_types @=@ Book part @=@ Book part
+base:normalized_types @=@ base:normalized_types @=@ Journal/Newspaper @=@ Journal/Newspaper
+base:normalized_types @=@ base:normalized_types @=@ Article contribution @=@ Article contribution
+base:normalized_types @=@ base:normalized_types @=@ Other non-article @=@ Other non-article
+base:normalized_types @=@ base:normalized_types @=@ Conference object @=@ Conference object
+base:normalized_types @=@ base:normalized_types @=@ Report @=@ Report
+base:normalized_types @=@ base:normalized_types @=@ Review @=@ Review
+base:normalized_types @=@ base:normalized_types @=@ Course material @=@ Course material
+base:normalized_types @=@ base:normalized_types @=@ Lecture @=@ Lecture
+base:normalized_types @=@ base:normalized_types @=@ Thesis @=@ Thesis
+base:normalized_types @=@ base:normalized_types @=@ Bachelor's thesis @=@ Bachelor's thesis
+base:normalized_types @=@ base:normalized_types @=@ Master's thesis @=@ Master's thesis
+base:normalized_types @=@ base:normalized_types @=@ Doctoral and postdoctoral thesis @=@ Doctoral and postdoctoral thesis
+base:normalized_types @=@ base:normalized_types @=@ Manuscript @=@ Manuscript
+base:normalized_types @=@ base:normalized_types @=@ Patent @=@ Patent
+base:normalized_types @=@ base:normalized_types @=@ Musical notation @=@ Musical notation
+base:normalized_types @=@ base:normalized_types @=@ Map @=@ Map
+base:normalized_types @=@ base:normalized_types @=@ Audio @=@ Audio
+base:normalized_types @=@ base:normalized_types @=@ Image/Video @=@ Image/Video
+base:normalized_types @=@ base:normalized_types @=@ Still image @=@ Still image
+base:normalized_types @=@ base:normalized_types @=@ Moving image/Video @=@ Moving image/Video
+base:normalized_types @=@ base:normalized_types @=@ Software @=@ Software
+base:normalized_types @=@ base:normalized_types @=@ Dataset @=@ Dataset
+base:normalized_types @=@ base:normalized_types @=@ Unknown @=@ Unknown
 dnet:datasource_typologies_ui @=@ dnet:datasource_typologies_ui @=@ Aggregator @=@ Aggregator
 dnet:datasource_typologies_ui @=@ dnet:datasource_typologies_ui @=@ CRIS system @=@ CRIS system
 dnet:datasource_typologies_ui @=@ dnet:datasource_typologies_ui @=@ Catalogue @=@ Catalogue
@@ -1324,34 +1366,34 @@ ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-AG-LS @=@ HORIZON Lum
 ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-SGA-AG @=@ HORIZON Specific Grant
 ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-TMA-MSCA-PF-EF @=@ HORIZON TMA MSCA Postdoctoral Fellowships - European Fellowships
 ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-AG-UN @=@ HORIZON Unit Grant
-ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-COFUND\\HORIZON-AG @=@ HORIZON-COFUND\\HORIZON Action Grant Budget-Based
-ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-CSA\\HORIZON-AG @=@ HORIZON-CSA\\HORIZON Action Grant Budget-Based
-ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-CSA\\HORIZON-AG-LS @=@ HORIZON-CSA\\HORIZON Lump Sum Grant
-ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-CSA\\HORIZON-SGA-AG @=@ HORIZON-CSA\\HORIZON Specific Grant
-ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-EIC-ACC-BF\\HORIZON-AG @=@ HORIZON-EIC-ACC-BF\\HORIZON Action Grant Budget-Based
-ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-EIC\\HORIZON-AG @=@ HORIZON-EIC\\HORIZON Action Grant Budget-Based
-ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-EIT-KIC\\HORIZON-AG @=@ HORIZON-EIT-KIC\\HORIZON Action Grant Budget-based
-ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-ERC-POC\\HORIZON-AG-LS @=@ HORIZON-ERC-POC\\HORIZON Lump Sum Grant
-ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-ERC-SYG\\HORIZON-AG @=@ HORIZON-ERC-SYG\\HORIZON Action Grant Budget-Based
-ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-ERC\\HORIZON-AG @=@ HORIZON-ERC\\HORIZON Action Grant Budget-Based
-ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-FPA\\HORIZON-FPA-AG @=@ HORIZON-FPA\\HORIZON Framework Partnership
-ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-IA\\HORIZON-AG @=@ HORIZON-IA\\HORIZON Action Grant Budget-Based
-ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-JU-CSA\\HORIZON-AG @=@ HORIZON-JU-CSA\\HORIZON Action Grant Budget-Based
-ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-JU-IA\\HORIZON-AG @=@ HORIZON-JU-IA\\HORIZON Action Grant Budget-Based
-ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-JU-IA\\HORIZON-AG-LS @=@ HORIZON-JU-IA\\HORIZON Lump Sum Grant
-ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-JU-RIA\\HORIZON-AG @=@ HORIZON-JU-RIA\\HORIZON Action Grant Budget-Based
-ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-PCP\\HORIZON-AG @=@ HORIZON-PCP\\HORIZON Action Grant Budget-Based
-ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-PCP\\HORIZON-AG-LS @=@ HORIZON-PCP\\HORIZON Lump Sum Grant
-ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-RIA\\HORIZON-AG @=@ HORIZON-RIA\\HORIZON Action Grant Budget-Based
-ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-RIA\\HORIZON-SGA-AG @=@ HORIZON-RIA\\HORIZON Specific Grant
-ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-TMA-MSCA-Cofund-D\\HORIZON-AG-UN @=@ HORIZON-TMA-MSCA-Cofund-D\\HORIZON Unit Grant
-ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-TMA-MSCA-Cofund-P\\HORIZON-AG-UN @=@ HORIZON-TMA-MSCA-Cofund-P\\HORIZON Unit Grant
-ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-TMA-MSCA-DN-ID\\HORIZON-AG-UN @=@ HORIZON-TMA-MSCA-DN-ID\\HORIZON Unit Grant
-ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-TMA-MSCA-DN-JD\\HORIZON-AG-UN @=@ HORIZON-TMA-MSCA-DN-JD\\HORIZON Unit Grant
-ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-TMA-MSCA-DN\\HORIZON-AG-UN @=@ HORIZON-TMA-MSCA-DN\\HORIZON Unit Grant
-ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-TMA-MSCA-PF-EF\\HORIZON-AG-UN @=@ HORIZON-TMA-MSCA-PF-EF\\HORIZON Unit Grant
-ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-TMA-MSCA-PF-GF\\HORIZON-AG-UN @=@ HORIZON-TMA-MSCA-PF-GF\\HORIZON Unit Grant
-ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-TMA-MSCA-SE\\HORIZON-AG-UN @=@ HORIZON-TMA-MSCA-SE\\HORIZON Unit Grant
+ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-COFUND\HORIZON-AG @=@ HORIZON-COFUND\HORIZON Action Grant Budget-Based
+ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-CSA\HORIZON-AG @=@ HORIZON-CSA\HORIZON Action Grant Budget-Based
+ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-CSA\HORIZON-AG-LS @=@ HORIZON-CSA\HORIZON Lump Sum Grant
+ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-CSA\HORIZON-SGA-AG @=@ HORIZON-CSA\HORIZON Specific Grant
+ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-EIC-ACC-BF\HORIZON-AG @=@ HORIZON-EIC-ACC-BF\HORIZON Action Grant Budget-Based
+ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-EIC\HORIZON-AG @=@ HORIZON-EIC\HORIZON Action Grant Budget-Based
+ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-EIT-KIC\HORIZON-AG @=@ HORIZON-EIT-KIC\HORIZON Action Grant Budget-based
+ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-ERC-POC\HORIZON-AG-LS @=@ HORIZON-ERC-POC\HORIZON Lump Sum Grant
+ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-ERC-SYG\HORIZON-AG @=@ HORIZON-ERC-SYG\HORIZON Action Grant Budget-Based
+ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-ERC\HORIZON-AG @=@ HORIZON-ERC\HORIZON Action Grant Budget-Based
+ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-FPA\HORIZON-FPA-AG @=@ HORIZON-FPA\HORIZON Framework Partnership
+ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-IA\HORIZON-AG @=@ HORIZON-IA\HORIZON Action Grant Budget-Based
+ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-JU-CSA\HORIZON-AG @=@ HORIZON-JU-CSA\HORIZON Action Grant Budget-Based
+ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-JU-IA\HORIZON-AG @=@ HORIZON-JU-IA\HORIZON Action Grant Budget-Based
+ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-JU-IA\HORIZON-AG-LS @=@ HORIZON-JU-IA\HORIZON Lump Sum Grant
+ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-JU-RIA\HORIZON-AG @=@ HORIZON-JU-RIA\HORIZON Action Grant Budget-Based
+ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-PCP\HORIZON-AG @=@ HORIZON-PCP\HORIZON Action Grant Budget-Based
+ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-PCP\HORIZON-AG-LS @=@ HORIZON-PCP\HORIZON Lump Sum Grant
+ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-RIA\HORIZON-AG @=@ HORIZON-RIA\HORIZON Action Grant Budget-Based
+ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-RIA\HORIZON-SGA-AG @=@ HORIZON-RIA\HORIZON Specific Grant
+ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-TMA-MSCA-Cofund-D\HORIZON-AG-UN @=@ HORIZON-TMA-MSCA-Cofund-D\HORIZON Unit Grant
+ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-TMA-MSCA-Cofund-P\HORIZON-AG-UN @=@ HORIZON-TMA-MSCA-Cofund-P\HORIZON Unit Grant
+ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-TMA-MSCA-DN-ID\HORIZON-AG-UN @=@ HORIZON-TMA-MSCA-DN-ID\HORIZON Unit Grant
+ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-TMA-MSCA-DN-JD\HORIZON-AG-UN @=@ HORIZON-TMA-MSCA-DN-JD\HORIZON Unit Grant
+ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-TMA-MSCA-DN\HORIZON-AG-UN @=@ HORIZON-TMA-MSCA-DN\HORIZON Unit Grant
+ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-TMA-MSCA-PF-EF\HORIZON-AG-UN @=@ HORIZON-TMA-MSCA-PF-EF\HORIZON Unit Grant
+ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-TMA-MSCA-PF-GF\HORIZON-AG-UN @=@ HORIZON-TMA-MSCA-PF-GF\HORIZON Unit Grant
+ec:hetoas @=@ Horizon Europe - Type of Actions @=@ HORIZON-TMA-MSCA-SE\HORIZON-AG-UN @=@ HORIZON-TMA-MSCA-SE\HORIZON Unit Grant
 ec:hetoas @=@ Horizon Europe - Type of Actions @=@ MSCA-PF @=@ MSCA Postdoctoral Fellowships
 dnet:eosc_datasource_types @=@ dnet:eosc_datasource_types @=@ Aggregator @=@ Aggregator
 dnet:eosc_datasource_types @=@ dnet:eosc_datasource_types @=@ CRIS system @=@ CRIS System
@@ -1609,52 +1651,52 @@ dnet:fos @=@ Fields of Science @=@ 060401 art practice, history & theory @=@ 060
 dnet:fos @=@ Fields of Science @=@ 060402 drama & theater @=@ 060402 drama & theater
 dnet:fos @=@ Fields of Science @=@ 060403 folklore @=@ 060403 folklore
 dnet:fos @=@ Fields of Science @=@ 060404 music @=@ 060404 music
-dnet:licenses @=@ dnet:licenses @=@ rioxx Under Embargo All Rights Reserved @=@ rioxx Under Embargo All Rights Reserved
-dnet:licenses @=@ dnet:licenses @=@ \"In Copyright\" Rights Statement @=@ \"In Copyright\" Rights Statement
+dnet:licenses @=@ dnet:licenses @=@ "In Copyright" Rights Statement @=@ "In Copyright" Rights Statement
+dnet:licenses @=@ dnet:licenses @=@ ACM Copyright Policies @=@ ACM Copyright Policies
+dnet:licenses @=@ dnet:licenses @=@ APS Licenses for Journal Article Re-use @=@ APS Licenses for Journal Article Re-use
+dnet:licenses @=@ dnet:licenses @=@ ASM Journals Non-Commercial TDM @=@ ASM Journals Non-Commercial TDM
+dnet:licenses @=@ dnet:licenses @=@ ASME Site License Agreemen @=@ ASME Site License Agreemen
+dnet:licenses @=@ dnet:licenses @=@ CC 0 @=@ CC 0
+dnet:licenses @=@ dnet:licenses @=@ CC BY @=@ CC BY
+dnet:licenses @=@ dnet:licenses @=@ CC BY NC @=@ CC BY NC
+dnet:licenses @=@ dnet:licenses @=@ CC BY NC ND @=@ CC BY NC ND
+dnet:licenses @=@ dnet:licenses @=@ CC BY NC SA @=@ CC BY NC SA
 dnet:licenses @=@ dnet:licenses @=@ CC BY ND @=@ CC BY ND
+dnet:licenses @=@ dnet:licenses @=@ CC BY ND SA @=@ CC BY ND SA
+dnet:licenses @=@ dnet:licenses @=@ CC BY SA @=@ CC BY SA
+dnet:licenses @=@ dnet:licenses @=@ CSP TDM @=@ CSP TDM
+dnet:licenses @=@ dnet:licenses @=@ Cambridge Core User Agreement @=@ Cambridge Core User Agreement
+dnet:licenses @=@ dnet:licenses @=@ EDP Sciences Copyright and Publication Licensing Policy @=@ EDP Sciences Copyright and Publication Licensing Policy
+dnet:licenses @=@ dnet:licenses @=@ EUP TDM @=@ EUP TDM
+dnet:licenses @=@ dnet:licenses @=@ Elsevier Non-Commercial  @=@ Elsevier Non-Commercial
+dnet:licenses @=@ dnet:licenses @=@ Elsevier TDM @=@ Elsevier TDM
 dnet:licenses @=@ dnet:licenses @=@ Emerald Insight Site Policies @=@ Emerald Insight Site Policies
-dnet:licenses @=@ dnet:licenses @=@ Springer TDM @=@ Springer TDM
+dnet:licenses @=@ dnet:licenses @=@ Emerald Insight TDM @=@ Emerald Insight TDM
+dnet:licenses @=@ dnet:licenses @=@ IEEE Copyright @=@ IEEE Copyright
+dnet:licenses @=@ dnet:licenses @=@ IEEE Open Access   @=@ IEEE Open Access
+dnet:licenses @=@ dnet:licenses @=@ IOP Copyright Policies @=@ IOP Copyright Policies
+dnet:licenses @=@ dnet:licenses @=@ IOP TDM @=@ IOP TDM
+dnet:licenses @=@ dnet:licenses @=@ IUCr Copyright and Licensing Policy @=@ IUCr Copyright and Licensing Policy
+dnet:licenses @=@ dnet:licenses @=@ Mary Ann Liebert TDM @=@ Mary Ann Liebert TDM
+dnet:licenses @=@ dnet:licenses @=@ OUP Standard Publication Reuse @=@ OUP Standard Publication Reuse
+dnet:licenses @=@ dnet:licenses @=@ OUP Standard Publication Reuse  @=@ OUP Standard Publication Reuse
+dnet:licenses @=@ dnet:licenses @=@ OUP Terms of Use and Content Access Policy @=@ OUP Terms of Use and Content Access Policy
+dnet:licenses @=@ dnet:licenses @=@ PDM @=@ PDM
+dnet:licenses @=@ dnet:licenses @=@ Royal Society Data Sharing and Accessibility @=@ Royal Society Data Sharing and Accessibility
 dnet:licenses @=@ dnet:licenses @=@ Royal Society of Chemistry Licence to Publish @=@ Royal Society of Chemistry Licence to Publish
 dnet:licenses @=@ dnet:licenses @=@ SAGE TDM @=@ SAGE TDM
-dnet:licenses @=@ dnet:licenses @=@ EUP TDM @=@ EUP TDM
-dnet:licenses @=@ dnet:licenses @=@ Trans Tech Publications Copyright and Content Usage Policy @=@ Trans Tech Publications Copyright and Content Usage Policy
-dnet:licenses @=@ dnet:licenses @=@ Standard ACS AuthorChoice/Editors’ Choice Usage Agreement @=@ Standard ACS AuthorChoice/Editors’ Choice Usage Agreement
-dnet:licenses @=@ dnet:licenses @=@ ASM Journals Non-Commercial TDM @=@ ASM Journals Non-Commercial TDM
-dnet:licenses @=@ dnet:licenses @=@ Springer Nature TDM @=@ Springer Nature TDM
-dnet:licenses @=@ dnet:licenses @=@ OUP Terms of Use and Content Access Policy @=@ OUP Terms of Use and Content Access Policy
-dnet:licenses @=@ dnet:licenses @=@ arXiv Non-Exclusive Distribution @=@ arXiv Non-Exclusive Distribution
-dnet:licenses @=@ dnet:licenses @=@ Mary Ann Liebert TDM @=@ Mary Ann Liebert TDM
-dnet:licenses @=@ dnet:licenses @=@ EDP Sciences Copyright and Publication Licensing Policy @=@ EDP Sciences Copyright and Publication Licensing Policy
-dnet:licenses @=@ dnet:licenses @=@ CC BY NC @=@ CC BY NC
-dnet:licenses @=@ dnet:licenses @=@ APS Licenses for Journal Article Re-use @=@ APS Licenses for Journal Article Re-use
 dnet:licenses @=@ dnet:licenses @=@ STM Policy #2 @=@ STM Policy #2
-dnet:licenses @=@ dnet:licenses @=@ IEEE Open Access   @=@ IEEE Open Access  
-dnet:licenses @=@ dnet:licenses @=@ CC BY SA @=@ CC BY SA
-dnet:licenses @=@ dnet:licenses @=@ CC BY NC SA @=@ CC BY NC SA
-dnet:licenses @=@ dnet:licenses @=@ IEEE Copyright @=@ IEEE Copyright
-dnet:licenses @=@ dnet:licenses @=@ Cambridge Core User Agreement @=@ Cambridge Core User Agreement
-dnet:licenses @=@ dnet:licenses @=@ Emerald Insight TDM @=@ Emerald Insight TDM
-dnet:licenses @=@ dnet:licenses @=@ CC 0 @=@ CC 0
-dnet:licenses @=@ dnet:licenses @=@ ASME Site License Agreemen @=@ ASME Site License Agreemen
 dnet:licenses @=@ dnet:licenses @=@ STM Policy #29 @=@ STM Policy #29
+dnet:licenses @=@ dnet:licenses @=@ Springer Nature TDM @=@ Springer Nature TDM
+dnet:licenses @=@ dnet:licenses @=@ Springer TDM @=@ Springer TDM
+dnet:licenses @=@ dnet:licenses @=@ Standard ACS AuthorChoice/Editors’ Choice Usage Agreement @=@ Standard ACS AuthorChoice/Editors’ Choice Usage Agreement
+dnet:licenses @=@ dnet:licenses @=@ Trans Tech Publications Copyright and Content Usage Policy @=@ Trans Tech Publications Copyright and Content Usage Policy
 dnet:licenses @=@ dnet:licenses @=@ University of Nottingham Institutional Repository End-User @=@ University of Nottingham Institutional Repository End-User
-dnet:licenses @=@ dnet:licenses @=@ ACM Copyright Policies @=@ ACM Copyright Policies
-dnet:licenses @=@ dnet:licenses @=@ CC BY NC ND @=@ CC BY NC ND
-dnet:licenses @=@ dnet:licenses @=@ Elsevier Non-Commercial  @=@ Elsevier Non-Commercial 
-dnet:licenses @=@ dnet:licenses @=@ CSP TDM @=@ CSP TDM
-dnet:licenses @=@ dnet:licenses @=@ CC BY ND SA @=@ CC BY ND SA
-dnet:licenses @=@ dnet:licenses @=@ Elsevier TDM @=@ Elsevier TDM
-dnet:licenses @=@ dnet:licenses @=@ OUP Standard Publication Reuse  @=@ OUP Standard Publication Reuse 
-dnet:licenses @=@ dnet:licenses @=@ CC BY @=@ CC BY
-dnet:licenses @=@ dnet:licenses @=@ IUCr Copyright and Licensing Policy @=@ IUCr Copyright and Licensing Policy
-dnet:licenses @=@ dnet:licenses @=@ PDM @=@ PDM
-dnet:licenses @=@ dnet:licenses @=@ Wiley TDM @=@ Wiley TDM
-dnet:licenses @=@ dnet:licenses @=@ OUP Standard Publication Reuse @=@ OUP Standard Publication Reuse
-dnet:licenses @=@ dnet:licenses @=@ IOP Copyright Policies @=@ IOP Copyright Policies
-dnet:licenses @=@ dnet:licenses @=@ rioxx All Rights Reserved @=@ rioxx All Rights Reserved
-dnet:licenses @=@ dnet:licenses @=@ IOP TDM @=@ IOP TDM
-dnet:licenses @=@ dnet:licenses @=@ Royal Society Data Sharing and Accessibility @=@ Royal Society Data Sharing and Accessibility
 dnet:licenses @=@ dnet:licenses @=@ Wiley Online Library User Agreement @=@ Wiley Online Library User Agreement
+dnet:licenses @=@ dnet:licenses @=@ Wiley TDM @=@ Wiley TDM
+dnet:licenses @=@ dnet:licenses @=@ arXiv Non-Exclusive Distribution @=@ arXiv Non-Exclusive Distribution
+dnet:licenses @=@ dnet:licenses @=@ rioxx All Rights Reserved @=@ rioxx All Rights Reserved
+dnet:licenses @=@ dnet:licenses @=@ rioxx Under Embargo All Rights Reserved @=@ rioxx Under Embargo All Rights Reserved
 dnet:publishers @=@ dnet:publishers @=@ Higher educational institution, Podillia State University @=@ Higher educational institution, Podillia State University
 dnet:publishers @=@ dnet:publishers @=@ Informa UK Limited @=@ Informa UK Limited
 dnet:publishers @=@ dnet:publishers @=@ International Journal of Management Economics and Business @=@ International Journal of Management Economics and Business
@@ -2220,7 +2262,7 @@ dnet:publishers @=@ dnet:publishers @=@ Corvinus University of Budapest @=@ Corv
 dnet:publishers @=@ dnet:publishers @=@ American Society of Animal Science (ASAS) @=@ American Society of Animal Science (ASAS)
 dnet:publishers @=@ dnet:publishers @=@ Portland Press Ltd. @=@ Portland Press Ltd.
 dnet:publishers @=@ dnet:publishers @=@ Universidad Nacional del Centro de la Provincia de Buenos Aires @=@ Universidad Nacional del Centro de la Provincia de Buenos Aires
-dnet:publishers @=@ dnet:publishers @=@ \\Sofia University \\\\St. Kliment Ohridski\\\\\\ @=@ \\Sofia University \\\\St. Kliment Ohridski\\\\\\
+dnet:publishers @=@ dnet:publishers @=@ \Sofia University \\St. Kliment Ohridski\\\ @=@ \Sofia University \\St. Kliment Ohridski\\\
 dnet:publishers @=@ dnet:publishers @=@ The Korean Society of Electrolyte Metabolism @=@ The Korean Society of Electrolyte Metabolism
 dnet:publishers @=@ dnet:publishers @=@ The Institute of Oriental Studies, National Academy of Sciences of the Republic of Armenia @=@ The Institute of Oriental Studies, National Academy of Sciences of the Republic of Armenia
 dnet:publishers @=@ dnet:publishers @=@ Universidad Juan Agustín Maza @=@ Universidad Juan Agustín Maza
@@ -2896,4 +2938,4 @@ openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http
 openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_12ce @=@ video
 openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_7ad9 @=@ website
 openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_393c @=@ workflow
-openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_8042 @=@ working pape
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_8042 @=@ working paper

@@ -389,6 +389,11 @@ case object Crossref2Oaf {
       )
     result.setTitle((mainTitles ::: originalTitles ::: shortTitles ::: subtitles).asJava)
 
+    // LANGUAGE
+    val language = (json \ "language").extractOrElse[String](null)
+    if (language != null)
+      result.setLanguage(qualifier(language, language, ModelConstants.DNET_LANGUAGES, ModelConstants.DNET_LANGUAGES))
+
     // DESCRIPTION
     val descriptionList =
       for { JString(description) <- json \ "abstract" } yield field[String](description, null)
@@ -452,7 +457,7 @@ case object Crossref2Oaf {
 
     if (subjectList.nonEmpty) {
       result.setSubject(
-        subjectList.map(s => subject(s, ModelConstants.SUBTITLE_QUALIFIER, null)).asJava
+        subjectList.map(s => subject(s, qualifier("keyword", "keyword", ModelConstants.DNET_SUBJECT_TYPOLOGIES, ModelConstants.DNET_SUBJECT_TYPOLOGIES), null)).asJava
       )
     }
 
@@ -955,7 +960,6 @@ case object Crossref2Oaf {
             //ERASMUS+
             case "10.13039/501100010790" =>
               generateSimpleRelationFromAward(funder, "erasmusplus_", a => a)
-            case _ => logger.debug("no match for " + funder.DOI.get)
             //Add for Danish funders
             //Independent Research Fund Denmark (IRFD)
             case "10.13039/501100004836" =>

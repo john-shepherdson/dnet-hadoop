@@ -2,7 +2,13 @@
 	{
 		"paramName": "g",
 		"paramLongName": "graphPath",
-		"paramDescription": "the path where there the graph is stored",
+		"paramDescription": "the path where the graph is stored",
+		"paramRequired": true
+	},
+	{
+		"paramName": "r",
+		"paramLongName": "rawRelsPath",
+		"paramDescription": "the path where raw relations are stored",
 		"paramRequired": true
 	},
 	{

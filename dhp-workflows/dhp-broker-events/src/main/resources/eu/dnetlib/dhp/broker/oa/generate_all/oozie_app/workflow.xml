@@ -6,6 +6,10 @@
             <description>the path where the graph is stored</description>
         </property>
         <property>
+            <name>rawRelsInputPath</name>
+            <description>the path where the raw relations are stored</description>
+        </property>
+        <property>
             <name>outputDir</name>
             <description>the path where the generated data will be stored</description>
         </property>
@@ -42,26 +46,6 @@
             <description>the elasticsearch host</description>
         </property>
         <property>
-            <name>esBatchWriteRetryCount</name>
-            <value>8</value>
-            <description>an ES configuration property</description>
-        </property>
-		<property>
-            <name>esBatchWriteRetryWait</name>
-            <value>60s</value>
-            <description>an ES configuration property</description>
-        </property>
-		<property>
-            <name>esBatchSizeEntries</name>
-            <value>200</value>
-            <description>an ES configuration property</description>
-        </property>
-		<property>
-            <name>esNodesWanOnly</name>
-            <value>true</value>
-            <description>an ES configuration property</description>
-        </property>
-        <property>
         	<name>maxIndexedEventsForDsAndTopic</name>
         	<description>the max number of events for each couple (ds/topic)</description>
         </property>
@@ -81,44 +65,22 @@
         	<name>brokerDbPassword</name>
         	<description>the password of the broker database</description>
         </property>
+
+        <!-- General oozie workflow properties -->
         <property>
-            <name>sparkDriverMemory</name>
-            <description>memory for driver process</description>
+            <name>sparkClusterOpts</name>
+            <value>--conf spark.extraListeners= --conf spark.sql.queryExecutionListeners= --conf spark.yarn.historyServer.address=http://iis-cdh5-test-gw.ocean.icm.edu.pl:18089 --conf spark.eventLog.dir=hdfs://nameservice1/user/spark/spark2ApplicationHistory --conf spark.executorEnv.JAVA_HOME=/srv/java/openjdk-17 --conf spark.yarn.appMasterEnv.JAVA_HOME=/srv/java/openjdk-17 --conf spark.sql.warehouse.dir=/user/hive/warehouse --conf spark.eventLog.compression.codec=lz4 --conf spark.shuffle.mapStatus.compression.codec=lz4 --conf spark.shuffle.useOldFetchProtocol=true --conf spark.eventLog.enabled=true</value>
+            <description>spark cluster-wide options</description>
         </property>
         <property>
-            <name>sparkExecutorMemory</name>
-            <description>memory for individual executor</description>
+            <name>sparkResourceOpts</name>
+            <value>--executor-memory=8G --conf spark.executor.memoryOverhead=4G --executor-cores=6 --driver-memory=9G --driver-cores=4 --conf spark.default.parallelism=3840 --conf spark.sql.shuffle.partitions=7680 --conf spark.sql.files.maxPartitionBytes=33554432 --conf spark.sql.adaptive.advisoryPartitionSizeInBytes=32m --conf spark.sql.adaptive.coalescePartitions.parallelismFirst=false --conf spark.sql.adaptive.forceOptimizeSkewedJoin=true --conf spark.sql.adaptive.skewJoin.skewedPartitionThresholdInBytes=64m --conf spark.sql.adaptive.skewJoin.skewedPartitionFactor=3.0 --conf spark.executor.extraJavaOptions="-XX:MaxDirectMemorySize=4g"</value>
+            <description>spark resource options</description>
         </property>
         <property>
-            <name>sparkExecutorCores</name>
-            <description>number of cores used by single executor</description>
-        </property>
-        <property>
-            <name>oozieActionShareLibForSpark2</name>
-            <description>oozie action sharelib for spark 2.*</description>
-        </property>
-        <property>
-            <name>spark2ExtraListeners</name>
-            <value>com.cloudera.spark.lineage.NavigatorAppListener</value>
-            <description>spark 2.* extra listeners classname</description>
-        </property>
-        <property>
-            <name>spark2SqlQueryExecutionListeners</name>
-            <value>com.cloudera.spark.lineage.NavigatorQueryListener</value>
-            <description>spark 2.* sql query execution listeners classname</description>
-        </property>
-        <property>
-            <name>spark2YarnHistoryServerAddress</name>
-            <description>spark 2.* yarn history server address</description>
-        </property>
-        <property>
-            <name>spark2EventLogDir</name>
-            <description>spark 2.* event log dir location</description>
-        </property>
-        <property>
-        	<name>sparkMaxExecutorsForIndexing</name>
-        	<value>8</value>
-        	<description>Max number of workers for ElasticSearch indexing</description>
+            <name>sparkApplicationOpts</name>
+            <value>--conf spark.sql.shuffle.partitions=7680</value>
+            <description>spark resource options</description>
         </property>
     </parameters>
 
@@ -133,10 +95,6 @@
             <property>
                 <name>oozie.launcher.mapred.job.queue.name</name>
                 <value>${oozieLauncherQueueName}</value>
-            </property>
-            <property>
-                <name>oozie.action.sharelib.for.spark</name>
-                <value>${oozieActionShareLibForSpark2}</value>
             </property>
         </configuration>
     </global>
@@ -182,17 +140,12 @@
             <class>eu.dnetlib.dhp.broker.oa.PrepareSimpleEntitiesJob</class>
             <jar>dhp-broker-events-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=5000
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--rawRelsPath</arg><arg>${rawRelsInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="wait_entities_and_rels"/>
@@ -207,17 +160,12 @@
             <class>eu.dnetlib.dhp.broker.oa.PrepareRelatedDatasourcesJob</class>
             <jar>dhp-broker-events-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=8000
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--rawRelsPath</arg><arg>${rawRelsInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="wait_entities_and_rels"/>
@@ -233,17 +181,12 @@
             <class>eu.dnetlib.dhp.broker.oa.PrepareRelatedDatasetsJob</class>
             <jar>dhp-broker-events-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=8000
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--rawRelsPath</arg><arg>${rawRelsInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="wait_entities_and_rels"/>
@@ -258,17 +201,12 @@
             <class>eu.dnetlib.dhp.broker.oa.PrepareRelatedProjectsJob</class>
             <jar>dhp-broker-events-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=5000
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--rawRelsPath</arg><arg>${rawRelsInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="wait_entities_and_rels"/>
@@ -283,17 +221,12 @@
             <class>eu.dnetlib.dhp.broker.oa.PrepareRelatedPublicationsJob</class>
             <jar>dhp-broker-events-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=10000
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--rawRelsPath</arg><arg>${rawRelsInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="wait_entities_and_rels"/>
@@ -308,17 +241,12 @@
             <class>eu.dnetlib.dhp.broker.oa.PrepareRelatedSoftwaresJob</class>
             <jar>dhp-broker-events-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=2000
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--rawRelsPath</arg><arg>${rawRelsInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="wait_entities_and_rels"/>
@@ -335,17 +263,12 @@
             <class>eu.dnetlib.dhp.broker.oa.JoinStep0Job</class>
             <jar>dhp-broker-events-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=8000
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--rawRelsPath</arg><arg>${rawRelsInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="join_entities_step1"/>
@@ -360,17 +283,12 @@
             <class>eu.dnetlib.dhp.broker.oa.JoinStep1Job</class>
             <jar>dhp-broker-events-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=8000
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--rawRelsPath</arg><arg>${rawRelsInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="join_entities_step2"/>
@@ -385,17 +303,12 @@
             <class>eu.dnetlib.dhp.broker.oa.JoinStep2Job</class>
             <jar>dhp-broker-events-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=8000
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--rawRelsPath</arg><arg>${rawRelsInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="join_entities_step3"/>
@@ -410,17 +323,12 @@
             <class>eu.dnetlib.dhp.broker.oa.JoinStep3Job</class>
             <jar>dhp-broker-events-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=8000
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--rawRelsPath</arg><arg>${rawRelsInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="join_entities_step4"/>
@@ -435,17 +343,12 @@
             <class>eu.dnetlib.dhp.broker.oa.JoinStep4Job</class>
             <jar>dhp-broker-events-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=8000
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--rawRelsPath</arg><arg>${rawRelsInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="prepare_groups"/>
@@ -460,17 +363,12 @@
             <class>eu.dnetlib.dhp.broker.oa.PrepareGroupsJob</class>
             <jar>dhp-broker-events-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=8000
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--rawRelsPath</arg><arg>${rawRelsInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="generate_events"/>
@@ -485,15 +383,9 @@
             <class>eu.dnetlib.dhp.broker.oa.GenerateEventsJob</class>
             <jar>dhp-broker-events-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=8000
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
             </spark-opts>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
             <arg>--outputDir</arg><arg>${outputDir}</arg>
@@ -502,10 +394,29 @@
 			<arg>--datasourceIdBlacklist</arg><arg>${datasourceIdBlacklist}</arg>
 			<arg>--topicWhitelist</arg><arg>${topicWhitelist}</arg>
         </spark>
-        <ok to="index_event_subset"/>
+        <ok to="generate_event_subset"/>
         <error to="Kill"/>
     </action>
     
+     <action name="generate_event_subset">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>GenerateEventSubsetJob</name>
+            <class>eu.dnetlib.dhp.broker.oa.GenerateEventSubsetJob</class>
+            <jar>dhp-broker-events-${projectVersion}.jar</jar>
+            <spark-opts>
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
+            </spark-opts>
+            <arg>--outputDir</arg><arg>${outputDir}</arg>
+            <arg>--maxEventsForTopic</arg><arg>${maxIndexedEventsForDsAndTopic}</arg>
+        </spark>
+        <ok to="index_event_subset"/>
+        <error to="Kill"/>
+    </action>
+
      <action name="index_event_subset">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
@@ -514,25 +425,13 @@
             <class>eu.dnetlib.dhp.broker.oa.IndexEventSubsetJob</class>
             <jar>dhp-broker-events-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
-                --conf spark.dynamicAllocation.maxExecutors=${sparkMaxExecutorsForIndexing} 
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
             </spark-opts>
             <arg>--outputDir</arg><arg>${outputDir}</arg>
             <arg>--index</arg><arg>${esEventIndexName}</arg>
             <arg>--esHost</arg><arg>${esIndexHost}</arg>
-            <arg>--esBatchWriteRetryCount</arg><arg>${esBatchWriteRetryCount}</arg>
-            <arg>--esBatchWriteRetryWait</arg><arg>${esBatchWriteRetryWait}</arg>
-            <arg>--esBatchSizeEntries</arg><arg>${esBatchSizeEntries}</arg>
-            <arg>--esNodesWanOnly</arg><arg>${esNodesWanOnly}</arg>
-            <arg>--maxEventsForTopic</arg><arg>${maxIndexedEventsForDsAndTopic}</arg>
-            <arg>--brokerApiBaseUrl</arg><arg>${brokerApiBaseUrl}</arg>
         </spark>
         <ok to="stats"/>
         <error to="Kill"/>
@@ -546,15 +445,9 @@
             <class>eu.dnetlib.dhp.broker.oa.GenerateStatsJob</class>
             <jar>dhp-broker-events-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
             </spark-opts>
             <arg>--outputDir</arg><arg>${outputDir}</arg>
             <arg>--dbUrl</arg><arg>${brokerDbUrl}</arg>
@@ -574,15 +467,9 @@
             <class>eu.dnetlib.dhp.broker.oa.GenerateNotificationsJob</class>
             <jar>dhp-broker-events-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
             </spark-opts>
             <arg>--outputDir</arg><arg>${outputDir}</arg>
             <arg>--brokerApiBaseUrl</arg><arg>${brokerApiBaseUrl}</arg>
@@ -599,23 +486,13 @@
             <class>eu.dnetlib.dhp.broker.oa.IndexNotificationsJob</class>
             <jar>dhp-broker-events-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
-                --conf spark.dynamicAllocation.maxExecutors=${sparkMaxExecutorsForIndexing} 
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
             </spark-opts>
             <arg>--outputDir</arg><arg>${outputDir}</arg>
             <arg>--index</arg><arg>${esNotificationsIndexName}</arg>
             <arg>--esHost</arg><arg>${esIndexHost}</arg>
-            <arg>--esBatchWriteRetryCount</arg><arg>${esBatchWriteRetryCount}</arg>
-            <arg>--esBatchWriteRetryWait</arg><arg>${esBatchWriteRetryWait}</arg>
-            <arg>--esBatchSizeEntries</arg><arg>${esBatchSizeEntries}</arg>
-            <arg>--esNodesWanOnly</arg><arg>${esNodesWanOnly}</arg>
             <arg>--brokerApiBaseUrl</arg><arg>${brokerApiBaseUrl}</arg>
         </spark>
         <ok to="End"/>

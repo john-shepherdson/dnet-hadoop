@@ -22,12 +22,11 @@ import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
+import eu.dnetlib.dhp.utils.DHPUtils;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import eu.dnetlib.pace.config.DedupConfig;
-import scala.collection.JavaConversions;
-import scala.collection.JavaConverters;
 
 public class SparkCreateDedupRecord extends AbstractSparkAction {
 
@@ -99,7 +98,7 @@ public class SparkCreateDedupRecord extends AbstractSparkAction {
 				.read()
 				.load(mergeRelPath)
 				.where("relClass == 'merges'")
-				.join(dedupIds, JavaConversions.asScalaBuffer(Arrays.asList("source", "target")), "left_semi")
+				.join(dedupIds, DHPUtils.toSeq(Arrays.asList("source", "target")).toSeq(), "left_semi")
 				.write()
 				.mode(SaveMode.Overwrite)
 				.option("compression", "gzip")

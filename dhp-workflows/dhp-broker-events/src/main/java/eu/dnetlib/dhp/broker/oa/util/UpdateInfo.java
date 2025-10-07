@@ -1,6 +1,7 @@
 
 package eu.dnetlib.dhp.broker.oa.util;
 
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -89,6 +90,7 @@ public final class UpdateInfo<T> {
 			.stream()
 			.filter(ds -> ds.getRelType().equals(BrokerConstants.COLLECTED_FROM_REL))
 			.map(OaBrokerRelatedDatasource::getName)
+			.filter(Objects::nonNull)
 			.findFirst()
 			.orElse("");
 		final String provType = getSource()
@@ -96,6 +98,7 @@ public final class UpdateInfo<T> {
 			.stream()
 			.filter(ds -> ds.getRelType().equals(BrokerConstants.COLLECTED_FROM_REL))
 			.map(OaBrokerRelatedDatasource::getType)
+			.filter(Objects::nonNull)
 			.findFirst()
 			.orElse("");
 
@@ -103,6 +106,7 @@ public final class UpdateInfo<T> {
 			.getInstances()
 			.stream()
 			.map(OaBrokerInstance::getUrl)
+			.filter(Objects::nonNull)
 			.findFirst()
 			.orElse(null);
 

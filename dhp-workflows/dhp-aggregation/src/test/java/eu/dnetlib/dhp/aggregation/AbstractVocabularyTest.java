@@ -4,6 +4,7 @@ package eu.dnetlib.dhp.aggregation;
 import static org.mockito.Mockito.lenient;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -25,7 +26,6 @@ public abstract class AbstractVocabularyTest {
 
 	public void setUpVocabulary() throws ISLookUpException, IOException {
 		lenient().when(isLookUpService.quickSearchProfile(VocabularyGroup.VOCABULARIES_XQUERY)).thenReturn(vocs());
-
 		lenient()
 			.when(isLookUpService.quickSearchProfile(VocabularyGroup.VOCABULARY_SYNONYMS_XQUERY))
 			.thenReturn(synonyms());
@@ -37,7 +37,8 @@ public abstract class AbstractVocabularyTest {
 			.readLines(
 				Objects
 					.requireNonNull(
-						AbstractVocabularyTest.class.getResourceAsStream("/eu/dnetlib/dhp/transform/terms.txt")));
+						AbstractVocabularyTest.class.getResourceAsStream("/eu/dnetlib/dhp/transform/terms.txt")),
+                    Charset.defaultCharset());
 	}
 
 	private static List<String> synonyms() throws IOException {
@@ -45,7 +46,8 @@ public abstract class AbstractVocabularyTest {
 			.readLines(
 				Objects
 					.requireNonNull(
-						AbstractVocabularyTest.class.getResourceAsStream("/eu/dnetlib/dhp/transform/synonyms.txt")));
+						AbstractVocabularyTest.class.getResourceAsStream("/eu/dnetlib/dhp/transform/synonyms.txt")),
+                    Charset.defaultCharset());
 	}
 
 	protected void mockupTrasformationRule(final String trule, final String path) throws Exception {

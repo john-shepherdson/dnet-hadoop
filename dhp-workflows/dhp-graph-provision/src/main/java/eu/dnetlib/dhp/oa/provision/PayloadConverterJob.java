@@ -31,10 +31,8 @@ import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
 import eu.dnetlib.dhp.oa.provision.model.TupleWrapper;
 import eu.dnetlib.dhp.oa.provision.utils.ContextMapper;
 import eu.dnetlib.dhp.oa.provision.utils.XmlRecordFactory;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.solr.SolrRecord;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
@@ -119,7 +117,7 @@ public class PayloadConverterJob {
 
 		spark
 			.read()
-			.load(toSeq(paths))
+			.load(toSeq(paths).toSeq())
 			.as(Encoders.kryo(JoinedEntity.class))
 			.filter(
 				filterDeletedByInferenceFn())

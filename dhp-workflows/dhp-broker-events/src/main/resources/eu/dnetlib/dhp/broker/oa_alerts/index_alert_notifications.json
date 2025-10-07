@@ -1,0 +1,32 @@
+[
+	{
+		"paramName": "p",
+		"paramLongName": "provenance",
+		"paramDescription": "the infos about the provenance of the collected records",
+		"paramRequired": true
+	},
+	{
+		"paramName": "d",
+		"paramLongName": "path",
+		"paramDescription": "the dir that contains the notifications files",
+		"paramRequired": true
+	},
+	{
+		"paramName": "idx",
+		"paramLongName": "index",
+		"paramDescription": "the ES index",
+		"paramRequired": true
+	},
+	{
+		"paramName": "es",
+		"paramLongName": "esHost",
+		"paramDescription": "the ES host",
+		"paramRequired": true
+	},
+	{
+		"paramName": "broker",
+		"paramLongName": "brokerApiBaseUrl",
+		"paramDescription": "the url of the broker service api",
+		"paramRequired": true
+	}
+]

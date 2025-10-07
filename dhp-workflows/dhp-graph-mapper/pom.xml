@@ -33,13 +33,21 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <args>
+                    <!-- <args>
                         <arg>-Xmax-classfile-name</arg>
                         <arg>200</arg>
-                    </args>
+                    </args> -->
                     <failOnMultipleScalaVersions>true</failOnMultipleScalaVersions>
                     <scalaCompatVersion>${scala.binary.version}</scalaCompatVersion>
                     <scalaVersion>${scala.version}</scalaVersion>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>9</source>
+                    <target>9</target>
                 </configuration>
             </plugin>
         </plugins>
@@ -87,13 +95,11 @@
         <dependency>
             <groupId>eu.dnetlib.dhp</groupId>
             <artifactId>dhp-common</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>eu.dnetlib.dhp</groupId>
             <artifactId>dhp-pace-core</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>
@@ -131,7 +137,6 @@
             <artifactId>jsonschema-generator</artifactId>
             <scope>test</scope>
         </dependency>
-
 
     </dependencies>
 

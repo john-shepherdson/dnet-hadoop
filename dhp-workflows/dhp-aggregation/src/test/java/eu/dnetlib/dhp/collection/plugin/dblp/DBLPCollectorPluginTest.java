@@ -44,8 +44,8 @@ class DBLPCollectorPluginTest {
 	}
 
 	@Test
-	// @Disabled
-	public void testOne() throws Exception {
+	@Disabled
+	void testOne() throws Exception {
 		System.out.println("one publication");
 
 		final Iterator<String> iterator = this.plugin.collect(this.api, null).iterator();
@@ -59,8 +59,8 @@ class DBLPCollectorPluginTest {
 	}
 
 	@Test
-	// @Disabled
-	public void testCompleteHarvesting() throws Exception {
+	@Disabled
+	void testCompleteHarvesting() throws Exception {
 		System.out.println("testing complete harvesting");
 		final Iterator<String> iterator = this.plugin.collect(this.api, null).iterator();
 		int i = 0;
@@ -79,7 +79,7 @@ class DBLPCollectorPluginTest {
 
 	@Test
 	@Disabled
-	public void testExtractXPaths() throws Exception {
+    void testExtractXPaths() throws Exception {
 		System.out.println("testExtractXPaths");
 
 		final Set<String> set = new LinkedHashSet<>();

@@ -28,7 +28,6 @@ import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.oa.graph.raw.common.AbstractMigrationApplication;
 import eu.dnetlib.dhp.oa.graph.raw.common.MigrateAction;
 import eu.dnetlib.dhp.oa.graph.raw.common.VerifyNsPrefixPredicate;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Context;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
@@ -87,7 +86,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 		log.info("postgresPassword: xxx");
 
 		final String dbSchema = parser.get("dbschema");
-		log.info("dbSchema {}: " + dbSchema);
+		log.info("dbSchema {}: ", dbSchema);
 
 		final String isLookupUrl = parser.get("isLookupUrl");
 		log.info("isLookupUrl: {}", isLookupUrl);
