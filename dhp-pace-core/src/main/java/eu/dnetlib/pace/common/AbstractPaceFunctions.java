@@ -83,7 +83,7 @@ public class AbstractPaceFunctions extends PaceCommonUtils {
 	}
 
 	public static String countryInference(final String original, String inferFrom) {
-		if (!original.equalsIgnoreCase("unknown"))
+		if (!original.isEmpty() && !original.equalsIgnoreCase("unknown"))
 			return original;
 
 		inferFrom = cleanup(inferFrom);
