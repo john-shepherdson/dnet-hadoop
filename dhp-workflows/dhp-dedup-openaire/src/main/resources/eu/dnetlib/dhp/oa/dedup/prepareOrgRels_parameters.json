@@ -42,9 +42,15 @@
     "paramRequired": true
   },
   {
-    "paramName": "t",
-    "paramLongName": "dbTable",
-    "paramDescription": "the name of the table in the database",
+    "paramName": "tde",
+    "paramLongName": "dedupEventsTable",
+    "paramDescription": "the name of the dedup events table in the database",
+    "paramRequired": true
+  },
+  {
+    "paramName": "tpc",
+    "paramLongName": "parentChildTable",
+    "paramDescription": "the name of the parent/child table in the database",
     "paramRequired": true
   },
   {

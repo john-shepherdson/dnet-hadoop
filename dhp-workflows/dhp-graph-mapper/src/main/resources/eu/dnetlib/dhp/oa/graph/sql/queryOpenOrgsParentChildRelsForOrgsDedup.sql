@@ -10,4 +10,4 @@ SELECT
 	'OpenOrgs Database'                                            AS collectedfromname,
 	'sysimport:crosswalk:entityregistry@@@dnet:provenance_actions' AS provenanceaction
 FROM relationships
-WHERE reltype = 'IsChildOf' OR reltype = 'IsParentOf'
+WHERE (reltype = 'IsChildOf' OR reltype = 'IsParentOf') and status = 'approved'

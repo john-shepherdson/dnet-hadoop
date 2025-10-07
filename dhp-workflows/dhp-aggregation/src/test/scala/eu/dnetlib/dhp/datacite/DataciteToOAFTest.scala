@@ -72,9 +72,16 @@ class DataciteToOAFTest extends AbstractVocabularyTest {
 
     import spark.implicits._
 
-    val nativeSize = spark.read.load(path).count()
+    val nativeSize = spark.read.text(path).count()
 
-    assertEquals(100, nativeSize)
+    assertEquals(1502, nativeSize)
+
+    val relDs = spark.read.schema("source STRING, target STRING, relClass STRING").json(path)
+      .where("relClass IS NOT NULL")
+
+    relDs.show(false)
+
+
 
     val result: Dataset[String] =
       spark.read.text(targetPath).as[String].map(DataciteUtilityTest.convertToOAF)(Encoders.STRING)
