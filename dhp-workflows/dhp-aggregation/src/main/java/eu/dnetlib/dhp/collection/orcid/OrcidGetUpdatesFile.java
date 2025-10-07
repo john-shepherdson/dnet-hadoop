@@ -51,9 +51,6 @@ public class OrcidGetUpdatesFile {
 		final String namenode = parser.get("namenode");
 		log.info("got variable namenode: {}", namenode);
 
-		final String master = parser.get("master");
-		log.info("got variable master: {}", master);
-
 		final String targetPath = parser.get("targetPath");
 		log.info("got variable targetPath: {}", targetPath);
 
@@ -69,7 +66,6 @@ public class OrcidGetUpdatesFile {
 		final SparkSession spark = SparkSession
 			.builder()
 			.appName(OrcidGetUpdatesFile.class.getName())
-			.master(master)
 			.getOrCreate();
 
 		final String latestDate = spark

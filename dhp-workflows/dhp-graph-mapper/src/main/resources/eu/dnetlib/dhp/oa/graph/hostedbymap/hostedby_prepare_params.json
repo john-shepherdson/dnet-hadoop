@@ -25,7 +25,7 @@
     "paramName": "m",
     "paramLongName": "master",
     "paramDescription": "true if the spark session is managed, false otherwise",
-    "paramRequired": true
+    "paramRequired": false
   },
 
   {

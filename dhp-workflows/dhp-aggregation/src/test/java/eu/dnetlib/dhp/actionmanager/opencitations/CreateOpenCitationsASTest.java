@@ -6,15 +6,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
@@ -27,13 +25,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.PidCleaner;
 
-public class CreateOpenCitationsASTest {
+class CreateOpenCitationsASTest {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -44,7 +40,7 @@ public class CreateOpenCitationsASTest {
 		.getLogger(CreateOpenCitationsASTest.class);
 
 	@BeforeAll
-	public static void beforeAll() throws IOException {
+    static void beforeAll() throws IOException {
 		workingDir = Files
 			.createTempDirectory(CreateOpenCitationsASTest.class.getSimpleName());
 		log.info("using work dir {}", workingDir);
@@ -59,7 +55,7 @@ public class CreateOpenCitationsASTest {
 		conf.set("spark.sql.warehouse.dir", workingDir.toString());
 		conf.set("hive.metastore.warehouse.dir", workingDir.resolve("warehouse").toString());
 
-		spark = SparkSession
+        spark = SparkSession
 			.builder()
 			.appName(CreateOpenCitationsASTest.class.getSimpleName())
 			.config(conf)
@@ -67,7 +63,7 @@ public class CreateOpenCitationsASTest {
 	}
 
 	@AfterAll
-	public static void afterAll() throws IOException {
+	static void afterAll() throws IOException {
 		FileUtils.deleteDirectory(workingDir.toFile());
 		spark.stop();
 	}
@@ -83,15 +79,12 @@ public class CreateOpenCitationsASTest {
 		CreateActionSetSparkJob
 			.main(
 				new String[] {
-					"-isSparkSessionManaged",
-					Boolean.FALSE.toString(),
-					"-inputPath",
-					inputPath,
-					"-outputPath",
-					workingDir.toString() + "/actionSet1"
+					"--isSparkSessionManaged", Boolean.FALSE.toString(),
+					"--inputPath", inputPath,
+					"--outputPath", workingDir.toString() + "/actionSet1"
 				});
 
-		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<Relation> tmp = sc
 			.sequenceFile(workingDir.toString() + "/actionSet1", Text.class, Text.class)
@@ -110,28 +103,25 @@ public class CreateOpenCitationsASTest {
 
 		String inputPath = getClass()
 			.getResource(
-				"/eu/dnetlib/dhp/actionmanager/opencitations/COCI")
+				"/eu/dnetlib/dhp/actionmanager/opencitations/COCI/inputremap/jsonforas")
 			.getPath();
 
 		CreateActionSetSparkJob
 			.main(
 				new String[] {
-					"-isSparkSessionManaged",
-					Boolean.FALSE.toString(),
-					"-inputPath",
-					inputPath,
-					"-outputPath",
-					workingDir.toString() + "/actionSet2"
+					"--isSparkSessionManaged", Boolean.FALSE.toString(),
+					"--inputPath", inputPath,
+					"--outputPath", workingDir.toString() + "/actionSet2"
 				});
 
-		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<Relation> tmp = sc
 			.sequenceFile(workingDir.toString() + "/actionSet2", Text.class, Text.class)
 			.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
 			.map(aa -> ((Relation) aa.getPayload()));
 
-		assertEquals(23, tmp.count());
+		assertEquals(27, tmp.count());
 
 		// tmp.foreach(r -> System.out.println(OBJECT_MAPPER.writeValueAsString(r)));
 
@@ -148,12 +138,9 @@ public class CreateOpenCitationsASTest {
 		CreateActionSetSparkJob
 			.main(
 				new String[] {
-					"-isSparkSessionManaged",
-					Boolean.FALSE.toString(),
-					"-inputPath",
-					inputPath,
-					"-outputPath",
-					workingDir.toString() + "/actionSet3"
+					"--isSparkSessionManaged", Boolean.FALSE.toString(),
+					"--inputPath", inputPath,
+					"--outputPath", workingDir.toString() + "/actionSet3"
 				});
 
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
@@ -181,15 +168,12 @@ public class CreateOpenCitationsASTest {
 		CreateActionSetSparkJob
 			.main(
 				new String[] {
-					"-isSparkSessionManaged",
-					Boolean.FALSE.toString(),
-					"-inputPath",
-					inputPath,
-					"-outputPath",
-					workingDir.toString() + "/actionSet4"
+					"--isSparkSessionManaged", Boolean.FALSE.toString(),
+					"--inputPath", inputPath,
+					"--outputPath", workingDir.toString() + "/actionSet4"
 				});
 
-		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<Relation> tmp = sc
 			.sequenceFile(workingDir.toString() + "/actionSet4", Text.class, Text.class)
@@ -215,21 +199,18 @@ public class CreateOpenCitationsASTest {
 
 		String inputPath = getClass()
 			.getResource(
-				"/eu/dnetlib/dhp/actionmanager/opencitations/COCI")
+				"/eu/dnetlib/dhp/actionmanager/opencitations/COCI/inputremap/jsonforas")
 			.getPath();
 
 		CreateActionSetSparkJob
 			.main(
 				new String[] {
-					"-isSparkSessionManaged",
-					Boolean.FALSE.toString(),
-					"-inputPath",
-					inputPath,
-					"-outputPath",
-					workingDir.toString() + "/actionSet5"
+					"--isSparkSessionManaged", Boolean.FALSE.toString(),
+					"--inputPath", inputPath,
+					"--outputPath", workingDir.toString() + "/actionSet5"
 				});
 
-		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<Relation> tmp = sc
 			.sequenceFile(workingDir.toString() + "/actionSet5", Text.class, Text.class)
@@ -240,8 +221,10 @@ public class CreateOpenCitationsASTest {
 			assertEquals("citation", r.getSubRelType());
 			assertEquals("resultResult", r.getRelType());
 		});
-		assertEquals(23, tmp.filter(r -> r.getRelClass().equals("Cites")).count());
-		assertEquals(0, tmp.filter(r -> r.getRelClass().equals("IsCitedBy")).count());
+
+        List<Relation> citations = tmp.collect();
+		assertEquals(27, citations.stream().filter(r -> r.getRelClass().equals("Cites")).count());
+		assertEquals(0, citations.stream().filter(r -> r.getRelClass().equals("IsCitedBy")).count());
 
 	}
 
@@ -256,15 +239,12 @@ public class CreateOpenCitationsASTest {
 		CreateActionSetSparkJob
 			.main(
 				new String[] {
-					"-isSparkSessionManaged",
-					Boolean.FALSE.toString(),
-					"-inputPath",
-					inputPath,
-					"-outputPath",
-					workingDir.toString() + "/actionSet6"
+					"--isSparkSessionManaged", Boolean.FALSE.toString(),
+					"--inputPath", inputPath,
+					"--outputPath", workingDir.toString() + "/actionSet6"
 				});
 
-		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<Relation> tmp = sc
 			.sequenceFile(workingDir.toString() + "/actionSet6", Text.class, Text.class)
@@ -281,35 +261,22 @@ public class CreateOpenCitationsASTest {
 	@Test
 	void testRelationsSourceTargetCouple() throws Exception {
 		final String doi1 = "50|doi_________::"
-			+ IdentifierFactory.md5(PidCleaner.normalizePidValue("doi", "10.1007/s10854-015-3684-x"));
-		final String doi2 = "50|doi_________::"
-			+ IdentifierFactory.md5(PidCleaner.normalizePidValue("doi", "10.1111/j.1551-2916.2008.02408.x"));
-		final String doi3 = "50|doi_________::"
-			+ IdentifierFactory.md5(PidCleaner.normalizePidValue("doi", "10.1007/s10854-014-2114-9"));
-		final String doi4 = "50|doi_________::"
-			+ IdentifierFactory.md5(PidCleaner.normalizePidValue("doi", "10.1016/j.ceramint.2013.09.069"));
-		final String doi5 = "50|doi_________::"
-			+ IdentifierFactory.md5(PidCleaner.normalizePidValue("doi", "10.1007/s10854-009-9913-4"));
-		final String doi6 = "50|doi_________::"
-			+ IdentifierFactory.md5(PidCleaner.normalizePidValue("doi", "10.1016/0038-1098(72)90370-5"));
+			+ IdentifierFactory.md5(PidCleaner.normalizePidValue("doi", "10.1142/s0219887817501687"));
 
 		String inputPath = getClass()
 			.getResource(
-				"/eu/dnetlib/dhp/actionmanager/opencitations/COCI")
+				"/eu/dnetlib/dhp/actionmanager/opencitations/COCI/inputremap/jsonforas")
 			.getPath();
 
 		CreateActionSetSparkJob
 			.main(
 				new String[] {
-					"-isSparkSessionManaged",
-					Boolean.FALSE.toString(),
-					"-inputPath",
-					inputPath,
-					"-outputPath",
-					workingDir.toString() + "/actionSet7"
+					"--isSparkSessionManaged", Boolean.FALSE.toString(),
+					"--inputPath", inputPath,
+					"--outputPath", workingDir.toString() + "/actionSet7"
 				});
 
-		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<Relation> tmp = sc
 			.sequenceFile(workingDir.toString() + "/actionSet7", Text.class, Text.class)
@@ -320,16 +287,7 @@ public class CreateOpenCitationsASTest {
 
 		assertEquals(5, check.count());
 
-//		check.foreach(r -> {
-//			if (r.getSource().equals(doi2) || r.getSource().equals(doi3) || r.getSource().equals(doi4) ||
-//				r.getSource().equals(doi5) || r.getSource().equals(doi6)) {
-//				assertEquals(ModelConstants.IS_CITED_BY, r.getRelClass());
-//				assertEquals(doi1, r.getTarget());
-//			}
-//		});
-
-		assertEquals(5, check.filter(r -> r.getSource().equals(doi1)).count());
-		check.filter(r -> r.getSource().equals(doi1)).foreach(r -> assertEquals(ModelConstants.CITES, r.getRelClass()));
-
+		assertEquals(5, check.filter(r -> r.getTarget().equals(doi1)).count());
+		check.filter(r -> r.getTarget().equals(doi1)).foreach(r -> assertEquals(ModelConstants.CITES, r.getRelClass()));
 	}
 }

@@ -90,7 +90,7 @@ public class DedupRecordFactory {
 
 		return mergeRels
 			.join(entities, DHPUtils.toSeq(Collections.singletonList("id")).toSeq(), "left")
-			.select("dedupId", "id", "kryoObject")
+			.selectExpr("dedupId", "id", "coalesce(kryoObject, X'00') AS kryoObject")
 			.as(Encoders.tuple(Encoders.STRING(), Encoders.STRING(), kryoEncoder))
 			.groupByKey((MapFunction<Tuple3<String, String, OafEntity>, String>) Tuple3::_1, Encoders.STRING())
 			.flatMapGroups(

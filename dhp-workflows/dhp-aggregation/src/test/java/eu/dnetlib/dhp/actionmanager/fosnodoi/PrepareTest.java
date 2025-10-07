@@ -1,9 +1,6 @@
 
 package eu.dnetlib.dhp.actionmanager.fosnodoi;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,7 +14,6 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SparkSession;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -26,13 +22,11 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.actionmanager.createunresolvedentities.PrepareFOSSparkJob;
-import eu.dnetlib.dhp.actionmanager.createunresolvedentities.PrepareSDGSparkJob;
-import eu.dnetlib.dhp.actionmanager.createunresolvedentities.ProduceTest;
 import eu.dnetlib.dhp.schema.oaf.Result;
 
 public class PrepareTest {
 
-	private static final Logger log = LoggerFactory.getLogger(ProduceTest.class);
+	private static final Logger log = LoggerFactory.getLogger(PrepareTest.class);
 
 	private static Path workingDir;
 	private static SparkSession spark;
@@ -40,14 +34,14 @@ public class PrepareTest {
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	@BeforeAll
-	public static void beforeAll() throws IOException {
+	static void beforeAll() throws IOException {
 		workingDir = Files.createTempDirectory(PrepareTest.class.getSimpleName());
 
 		fs = FileSystem.getLocal(new Configuration());
 		log.info("using work dir {}", workingDir);
 
 		SparkConf conf = new SparkConf();
-		conf.setAppName(ProduceTest.class.getSimpleName());
+		conf.setAppName(PrepareTest.class.getSimpleName());
 
 		conf.setMaster("local[*]");
 		conf.set("spark.driver.host", "localhost");
@@ -64,7 +58,7 @@ public class PrepareTest {
 	}
 
 	@AfterAll
-	public static void afterAll() throws IOException {
+    static void afterAll() throws IOException {
 		FileUtils.deleteDirectory(workingDir.toFile());
 		spark.stop();
 	}
@@ -80,10 +74,7 @@ public class PrepareTest {
 				new String[] {
 					"--isSparkSessionManaged", Boolean.FALSE.toString(),
 					"--sourcePath", sourcePath,
-
-					"-outputPath", workingDir.toString() + "/work",
-					"-distributeDoi", Boolean.FALSE.toString()
-
+					"--outputPath", workingDir.toString() + "/work"
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());

@@ -2,6 +2,7 @@
   "id":"api_________::opendoar____::2::0",
   "baseUrl":"https://www.alexandria.unisg.ch/cgi/oai2",
   "protocol":"oai",
+  "compatibilityLevel":"openaire4.0",
   "params": {
     "set":"driver",
     "metadata_identifier_path":"//*[local-name()\u003d\u0027header\u0027]/*[local-name()\u003d\u0027identifier\u0027]",

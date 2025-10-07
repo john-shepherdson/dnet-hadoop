@@ -92,7 +92,6 @@ object SparkPrepareHostedByInfoToApply {
         .builder()
         .config(conf)
         .appName(getClass.getSimpleName)
-        .master(parser.get("master"))
         .getOrCreate()
 
     val graphPath = parser.get("graphPath")
