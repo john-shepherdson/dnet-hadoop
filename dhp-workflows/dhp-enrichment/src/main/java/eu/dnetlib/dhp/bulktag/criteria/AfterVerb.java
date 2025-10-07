@@ -21,7 +21,7 @@ public class AfterVerb implements Selection, JsonPathAware, Serializable {
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    private Object param;
+    private Object param; //il value nella configurazione
     private String jsonPath;
 
     public AfterVerb() {}
@@ -42,25 +42,37 @@ public class AfterVerb implements Selection, JsonPathAware, Serializable {
         }
 
         try {
-            if(jsonPath != null){
-                ReadContext ctx;
-                ctx = JsonPath.parse((String)value);
-
-                // estraggo i valori usando il jsonpath
-                Object results = ctx.read(jsonPath);
-
-                if (results == null || (results instanceof List<?> )) {
-                    return false;
-                }
-
-                if(results instanceof String date){
-                    LocalDate resultDate = parseDate(date);
-                    LocalDate projectDate = parseDate(otherEntityValue);
-                    return resultDate.isAfter(projectDate);
-                }
+            ReadContext ctx;
+            ctx = JsonPath.parse((String)value);
+            // estraggo i valori usando il jsonpath
+            Object results = ctx.read(jsonPath);
+            if(results == null)
                 return false;
 
+            LocalDate resultDate = LocalDate.of(1900, 1, 1);
+            if(results instanceof String date)
+                 resultDate = parseDate(date);
+            else
+                return false;
+
+            if(jsonPath != null && param != null && otherEntityValue != null){
+                if ( param instanceof List<?>) {
+                    return false;
+                }
+                    LocalDate projectDate = parseDate(otherEntityValue);
+                    LocalDate thresholdDate = parseDate(param);
+                    return resultDate.isAfter(projectDate) && resultDate.isAfter(thresholdDate);
+
             }
+            if(jsonPath != null ){
+
+                    LocalDate projectDate = parseDate(otherEntityValue);
+                    return resultDate.isAfter(projectDate) ;
+
+
+            }
+            if( param != null)
+                return apply(value);
 
             return false;
         } catch (Exception e) {
@@ -95,6 +107,6 @@ public class AfterVerb implements Selection, JsonPathAware, Serializable {
 
     @Override
     public void setJsonPath(String jsonpath) {
-
+        this.jsonPath = jsonpath;
     }
 }
