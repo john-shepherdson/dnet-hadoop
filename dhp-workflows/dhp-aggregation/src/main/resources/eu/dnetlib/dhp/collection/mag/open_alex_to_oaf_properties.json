@@ -1,0 +1,38 @@
+[
+  {
+    "paramName": "m",
+    "paramLongName": "master",
+    "paramDescription": "the master name",
+    "paramRequired": true
+  },
+  {
+    "paramName": "oa",
+    "paramLongName": "openAlexBasePath",
+    "paramDescription": "The openAlex Base Path",
+    "paramRequired": true
+  },
+  {
+    "paramName": "ma",
+    "paramLongName": "mdstoreMagPath",
+    "paramDescription": "The mag Base path",
+    "paramRequired": true
+  },
+  {
+    "paramName": "wp",
+    "paramLongName": "workingPath",
+    "paramDescription": "The working path",
+    "paramRequired": true
+  },
+  {
+    "paramName": "i",
+    "paramLongName": "isLookupUrl",
+    "paramDescription": "The isLookup Url",
+    "paramRequired": true
+  },
+  {
+    "paramName": "t",
+    "paramLongName": "targetPath",
+    "paramDescription": "The target Path",
+    "paramRequired": true
+  }
+]

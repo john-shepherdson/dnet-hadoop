@@ -13,9 +13,20 @@
     </property>
     <property>
         <name>oozie.action.sharelib.for.spark</name>
-        <value>spark2</value>
+        <value>spark342</value>
     </property>
-
+    <property>
+        <name>hiveMetastoreUris</name>
+        <value>thrift://iis-cdh5-test-m3.ocean.icm.edu.pl:9083</value>
+    </property>
+    <property>
+        <name>hiveJdbcUrl</name>
+        <value>jdbc:hive2://iis-cdh5-test-m3.ocean.icm.edu.pl:10000</value>
+    </property>
+    <property>
+        <name>hiveDbName</name>
+        <value>openaire</value>
+    </property>
     <property>
         <name>oozie.launcher.mapreduce.user.classpath.first</name>
         <value>true</value>
