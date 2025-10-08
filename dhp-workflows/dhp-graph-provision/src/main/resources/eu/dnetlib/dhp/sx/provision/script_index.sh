@@ -1,5 +1,5 @@
 #CREATE SCHOLIX INDEX
-curl -XPUT 'localhost:9200/scholix_shadow?pretty' -H 'Content-Type: application/json' -d'{
+curl -XPUT 'localhost:9200/scholix?pretty' -H 'Content-Type: application/json' -d'{
   "mappings":{
     "properties":{
       "identifier":{
@@ -73,7 +73,7 @@ curl -XPUT 'localhost:9200/scholix_shadow?pretty' -H 'Content-Type: application/
   }
 }'
 #CREATE SUMMARY INDEX
-curl -XPUT 'localhost:9200/summary_shadow?pretty' -H 'Content-Type: application/json' -d'
+curl -XPUT 'localhost:9200/summary?pretty' -H 'Content-Type: application/json' -d'
 {
   "mappings":{
     "properties":{
@@ -106,6 +106,47 @@ curl -XPUT 'localhost:9200/summary_shadow?pretty' -H 'Content-Type: application/
     }
   }
 }'
+
+
+#CREATE STATS INDEX
+curl -XPUT 'localhost:9200/scholix_stats?pretty' -H 'Content-Type: application/json' -d'
+{
+  "mappings":{
+    "properties":{
+      "body":{
+        "type":"text",
+        "index":false
+      },
+      "stats":{
+        "type":"keyword"
+      },
+      "date":{
+              "type":"date"
+      }
+    }
+  },
+  "settings": {
+    "index": {
+      "refresh_interval":"36000s",
+      "number_of_shards":"1",
+      "translog": {
+        "sync_interval": "15s",
+        "durability": "ASYNC"
+      },
+      "analysis": {
+        "analyzer": {
+          "analyzer_keyword": {
+            "filter": "lowercase",
+            "tokenizer": "keyword"
+          }
+        }
+      },
+      "number_of_replicas": "0"
+    }
+  }
+}'
+
+
 
 #CREATE ALIASES
 curl -XPOST 'localhost:9200/_aliases' -H 'Content-Type: application/json' -d'
