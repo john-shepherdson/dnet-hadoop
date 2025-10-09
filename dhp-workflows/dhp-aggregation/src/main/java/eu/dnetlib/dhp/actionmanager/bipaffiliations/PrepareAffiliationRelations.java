@@ -2,6 +2,8 @@
 package eu.dnetlib.dhp.actionmanager.bipaffiliations;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+import static eu.dnetlib.dhp.common.person.Constants.OPENAPC_INPUT_SCHEMA;
+import static eu.dnetlib.dhp.common.person.Constants.RESULT_MATCHED_SCHEMA;
 import static org.apache.spark.sql.functions.expr;
 import static org.apache.spark.sql.types.DataTypes.StringType;
 
@@ -11,20 +13,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.arrow.flatbuf.Bool;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.BZip2Codec;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.MapGroupsFunction;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.types.DataTypes;
-import org.apache.spark.sql.types.StructType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -197,7 +195,7 @@ public class PrepareAffiliationRelations implements Serializable {
 	}
 
 	private static Dataset<Relation> prepareAffiliationRelationsGraph(SparkSession spark, String datasetPath, List<KeyValue> collectedfromOpenAIRE, String dataprovenance) {
-		return  getRels(spark.read().schema(eu.dnetlib.dhp.actionmanager.bipaffiliations.Constants.RESULT_MATCHED_SCHEMA).json(datasetPath)
+		return  getRels(spark.read().schema(RESULT_MATCHED_SCHEMA).json(datasetPath)
 				.select("id","organizations")
 				.withColumn("matching", functions.explode(new Column("organizations"))), collectedfromOpenAIRE, dataprovenance);
 
@@ -214,7 +212,7 @@ public class PrepareAffiliationRelations implements Serializable {
 		// load and parse affiliation relations from HDFS
 		return getRels( spark
 				.read()
-				.schema(eu.dnetlib.dhp.actionmanager.bipaffiliations.Constants.OPENAPC_INPUT_SCHEMA)
+				.schema(OPENAPC_INPUT_SCHEMA)
 				.json(inputPath)
 				.where("doi is not null")
 				.withColumn("id",  expr("md5HashWithPrefix(doi)"))
