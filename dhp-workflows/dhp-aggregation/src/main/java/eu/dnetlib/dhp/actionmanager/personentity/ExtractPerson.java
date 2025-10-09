@@ -148,10 +148,9 @@ public class ExtractPerson implements Serializable {
 
 		// create the relation dataset with possible redundant relations
 		Dataset<Relation> relations = authors
-			.flatMap(
-				(FlatMapFunction<Row, Relation>) a -> Arrays
-					.asList(getAuthorshipRelation(a), getAffiliationRelation(a))
-					.iterator(),
+			.map(
+				(MapFunction<Row, Relation>) ExtractPerson::getAuthorshipRelation
+					,
 				Encoders.bean(Relation.class))
 			.unionAll(
 				allAuthors
