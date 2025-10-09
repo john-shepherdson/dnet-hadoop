@@ -2,6 +2,8 @@
 package eu.dnetlib.dhp.enrich.relsfrompublisherenricheddata;
 
 import static eu.dnetlib.dhp.common.enrichment.Constants.PROPAGATION_DATA_INFO_TYPE;
+import static eu.dnetlib.dhp.common.person.Constants.getKeyValues;
+import static eu.dnetlib.dhp.common.person.Constants.getSerializationBean;
 
 import java.io.IOException;
 import java.util.*;
@@ -9,7 +11,7 @@ import java.util.stream.Collectors;
 
 import com.cloudera.com.fasterxml.jackson.core.JsonProcessingException;
 import com.cloudera.com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.dhp.common.person.Constants;
+import eu.dnetlib.dhp.common.person.*;
 
 import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.FlatMapFunction;
@@ -24,7 +26,6 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.PropagationConstant;
 import eu.dnetlib.dhp.common.author.SparkEnrichWithOrcidAuthors;
-import eu.dnetlib.dhp.common.person.CoAuthorshipIterator;
 import eu.dnetlib.dhp.orcidtoresultfromsemrel.OrcidAuthors;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
@@ -75,11 +76,6 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 			.schema(Encoders.bean(Result.class).schema())
 			.json(orcidPath + "/publication")
 			.as(Encoders.bean(Result.class))
-			// selects only publications with doi since it is the only way to match with publisher data
-			.filter(
-				(FilterFunction<Result>) r -> r.getPid() != null &&
-					r.getPid().stream().anyMatch(p -> p.getQualifier().getClassid().equalsIgnoreCase("doi")))
-			// select only the results with at least the orcid for one author
 			.filter(
 				(FilterFunction<Result>) r -> r.getAuthor() != null &&
 					r
@@ -95,17 +91,11 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 											.getQualifier()
 											.getClassid()
 											.equalsIgnoreCase(ModelConstants.ORCID_PENDING))))
-			.flatMap((FlatMapFunction<Result, Tuple2<String, OrcidAuthors>>) r -> {
-				List<Tuple2<String, OrcidAuthors>> t2 = new ArrayList<>();
-				List<String> dois = r
-					.getPid()
-					.stream()
-					.filter(p -> p.getQualifier().getClassid().equalsIgnoreCase("doi"))
-					.map(p -> p.getValue())
-					.collect(Collectors.toList());
+			.map((MapFunction<Result, Tuple2<String, OrcidAuthors>>) r -> {
+
 				OrcidAuthors authors = getOrcidAuthorsList(r.getAuthor());
-				dois.forEach(doi -> t2.add(new Tuple2<>(doi, authors)));
-				return t2.iterator();
+
+				return new Tuple2<>(r.getId(), authors);
 			}, Encoders.tuple(Encoders.STRING(), Encoders.bean(OrcidAuthors.class)))
 			.selectExpr("_1 as id", "_2.orcidAuthorList as orcid_authors");// in this case the id is the doi
 
@@ -113,22 +103,20 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 
 		Dataset<Row> df = spark
 			.read()
-			.schema(Constants.PUBLISHER_INPUT_SCHEMA)
+			.schema(Constants.RESULT_MATCHED_SCHEMA)
 			.json(graphPath) // the path to the publisher files
-			.where("doi is not null");
+			.where("id is not null");
 
 		Dataset<Row> authors = df
-			.selectExpr("doi", "explode(authors) as author")
+			.selectExpr("id", "explode(authors) as author")
 			.selectExpr(
-				"doi", "author.name.full as fullname",
-				"author.name.first as firstname",
-				"author.name.last as lastname",
+				"id", "author.fullname as fullname",
 				"author.pids as pids",
-				"author.matchings as affiliations",
+				"author.affiliations as affiliations",
 					"author.corresponding as corresponding",
 					"author.contributor_roles as roles" )
 			.map(
-				(MapFunction<Row, Tuple2<String, Author>>) a -> new Tuple2<>(a.getAs("doi"), getAuthor(a)),
+				(MapFunction<Row, Tuple2<String, Author>>) a -> new Tuple2<>(a.getAs("id"), getAuthor(a)),
 				Encoders.tuple(Encoders.STRING(), Encoders.bean(Author.class)))
 			.groupByKey((MapFunction<Tuple2<String, Author>, String>) t2 -> t2._1(), Encoders.STRING())
 			.mapGroups(
@@ -139,7 +127,7 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 					return new Tuple2<>(k, pa);
 				}, Encoders.tuple(Encoders.STRING(), Encoders.bean(PublisherAuthors.class)))
 			.selectExpr("_1 as id", "_2.publisherAuthorList as graph_authors");
-authors.show(false);
+
 		orcidDnet
 			.join(authors, "id")
 			.write()
@@ -319,7 +307,7 @@ authors.show(false);
 			.read()
 			.schema(Encoders.bean(ORCIDAuthorEnricherResult.class).schema())
 			.parquet(workingDir + "/publication_matched")
-			.selectExpr("id as doi", "enriched_author")
+			.selectExpr("id", "enriched_author")
 			.flatMap(
 				(FlatMapFunction<Row, Relation>) EnrichExternalDataWithGraphORCID::getRelationsList,
 				Encoders.bean(Relation.class));
@@ -348,7 +336,7 @@ authors.show(false);
 					p -> relationList
 						.add(
 							getRelations(
-								Constants.removePrefixUrl(r.getAs("doi")),
+								r.getAs("id"),
 								author.getList(author.fieldIndex("rawAffiliationString")),
 								Constants.removePrefixUrl(p.getAs("value")))));
 
@@ -357,57 +345,16 @@ authors.show(false);
 		return relationList.iterator();
 	}
 
-	private static Relation getRelations(String doi, List<String> rawAffiliationString, String orcid) {
+	private static Relation getRelations(String id, List<String> rawAffiliationString, String orcid) {
 		Relation rel = OafMapperUtils
 			.getRelation(Constants.PERSON_PREFIX + Constants.SEPARATOR
-				+ DHPUtils.md5(orcid), "50|doi_________::" + DHPUtils.md5(doi),
+				+ DHPUtils.md5(orcid), id,
 				ModelConstants.RESULT_PERSON_RELTYPE, ModelConstants.RESULT_PERSON_SUBRELTYPE,
 				ModelConstants.RESULT_PERSON_HASAUTHORED,
 				null, DATAINFO, null);
 		rawAffiliationString.forEach(raf -> {
             try {
-                SerializationBean sb = new ObjectMapper().readValue(raf, SerializationBean.class);
-				List<KeyValue> keyValueList = new ArrayList<>();
-				if(Optional.ofNullable(sb.getCorresponding()).isPresent()) {
-					KeyValue kv = new KeyValue();
-					kv.setKey("corresponding");
-					kv.setValue(String.valueOf(sb.getCorresponding()));
-					keyValueList.add(kv);
-				}
-				if(!sb.getAffs().isEmpty()) {
-					sb.getAffs().forEach(a -> {
-						KeyValue kv = new KeyValue();
-						kv.setKey("declared_affiliation");
-						if (Optional.ofNullable(a.getRor()).isPresent())
-							kv.setValue(a.getRor());
-						else
-							kv.setValue("OpenOrgs: " + a.getOpenOrgs());
-						kv
-								.setDataInfo(
-										OafMapperUtils
-												.dataInfo(
-														false,
-														"openaire:inference",
-														true,
-														false,
-														null,
-														String.valueOf(a.getConfidence())));
-						keyValueList.add(kv);
-					});
-				}
-				if(Optional.ofNullable(sb.getRoles()).isPresent()) {
-					sb.getRoles().stream().forEach(r -> {
-						KeyValue kv = new KeyValue();
-						if(Optional.ofNullable(r.getRoleSchema()).isPresent() && Optional.ofNullable(r.getRoleValue()).isPresent()) {
-							kv.setKey("role");
-							kv.setValue(r.getRoleSchema() + " " + r.getRoleValue());
-						}else {
-							kv.setKey("role");
-							kv.setValue(r.getRoleName());
-						}
-						keyValueList.add(kv);
-					});
-				}
+				List<KeyValue> keyValueList = getKeyValues(raf);
 
 				if(keyValueList.size() > 0) {
 					if(!Optional.ofNullable(rel.getProperties()).isPresent()) {
@@ -426,14 +373,17 @@ authors.show(false);
 		return rel;
 	}
 
+
+
 	private static @NotNull Author getAuthor(Row a) throws JsonProcessingException {
 		Author author = new Author();
 
-		author.setName(a.getAs("firstname"));
+
 		author.setFullname(a.getAs("fullname"));
+		author.setName(a.getAs("firstname"));
 		author.setSurname(a.getAs("lastname"));
+
 		List<StructuredProperty> pids = new ArrayList<>();
-		List<String> serializationBean = new ArrayList<>();
 
 		List<Row> publisherPids = new ArrayList<>();
 		if (Optional.ofNullable(a.getAs("pids")).isPresent())
@@ -441,48 +391,7 @@ authors.show(false);
 
 		publisherPids.forEach(pid -> pids.add(getPid(pid)));
 
-		List<Row> affiliations = a.getList(a.fieldIndex("affiliations"));
-		SerializationBean sb = new SerializationBean();
-		// "`Matchings`: ARRAY<STRUCT<`PID`:STRING, `Value`:STRING,`Confidence`:DOUBLE, `Status`:STRING>>,
-		sb.setAffs(affiliations.stream().map(
-				aff -> {
-					if(aff.getAs("Status").equals("active")){
-						SerializationOrg so = new SerializationOrg();
-						if("ror".equalsIgnoreCase(aff.getAs("PID")))
-							so.setRor(aff.getAs("Value"));
-						else
-							so.setOpenOrgs(aff.getAs("Value"));
-						so.setConfidence(aff.getAs("Confidence"));
-						return so;
-					}
-					return null;
-				}
-		).filter(Objects::nonNull).collect(Collectors.toList()));
-
-		List<Row> roles = a.getList(a.fieldIndex("roles"));
-		if(Optional.ofNullable(roles).isPresent())
-			sb.setRoles(roles.stream().map(r -> {
-				SerializationRoles sr = null;
-				if(Optional.ofNullable(r.getAs("schema")).isPresent()){
-					sr = new SerializationRoles();
-					sr.setRoleSchema(r.getAs("schema"));
-				}
-
-				if(Optional.ofNullable(r.getAs("value")).isPresent()){
-					if(sr == null)
-						sr = new SerializationRoles();
-					sr.setRoleValue(r.getAs("value"));
-				}
-				if(Optional.ofNullable(r.getAs("name")).isPresent()){
-					if(sr == null)
-						sr = new SerializationRoles();
-					sr.setRoleName(r.getAs("name"));
-				}
-					return sr;
-			}).filter(Objects::nonNull).collect(Collectors.toList()));
-
-		if(Optional.ofNullable(a.getAs("corresponding")).isPresent())
-			sb.setCorresponding(Boolean.valueOf(a.getAs("corresponding")));
+		SerializationBean sb = getSerializationBean(a);
 
 		author.setPid(pids);
 		// in this case the rawaffiliation string is used as an accumulator to create relations

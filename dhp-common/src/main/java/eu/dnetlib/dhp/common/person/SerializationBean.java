@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.enrich.relsfrompublisherenricheddata;
+package eu.dnetlib.dhp.common.person;
 
 import java.io.Serializable;
 import java.util.List;

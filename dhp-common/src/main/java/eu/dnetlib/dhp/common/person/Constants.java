@@ -1,17 +1,28 @@
 
 package eu.dnetlib.dhp.common.person;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
+import com.cloudera.com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
+import eu.dnetlib.dhp.schema.oaf.utils.PidCleaner;
+import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 import eu.dnetlib.dhp.utils.DHPUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.spark.sql.Row;
 import org.apache.spark.sql.types.ArrayType;
 import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructType;
+import org.jetbrains.annotations.NotNull;
 
 import static org.apache.spark.sql.types.DataTypes.StringType;
 
@@ -43,39 +54,6 @@ public class Constants {
 	public static final String PROJECT_ID_PREFIX = ModelSupport.getIdPrefix(Project.class)
 		+ IdentifierFactory.ID_PREFIX_SEPARATOR;
 
-	public static final StructType PUBLISHER_INPUT_SCHEMA = new StructType()
-			.add("doi", DataTypes.StringType)
-			.add(
-					"authors", DataTypes
-							.createArrayType(
-									new StructType()
-											.add("corresponding", DataTypes.StringType)
-											.add(
-													"contributor_roles", DataTypes
-															.createArrayType(
-																	new StructType()
-																			.add("schema", DataTypes.StringType)
-																			.add("value", DataTypes.StringType)
-																			.add("name", DataTypes.StringType)))
-											.add(
-													"name", new StructType()
-															.add("full", DataTypes.StringType)
-															.add("first", DataTypes.StringType)
-															.add("last", DataTypes.StringType))
-											.add(
-													"matchings", DataTypes
-															.createArrayType(
-																	new StructType()
-																			.add("PID", DataTypes.StringType)
-																			.add("Value", DataTypes.StringType)
-																			.add("Confidence", DataTypes.DoubleType)
-																			.add("Status", DataTypes.StringType)))
-											.add(
-													"pids", DataTypes
-															.createArrayType(
-																	new StructType()
-																			.add("schema", DataTypes.StringType)
-																			.add("value", DataTypes.StringType)))));
 
 	public final static StructType MATCHING_SCHEMA = new StructType()
 			.add("provenance", StringType)
@@ -98,6 +76,8 @@ public class Constants {
 			.add("authors", DataTypes.createArrayType(
 					new StructType()
 							.add("fullname", StringType)
+							.add("firstname", StringType)
+							.add("lastname", StringType)
 							.add("affiliations", DataTypes.createArrayType(
 									new StructType()
 											.add("raw_affiliation_string", StringType)
@@ -135,5 +115,99 @@ public class Constants {
 
 		// if there is no known prefix to remove the string is returned as it is
 		return trimmed;
+	}
+
+	public static List<KeyValue> getKeyValues(SerializationBean sb){
+		List<KeyValue> keyValueList = new ArrayList<>();
+		if(Optional.ofNullable(sb.getCorresponding()).isPresent()) {
+			KeyValue kv = new KeyValue();
+			kv.setKey("corresponding");
+			kv.setValue(String.valueOf(sb.getCorresponding()));
+			keyValueList.add(kv);
+		}
+		if(!sb.getAffs().isEmpty()) {
+			sb.getAffs().forEach(a -> {
+				KeyValue kv = new KeyValue();
+				kv.setKey("declared_affiliation");
+				if (Optional.ofNullable(a.getRor()).isPresent())
+					kv.setValue(a.getRor());
+				else
+					kv.setValue("OpenOrgs: " + a.getOpenOrgs());
+				kv
+						.setDataInfo(
+								OafMapperUtils
+										.dataInfo(
+												false,
+												"openaire:inference",
+												true,
+												false,
+												null,
+												String.valueOf(a.getConfidence())));
+				keyValueList.add(kv);
+			});
+		}
+		if(Optional.ofNullable(sb.getRoles()).isPresent()) {
+			sb.getRoles().stream().forEach(r -> {
+				KeyValue kv = new KeyValue();
+				if(Optional.ofNullable(r.getRoleSchema()).isPresent() && Optional.ofNullable(r.getRoleValue()).isPresent()) {
+					kv.setKey("role");
+					kv.setValue(r.getRoleSchema() + " " + r.getRoleValue());
+				}else {
+					kv.setKey("role");
+					kv.setValue(r.getRoleName());
+				}
+				keyValueList.add(kv);
+			});
+		}
+		return keyValueList;
+
+	}
+
+	public static @NotNull List<KeyValue> getKeyValues(String raf) throws IOException {
+		return getKeyValues( new ObjectMapper().readValue(raf, SerializationBean.class));
+	}
+
+	public static @NotNull SerializationBean getSerializationBean(Row a) {
+		List<Row> affiliations = a.getList(a.fieldIndex("affiliations"));
+		SerializationBean sb = new SerializationBean();
+		sb.setAffs(affiliations.stream().map(
+				aff -> {
+					if(aff.getAs("status").equals("active")){
+						SerializationOrg so = new SerializationOrg();
+						if("ror".equalsIgnoreCase(aff.getAs("pid")))
+							so.setRor(aff.getAs("value"));
+						else
+							so.setOpenOrgs(aff.getAs("value"));
+						so.setConfidence(aff.getAs("confidence"));
+						return so;
+					}
+					return null;
+				}
+		).filter(Objects::nonNull).collect(Collectors.toList()));
+		List<Row> roles = a.getList(a.fieldIndex("roles"));
+		if(Optional.ofNullable(roles).isPresent())
+			sb.setRoles(roles.stream().map(r -> {
+				SerializationRoles sr = null;
+				if(Optional.ofNullable(r.getAs("schema")).isPresent()){
+					sr = new SerializationRoles();
+					sr.setRoleSchema(r.getAs("schema"));
+				}
+
+				if(Optional.ofNullable(r.getAs("value")).isPresent()){
+					if(sr == null)
+						sr = new SerializationRoles();
+					sr.setRoleValue(r.getAs("value"));
+				}
+				if(Optional.ofNullable(r.getAs("name")).isPresent()){
+					if(sr == null)
+						sr = new SerializationRoles();
+					sr.setRoleName(r.getAs("name"));
+				}
+				return sr;
+			}).filter(Objects::nonNull).collect(Collectors.toList()));
+
+		if(Optional.ofNullable(a.getAs("corresponding")).isPresent())
+			sb.setCorresponding(Boolean.valueOf(a.getAs("corresponding")));
+		return sb;
 	}
 }
