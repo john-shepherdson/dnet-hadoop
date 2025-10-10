@@ -155,9 +155,6 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 
 					log.info("Processing Openorgs Merge Rels...");
 					smdbe.execute("queryOpenOrgsSimilarityForProvision.sql", smdbe::processOrgOrgMergeRels);
-
-					log.info("Processing Openorgs Parent/Child Rels...");
-					smdbe.execute("queryOpenOrgsParentChildRelsForProvision.sql", smdbe::processOrgOrgParentChildRels);
 					break;
 
 				case openaire_organizations: // generates organization entities and relations for openorgs dedup from openaire
