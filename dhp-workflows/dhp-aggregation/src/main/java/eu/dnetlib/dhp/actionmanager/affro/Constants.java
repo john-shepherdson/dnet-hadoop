@@ -146,10 +146,12 @@ public class Constants implements Serializable {
             .add("authors", DataTypes.createArrayType(
                     new StructType()
                             .add("fullname", StringType)
+                            .add("firstname", StringType)
+                            .add("lastname", StringType)
                             .add("affiliations", DataTypes.createArrayType(
                                     new StructType()
                                             .add("raw_affiliation_string", StringType)
-                                            .add("Matchings", MATCHING_ARRAY_SCHEMA)
+                                            .add("matchings", MATCHING_ARRAY_SCHEMA)
                             ))
                             .add("corresponding", DataTypes.BooleanType)
                             .add("contributor_roles", DataTypes.createArrayType(new StructType()
