@@ -35,7 +35,7 @@ FROM organizations o
 	LEFT OUTER JOIN urls u        ON (u.id = o.id)
 	LEFT OUTER JOIN other_ids i   ON (i.id = o.id)
 	LEFT OUTER JOIN other_names n ON (n.id = o.id)
-	LEFT OUTER JOIN oa_duplicates d ON (o.id = d.local_id AND d.status != 'is_different')
+	LEFT OUTER JOIN oa_duplicates d ON (o.id = d.local_id AND d.reltype != 'is_different')
     LEFT OUTER JOIN organizations od ON (d.oa_original_id = od.id)
     LEFT OUTER JOIN other_ids idup  ON (od.id = idup.id)
     LEFT OUTER JOIN org_types ON (org_types.val = o.type)
