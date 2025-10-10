@@ -15,4 +15,4 @@ LEFT OUTER JOIN
     organizations o ON (d.local_id = o.id)
 
 WHERE
-    (d.status = 'is_similar' OR d.status = 'suggested') AND (o.status != 'hidden');
+    (d.reltype = 'is_similar' OR d.reltype = 'suggested') AND (o.status != 'hidden');
