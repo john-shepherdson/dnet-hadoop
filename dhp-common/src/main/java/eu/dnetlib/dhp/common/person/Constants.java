@@ -184,7 +184,7 @@ public class Constants {
 					return null;
 				}
 		).filter(Objects::nonNull).collect(Collectors.toList()));
-		List<Row> roles = a.getList(a.fieldIndex("roles"));
+		List<Row> roles = a.getList(a.fieldIndex("contributor_roles"));
 		if(Optional.ofNullable(roles).isPresent())
 			sb.setRoles(roles.stream().map(r -> {
 				SerializationRoles sr = null;

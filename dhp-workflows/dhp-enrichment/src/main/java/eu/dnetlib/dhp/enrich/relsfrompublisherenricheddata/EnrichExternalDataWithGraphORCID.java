@@ -109,12 +109,9 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 
 		Dataset<Row> authors = df
 			.selectExpr("id", "explode(authors) as author")
-			.selectExpr(
-				"id", "author.fullname as fullname",
-				"author.pids as pids",
-				"author.affiliations as affiliations",
-					"author.corresponding as corresponding",
-					"author.contributor_roles as roles" )
+			.select(
+				"id", "author")
+
 			.map(
 				(MapFunction<Row, Tuple2<String, Author>>) a -> new Tuple2<>(a.getAs("id"), getAuthor(a)),
 				Encoders.tuple(Encoders.STRING(), Encoders.bean(Author.class)))
@@ -377,21 +374,21 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 
 	private static @NotNull Author getAuthor(Row a) throws JsonProcessingException {
 		Author author = new Author();
+		Row authorRow = a.getAs("author");
 
-
-		author.setFullname(a.getAs("fullname"));
-		author.setName(a.getAs("firstname"));
-		author.setSurname(a.getAs("lastname"));
+		author.setFullname(authorRow.getAs("fullname"));
+		author.setName(authorRow.getAs("firstname"));
+		author.setSurname(authorRow.getAs("lastname"));
 
 		List<StructuredProperty> pids = new ArrayList<>();
 
 		List<Row> publisherPids = new ArrayList<>();
-		if (Optional.ofNullable(a.getAs("pids")).isPresent())
-			publisherPids = a.getList(a.fieldIndex("pids"));
+		if (Optional.ofNullable(authorRow.getAs("pids")).isPresent())
+			publisherPids = authorRow.getList(authorRow.fieldIndex("pids"));
 
 		publisherPids.forEach(pid -> pids.add(getPid(pid)));
 
-		SerializationBean sb = getSerializationBean(a);
+		SerializationBean sb = getSerializationBean(authorRow);
 
 		author.setPid(pids);
 		// in this case the rawaffiliation string is used as an accumulator to create relations

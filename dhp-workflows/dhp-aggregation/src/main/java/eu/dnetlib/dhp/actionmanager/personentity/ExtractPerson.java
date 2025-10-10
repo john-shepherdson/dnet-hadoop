@@ -120,28 +120,10 @@ public class ExtractPerson implements Serializable {
 		Dataset<Row> allAuthors = df
 			.selectExpr("id", "explode(authors) as author")
 			.selectExpr(
-				"id", "author.contributor_roles as roles",
-				"author.corresponding as corresponding", "author.affiliations as affiliations",
+				"id",
+				"author",
 				"explode(author.pids) as pid")
 			.where("pid.schema = 'orcid'");
-
-//		Dataset<Row> authors = allAuthors
-//			.selectExpr("explode (affs) as affiliation", "doi", "corresponding", "roles", "pid.value as orcid")
-//			.where("affiliation.Status = 'active'")
-//			.selectExpr(
-//				"affiliation.Value as orgid", "affiliation.PID as orgpid", "affiliation.Confidence as trust", "doi",
-//				"corresponding", "roles", "orcid");
-//
-//		authors = authors
-//			.where("roles is null")
-//			.selectExpr("*", " '' AS roleschema", " '' AS rolevalue", "'' AS rolename")
-//			.drop("roles")
-//			.unionAll(
-//				authors
-//					.where("roles is not null")
-//					.selectExpr("orgid", "orgpid", "trust", "doi", "corresponding", "explode(roles) as role", "orcid")
-//					.selectExpr("*", "role.schema as roleschema", "role.value as rolevalue", "role.name as rolename")
-//					.drop("role"));
 
 		// create the relation dataset with possible redundant relations
 		Dataset<Relation> relations = allAuthors
@@ -153,7 +135,6 @@ public class ExtractPerson implements Serializable {
 				allAuthors
 					.selectExpr("id", "pid.value as orcid")
 					.groupByKey((MapFunction<Row, String>) r -> r.getAs("id"), Encoders.STRING())
-
 					.mapGroups(
 						(MapGroupsFunction<String, Row, Coauthors>) (k, it) -> extractCoAuthorsRow(it),
 						Encoders.bean(Coauthors.class))
