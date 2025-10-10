@@ -33,6 +33,8 @@ public class Constants implements Serializable {
     public final static StructType DATASET_SCHEMA = new StructType()
             .add("id", StringType)
             .add("fullname", StringType)
+            .add("firstname", StringType)
+            .add("lastname", StringType)
             .add("raw_affiliation_string", StringType)
             .add("corresponding", DataTypes.BooleanType)
             .add("contributor_roles", DataTypes.createArrayType(new StructType()
@@ -61,6 +63,8 @@ public class Constants implements Serializable {
                             .createArrayType(
                                     new StructType()
                                             .add("fullname", StringType)
+                                            .add("name", StringType)
+                                            .add("surname", StringType)
                                             .add("pid", DataTypes.createArrayType(
                                                     new StructType()
                                                             .add("value", StringType)

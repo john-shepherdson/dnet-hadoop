@@ -231,6 +231,8 @@ public class PrepareDataset implements Serializable {
                 .drop(col("id"))
                 .drop(col("doi"))
                 .withColumn("fullname", col("author.name.full"))
+                .withColumn("firstname", col("author.name.first"))
+                .withColumn("lastname", col("author.name.last"))
                 .withColumn("raw_affiliation_strings",  col("author.raw_affiliations"))
                 .withColumn("corresponding", col("author.corresponding"))
                 .withColumn("contributor_roles", col("author.contributor_roles"))
@@ -241,7 +243,7 @@ public class PrepareDataset implements Serializable {
                 .filter("raw_affiliation_string IS NOT NULL AND TRIM(raw_affiliation_string) != '' AND LOWER(raw_affiliation_string) NOT IN ('unknown', 'none')")
                 .withColumn("id",  col("graphId"))
                 .drop(col("graphId"))
-                .select("id","fullname","raw_affiliation_string","corresponding","contributor_roles", "pids")
+                .select("id","fullname","firstname", "lastname", "raw_affiliation_string","corresponding","contributor_roles", "pids")
                 .as(RowEncoder.apply(DATASET_SCHEMA));
     }
 
@@ -252,6 +254,8 @@ public class PrepareDataset implements Serializable {
                 .select(col("id"), col("author"), explode(col("author.rawAffiliationString")).alias("raw_affiliation_string"))
                 .filter("raw_affiliation_string IS NOT NULL AND TRIM(raw_affiliation_string) != '' AND LOWER(raw_affiliation_string) NOT IN ('unknown', 'none')")
                 .withColumn("fullname", col("author.fullName"))
+                .withColumn("firstname", col("author.name"))
+                .withColumn("lastname", col("author.lastname"))
                 .withColumn("pid", col("author.pid"))
                 .drop("author")
                 .withColumn("corresponding", lit(null))
@@ -273,7 +277,7 @@ public class PrepareDataset implements Serializable {
                                 )).cast("array<struct<value:string,schema:string>>")
                         )
                 )
-                .select(col("id"), col("fullname"), col("raw_affiliation_string"), col("corresponding"), col("contributor_roles"), col("pids"))
+                .select(col("id"), col("fullname"), col("firstname"), col("lastname"), col("raw_affiliation_string"), col("corresponding"), col("contributor_roles"), col("pids"))
 
                 .as(RowEncoder.apply(DATASET_SCHEMA));
     }
@@ -284,6 +288,8 @@ public class PrepareDataset implements Serializable {
                 .select(col("id"),
                         explode( col("authorships")).alias("author"))
                 .withColumn("fullname", col("author.author.display_name"))
+                .withColumn("firstname", lit(null))
+                .withColumn("lastname", lit(null))
                 .withColumn("raw_affiliation_strings", col("author.raw_affiliation_strings"))
                 .select(col("id"), col("fullname"),
                         explode(col("raw_affiliation_strings")).alias("raw_affiliation_string"))
@@ -294,7 +300,7 @@ public class PrepareDataset implements Serializable {
                         "pids",
                         lit(null).cast(PID_SCHEMA)
                 )
-                .select(col("id"), col("fullname"), col("raw_affiliation_string"), col("corresponding"), col("contributor_roles"), col("pids"))
+                .select(col("id"), col("fullname"), col("firstname"), col("lastname"), col("raw_affiliation_string"), col("corresponding"), col("contributor_roles"), col("pids"))
                 .as(RowEncoder.apply(DATASET_SCHEMA));
     }
 
@@ -318,7 +324,9 @@ public class PrepareDataset implements Serializable {
                         "pids",
                         lit(null).cast(PID_SCHEMA)
                 )
-                .select(col("id"), col("fullname"), col("raw_affiliation_string"), col("corresponding"), col("contributor_roles"), col("pids"))
+                .withColumn("firstname", lit(null))
+                .withColumn("lastname", lit(null))
+                .select(col("id"), col("fullname"), col("firstname"), col("lastname"), col("raw_affiliation_string"), col("corresponding"), col("contributor_roles"), col("pids"))
                 .as(RowEncoder.apply(DATASET_SCHEMA));
     }
 
