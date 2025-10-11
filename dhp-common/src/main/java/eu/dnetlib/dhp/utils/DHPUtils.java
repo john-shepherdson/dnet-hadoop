@@ -129,8 +129,9 @@ public class DHPUtils {
 		throws IOException {
 
 		log.info("writing file {}, size {}", path, content.length());
-		try (FileSystem fs = FileSystem.get(conf);
-			BufferedOutputStream os = new BufferedOutputStream(fs.create(new Path(path)))) {
+		Path f = new Path(path);
+		try (FileSystem fs = f.getFileSystem(conf);
+			BufferedOutputStream os = new BufferedOutputStream(fs.create(f))) {
 			os.write(content.getBytes(StandardCharsets.UTF_8));
 			os.flush();
 		}
@@ -138,9 +139,8 @@ public class DHPUtils {
 
 	public static String readHdfsFile(Configuration conf, String path) throws IOException {
 		log.info("reading file {}", path);
-
-		try (FileSystem fs = FileSystem.get(conf)) {
-			final Path p = new Path(path);
+		final Path p = new Path(path);
+		try (FileSystem fs = p.getFileSystem(conf)) {
 			if (!fs.exists(p)) {
 				throw new FileNotFoundException(path);
 			}
