@@ -25,7 +25,7 @@ class SparkOpenAlexToOAF(propertyPath: String, args: Array[String], log: Logger)
     log.info("found parameters mdstoreMagPath: {}", mdstoreMagPath)
     createWorksUpdatedVersion(spark, openAlexBasePath, workingPath)
     log.info("createWorksUpdatedVersion finished")
-    extractMagUsedIds(spark, mdstoreMagPath, workingPath)
+      extractMagUsedIds(spark, mdstoreMagPath, workingPath)
     log.info("extractMagUsedIds finished")
     val isLookupUrl: String = parser.get("isLookupUrl")
     log.info("isLookupUrl: {}", isLookupUrl)
@@ -74,6 +74,7 @@ class SparkOpenAlexToOAF(propertyPath: String, args: Array[String], log: Logger)
 
     oaWorks
       .map(s => OAUtility.convertWorksToResult(s, vocabularies))
+      .filter(s => s.nonEmpty)
       .write
       .option("compression", "gzip")
       .mode("Overwrite")
