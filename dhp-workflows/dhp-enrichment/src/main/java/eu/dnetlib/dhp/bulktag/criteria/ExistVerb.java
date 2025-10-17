@@ -53,39 +53,47 @@ public class ExistVerb implements Selection, JsonPathAware, Serializable {
 	private boolean exist(Object value, String jsonPath) {
 		ReadContext ctx;
 
-		if(value instanceof String s)
-			ctx = JsonPath.parse(s);
-		else
-			ctx = JsonPath.parse(value);
+		if(jsonPath != null) {
+			if(value instanceof String s)
+				ctx = JsonPath.parse(s);
+			else
+				ctx = JsonPath.parse(value);
 
-		// estraggo i valori usando il jsonpath
-		Object results = ctx.read(jsonPath);
+			// estraggo i valori usando il jsonpath
+			Object results = ctx.read(jsonPath);
 
-		if (results == null || (results instanceof List<?> lista && lista.isEmpty())) {
-			return false;
-		}
+			if (results == null || (results instanceof List<?> lista && lista.isEmpty())) {
+				return false;
+			}
 
-		// confronto i risultati con "value"
-		if (params == null) {
-			return false;
-		} else {
-			if (params instanceof String s){
-				if(results instanceof List<?> lista)
-					return lista.stream().anyMatch(v -> s.equals(v.toString()));
-				if(results instanceof String s1)
-					return s.equals(s1);
+			// confronto i risultati con "value"
+			if (params == null) {
+				return false;
+			} else {
+				if (params instanceof String s){
+					if(results instanceof List<?> lista)
+						return lista.stream().anyMatch(v -> s.equals(v.toString()));
+					if(results instanceof String s1)
+						return s.equals(s1);
+					return false;
+
+				}
+				if(params instanceof List<?> paramsList){
+					if(results instanceof List<?> lista)
+						return lista.stream().anyMatch(paramsList::contains);
+					if(results instanceof String s)
+						return paramsList.contains(s);
+				}
 				return false;
 
 			}
-			if(params instanceof List<?> paramsList){
-				if(results instanceof List<?> lista)
-					return lista.stream().anyMatch(paramsList::contains);
-				if(results instanceof String s)
-					return paramsList.contains(s);
-			}
-			return false;
-
 		}
+		else {
+			if ( value instanceof List<?> lista )
+				return !lista.isEmpty();
+			return value != null;
+		}
+
 	}
 
 	public Object getParam() {

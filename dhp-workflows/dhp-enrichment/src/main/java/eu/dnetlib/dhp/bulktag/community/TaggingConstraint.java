@@ -9,7 +9,18 @@ public class TaggingConstraint extends SelectionConstraints implements Serializa
 	private String id;
 	String entityToTag;
 	String entityClass;
+	String joinOn;
 	private RelatedEntity relatedEntity;
+
+	public String getJoinOn() {
+		return joinOn;
+	}
+
+	public void setJoinOn(String joinOn) {
+		this.joinOn = joinOn;
+	}
+
+
 
 	public RelatedEntity getRelatedEntity() {
 		return relatedEntity;

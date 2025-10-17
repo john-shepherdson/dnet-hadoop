@@ -42,20 +42,20 @@ public class AfterVerb implements Selection, JsonPathAware, Serializable {
         }
 
         try {
-            ReadContext ctx;
-            ctx = JsonPath.parse((String)value);
-            // estraggo i valori usando il jsonpath
-            Object results = ctx.read(jsonPath);
-            if(results == null)
-                return false;
-
-            LocalDate resultDate = LocalDate.of(1900, 1, 1);
-            if(results instanceof String date)
-                 resultDate = parseDate(date);
-            else
-                return false;
 
             if(jsonPath != null && param != null && otherEntityValue != null){
+                ReadContext ctx;
+                ctx = JsonPath.parse((String)value);
+                // estraggo i valori usando il jsonpath
+                Object results = ctx.read(jsonPath);
+                if(results == null)
+                    return false;
+
+                LocalDate resultDate = LocalDate.of(1900, 1, 1);
+                if(results instanceof String date)
+                    resultDate = parseDate(date);
+                else
+                    return false;
                 if ( param instanceof List<?>) {
                     return false;
                 }
@@ -65,7 +65,18 @@ public class AfterVerb implements Selection, JsonPathAware, Serializable {
 
             }
             if(jsonPath != null ){
+                ReadContext ctx;
+                ctx = JsonPath.parse((String)value);
+                // estraggo i valori usando il jsonpath
+                Object results = ctx.read(jsonPath);
+                if(results == null)
+                    return false;
 
+                LocalDate resultDate = LocalDate.of(1900, 1, 1);
+                if(results instanceof String date)
+                    resultDate = parseDate(date);
+                else
+                    return false;
                     LocalDate projectDate = parseDate(otherEntityValue);
                     return resultDate.isAfter(projectDate) ;
 
