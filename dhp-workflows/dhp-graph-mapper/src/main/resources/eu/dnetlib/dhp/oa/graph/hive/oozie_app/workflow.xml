@@ -25,6 +25,44 @@
             <value>--conf spark.sql.shuffle.partitions=7680</value>
             <description>spark resource options</description>
         </property>
+        <property>
+            <name>sparkApplicationOpts</name>
+            <value>--conf spark.sql.shuffle.partitions=7680</value>
+            <description>spark resource options</description>
+        </property>
+
+        <!-- distcp copy properties -->
+        <property>
+            <name>s3upload</name>
+            <value>false</value>
+            <description>should upload the DB on a cloud provider via distcp?</description>
+        </property>
+        <property>
+            <name>s3accessKey</name>
+            <value>xyz</value>
+            <description>The S3 access key</description>
+        </property>
+        <property>
+            <name>s3secretKey</name>
+            <value>xyz</value>
+            <description>The S3 secret key</description>
+        </property>
+        <property>
+            <name>s3endpoint</name>
+            <value>xyz</value>
+            <description>The S3 endpoint</description>
+        </property>
+        <property>
+            <name>dbSourcePath</name>
+            <value>xyz</value>
+            <description>The source Graph DB base path</description>
+        </property>
+        <property>
+            <name>dbDestinationPath</name>
+            <value>xyz</value>
+            <description>The Graph DB destination path on S3</description>
+        </property>
+
     </parameters>
 
     <global>
@@ -46,7 +84,15 @@
         </configuration>
     </global>
 
-    <start to="reset_DB"/>
+    <start to="resumeFrom"/>
+
+    <decision name="resumeFrom">
+        <switch>
+            <case to="reset_DB">${wf:conf('resumeFrom') eq '_START_'}</case>
+            <case to="s3upload">${wf:conf('resumeFrom') eq 's3upload'}</case>
+            <default to="reset_DB"/>
+        </switch>
+    </decision>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -301,6 +347,29 @@
             <script>lib/scripts/postprocessing.sql</script>
             <param>hiveDbName=${hiveDbName}</param>
         </hive2>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <decision name="shouldUploadToS3">
+        <switch>
+            <case to="s3upload">${wf:conf('s3upload') eq 'true'}</case>
+            <default to="End"/>
+        </switch>
+    </decision>
+
+    <action name="s3upload">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>upload.sh</exec>
+            <argument>${s3accessKey}</argument>
+            <argument>${s3secretKey}</argument>
+            <argument>${s3endpoint}</argument>
+            <argument>${dbSourcePath}</argument>
+            <argument>${dbDestinationPath}</argument>
+            <file>upload.sh</file>
+        </shell>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
