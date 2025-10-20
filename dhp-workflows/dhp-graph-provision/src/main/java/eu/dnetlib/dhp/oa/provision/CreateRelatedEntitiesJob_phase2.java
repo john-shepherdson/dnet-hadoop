@@ -114,7 +114,7 @@ public class CreateRelatedEntitiesJob_phase2 {
                 .agg(aggregator);
 
         entities
-            .joinWith(semiJoined, entities.col("_1").equalTo(semiJoined.col("_1")))
+            .joinWith(semiJoined, entities.col("_1").equalTo(semiJoined.col("key")), "left")
             .map((MapFunction<Tuple2<Tuple2<String, E>, Tuple2<String, SemiJoinedEntity>>, JoinedEntity>)value -> {
                 JoinedEntity je = new JoinedEntity(value._1()._2());
                 Optional
