@@ -25,6 +25,7 @@
         <module>dhp-workflows</module>
         <module>dhp-shade-package</module>
         <module>dhp-actionsets</module>
+        <module>dhp-workflows/dhp-tagging</module>
     </modules>
 
     <issueManagement>
