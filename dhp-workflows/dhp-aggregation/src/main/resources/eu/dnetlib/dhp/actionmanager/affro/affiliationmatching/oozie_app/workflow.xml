@@ -71,7 +71,7 @@
         </configuration>
     </global>
 
-    <start to="BeginReadCrossref"/>
+    <start to="preparedataset"/>
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
@@ -80,7 +80,7 @@
             <delete path="${workingDir}"/>
             <mkdir path="${workingDir}"/>
         </fs>
-        <ok to="preparedataset"/>
+        <ok to="BeginReadCrossref"/>
         <error to="Kill"/>
     </action>
 

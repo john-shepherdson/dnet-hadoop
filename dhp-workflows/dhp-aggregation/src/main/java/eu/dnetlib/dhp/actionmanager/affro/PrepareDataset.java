@@ -255,7 +255,7 @@ public class PrepareDataset implements Serializable {
                 .filter("raw_affiliation_string IS NOT NULL AND TRIM(raw_affiliation_string) != '' AND LOWER(raw_affiliation_string) NOT IN ('unknown', 'none')")
                 .withColumn("fullname", col("author.fullName"))
                 .withColumn("firstname", col("author.name"))
-                .withColumn("lastname", col("author.lastname"))
+                .withColumn("lastname", col("author.surname"))
                 .withColumn("pid", col("author.pid"))
                 .drop("author")
                 .withColumn("corresponding", lit(null))
