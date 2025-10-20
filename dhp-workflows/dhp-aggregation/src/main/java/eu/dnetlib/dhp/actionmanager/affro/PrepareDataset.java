@@ -288,12 +288,12 @@ public class PrepareDataset implements Serializable {
                 .select(col("id"),
                         explode( col("authorships")).alias("author"))
                 .withColumn("fullname", col("author.author.display_name"))
-                .withColumn("firstname", lit(null))
-                .withColumn("lastname", lit(null))
                 .withColumn("raw_affiliation_strings", col("author.raw_affiliation_strings"))
                 .select(col("id"), col("fullname"),
                         explode(col("raw_affiliation_strings")).alias("raw_affiliation_string"))
                 .filter("raw_affiliation_string IS NOT NULL AND TRIM(raw_affiliation_string) != '' AND LOWER(raw_affiliation_string) NOT IN ('unknown', 'none')")
+                .withColumn("firstname", lit(null))
+                .withColumn("lastname", lit(null))
                 .withColumn("corresponding", lit(null))
                 .withColumn("contributor_roles", lit(null))
                 .withColumn(
