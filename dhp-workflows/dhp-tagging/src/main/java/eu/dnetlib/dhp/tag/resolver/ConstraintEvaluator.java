@@ -1,22 +1,5 @@
 package eu.dnetlib.dhp.tag.resolver;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.ReadContext;
-import eu.dnetlib.dhp.api.Utils;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.bulktag.SparkBulkTagJob;
-import eu.dnetlib.dhp.bulktag.criteria.VerbResolverFactory;
-import org.apache.commons.io.IOUtils;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.function.MapFunction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
@@ -26,9 +9,23 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
-
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
-import static org.apache.spark.sql.functions.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.tag.bean.ProtoMap;
+import eu.dnetlib.dhp.tag.bean.TaggingConstraint;
+import eu.dnetlib.dhp.tag.bean.TaggingConstraints;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.sql.*;
+import org.apache.spark.sql.Dataset;
 
 public class ConstraintEvaluator implements Serializable {
     private static final Logger log = LoggerFactory.getLogger(ConstraintEvaluator.class);
@@ -37,7 +34,7 @@ public class ConstraintEvaluator implements Serializable {
     public static void main(String[] args) throws Exception {
         String jsonConfiguration = IOUtils
                 .toString(
-                        SparkBulkTagJob.class
+                        ConstraintEvaluator.class
                                 .getResourceAsStream(
                                         "/eu/dnetlib/dhp/wf/subworkflows/bulktag/input_bulkTag_parameters.json"));
 
@@ -89,28 +86,9 @@ public class ConstraintEvaluator implements Serializable {
         final String hdfsPath = outputPath + "masterDuplicate";
         log.info("hdfsPath: {}", hdfsPath);
 
-        //final String configurationPath = parser.get("configurationPath");
-
-
-
-        taggingConstraints.getTags().forEach(t -> t.setSelection(VerbResolverFactory.newInstance()));
-
         SparkConf conf = new SparkConf();
 
         //todo the community configuration must be included in the tagging
-        CommunityConfiguration cc;
-
-        String taggingConf = Optional
-                .ofNullable(parser.get("taggingConf"))
-                .map(String::valueOf)
-                .orElse(null);
-
-        if (taggingConf != null) {
-            cc = CommunityConfigurationFactory.newInstance(taggingConf);
-        } else {
-            cc = Utils.getCommunityConfiguration(baseURL);
-            //writeCommunityConfiguration(configurationPath, hdfsNameNode, cc);
-        }
 
         runWithSparkSession(
                 conf,
@@ -136,70 +114,76 @@ public class ConstraintEvaluator implements Serializable {
 
 
     private static  void evaluate(SparkSession spark, TaggingConstraint tag, String inputPath, ProtoMap protoMap) throws ClassNotFoundException {
-        if(tag.getRelatedEntity() != null){
-
-            Dataset<Row> linking_entity = spark.read()
-                    .json(inputPath + tag.getRelatedEntity().getLinkingResource())
-                    .where(tag.getRelatedEntity().getLinkingAttribute() + " = '" + tag.getRelatedEntity().getLinkingAttributeValue() + "'")
-                    .select(tag.getRelatedEntity().getAttributes_to_select().stream().map(functions::col).toArray(Column[]::new));
-
-            Dataset<Row> left = spark.read()
-                    .json(inputPath + tag.getEntityToTag());
-
-            Dataset<Row> right = spark.read()
-                    .json(inputPath + tag.getRelatedEntity().getEntity());
-
-
-            Dataset<Row> result = left
-                    .join(linking_entity, left.col(tag.getJoinOn()).equalTo(linking_entity.col(tag.getRelatedEntity().getJoinOnLeft())))
-                    .join(right, right.col(tag.getJoinOn()).equalTo(linking_entity.col(tag.getRelatedEntity().getJoinOnRigth())))
-                    .select(left.col("*"), right.col(tag.getRelatedEntity().getLinkedResourceField()));
-
-
-            Dataset<Row> jsonDataset = result
-                            .withColumn("left", to_json(struct(Arrays.stream(result.columns())
-                            .filter(c -> !c.equals(tag.getRelatedEntity().getLinkedResourceField()))
-                            .map(functions::col)
-                            .toArray(Column[]::new))))
-                    .withColumn("right", to_json(struct(col(tag.getRelatedEntity().getLinkedResourceField()))));
-
-            jsonDataset.map((MapFunction<Row, String>)e  -> {
-                String leftJson = e.getAs("left");
-                String rightJson = e.getAs("right");
-
-                if(rightJson == null)
-                    return null;
-                if(Boolean.TRUE.equals(verifyCriteria(tag, leftJson, rightJson, protoMap))){
-                    ObjectMapper mapper = new ObjectMapper();
-                    String className = tag.getEntityClass();
-                    Class<?> clazz = null;
-                    try {
-                        clazz = Class.forName(className);
-                    } catch (ClassNotFoundException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                    try {
-                        Object leftInstance = mapper.readValue(leftJson, clazz);
-                        PropertyDescriptor pd = new PropertyDescriptor("id", leftInstance.getClass());
-                        return pd.getReadMethod().invoke(leftInstance) + "@@" + tag.getId();
-                    } catch (IOException ex) {
-                        throw new RuntimeException(ex);
-                    } catch (IntrospectionException ex) {
-                        throw new RuntimeException(ex);
-                    } catch (InvocationTargetException ex) {
-                        throw new RuntimeException(ex);
-                    } catch (IllegalAccessException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                }
-
-                return null;
-            }, Encoders.STRING())
-                    .filter(Objects::nonNull);
-
-        }else{
-
+        for (String tablename : tag.getInputs().keySet()){
+            spark.read().json(tag.getInputs().get(tablename))
+                    .createOrReplaceTempView(tablename);
         }
+
+//
+//        if(tag.getRelatedEntity() != null){
+//
+//            Dataset<Row> linking_entity = spark.read()
+//                    .json(inputPath + tag.getRelatedEntity().getLinkingResource())
+//                    .where(tag.getRelatedEntity().getLinkingAttribute() + " = '" + tag.getRelatedEntity().getLinkingAttributeValue() + "'")
+//                    .select(tag.getRelatedEntity().getAttributes_to_select().stream().map(functions::col).toArray(Column[]::new));
+//
+//            Dataset<Row> left = spark.read()
+//                    .json(inputPath + tag.getEntityToTag());
+//
+//            Dataset<Row> right = spark.read()
+//                    .json(inputPath + tag.getRelatedEntity().getEntity());
+//
+//
+//            Dataset<Row> result = left
+//                    .join(linking_entity, left.col(tag.getJoinOn()).equalTo(linking_entity.col(tag.getRelatedEntity().getJoinOnLeft())))
+//                    .join(right, right.col(tag.getJoinOn()).equalTo(linking_entity.col(tag.getRelatedEntity().getJoinOnRigth())))
+//                    .select(left.col("*"), right.col(tag.getRelatedEntity().getLinkedResourceField()));
+//
+//
+//            Dataset<Row> jsonDataset = result
+//                            .withColumn("left", to_json(struct(Arrays.stream(result.columns())
+//                            .filter(c -> !c.equals(tag.getRelatedEntity().getLinkedResourceField()))
+//                            .map(functions::col)
+//                            .toArray(Column[]::new))))
+//                    .withColumn("right", to_json(struct(col(tag.getRelatedEntity().getLinkedResourceField()))));
+//
+//            jsonDataset.map((MapFunction<Row, String>)e  -> {
+//                String leftJson = e.getAs("left");
+//                String rightJson = e.getAs("right");
+//
+//                if(rightJson == null)
+//                    return null;
+//                if(Boolean.TRUE.equals(verifyCriteria(tag, leftJson, rightJson, protoMap))){
+//                    ObjectMapper mapper = new ObjectMapper();
+//                    String className = tag.getEntityClass();
+//                    Class<?> clazz = null;
+//                    try {
+//                        clazz = Class.forName(className);
+//                    } catch (ClassNotFoundException ex) {
+//                        throw new RuntimeException(ex);
+//                    }
+//                    try {
+//                        Object leftInstance = mapper.readValue(leftJson, clazz);
+//                        PropertyDescriptor pd = new PropertyDescriptor("id", leftInstance.getClass());
+//                        return pd.getReadMethod().invoke(leftInstance) + "@@" + tag.getId();
+//                    } catch (IOException ex) {
+//                        throw new RuntimeException(ex);
+//                    } catch (IntrospectionException ex) {
+//                        throw new RuntimeException(ex);
+//                    } catch (InvocationTargetException ex) {
+//                        throw new RuntimeException(ex);
+//                    } catch (IllegalAccessException ex) {
+//                        throw new RuntimeException(ex);
+//                    }
+//                }
+//
+//                return null;
+//            }, Encoders.STRING())
+//                    .filter(Objects::nonNull);
+//
+//        }else{
+//
+//        }
 
     }
 
