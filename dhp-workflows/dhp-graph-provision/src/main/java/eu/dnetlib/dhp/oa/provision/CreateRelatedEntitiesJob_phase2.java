@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.oa.provision.model.SemiJoinedEntity;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
@@ -106,76 +107,71 @@ public class CreateRelatedEntitiesJob_phase2 {
 		Dataset<Tuple2<String, RelatedEntityWrapper>> relatedEntities = readRelatedEntities(
 			spark, relatedEntitiesPath, entityClazz);
 
-		TypedColumn<JoinedEntity, JoinedEntity> aggregator = new AdjacencyListAggregator().toColumn();
+        TypedColumn<Tuple2<String, RelatedEntityWrapper>, SemiJoinedEntity> aggregator = new RelatedEntiryWrapperAggregator().toColumn();
 
-		entities
-			.joinWith(relatedEntities, entities.col("_1").equalTo(relatedEntities.col("_1")), "left")
-			.map((MapFunction<Tuple2<Tuple2<String, E>, Tuple2<String, RelatedEntityWrapper>>, JoinedEntity>) value -> {
-				JoinedEntity je = new JoinedEntity(value._1()._2());
-				Optional
-					.ofNullable(value._2())
-					.map(Tuple2::_2)
-					.ifPresent(r -> je.getLinks().add(r));
-				return je;
-			}, Encoders.kryo(JoinedEntity.class))
-			.groupByKey(
-				(MapFunction<JoinedEntity, String>) value -> value.getEntity().getId(),
-				Encoders.STRING())
-			.agg(aggregator)
-			.map(
-				(MapFunction<Tuple2<String, JoinedEntity>, JoinedEntity>) value -> value._2(),
-				Encoders.kryo(JoinedEntity.class))
-			.write()
-			.mode(SaveMode.Overwrite)
-			.parquet(outputPath);
+        Dataset<Tuple2<String, SemiJoinedEntity>> semiJoined = relatedEntities
+                .groupByKey((MapFunction<Tuple2<String, RelatedEntityWrapper>, String>) Tuple2::_1, Encoders.STRING())
+                .agg(aggregator);
+
+        entities
+            .joinWith(semiJoined, entities.col("_1").equalTo(semiJoined.col("key")), "left")
+            .map((MapFunction<Tuple2<Tuple2<String, E>, Tuple2<String, SemiJoinedEntity>>, JoinedEntity>)value -> {
+                JoinedEntity je = new JoinedEntity(value._1()._2());
+                Optional
+                    .ofNullable(value._2())
+                    .map(Tuple2::_2)
+                    .ifPresent(r -> je.setLinks(r.getLinks()));
+                return je;
+            }, Encoders.kryo(JoinedEntity.class))
+            .write()
+            .mode(SaveMode.Overwrite)
+            .parquet(outputPath);
 	}
 
-	public static class AdjacencyListAggregator extends Aggregator<JoinedEntity, JoinedEntity, JoinedEntity> {
+    public static class RelatedEntiryWrapperAggregator extends Aggregator<Tuple2<String, RelatedEntityWrapper>, SemiJoinedEntity, SemiJoinedEntity> {
 
-		@Override
-		public JoinedEntity zero() {
-			return new JoinedEntity();
-		}
+        private static final String EMPTY_ID = "";
 
-		@Override
-		public JoinedEntity reduce(JoinedEntity b, JoinedEntity a) {
-			return mergeAndGet(b, a);
-		}
+        @Override
+        public SemiJoinedEntity zero() {
+            return new SemiJoinedEntity(EMPTY_ID, Lists.newArrayList());
+        }
 
-		private JoinedEntity mergeAndGet(JoinedEntity b, JoinedEntity a) {
-			b
-				.setEntity(
-					Optional
-						.ofNullable(a.getEntity())
-						.orElse(
-							Optional
-								.ofNullable(b.getEntity())
-								.orElse(null)));
-			b.getLinks().addAll(a.getLinks());
-			return b;
-		}
+        private SemiJoinedEntity mergeAndGet(SemiJoinedEntity t, Tuple2<String, RelatedEntityWrapper> r) {
+            if (EMPTY_ID.equals(t.getId())) {
+                t = new SemiJoinedEntity(r._2().getRelation().getSource(), Lists.newArrayList(r._2()));
+            } else {
+                t.getLinks().add(r._2());
+            }
+            return t;
+        }
 
-		@Override
-		public JoinedEntity merge(JoinedEntity b, JoinedEntity a) {
-			return mergeAndGet(b, a);
-		}
+        @Override
+        public SemiJoinedEntity reduce(SemiJoinedEntity t, Tuple2<String, RelatedEntityWrapper> r) {
+            return mergeAndGet(t, r);
+        }
 
-		@Override
-		public JoinedEntity finish(JoinedEntity j) {
-			return j;
-		}
+        @Override
+        public SemiJoinedEntity merge(SemiJoinedEntity t1, SemiJoinedEntity t2) {
+            t1.getLinks().addAll(t2.getLinks());
+            return t1;
+        }
 
-		@Override
-		public Encoder<JoinedEntity> bufferEncoder() {
-			return Encoders.kryo(JoinedEntity.class);
-		}
+        @Override
+        public SemiJoinedEntity finish(SemiJoinedEntity reduction) {
+            return reduction;
+        }
 
-		@Override
-		public Encoder<JoinedEntity> outputEncoder() {
-			return Encoders.kryo(JoinedEntity.class);
-		}
+        @Override
+        public Encoder<SemiJoinedEntity> bufferEncoder() {
+            return Encoders.kryo(SemiJoinedEntity.class);
+        }
 
-	}
+        @Override
+        public Encoder<SemiJoinedEntity> outputEncoder() {
+            return Encoders.kryo(SemiJoinedEntity.class);
+        }
+    }
 
 	private static <E extends OafEntity> Dataset<Tuple2<String, RelatedEntityWrapper>> readRelatedEntities(
 		SparkSession spark, String inputRelatedEntitiesPath, Class<E> entityClazz) {
