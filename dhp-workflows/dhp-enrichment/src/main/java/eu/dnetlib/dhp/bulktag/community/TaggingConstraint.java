@@ -4,38 +4,23 @@ package eu.dnetlib.dhp.bulktag.community;
 import eu.dnetlib.dhp.bulktag.resolver.RelatedEntity;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
 public class TaggingConstraint extends SelectionConstraints implements Serializable {
 	private String id;
-	String entityToTag;
-	String entityClass;
-	String joinOn;
-	private RelatedEntity relatedEntity;
+	private Map<String, String> inputs;
+	private List<SelectPair> selects ;
+	private String entityToTag;
+	//private List<Constraints> criteria;
+	private String resultTable;
 
-	public String getJoinOn() {
-		return joinOn;
+	public String getResultTable() {
+		return resultTable;
 	}
 
-	public void setJoinOn(String joinOn) {
-		this.joinOn = joinOn;
-	}
-
-
-
-	public RelatedEntity getRelatedEntity() {
-		return relatedEntity;
-	}
-
-	public void setRelatedEntity(RelatedEntity relatedEntity) {
-		this.relatedEntity = relatedEntity;
-	}
-
-	public String getEntityClass() {
-		return entityClass;
-	}
-
-	public void setEntityClass(String entityClass) {
-		this.entityClass = entityClass;
+	public void setResultTable(String resultTable) {
+		this.resultTable = resultTable;
 	}
 
 	public String getEntityToTag() {
@@ -53,4 +38,21 @@ public class TaggingConstraint extends SelectionConstraints implements Serializa
 	public void setId(String id) {
 		this.id = id;
 	}
+
+	public Map<String, String> getInputs() {
+		return inputs;
+	}
+
+	public void setInputs(Map<String, String> inputs) {
+		this.inputs = inputs;
+	}
+
+	public List<SelectPair> getSelects() {
+		return selects;
+	}
+
+	public void setSelects(List<SelectPair> selects) {
+		this.selects = selects;
+	}
+
 }

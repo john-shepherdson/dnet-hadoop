@@ -1,0 +1,33 @@
+[
+
+  {
+    "paramName": "pm",
+    "paramLongName":"pathMapPath",
+    "paramDescription": "the json path associated to each selection field",
+    "paramRequired": true
+  },
+  {
+    "paramName": "out",
+    "paramLongName": "outputPath",
+    "paramDescription": "the path used to store temporary output files",
+    "paramRequired": true
+  },
+  {
+    "paramName": "ssm",
+    "paramLongName": "isSparkSessionManaged",
+    "paramDescription": "true if the spark session is managed, false otherwise",
+    "paramRequired": false
+  },
+  {
+    "paramName": "tp",
+    "paramLongName": "taggingPath",
+    "paramDescription": "this parameter is intended for testing purposes only. It is a possible tagging configuration obtained via the XQUERY. Intended to be removed",
+    "paramRequired": true
+  }
+,{
+  "paramName": "nn",
+  "paramLongName": "nameNode",
+  "paramDescription": "this parameter is to specify the api to be queried (beta or production)",
+  "paramRequired": true
+}
+]

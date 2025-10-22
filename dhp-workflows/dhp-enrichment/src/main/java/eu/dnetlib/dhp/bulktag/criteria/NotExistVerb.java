@@ -3,27 +3,24 @@ package eu.dnetlib.dhp.bulktag.criteria;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.List;
-import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.ReadContext;
 
 //Verifica che almeno un valore in una lista sia uguale al valore dato oppure che esista un valore indipendentemente da un valore dato
 //per esempio esiste una data
-@VerbClass("exist")
-public class ExistVerb implements Selection, JsonPathAware, Serializable {
+@VerbClass("not_exist")
+public class NotExistVerb implements Selection, JsonPathAware, Serializable {
 	private String jsonPath;
 	private Object params ;
 
-	public ExistVerb() {
+	public NotExistVerb() {
 	}
 
-	public ExistVerb(final Object param) {
+	public NotExistVerb(final Object param) {
 		this.params = param;
 	}
 
 	@Override
 	public boolean apply(Object value) {
-		return value != null;
+		return value == null;
 
 	}
 

@@ -9,10 +9,19 @@ public class TaggingConstraint  implements Serializable {
 
 
 	private String id;
-			private Map<String, String> inputs;
-			private List<String> selects ;
+	private Map<String, String> inputs;
+	private List<Pair> selects ;
 	private String entityToTag;
 	private List<Constraints> criteria;
+	private String resultTable;
+
+	public String getResultTable() {
+		return resultTable;
+	}
+
+	public void setResultTable(String resultTable) {
+		this.resultTable = resultTable;
+	}
 
 	public String getEntityToTag() {
 		return entityToTag;
@@ -38,11 +47,11 @@ public class TaggingConstraint  implements Serializable {
 		this.inputs = inputs;
 	}
 
-	public List<String> getSelects() {
+	public List<Pair> getSelects() {
 		return selects;
 	}
 
-	public void setSelects(List<String> selects) {
+	public void setSelects(List<Pair> selects) {
 		this.selects = selects;
 	}
 

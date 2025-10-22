@@ -1,30 +1,24 @@
 package eu.dnetlib.dhp.bulktag.criteria;
 
-import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.ReadContext;
-import eu.dnetlib.dhp.bulktag.criteria.VerbClass;
-
 import java.io.IOException;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Verifica che una data sia successiva ad un'altra.
  * Usato ad esempio per: publicationDate > project.startDate
  */
 //todo rivedere questa classe
-@VerbClass("after")
-public class AfterVerb implements Selection, Serializable {
+@VerbClass("before")
+public class BeforeVerb implements Selection, Serializable {
 
     private Object param; //il value nella configurazione
 
 
-    public AfterVerb() {}
+    public BeforeVerb() {}
 
-    public AfterVerb(Object param) {
+    public BeforeVerb(Object param) {
         this.param = param;
     }
 
@@ -43,7 +37,7 @@ public class AfterVerb implements Selection, Serializable {
             else
                 return false;
             LocalDate projectDate = parseDate(otherEntityValue);
-            return resultDate.isAfter(projectDate);
+            return resultDate.isBefore(projectDate);
         }
         if(value != null && param != null) {
             if(value instanceof String date)
@@ -51,7 +45,7 @@ public class AfterVerb implements Selection, Serializable {
             else
                 return false;
             LocalDate thresholdDate = parseDate(param);
-            return resultDate.isAfter(thresholdDate);
+            return resultDate.isBefore(thresholdDate);
         }
         return false;
 
