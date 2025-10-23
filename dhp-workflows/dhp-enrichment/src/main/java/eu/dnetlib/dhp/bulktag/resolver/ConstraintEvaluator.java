@@ -1,15 +1,14 @@
 package eu.dnetlib.dhp.bulktag.resolver;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
 import com.jayway.jsonpath.ReadContext;
-import eu.dnetlib.dhp.api.Utils;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.bulktag.SparkBulkTagJob;
 import eu.dnetlib.dhp.bulktag.community.*;
-import eu.dnetlib.dhp.bulktag.criteria.JsonPathAware;
 import eu.dnetlib.dhp.bulktag.criteria.VerbResolverFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -23,14 +22,9 @@ import org.slf4j.LoggerFactory;
 import scala.Tuple2;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
-import static org.apache.spark.sql.functions.*;
 
 
-import java.beans.IntrospectionException;
-import java.beans.PropertyDescriptor;
-import java.io.IOException;
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
@@ -241,16 +235,17 @@ public class ConstraintEvaluator implements Serializable {
             Object value = null;
             //nella configurazione c'e' l'indicazione dell'id nella path map che continene
             //il jsonpath da usare
-            String mapKey = con.getJsonpath();
+            String mapKey = con.getJsonPath();
             if (mapKey != null ) {
                 if(protoMap.containsKey(mapKey)) {
-                    con.setJsonpath(protoMap.get(mapKey).getPath());
+                    con.setVerbJsonPath(protoMap.get(mapKey).getPath());
                 }
             }
             ReadContext context = JsonPath.parse(leftJson);
             if (protoMap.containsKey(con.getField())){
                 try {
                     value = context.read(protoMap.get(con.getField()).getPath());
+
                 }catch (PathNotFoundException e) {
                     value = null;
                 }

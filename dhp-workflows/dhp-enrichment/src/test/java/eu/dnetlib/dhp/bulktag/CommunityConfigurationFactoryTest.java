@@ -7,12 +7,10 @@ import java.util.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.Field;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
-import eu.dnetlib.dhp.utils.DHPUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.DocumentException;
@@ -20,12 +18,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 
-import com.google.gson.Gson;
-
 import eu.dnetlib.dhp.bulktag.community.CommunityConfiguration;
 import eu.dnetlib.dhp.bulktag.community.CommunityConfigurationFactory;
 import eu.dnetlib.dhp.bulktag.community.Constraint;
-import eu.dnetlib.dhp.bulktag.community.SelectionConstraints;
 import eu.dnetlib.dhp.bulktag.criteria.VerbResolver;
 
 /** Created by miriam on 03/08/2018. */
@@ -83,7 +78,7 @@ class CommunityConfigurationFactoryTest {
 		sc.setVerb("exist");
 		sc.setField("publicationDate");
 		sc.setValue(null);
-		sc.setJsonpath("$.value");
+		sc.setJsonPath("$.value");
 		sc.setSelection(resolver);// .getSelectionCriteria(sc.getVerb(), sc.getValue()));
 		Assertions.assertTrue(sc.verifyCriteria(new ObjectMapper().writeValueAsString(dateOfAcceptance)));
 	}
@@ -105,7 +100,7 @@ class CommunityConfigurationFactoryTest {
 		sc.setVerb("exist");
 		sc.setField("author");
 		sc.setValue(List.of("orcid", "fakepid"));
-		sc.setJsonpath("$['pid'][*]['qualifier'].classid");
+		sc.setJsonPath("$['pid'][*]['qualifier'].classid");
 		sc.setSelection(resolver);// .getSelectionCriteria(sc.getVerb(), sc.getValue()));
 		Assertions.assertFalse(sc.verifyCriteria(new ObjectMapper().writeValueAsString(author)));
 		author.setPid(null);
@@ -148,7 +143,7 @@ class CommunityConfigurationFactoryTest {
 		sc.setVerb("exist_forall");
 		sc.setField("authors");
 		sc.setValue(List.of("orcid", "fakepid"));
-		sc.setJsonpath("$['pid'][*]['qualifier'].classid");
+		sc.setJsonPath("$['pid'][*]['qualifier'].classid");
 		sc.setSelection(resolver);// .getSelectionCriteria(sc.getVerb(), sc.getValue()));
 		Assertions.assertFalse(sc.verifyCriteria(new ObjectMapper().writeValueAsString(authors)));
 

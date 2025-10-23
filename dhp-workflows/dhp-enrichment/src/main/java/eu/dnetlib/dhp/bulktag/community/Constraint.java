@@ -14,18 +14,18 @@ public class Constraint implements Serializable {
 	private String verb;
 	private String field;
 	private Object value;
-	private String jsonpath;
+	private String jsonPath;
 
 
 	@JsonIgnore
 	private Selection selection;
 
-	public String getJsonpath() {
-		return jsonpath;
+	public String getJsonPath() {
+		return jsonPath;
 	}
 
-	public void setJsonpath(String jsonpath) {
-		this.jsonpath = jsonpath;
+	public void setJsonPath(String jsonPath) {
+		this.jsonPath = jsonPath;
 	}
 
 	public String getVerb() {
@@ -63,7 +63,7 @@ public class Constraint implements Serializable {
 		selection = resolver.getSelectionCriteria(verb, value);
 
 		if (selection instanceof JsonPathAware jpa) {
-			jpa.setJsonPath(jsonpath);
+			jpa.setJsonPath(jsonPath);
 		}
 	}
 
@@ -81,6 +81,12 @@ public class Constraint implements Serializable {
 		}catch (Exception e){
 			return false;
 		}
+	}
+
+	public void setVerbJsonPath(String jsonPath){
+		if( selection instanceof JsonPathAware jpa)
+			jpa.setJsonPath(jsonPath);
+
 	}
 
 }

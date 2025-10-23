@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.bulktag.criteria;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.List;
 
 //Verifica che almeno un valore in una lista sia uguale al valore dato oppure che esista un valore indipendentemente da un valore dato
 //per esempio esiste una data
@@ -20,7 +21,9 @@ public class NotExistVerb implements Selection, JsonPathAware, Serializable {
 
 	@Override
 	public boolean apply(Object value) {
-		return value == null;
+		ExistVerb existVerb = new ExistVerb(params);
+		existVerb.setJsonPath(jsonPath);
+		return !existVerb.apply(value);
 
 	}
 

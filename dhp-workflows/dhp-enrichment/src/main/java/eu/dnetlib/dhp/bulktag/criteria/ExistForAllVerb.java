@@ -26,11 +26,15 @@ public class ExistForAllVerb implements Selection, JsonPathAware, Serializable {
 	public boolean apply(Object value)  {
 
         List<Object> parsed = null;
-        try {
-            parsed = new ObjectMapper().readValue((String)value, List.class);
-        } catch (IOException e) {
-            return false;
-        }
+		if(value instanceof List<?> lista)
+			parsed = (List<Object>) lista;
+		else {
+			try {
+				parsed = new ObjectMapper().readValue((String)value, List.class);
+			} catch (IOException e) {
+				return false;
+			}
+		}
 
         return parsed.stream().allMatch(o -> {
 			ExistVerb exist = new ExistVerb(params);

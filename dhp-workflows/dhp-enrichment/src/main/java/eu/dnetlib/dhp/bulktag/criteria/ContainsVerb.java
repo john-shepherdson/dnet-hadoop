@@ -10,40 +10,41 @@ import java.util.List;
 @VerbClass("contains")
 public class ContainsVerb implements Selection, Serializable {
 
-	private List<String> params = new ArrayList<>();
+	private Object params ;
 
 	public ContainsVerb() {
 	}
 
-	public ContainsVerb(final String param) {
-		this.params = List.of(param);
-	}
-	public ContainsVerb(final List<String> params) {
-		this.params = params;
-	}
 
 	public ContainsVerb(final Object param) {
-		if(param instanceof String s)
-			this.params = List.of(s);
-		if(param instanceof List<?> lista && !lista.isEmpty() && lista.get(0) instanceof String)
-			lista.forEach(l -> params.add(String.valueOf(l)));
+		this.params = param;
 	}
 
 	@Override
 	public boolean apply(Object value) {
-		if(value instanceof String s)
-			return params.stream().allMatch(s::contains);
+		if(value instanceof String valueString && params instanceof String paramString)
+			return valueString.contains(paramString);
+		if(value instanceof String s && params instanceof List<?> lista)
+			return lista.stream().allMatch(entry -> s.contains((String)entry));
 
 		//todo in questo caso bisogna capire se abbiamo un POJO o una lista di stringhe
 		//comunque basta che almeno un elemento nella lista contenga tutti i valori
 		//passati nel constraint
-		if(value instanceof List<?> lista)
+		if(value instanceof List<?> lista && params instanceof String paramString)
 			return lista.stream().anyMatch(l -> {
 				if(l instanceof String s)
-					return params.stream().allMatch(s::contains);
+					return s.contains(paramString);
+					//return params.stream().allMatch(s::contains);
 				return false;
 			});
 
+		if(value instanceof List<?> lista && params instanceof List<?> paramsList)
+			return lista.stream().allMatch(l -> {
+				if(l instanceof String s)
+					//return s.contains(paramString);
+					return paramsList.stream().anyMatch(entry -> s.contains((String)entry));
+				return false;
+			});
 
 		return false;
 	}
@@ -53,11 +54,11 @@ public class ContainsVerb implements Selection, Serializable {
 		return false;
 	}
 
-	public List<String> getParam() {
+	public Object getParam() {
 		return params;
 	}
 
-	public void setParam(List<String> param) {
+	public void setParam(Object param) {
 		this.params = param;
 	}
 }

@@ -6,10 +6,11 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 /**
- * Verifica che una data sia successiva ad un'altra.
- * Usato ad esempio per: publicationDate > project.startDate
+ * Verifica che una data sia precedente ad un'altra.
+ * Usato ad esempio per: publicationDate < project.startDate
+ * Si applica a due oggetti di tipo stringa che rappresentano le date
  */
-//todo rivedere questa classe
+
 @VerbClass("before")
 public class BeforeVerb implements Selection, Serializable {
 
@@ -24,12 +25,21 @@ public class BeforeVerb implements Selection, Serializable {
 
     @Override
     public boolean apply(Object value) { //qua devo passare il valore da confrontare
-       return false;
+        LocalDate resultDate;
+        if(value != null && param != null) {
+            if(value instanceof String date)
+                resultDate = parseDate(date);
+            else
+                throw new RuntimeException("The value obtained from metadata is not of type String");
+            LocalDate thresholdDate = parseDate(param);
+            return resultDate.isBefore(thresholdDate);
+        }
+        throw new RuntimeException("At least one comparison value is missing");
     }
 
     @Override
     public boolean apply(Object value, Object otherEntityValue) throws IOException {
-        LocalDate resultDate = LocalDate.of(1900, 1, 1);
+        LocalDate resultDate ;
         if(value != null && otherEntityValue != null){
 
             if(value instanceof String date)
@@ -39,15 +49,10 @@ public class BeforeVerb implements Selection, Serializable {
             LocalDate projectDate = parseDate(otherEntityValue);
             return resultDate.isBefore(projectDate);
         }
-        if(value != null && param != null) {
-            if(value instanceof String date)
-                resultDate = parseDate(date);
-            else
-                return false;
-            LocalDate thresholdDate = parseDate(param);
-            return resultDate.isBefore(thresholdDate);
-        }
-        return false;
+        if (value != null && otherEntityValue == null)
+            return apply(value);
+
+        throw new RuntimeException("At least one comparison value is missing ");
 
 
     }

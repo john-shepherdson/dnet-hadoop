@@ -40,6 +40,73 @@
                     ]
                 }
             ]
+        },
+        {
+            "id": "AP",
+            "inputs":{"publication":"/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/graph/publication"},
+            "selects":null,
+            "entityToTag":"publication",
+            "resultTable": "publication",
+            "criteria": [
+                {
+                    "constraint": [
+                        {
+                            "verb": "exist_forall",
+                            "field": "authorWhole",
+                            "value": ["orcid", "orcid_pending", "github", "lattes", "linkedin", "twitter", "gitlab", "acm", "dblp", "dia", "gepris", "ieee", "isni", "jst", "nii", "openid", "repec", "researcherid", "viaf", "zbmath"],
+                            "jsonPath": "authorPids"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "MA",
+            "inputs":{"publication":"/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/graph/publication"},
+            "selects":null,
+            "entityToTag":"publication",
+            "resultTable": "publication",
+            "criteria": [
+                {
+                    "constraint": [
+                        {
+                            "verb": "not_exist",
+                            "field": "description",
+                            "value": null,
+                            "jsonPath": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "NP",
+            "inputs":{"publication":"/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/graph/publication"},
+            "selects":null,
+            "entityToTag":"publication",
+            "resultTable": "publication",
+            "criteria": [
+                {
+                    "constraint": [
+                        {
+                            "verb": "not_exist",
+                            "field": "pidScheme",
+                            "value": [
+                                "doi",
+                                "pmid",
+                                "pmc",
+                                "pmcid",
+                                "ark",
+                                "omid",
+                                "crossref",
+                                "openalex",
+                                "arxiv",
+                                "handle"
+                            ]
+                        }
+                    ]
+                }
+            ]
         }
     ]
 }

@@ -20,6 +20,7 @@
     "documentType": {"path": "$['instance'][*]['instancetype'].classname"},
     "language": {"path": "$['language'].classid"},
     "resultType": {"path": "$['resulttype'].classid"},
+    "pidScheme": {"path": "$['pid'][*]['qualifier']['classid']"},
     "publicationyear": {
         "path": "$['dateofacceptance'].value",
         "action": {

@@ -4,7 +4,6 @@ package eu.dnetlib.dhp.bulktag.criteria;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 @VerbClass("equals")
