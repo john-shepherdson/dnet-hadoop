@@ -75,16 +75,15 @@ public class ConstraintEvaluatorJobText {
                                 "-nameNode", "local"
                         });
 
-        org.apache.spark.sql.Dataset<Row> df = spark.read().json(workingDir.toString() + "/taggingOutcome/");
+        org.apache.spark.sql.Dataset<Row> df = spark.read().json(workingDir.toString() + "/taggingOutcome/").filter((FilterFunction<Row>) r -> r.getAs("_2").equals("PB"));
         Assertions.assertEquals(2, df.count());
-        df.foreach((ForeachFunction<Row>)  r -> Assertions.assertEquals("PB", r.getAs("_2")));
         Assertions.assertEquals(1, df.filter((FilterFunction<Row>) r -> r.getAs("_1").equals("50|doi_________::063c7d157e255e750eecd8d87b365ef8")).count());
         Assertions.assertEquals(1, df.filter((FilterFunction<Row>) r -> r.getAs("_1").equals("50|doi_________::1afa53066516961d77082e95cc507114")).count());
 
     }
 
     @Test
-    void ExistPublicationDateTest() throws Exception {
+    void NotExistAbstractTest() throws Exception {
 
         ConstraintEvaluator
                 .main(
@@ -96,9 +95,54 @@ public class ConstraintEvaluatorJobText {
                                 "-nameNode", "local"
                         });
 
-        org.apache.spark.sql.Dataset<Row> df = spark.read().json(workingDir.toString() + "/taggingOutcome/");
-        df.show(false);
+        org.apache.spark.sql.Dataset<Row> df = spark.read().json(workingDir.toString() + "/taggingOutcome/").filter((FilterFunction<Row>) r -> r.getAs("_2").equals("MA"));;
+        Assertions.assertEquals(2, df.count());
+        Assertions.assertEquals(1, df.filter((FilterFunction<Row>) r -> r.getAs("_1").equals("50|4dc99724cf04::80cb462a2c32d579c78abd0fc4029fe3")).count());
+        Assertions.assertEquals(1, df.filter((FilterFunction<Row>) r -> r.getAs("_1").equals("50|57a035e5b1ae::2172074b599ad664d6dc1028b3f53823")).count());
 
+        df.show(false);
+    }
+
+    @Test
+    void NotExistPublicationDateTest() throws Exception {
+
+        ConstraintEvaluator
+                .main(
+                        new String[] {
+                                "-isSparkSessionManaged", Boolean.FALSE.toString(),
+                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/taggingConf").getPath(),
+                                "-outputPath", workingDir.toString() + "/taggingOutcome/",
+                                "-pathMapPath", getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/pathMap").getPath() ,
+                                "-nameNode", "local"
+                        });
+
+        org.apache.spark.sql.Dataset<Row> df = spark.read().json(workingDir.toString() + "/taggingOutcome/").filter((FilterFunction<Row>) r -> r.getAs("_2").equals("DA"));;
+        Assertions.assertEquals(2, df.count());
+        Assertions.assertEquals(1, df.filter((FilterFunction<Row>) r -> r.getAs("_1").equals("50|1f309934e546::583dfb08afb63c1eb65ee3b91d2598e3")).count());
+        Assertions.assertEquals(1, df.filter((FilterFunction<Row>) r -> r.getAs("_1").equals("50|57a035e5b1ae::2172074b599ad664d6dc1028b3f53823")).count());
+
+        df.show(false);
+    }
+
+    @Test
+    void NotExistPublicationDateTest() throws Exception {
+
+        ConstraintEvaluator
+                .main(
+                        new String[] {
+                                "-isSparkSessionManaged", Boolean.FALSE.toString(),
+                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/taggingConf").getPath(),
+                                "-outputPath", workingDir.toString() + "/taggingOutcome/",
+                                "-pathMapPath", getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/pathMap").getPath() ,
+                                "-nameNode", "local"
+                        });
+
+        org.apache.spark.sql.Dataset<Row> df = spark.read().json(workingDir.toString() + "/taggingOutcome/").filter((FilterFunction<Row>) r -> r.getAs("_2").equals("DA"));;
+        Assertions.assertEquals(2, df.count());
+        Assertions.assertEquals(1, df.filter((FilterFunction<Row>) r -> r.getAs("_1").equals("50|1f309934e546::583dfb08afb63c1eb65ee3b91d2598e3")).count());
+        Assertions.assertEquals(1, df.filter((FilterFunction<Row>) r -> r.getAs("_1").equals("50|57a035e5b1ae::2172074b599ad664d6dc1028b3f53823")).count());
+
+        df.show(false);
     }
 
 //    @Test

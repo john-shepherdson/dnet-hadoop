@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.List;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ReadContext;
+import org.apache.commons.lang3.StringUtils;
 
 //Verifica che esista un valore indipendentemente dal valore dato (param = null)
 //Verifica che esista fra i valori a disposizione almeno uno uguale ad una lista di valori dati (param = lista).
@@ -28,6 +29,8 @@ public class ExistVerb implements Selection, JsonPathAware, Serializable {
 		//in questo caso esiste un valore indipendentemente dal valore dato
 		if(params == null && jsonPath == null) {
 			if (value instanceof List<?> lista && lista.isEmpty())
+				return false;
+			if (value instanceof String s && StringUtils.isEmpty(s))
 				return false;
 			return value != null;
 		}
