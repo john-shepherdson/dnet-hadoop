@@ -1065,6 +1065,12 @@
             </dependencyManagement>
         </profile>
         <profile>
+            <id>spark24</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
             <id>spark34</id>
             <properties>
                 <scala.binary.version>2.12</scala.binary.version>
