@@ -1,0 +1,136 @@
+    <workflow-app name="Alert_Notifications_Workflow" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>mdStoreInputId</name>
+            <description>the identifier of the native MDStore</description>
+        </property>
+        <property>
+            <name>mdStoreManagerURI</name>
+            <description>the path of the cleaned mdstore</description>
+        </property>
+        <property>
+            <name>apiDescription</name>
+            <description>A json encoding of the API Description class</description>
+        </property>
+        <property>
+        	<name>brokerApiBaseUrl</name>
+        	<description>the url of the broker service api</description>
+        </property>
+    	 <property>
+            <name>esIndexName</name>
+            <description>the elasticsearch index name for alert notifications</description>
+        </property>
+        <property>
+            <name>esIndexHost</name>
+            <description>the elasticsearch host</description>
+        </property>
+        
+        <!-- General oozie workflow properties -->
+        <property>
+            <name>sparkClusterOpts</name>
+            <value>--conf spark.extraListeners= --conf spark.sql.queryExecutionListeners= --conf spark.yarn.historyServer.address=http://iis-cdh5-test-gw.ocean.icm.edu.pl:18089 --conf spark.eventLog.dir=hdfs://nameservice1/user/spark/spark2ApplicationHistory --conf spark.executorEnv.JAVA_HOME=/srv/java/openjdk-17 --conf spark.yarn.appMasterEnv.JAVA_HOME=/srv/java/openjdk-17 --conf spark.sql.warehouse.dir=/user/hive/warehouse --conf spark.eventLog.compression.codec=lz4 --conf spark.shuffle.mapStatus.compression.codec=lz4 --conf spark.shuffle.useOldFetchProtocol=true --conf spark.eventLog.enabled=true</value>
+            <description>spark cluster-wide options</description>
+        </property>
+        <property>
+            <name>sparkResourceOpts</name>
+            <value>--executor-memory=8G --conf spark.executor.memoryOverhead=4G --executor-cores=6 --driver-memory=9G --driver-cores=4 --conf spark.default.parallelism=3840 --conf spark.sql.shuffle.partitions=7680 --conf spark.sql.files.maxPartitionBytes=33554432 --conf spark.sql.adaptive.advisoryPartitionSizeInBytes=32m --conf spark.sql.adaptive.coalescePartitions.parallelismFirst=false --conf spark.sql.adaptive.forceOptimizeSkewedJoin=true --conf spark.sql.adaptive.skewJoin.skewedPartitionThresholdInBytes=64m --conf spark.sql.adaptive.skewJoin.skewedPartitionFactor=3.0 --conf spark.executor.extraJavaOptions="-XX:MaxDirectMemorySize=4g"</value>
+            <description>spark resource options</description>
+        </property>
+        <property>
+            <name>sparkApplicationOpts</name>
+            <value>--conf spark.sql.shuffle.partitions=7680</value>
+            <description>spark resource options</description>
+        </property>
+        
+    </parameters>
+
+    <start to="BeginRead"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <action name="BeginRead">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>READ_LOCK</arg>
+            <arg>--mdStoreID</arg><arg>${mdStoreInputId}</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+            <capture-output/>
+        </java>
+        <ok to="GenerateAlertNotifications"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="GenerateAlertNotifications">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Generate Alert Notifications</name>
+            <class>eu.dnetlib.dhp.broker.oa_alerts.GenerateAlertNotificationsJob</class>
+            <jar>dhp-broker-events-${projectVersion}.jar</jar>
+            <spark-opts>
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
+            </spark-opts>
+            <arg>--mdstoreInputVersion</arg><arg>${wf:actionData('BeginRead')['mdStoreReadLockVersion']}</arg>
+            <arg>--provenance</arg><arg><!-- TODO --></arg>
+            <arg>--apidescriptor</arg><arg>${apiDescription}</arg>
+            <arg>--outputDir</arg><arg><!-- TODO --></arg>
+            <arg>--brokerApiBaseUrl</arg><arg>${brokerApiBaseUrl}</arg>
+        </spark>
+        <ok to="IndexAlertNotifications"/>
+        <error to="EndRead"/>
+    </action>
+
+	<action name="IndexAlertNotifications">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Generate Alert Notifications</name>
+            <class>eu.dnetlib.dhp.broker.oa_alerts.IndexAlertNotificationsJob</class>
+            <jar>dhp-broker-events-${projectVersion}.jar</jar>
+            <spark-opts>
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
+            </spark-opts>
+			<arg>--provenance</arg><arg><!-- TODO --></arg>
+			<arg>--path</arg><arg><!-- TODO --></arg>
+			<arg>--index</arg><arg>${esIndexName}</arg>
+			<arg>--esHost</arg><arg>${esIndexHost}</arg>
+			<arg>--brokerApiBaseUrl</arg><arg>${brokerApiBaseUrl}</arg>
+        </spark>
+        <ok to="EndRead"/>
+        <error to="EndRead"/>
+    </action>
+
+    <action name="EndRead">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>READ_UNLOCK</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+            <arg>--readMDStoreId</arg><arg>${wf:actionData('BeginRead')['mdStoreReadLockVersion']}</arg>
+            <capture-output/>
+        </java>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+    
+    <end name="End"/>
+
+</workflow-app>
