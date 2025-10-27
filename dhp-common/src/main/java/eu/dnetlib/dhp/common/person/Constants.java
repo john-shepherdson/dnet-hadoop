@@ -46,7 +46,7 @@ public class Constants {
 					"authors", DataTypes
 							.createArrayType(
 									new StructType()
-											.add("corresponding", DataTypes.StringType)
+											.add("corresponding", DataTypes.BooleanType)
 											.add(
 													"contributor_roles", DataTypes
 															.createArrayType(
