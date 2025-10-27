@@ -6,6 +6,12 @@
 		"paramRequired": true
 	},
 	{
+		"paramName": "a",
+		"paramLongName": "apidescriptor",
+		"paramDescription": "the JSON encoding of the API Descriptor",
+		"paramRequired": true
+	},
+	{
 		"paramName": "d",
 		"paramLongName": "path",
 		"paramDescription": "the dir that contains the notifications files",

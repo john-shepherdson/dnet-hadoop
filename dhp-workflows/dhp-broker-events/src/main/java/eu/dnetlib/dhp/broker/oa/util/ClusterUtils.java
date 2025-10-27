@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocatedFileStatus;
@@ -25,6 +26,7 @@ import org.apache.spark.util.LongAccumulator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.collection.ApiDescriptor;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Relation;
@@ -132,6 +134,10 @@ public class ClusterUtils {
 					return r;
 				}, Encoders.bean(Relation.class))
 				.filter((FilterFunction<Relation>) r -> relType.equals(r.getRelType()));
+	}
+
+	public static String pathForAlertNotifications(final String baseDir, final ApiDescriptor api) {
+		return baseDir.trim() + "/" + DigestUtils.md5Hex(api.getId()) + "_alert_notifications";
 	}
 
 }

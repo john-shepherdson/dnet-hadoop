@@ -73,20 +73,24 @@ public class GenerateAlertNotificationsJob {
 
 		final String mdstoreInputVersion = parser.get("mdstoreInputVersion");
 
-		final String outputPath = parser.get("outputDir");
+		final Provenance provenance = DHPUtils.MAPPER.readValue(parser.get("provenance"), Provenance.class);
+		final ApiDescriptor api = DHPUtils.MAPPER.readValue(parser.get("apidescriptor"), ApiDescriptor.class);
 
-		final String dsId = DHPUtils.MAPPER.readValue(parser.get("provenance"), Provenance.class).getDatasourceId();
+		final String dsId = provenance.getDatasourceId();
 		log.info("dsId: {}", dsId);
 
-		final String dsName = DHPUtils.MAPPER.readValue(parser.get("provenance"), Provenance.class).getDatasourceName();
+		final String dsName = provenance.getDatasourceName();
 		log.info("dsName: {}", dsName);
 
-		final String compatibilityLevel = DHPUtils.MAPPER.readValue(parser.get("apidescriptor"), ApiDescriptor.class).getCompatibilityLevel();
+		final String compatibilityLevel = api.getCompatibilityLevel();
 		log.info("compatibilityLevel: {}", compatibilityLevel);
 
 		final MDStoreVersion mdstoreVersion = DHPUtils.MAPPER.readValue(mdstoreInputVersion, MDStoreVersion.class);
 		final String inputPath = mdstoreVersion.getHdfsPath() + Constants.MDSTORE_DATA_PATH;
 		log.info("inputPath: {}", inputPath);
+
+		final String outputPath = ClusterUtils.pathForAlertNotifications(parser.get("outputDir"), api);
+		log.info(outputPath);
 
 		final String brokerApiBaseUrl = parser.get("brokerApiBaseUrl");
 		log.info("brokerApiBaseUrl: {}", brokerApiBaseUrl);

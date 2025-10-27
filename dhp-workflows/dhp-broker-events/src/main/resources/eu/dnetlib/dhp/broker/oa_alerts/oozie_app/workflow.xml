@@ -1,6 +1,14 @@
     <workflow-app name="Alert_Notifications_Workflow" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
+            <name>apiDescription</name>
+            <description>A json encoding of the API Description class</description>
+        </property>
+        <property>
+            <name>dataSourceInfo</name>
+            <description>A json encoding of the Datasource Info</description>
+        </property>
+        <property>
             <name>mdStoreInputId</name>
             <description>the identifier of the native MDStore</description>
         </property>
@@ -9,20 +17,20 @@
             <description>the path of the cleaned mdstore</description>
         </property>
         <property>
-            <name>apiDescription</name>
-            <description>A json encoding of the API Description class</description>
+            <name>outputDir</name>
+            <description>the path where the generated data will be stored</description>
         </property>
         <property>
-        	<name>brokerApiBaseUrl</name>
-        	<description>the url of the broker service api</description>
-        </property>
-    	 <property>
             <name>esIndexName</name>
             <description>the elasticsearch index name for alert notifications</description>
         </property>
         <property>
             <name>esIndexHost</name>
             <description>the elasticsearch host</description>
+        </property>
+        <property>
+        	<name>brokerApiBaseUrl</name>
+        	<description>the url of the broker service api</description>
         </property>
         
         <!-- General oozie workflow properties -->
@@ -81,9 +89,9 @@
                 ${sparkApplicationOpts}
             </spark-opts>
             <arg>--mdstoreInputVersion</arg><arg>${wf:actionData('BeginRead')['mdStoreReadLockVersion']}</arg>
-            <arg>--provenance</arg><arg><!-- TODO --></arg>
+            <arg>--provenance</arg><arg>${dataSourceInfo}</arg>
             <arg>--apidescriptor</arg><arg>${apiDescription}</arg>
-            <arg>--outputDir</arg><arg><!-- TODO --></arg>
+            <arg>--outputDir</arg><arg>${outputDir}</arg>
             <arg>--brokerApiBaseUrl</arg><arg>${brokerApiBaseUrl}</arg>
         </spark>
         <ok to="IndexAlertNotifications"/>
@@ -102,8 +110,9 @@
                 ${sparkResourceOpts}
                 ${sparkApplicationOpts}
             </spark-opts>
-			<arg>--provenance</arg><arg><!-- TODO --></arg>
-			<arg>--path</arg><arg><!-- TODO --></arg>
+			<arg>--provenance</arg><arg>${dataSourceInfo}</arg>
+			<arg>--apidescriptor</arg><arg>${apiDescription}</arg>
+			<arg>--path</arg><arg>${outputDir}</arg>
 			<arg>--index</arg><arg>${esIndexName}</arg>
 			<arg>--esHost</arg><arg>${esIndexHost}</arg>
 			<arg>--brokerApiBaseUrl</arg><arg>${brokerApiBaseUrl}</arg>

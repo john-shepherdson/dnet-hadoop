@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.broker.oa.util.BrokerIndexClient;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
+import eu.dnetlib.dhp.collection.ApiDescriptor;
 import eu.dnetlib.dhp.index.es.ConvertJSONWithId;
 import eu.dnetlib.dhp.schema.mdstore.Provenance;
 import eu.dnetlib.dhp.utils.DHPUtils;
@@ -34,7 +35,9 @@ public class IndexAlertNotificationsJob {
 								.getResourceAsStream("/eu/dnetlib/dhp/broker/oa_alert/index_alert_notifications.json")));
 		parser.parseArgument(args);
 
-		final String notificationsPath = parser.get("path");
+		final ApiDescriptor api = DHPUtils.MAPPER.readValue(parser.get("apidescriptor"), ApiDescriptor.class);
+
+		final String notificationsPath = ClusterUtils.pathForAlertNotifications(parser.get("path"), api);
 		log.info("notificationsPath: {}", notificationsPath);
 
 		final String index = parser.get("index");
