@@ -52,7 +52,7 @@ import eu.dnetlib.validator2.result_models.StandardValidationResult;
 
 public class GenerateAlertNotificationsJob {
 
-	private static final String TOPIC_PREFIX = "ALERT/VALIDATOR/";
+	private static final String TOPIC_PREFIX = "ALERT/";
 
 	private static final Logger log = LoggerFactory.getLogger(GenerateAlertNotificationsJob.class);
 
