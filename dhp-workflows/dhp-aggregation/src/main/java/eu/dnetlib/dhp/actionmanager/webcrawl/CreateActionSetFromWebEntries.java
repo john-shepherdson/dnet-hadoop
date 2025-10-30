@@ -216,7 +216,7 @@ public class CreateActionSetFromWebEntries implements Serializable {
 								false, null, false, false,
 								OafMapperUtils
 									.qualifier(
-										"sysimport:crasswalk:webcrawl", "Imported from Webcrawl",
+										"sysimport:cr0sswalk:webcrawl", "Imported from Webcrawl",
 										ModelConstants.DNET_PROVENANCE_ACTIONS, ModelConstants.DNET_PROVENANCE_ACTIONS),
 								"0.9"),
 						null));
