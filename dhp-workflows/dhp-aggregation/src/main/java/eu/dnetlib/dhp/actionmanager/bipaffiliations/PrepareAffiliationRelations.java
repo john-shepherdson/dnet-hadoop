@@ -65,7 +65,7 @@ public class PrepareAffiliationRelations implements Serializable {
 				.toString(
 						PrepareAffiliationRelations.class
 								.getResourceAsStream(
-										"/eu/dnetlib/dhp/actionmanager/affro/input_actionset_parameter.json"));
+										"/eu/dnetlib/dhp/actionmanager/bipaffiliations/input_actionset_parameter.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 		parser.parseArgument(args);

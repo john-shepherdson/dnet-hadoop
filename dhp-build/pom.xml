@@ -21,7 +21,10 @@
 	<profiles>
 		<profile>
 			<id>spark24</id>
-			<modules>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
 				<module>dhp-build-properties-maven-plugin</module>
 			</modules>
 		</profile>

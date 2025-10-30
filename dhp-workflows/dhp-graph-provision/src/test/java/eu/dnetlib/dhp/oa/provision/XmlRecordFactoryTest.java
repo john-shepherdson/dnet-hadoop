@@ -11,6 +11,7 @@ import org.apache.commons.io.IOUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
+import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 import org.junit.jupiter.api.Test;
 
@@ -108,6 +109,9 @@ public class XmlRecordFactoryTest {
 
 		final ContextMapper contextMapper = new ContextMapper();
 
+        contextMapper.put("egi", new ContextDef("egi", "European Grid Infrastructure", "context", "ri"));
+        contextMapper.put("egi::2", new ContextDef("egi::2", "EGI Projects", "category", ""));
+
 		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
 			PayloadConverterJob.schemaLocation);
 
@@ -132,6 +136,10 @@ public class XmlRecordFactoryTest {
 		assertNotNull(doc);
 		System.out.println(doc.asXML());
 		assertEquals("2021-01-01", doc.valueOf("//validated/@date"));
+
+        List<Node> context = (List<Node>) doc.selectNodes("//context/@id");
+        assertEquals(1, context.size());
+        assertEquals("egi", context.get(0).getText());
 	}
 
 	@Test
