@@ -21,6 +21,10 @@
     "language": {"path": "$['language'].classid"},
     "resultType": {"path": "$['resulttype'].classid"},
     "pidScheme": {"path": "$['pid'][*]['qualifier']['classid']"},
+    "instance": {"path": "$['instance'][*]"},
+    "instanceAlternateIdentifiers" : {"path": "$['alternateIdentifier'][*]['value']"},
+    "instancePids": {"path": "$['pid'][*]['value']"},
+    "instanceLicence":{"path":"$['license']['value']"},
     "publicationyear": {
         "path": "$['dateofacceptance'].value",
         "action": {

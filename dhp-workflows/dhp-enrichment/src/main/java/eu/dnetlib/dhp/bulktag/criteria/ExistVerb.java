@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
 import com.jayway.jsonpath.ReadContext;
 import org.apache.commons.lang3.StringUtils;
 
@@ -24,15 +25,24 @@ public class ExistVerb implements Selection, JsonPathAware, Serializable {
 		this.params = param;
 	}
 
+	private Boolean isEmpty(Object value){
+		if (value instanceof List<?> lista ) {
+			return lista == null || lista.stream().allMatch(l -> {
+				if (l instanceof String s)
+					return StringUtils.isEmpty(s);
+				return l == null;
+			});
+		}
+		if (value instanceof String s)
+			return StringUtils.isEmpty(s);
+		return value == null;
+	}
+
 	@Override
 	public boolean apply(Object value) {
 		//in questo caso esiste un valore indipendentemente dal valore dato
 		if(params == null && jsonPath == null) {
-			if (value instanceof List<?> lista && lista.isEmpty())
-				return false;
-			if (value instanceof String s && StringUtils.isEmpty(s))
-				return false;
-			return value != null;
+			return !isEmpty(value);
 		}
 		//il valore esiste in una lista di valori dati.
 		//jsonPath e' nullp => value e' una stringa da controllare e params e' una lista di valori
@@ -54,12 +64,15 @@ public class ExistVerb implements Selection, JsonPathAware, Serializable {
 				ctx = JsonPath.parse((String)value);
 			else
 				ctx = JsonPath.parse(value);
-			Object results = ctx.read(jsonPath);
-			if (results == null || (results instanceof List<?> lista &&  lista.isEmpty())) {
+			Object results;
+			try{
+				 results = ctx.read(jsonPath);
+			}catch(PathNotFoundException e){
 				return false;
 			}
+
 			if(params == null) {
-				return true;
+				return !isEmpty(results);
 			}
 			if (results instanceof String stringa && params instanceof List<?> lista) {
 				return lista.stream().anyMatch(entry -> stringa.equalsIgnoreCase((String) entry));

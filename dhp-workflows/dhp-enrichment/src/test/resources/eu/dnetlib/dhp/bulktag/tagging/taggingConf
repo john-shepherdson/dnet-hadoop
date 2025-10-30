@@ -1,97 +1,131 @@
 {
-    "tags": [
+    "tags":[
         {
-            "id": "PB",
-            "inputs":{"publication":"/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/graph/publication",
-            "relation":"/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/graph/relation",
-            "project":"/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/graph/project"},
+            "id":"PB",
+            "inputs":{
+                "publication":"/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/graph/publication",
+                "relation":"/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/graph/relation",
+                "project":"/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/graph/project"
+            },
             "selects":[
-                {"tableName": "result", "tableSelect":"SELECT publication.* , project.startDate.value as comparisonValue FROM publication JOIN relation JOIN project on publication.id = relation.source AND project.id = relation.target WHERE relation.relClass = 'isProducedBy'"}
+                {
+                    "tableName":"result",
+                    "tableSelect":"SELECT publication.* , project.startDate.value as comparisonValue FROM publication JOIN relation JOIN project on publication.id = relation.source AND project.id = relation.target WHERE relation.relClass = 'isProducedBy'"
+                }
             ],
             "entityToTag":"publication",
-            "resultTable": "result",
-            "criteria": [
+            "resultTable":"result",
+            "criteria":[
                 {
-                    "constraint": [
+                    "constraint":[
                         {
-                            "verb": "before",
-                            "field": "publicationDate",
-                            "value": null
+                            "verb":"before",
+                            "field":"publicationDate",
+                            "value":null
                         }
                     ]
                 }
             ]
         },
         {
-            "id": "DA",
-            "inputs":{"publication":"/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/graph/publication"},
+            "id":"DA",
+            "inputs":{
+                "publication":"/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/graph/publication"
+            },
             "selects":null,
             "entityToTag":"publication",
-            "resultTable": "publication",
-            "criteria": [
+            "resultTable":"publication",
+            "criteria":[
                 {
-                    "constraint": [
+                    "constraint":[
                         {
-                            "verb": "not_exist",
-                            "field": "publicationDate",
-                            "value": null,
-                            "jsonPath": null
+                            "verb":"not_exist",
+                            "field":"publicationDate",
+                            "value":null,
+                            "jsonPath":null
                         }
                     ]
                 }
             ]
         },
         {
-            "id": "AP",
-            "inputs":{"publication":"/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/graph/publication"},
+            "id":"AP",
+            "inputs":{
+                "publication":"/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/graph/publication"
+            },
             "selects":null,
             "entityToTag":"publication",
-            "resultTable": "publication",
-            "criteria": [
+            "resultTable":"publication",
+            "criteria":[
                 {
-                    "constraint": [
+                    "constraint":[
                         {
-                            "verb": "exist_forall",
-                            "field": "authorWhole",
-                            "value": ["orcid", "orcid_pending", "github", "lattes", "linkedin", "twitter", "gitlab", "acm", "dblp", "dia", "gepris", "ieee", "isni", "jst", "nii", "openid", "repec", "researcherid", "viaf", "zbmath"],
-                            "jsonPath": "authorPids"
+                            "verb":"not_exist_forall",
+                            "field":"authorWhole",
+                            "value":[
+                                "orcid",
+                                "orcid_pending",
+                                "github",
+                                "lattes",
+                                "linkedin",
+                                "twitter",
+                                "gitlab",
+                                "acm",
+                                "dblp",
+                                "dia",
+                                "gepris",
+                                "ieee",
+                                "isni",
+                                "jst",
+                                "nii",
+                                "openid",
+                                "repec",
+                                "researcherid",
+                                "viaf",
+                                "zbmath"
+                            ],
+                            "jsonPath":"authorPids"
                         }
                     ]
                 }
             ]
         },
         {
-            "id": "MA",
-            "inputs":{"publication":"/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/graph/publication"},
+            "id":"MA",
+            "inputs":{
+                "publication":"/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/graph/publication"
+            },
             "selects":null,
             "entityToTag":"publication",
-            "resultTable": "publication",
-            "criteria": [
+            "resultTable":"publication",
+            "criteria":[
                 {
-                    "constraint": [
+                    "constraint":[
                         {
-                            "verb": "not_exist",
-                            "field": "description",
-                            "value": null,
-                            "jsonPath": null
+                            "verb":"not_exist",
+                            "field":"description",
+                            "value":null,
+                            "jsonPath":null
                         }
                     ]
                 }
             ]
         },
         {
-            "id": "NP",
-            "inputs":{"publication":"/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/graph/publication"},
+            "id":"NP",
+            "inputs":{
+                "publication":"/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/graph/publication"
+            },
             "selects":null,
             "entityToTag":"publication",
-            "resultTable": "publication",
-            "criteria": [
+            "resultTable":"publication",
+            "criteria":[
                 {
-                    "constraint": [
+                    "constraint":[
                         {
-                            "verb": "not_exist",
-                            "field": "pidScheme",
-                            "value": [
+                            "verb":"not_exist",
+                            "field":"pidScheme",
+                            "value":[
                                 "doi",
                                 "pmid",
                                 "pmc",
@@ -108,24 +142,234 @@
                 }
             ]
         },
-         {
-             "id": "HD",
-             "inputs":{"publication":"/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/graph/publication"},
-             "selects":null,
-             "entityToTag":"publication",
-             "resultTable": "publication",
-             "criteria": [
-                 {
-                     "constraint": [
-                         {
-                             "verb": "not_exist_forall",
-                             "field": "hostedby",
-                             "value": null,
-                             "jsonPath": null
-                         }
-                     ]
-                 }
-             ]
-         }
+        {
+            "id":"HD",
+            "inputs":{
+                "publication":"/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/graph/publication"
+            },
+            "selects":null,
+            "entityToTag":"publication",
+            "resultTable":"publication",
+            "criteria":[
+                {
+                    "constraint":[
+                        {
+                            "verb":"not_exist_forall",
+                            "field":"hostedby",
+                            "value":null,
+                            "jsonPath":null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id":"MPID",
+            "inputs":{
+                "publication":"/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/graph/publication"
+            },
+            "selects":null,
+            "entityToTag":"publication",
+            "resultTable":"publication",
+            "criteria":[
+                {
+                    "constraint":[
+                        {
+                            "verb":"not_exist_forall",
+                            "field":"instance",
+                            "value":[
+                                "doi",
+                                "pmid",
+                                "pmc",
+                                "pmcid",
+                                "ark",
+                                "omid",
+                                "crossref",
+                                "openalex",
+                                "arxiv",
+                                "handle"
+                            ],
+                            "jsonPath":"pidScheme"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id":"MID",
+            "inputs":{
+                "publication":"/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/graph/publication"
+            },
+            "selects":null,
+            "entityToTag":"publication",
+            "resultTable":"publication",
+            "criteria":[
+                {
+                    "constraint":[
+                        {
+                            "verb":"not_exist_forall",
+                            "field":"instance",
+                            "value":null,
+                            "jsonPath":"instanceAlternateIdentifiers"
+                        },
+                        {
+                            "verb":"not_exist_forall",
+                            "field":"instance",
+                            "value":null,
+                            "jsonPath":"instancePids"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id":"MIL",
+            "inputs":{
+                "publication":"/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/graph/publication"
+            },
+            "selects":null,
+            "entityToTag":"publication",
+            "resultTable":"publication",
+            "criteria":[
+                {
+                    "constraint":[
+                        {
+                            "verb":"not_exist_forall",
+                            "field":"instance",
+                            "value":null,
+                            "jsonPath":"instanceLicence"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id":"SM",
+            "inputs":{
+                "dataset":"/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/graph/dataset"
+            },
+            "selects":null,
+            "entityToTag":"dataset",
+            "resultTable":"dataset",
+            "criteria":[
+                {
+                    "constraint":[
+                        {
+                            "verb":"starts_with_caseinsensitive",
+                            "field":"title",
+                            "value":"supplementary material for"
+                        }
+                    ]
+                },
+                {
+                    "constraint":[
+                        {
+                            "verb":"starts_with_caseinsensitive",
+                            "field":"title",
+                            "value":"supplementary materials for"
+                        }
+                    ]
+                },
+                {
+                    "constraint":[
+                        {
+                            "verb":"starts_with_caseinsensitive",
+                            "field":"title",
+                            "value":"supplementary file for"
+                        }
+                    ]
+                },
+                {
+                    "constraint":[
+                        {
+                            "verb":"starts_with_caseinsensitive",
+                            "field":"title",
+                            "value":"supplementary document for"
+                        }
+                    ]
+                },
+                {
+                    "constraint":[
+                        {
+                            "verb":"starts_with_caseinsensitive",
+                            "field":"title",
+                            "value":"supplementary figure"
+                        }
+                    ]
+                },
+                {
+                    "constraint":[
+                        {
+                            "verb":"starts_with_caseinsensitive",
+                            "field":"title",
+                            "value":"supplemental figure"
+                        }
+                    ]
+                },
+                {
+                    "constraint":[
+                        {
+                            "verb":"starts_with_caseinsensitive",
+                            "field":"title",
+                            "value":"supplementary table"
+                        }
+                    ]
+                },
+                {
+                    "constraint":[
+                        {
+                            "verb":"starts_with_caseinsensitive",
+                            "field":"title",
+                            "value":"figure"
+                        }
+                    ]
+                },
+                {
+                    "constraint":[
+                        {
+                            "verb":"starts_with_caseinsensitive",
+                            "field":"title",
+                            "value":"table for"
+                        }
+                    ]
+                },
+                {
+                    "constraint":[
+                        {
+                            "verb":"starts_with_caseinsensitive",
+                            "field":"title",
+                            "value":"data from"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+                    "id":"MT",
+                    "inputs":{
+                        "publication":"/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/graph/publication",
+                        "relation":"/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/graph/relation",
+                        "dataset":"/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/graph/dataset"
+                    },
+                    "selects":[
+                        {
+                            "tableName":"result",
+                            "tableSelect":"SELECT dataset.* , publication.title.value as comparisonValue FROM publication JOIN relation JOIN dataset on publication.id = relation.source AND dataset.id = relation.target WHERE relation.relClass = 'IsSupplementedBy'"
+                        }
+                    ],
+                    "entityToTag":"dataset",
+                    "resultTable":"result",
+                    "criteria":[
+                        {
+                            "constraint":[
+                                {
+                                    "verb":"not_exist_forall",
+                                    "field":"title",
+                                    "value":null
+                                }
+                            ]
+                        }
+                    ]
+                }
     ]
 }

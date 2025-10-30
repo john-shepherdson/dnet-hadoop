@@ -9,45 +9,35 @@ import java.util.List;
 @VerbClass("not_equals_caseinsensitive")
 public class NotEqualVerbIgnoreCase implements Selection, Serializable {
 
-	private List<String> params = new ArrayList<>();
+	private Object params ;
 
-	public NotEqualVerbIgnoreCase(final String param) {
-		this.params = List.of(param);
-	}
-	public NotEqualVerbIgnoreCase(final List<String> param) {
-		this.params = param;
-	}
 
 	public NotEqualVerbIgnoreCase(final Object param) {
-		if(param instanceof String s)
-			this.params = List.of(s);
-		if(param instanceof List<?> lista && !lista.isEmpty() && lista.get(0) instanceof String)
-			lista.forEach(l -> params.add(String.valueOf(l)));
+		this.params = param;
 	}
 	public NotEqualVerbIgnoreCase() {
 	}
 
-	public List<String> getParam() {
+	public Object getParam() {
 		return params;
 	}
 
-	public void setParam(List<String> param) {
+	public void setParam(Object param) {
 		this.params = param;
 	}
 
 	@Override
 	public boolean apply(Object value)
 	{
-		if(params.size() == 1){
-			if(value instanceof String s)
-				return !s.equalsIgnoreCase(params.get(0));
-			if(value instanceof List<?> list )
-				if(list.size() == 1 && list.get(0) instanceof String s )
-					return ! params.get(0).equalsIgnoreCase(s);
+		if(params instanceof String sParam){
+			if(value instanceof String s  )
+				return !s.trim().equalsIgnoreCase(sParam.trim());
+			if (value instanceof List<?> lista )
+				return lista.stream().allMatch(l -> (l instanceof String sValue && !sValue.trim().equalsIgnoreCase(sParam.trim())));
 		}
 
 
-		return true;
+		throw new RuntimeException("Verb not applicable with this configuration");
 	}
 
 	@Override

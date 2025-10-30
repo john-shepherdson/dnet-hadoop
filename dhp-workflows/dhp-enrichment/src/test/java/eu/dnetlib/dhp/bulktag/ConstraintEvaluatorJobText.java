@@ -104,7 +104,7 @@ public class ConstraintEvaluatorJobText {
     }
 
     @Test
-    void NotExistPublicationDateTest() throws Exception {
+    void NotExistAuthorPidTest() throws Exception {
 
         ConstraintEvaluator
                 .main(
@@ -116,10 +116,9 @@ public class ConstraintEvaluatorJobText {
                                 "-nameNode", "local"
                         });
 
-        org.apache.spark.sql.Dataset<Row> df = spark.read().json(workingDir.toString() + "/taggingOutcome/").filter((FilterFunction<Row>) r -> r.getAs("_2").equals("DA"));;
-        Assertions.assertEquals(2, df.count());
-        Assertions.assertEquals(1, df.filter((FilterFunction<Row>) r -> r.getAs("_1").equals("50|1f309934e546::583dfb08afb63c1eb65ee3b91d2598e3")).count());
-        Assertions.assertEquals(1, df.filter((FilterFunction<Row>) r -> r.getAs("_1").equals("50|57a035e5b1ae::2172074b599ad664d6dc1028b3f53823")).count());
+        org.apache.spark.sql.Dataset<Row> df = spark.read().json(workingDir.toString() + "/taggingOutcome/").filter((FilterFunction<Row>) r -> r.getAs("_2").equals("AP"));;
+
+        Assertions.assertEquals(11, df.count());
 
         df.show(false);
     }
@@ -143,6 +142,146 @@ public class ConstraintEvaluatorJobText {
         Assertions.assertEquals(1, df.filter((FilterFunction<Row>) r -> r.getAs("_1").equals("50|57a035e5b1ae::2172074b599ad664d6dc1028b3f53823")).count());
 
         df.show(false);
+    }
+
+    @Test
+    void NotExistResultPidTest() throws Exception {
+
+        ConstraintEvaluator
+                .main(
+                        new String[] {
+                                "-isSparkSessionManaged", Boolean.FALSE.toString(),
+                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/taggingConf").getPath(),
+                                "-outputPath", workingDir.toString() + "/taggingOutcome/",
+                                "-pathMapPath", getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/pathMap").getPath() ,
+                                "-nameNode", "local"
+                        });
+
+        org.apache.spark.sql.Dataset<Row> df = spark.read().json(workingDir.toString() + "/taggingOutcome/").filter((FilterFunction<Row>) r -> r.getAs("_2").equals("NP"));;
+
+        Assertions.assertEquals(7, df.count());
+
+        df.show(false);
+    }
+
+    @Test
+    void NotExistHostedByTest() throws Exception {
+
+        ConstraintEvaluator
+                .main(
+                        new String[] {
+                                "-isSparkSessionManaged", Boolean.FALSE.toString(),
+                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/taggingConf").getPath(),
+                                "-outputPath", workingDir.toString() + "/taggingOutcome/",
+                                "-pathMapPath", getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/pathMap").getPath() ,
+                                "-nameNode", "local"
+                        });
+
+        org.apache.spark.sql.Dataset<Row> df = spark.read().json(workingDir.toString() + "/taggingOutcome/").filter((FilterFunction<Row>) r -> r.getAs("_2").equals("HD"));;
+
+        Assertions.assertEquals(2, df.count());
+
+        df.show(false);
+    }
+
+    @Test
+    void NotExistInstancePidTest() throws Exception {
+
+        ConstraintEvaluator
+                .main(
+                        new String[] {
+                                "-isSparkSessionManaged", Boolean.FALSE.toString(),
+                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/taggingConf").getPath(),
+                                "-outputPath", workingDir.toString() + "/taggingOutcome/",
+                                "-pathMapPath", getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/pathMap").getPath() ,
+                                "-nameNode", "local"
+                        });
+
+        org.apache.spark.sql.Dataset<Row> df = spark.read().json(workingDir.toString() + "/taggingOutcome/").filter((FilterFunction<Row>) r -> r.getAs("_2").equals("MPID"));;
+
+        //Assertions.assertEquals(3, df.count());
+        Assertions.assertEquals(8, df.count());
+
+    }
+
+    @Test
+    void NotExistInstanceIdentifierTest() throws Exception {
+
+        ConstraintEvaluator
+                .main(
+                        new String[] {
+                                "-isSparkSessionManaged", Boolean.FALSE.toString(),
+                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/taggingConf").getPath(),
+                                "-outputPath", workingDir.toString() + "/taggingOutcome/",
+                                "-pathMapPath", getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/pathMap").getPath() ,
+                                "-nameNode", "local"
+                        });
+
+        org.apache.spark.sql.Dataset<Row> df = spark.read().json(workingDir.toString() + "/taggingOutcome/").filter((FilterFunction<Row>) r -> r.getAs("_2").equals("MID"));;
+
+        //Assertions.assertEquals(3, df.count());
+        df.show(false);
+
+    }
+
+    @Test
+    void NotExistInstancelicenceTest() throws Exception {
+
+        ConstraintEvaluator
+                .main(
+                        new String[] {
+                                "-isSparkSessionManaged", Boolean.FALSE.toString(),
+                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/taggingConf").getPath(),
+                                "-outputPath", workingDir.toString() + "/taggingOutcome/",
+                                "-pathMapPath", getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/pathMap").getPath() ,
+                                "-nameNode", "local"
+                        });
+
+        org.apache.spark.sql.Dataset<Row> df = spark.read().json(workingDir.toString() + "/taggingOutcome/").filter((FilterFunction<Row>) r -> r.getAs("_2").equals("MIL"));;
+
+        //Assertions.assertEquals(3, df.count());
+        df.show(false);
+
+    }
+
+    @Test
+    void SupplementaryMaterialTest() throws Exception {
+
+        ConstraintEvaluator
+                .main(
+                        new String[] {
+                                "-isSparkSessionManaged", Boolean.FALSE.toString(),
+                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/taggingConf").getPath(),
+                                "-outputPath", workingDir.toString() + "/taggingOutcome/",
+                                "-pathMapPath", getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/pathMap").getPath() ,
+                                "-nameNode", "local"
+                        });
+
+        org.apache.spark.sql.Dataset<Row> df = spark.read().json(workingDir.toString() + "/taggingOutcome/").filter((FilterFunction<Row>) r -> r.getAs("_2").equals("SM"));;
+
+        Assertions.assertEquals(2, df.count());
+
+
+    }
+
+    @Test
+    void MeaningfulTitleTest() throws Exception {
+
+        ConstraintEvaluator
+                .main(
+                        new String[] {
+                                "-isSparkSessionManaged", Boolean.FALSE.toString(),
+                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/taggingConf").getPath(),
+                                "-outputPath", workingDir.toString() + "/taggingOutcome/",
+                                "-pathMapPath", getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/pathMap").getPath() ,
+                                "-nameNode", "local"
+                        });
+
+        org.apache.spark.sql.Dataset<Row> df = spark.read().json(workingDir.toString() + "/taggingOutcome/").filter((FilterFunction<Row>) r -> r.getAs("_2").equals("MT"));;
+
+        Assertions.assertEquals(2, df.count());
+
+
     }
 
 //    @Test

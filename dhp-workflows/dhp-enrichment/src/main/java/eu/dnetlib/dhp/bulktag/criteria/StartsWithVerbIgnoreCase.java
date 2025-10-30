@@ -9,32 +9,24 @@ import java.util.List;
 @VerbClass("starts_with_caseinsensitive")
 public class StartsWithVerbIgnoreCase implements Selection, Serializable {
 
-	private List<String> params = new ArrayList<>();
+	private Object params = new ArrayList<>();
 
 	public StartsWithVerbIgnoreCase() {
 	}
 
 	public StartsWithVerbIgnoreCase(final Object param) {
-		if(param instanceof String s)
-			this.params = List.of(s);
-		if(param instanceof List<?> lista && !lista.isEmpty() && lista.get(0) instanceof String)
-			lista.forEach(l -> params.add(String.valueOf(l)));
+		this.params = param;
+
 	}
 
-	public StartsWithVerbIgnoreCase(final String param) {
-		this.params = List.of(param);
-	}
-	public StartsWithVerbIgnoreCase(final List<String> param) {
-		this.params = param;
-	}
 
 	@Override
 	public boolean apply(Object value) {
-		if(params.size() == 1){
-			if(value instanceof String s)
-				return s.toLowerCase().startsWith(params.get(0).toLowerCase());
-			if (value instanceof List<?> lista && lista.size() == 1 && lista.get(0) instanceof String s)
-				return s.toLowerCase().startsWith(params.get(0).toLowerCase());
+		if(params instanceof String sParam){
+			if(value instanceof String s  )
+				return s.toLowerCase().startsWith(sParam.toLowerCase());
+			if (value instanceof List<?> lista )
+				return lista.stream().anyMatch(l -> (l instanceof String sValue && sValue.toLowerCase().startsWith(sParam.toLowerCase())));
 		}
 
 		return false;
@@ -45,11 +37,11 @@ public class StartsWithVerbIgnoreCase implements Selection, Serializable {
 		return false;
 	}
 
-	public List<String> getParam() {
+	public Object getParam() {
 		return params;
 	}
 
-	public void setParam(List<String> param) {
+	public void setParam(Object param) {
 		this.params = param;
 	}
 }
