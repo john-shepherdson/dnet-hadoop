@@ -987,7 +987,7 @@ case object Crossref2Oaf {
               queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
               //EDTECH-ID
             case "10.13039/501100025197" =>
-              generateSimpleRelationFromAward(funder, "edtech________", a => a)
+              generateSimpleRelationFromAward(funder, "edtech______", a => a)
             case _ => logger.debug("no match for " + funder.DOI.get)
           }
 
