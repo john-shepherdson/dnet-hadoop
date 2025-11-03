@@ -95,7 +95,7 @@
             <arg>--brokerApiBaseUrl</arg><arg>${brokerApiBaseUrl}</arg>
         </spark>
         <ok to="IndexAlertNotifications"/>
-        <error to="EndRead"/>
+        <error to="EndReadFailed"/>
     </action>
 
 	<action name="IndexAlertNotifications">
@@ -118,7 +118,7 @@
 			<arg>--brokerApiBaseUrl</arg><arg>${brokerApiBaseUrl}</arg>
         </spark>
         <ok to="EndRead"/>
-        <error to="EndRead"/>
+        <error to="EndReadFailed"/>
     </action>
 
     <action name="EndRead">
@@ -137,6 +137,25 @@
             <capture-output/>
         </java>
         <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+    
+    <action name="EndReadFailed">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>READ_UNLOCK</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+            <arg>--readMDStoreId</arg><arg>${wf:actionData('BeginRead')['mdStoreReadLockVersion']}</arg>
+            <capture-output/>
+        </java>
+        <ok to="Kill"/>
         <error to="Kill"/>
     </action>
     
