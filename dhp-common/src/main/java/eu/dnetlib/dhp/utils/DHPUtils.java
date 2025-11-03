@@ -128,7 +128,7 @@ public class DHPUtils {
 	public static void writeHdfsFile(final Configuration conf, final String content, final String path)
 		throws IOException {
 
-		log.info("writing file {}, size {}", path, content.length());
+		log.info("writing file {}, size {}", path, content);
 		try (FileSystem fs = FileSystem.get(conf);
 			BufferedOutputStream os = new BufferedOutputStream(fs.create(new Path(path)))) {
 			os.write(content.getBytes(StandardCharsets.UTF_8));

@@ -91,13 +91,11 @@
                 ${sparkClusterOpts}
                 ${sparkResourceOpts}
                 ${sparkApplicationOpts}
-                --conf spark.sql.shuffle.partitions=10000
             </spark-opts>
             <arg>--inputPath</arg><arg>${inputPath}/publication</arg>
             <arg>--hiveDbName</arg><arg>${hiveDbName}</arg>
             <arg>--className</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
-            <arg>--numPartitions</arg><arg>10000</arg>
         </spark>
         <ok to="join_import"/>
         <error to="Kill"/>
@@ -114,13 +112,11 @@
                 ${sparkClusterOpts}
                 ${sparkResourceOpts}
                 ${sparkApplicationOpts}
-                --conf spark.sql.shuffle.partitions=4000
             </spark-opts>
             <arg>--inputPath</arg><arg>${inputPath}/dataset</arg>
             <arg>--hiveDbName</arg><arg>${hiveDbName}</arg>
             <arg>--className</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
-            <arg>--numPartitions</arg><arg>8000</arg>
         </spark>
         <ok to="join_import"/>
         <error to="Kill"/>
@@ -137,13 +133,11 @@
                 ${sparkClusterOpts}
                 ${sparkResourceOpts}
                 ${sparkApplicationOpts}
-                --conf spark.sql.shuffle.partitions=8000
             </spark-opts>
             <arg>--inputPath</arg><arg>${inputPath}/otherresearchproduct</arg>
             <arg>--hiveDbName</arg><arg>${hiveDbName}</arg>
             <arg>--className</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
-            <arg>--numPartitions</arg><arg>3000</arg>
         </spark>
         <ok to="join_import"/>
         <error to="Kill"/>
@@ -160,13 +154,11 @@
                 ${sparkClusterOpts}
                 ${sparkResourceOpts}
                 ${sparkApplicationOpts}
-                --conf spark.sql.shuffle.partitions=1000
             </spark-opts>
             <arg>--inputPath</arg><arg>${inputPath}/software</arg>
             <arg>--hiveDbName</arg><arg>${hiveDbName}</arg>
             <arg>--className</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
-            <arg>--numPartitions</arg><arg>1000</arg>
         </spark>
         <ok to="join_import"/>
         <error to="Kill"/>
@@ -183,13 +175,11 @@
                 ${sparkClusterOpts}
                 ${sparkResourceOpts}
                 ${sparkApplicationOpts}
-                --conf spark.sql.shuffle.partitions=200
             </spark-opts>
             <arg>--inputPath</arg><arg>${inputPath}/datasource</arg>
             <arg>--hiveDbName</arg><arg>${hiveDbName}</arg>
             <arg>--className</arg><arg>eu.dnetlib.dhp.schema.oaf.Datasource</arg>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
-            <arg>--numPartitions</arg><arg>200</arg>
         </spark>
         <ok to="join_import"/>
         <error to="Kill"/>
@@ -206,13 +196,11 @@
                 ${sparkClusterOpts}
                 ${sparkResourceOpts}
                 ${sparkApplicationOpts}
-                --conf spark.sql.shuffle.partitions=1000
             </spark-opts>
             <arg>--inputPath</arg><arg>${inputPath}/organization</arg>
             <arg>--hiveDbName</arg><arg>${hiveDbName}</arg>
             <arg>--className</arg><arg>eu.dnetlib.dhp.schema.oaf.Organization</arg>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
-            <arg>--numPartitions</arg><arg>1000</arg>
         </spark>
         <ok to="join_import"/>
         <error to="Kill"/>
@@ -229,13 +217,11 @@
                 ${sparkClusterOpts}
                 ${sparkResourceOpts}
                 ${sparkApplicationOpts}
-                --conf spark.sql.shuffle.partitions=1000
             </spark-opts>
             <arg>--inputPath</arg><arg>${inputPath}/project</arg>
             <arg>--hiveDbName</arg><arg>${hiveDbName}</arg>
             <arg>--className</arg><arg>eu.dnetlib.dhp.schema.oaf.Project</arg>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
-            <arg>--numPartitions</arg><arg>1000</arg>
         </spark>
         <ok to="join_import"/>
         <error to="Kill"/>
@@ -252,13 +238,11 @@
                 ${sparkClusterOpts}
                 ${sparkResourceOpts}
                 ${sparkApplicationOpts}
-                --conf spark.sql.shuffle.partitions=1000
             </spark-opts>
             <arg>--inputPath</arg><arg>${inputPath}/person</arg>
             <arg>--hiveDbName</arg><arg>${hiveDbName}</arg>
             <arg>--className</arg><arg>eu.dnetlib.dhp.schema.oaf.Person</arg>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
-            <arg>--numPartitions</arg><arg>1000</arg>
         </spark>
         <ok to="join_import"/>
         <error to="Kill"/>
@@ -275,13 +259,11 @@
                 ${sparkClusterOpts}
                 ${sparkResourceOpts}
                 ${sparkApplicationOpts}
-                --conf spark.sql.shuffle.partitions=15000
             </spark-opts>
             <arg>--inputPath</arg><arg>${inputPath}/relation</arg>
             <arg>--hiveDbName</arg><arg>${hiveDbName}</arg>
             <arg>--className</arg><arg>eu.dnetlib.dhp.schema.oaf.Relation</arg>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
-            <arg>--numPartitions</arg><arg>15000</arg>
         </spark>
         <ok to="join_import"/>
         <error to="Kill"/>
