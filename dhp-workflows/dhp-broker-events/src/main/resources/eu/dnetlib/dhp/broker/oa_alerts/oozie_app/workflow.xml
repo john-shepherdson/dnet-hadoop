@@ -36,7 +36,7 @@
         <!-- General oozie workflow properties -->
         <property>
             <name>sparkClusterOpts</name>
-            <value>--conf spark.extraListeners= --conf spark.sql.queryExecutionListeners= --conf spark.yarn.historyServer.address=http://iis-cdh5-test-gw.ocean.icm.edu.pl:18089 --conf spark.eventLog.dir=hdfs://nameservice1/user/spark/spark2ApplicationHistory --conf spark.executorEnv.JAVA_HOME=/srv/java/openjdk-17 --conf spark.yarn.appMasterEnv.JAVA_HOME=/srv/java/openjdk-17 --conf spark.sql.warehouse.dir=/user/hive/warehouse --conf spark.eventLog.compression.codec=lz4 --conf spark.shuffle.mapStatus.compression.codec=lz4 --conf spark.shuffle.useOldFetchProtocol=true --conf spark.eventLog.enabled=true</value>
+            <value>--conf spark.extraListeners= --conf spark.sql.queryExecutionListeners= --conf spark.yarn.historyServer.address=http://iis-cdh5-test-gw.ocean.icm.edu.pl:18089 --conf spark.eventLog.dir=hdfs://nameservice1/user/spark/spark2ApplicationHistory --conf spark.executorEnv.JAVA_HOME=/srv/java/openjdk-17 --conf spark.yarn.appMasterEnv.JAVA_HOME=/srv/java/openjdk-17 --conf spark.yarn.appMasterEnv.HADOOP_USER_NAME=dnet.beta --conf spark.sql.warehouse.dir=/user/hive/warehouse --conf spark.oozie.action.sharelib.for.spark=spark344 --conf spark.eventLog.compression.codec=lz4 --conf spark.shuffle.mapStatus.compression.codec=lz4 --conf spark.shuffle.useOldFetchProtocol=true --conf spark.network.maxRemoteBlockSizeFetchToMem=1G --conf spark.eventLog.enabled=true --conf spark.sql.codegen.wholeStage=false</value>
             <description>spark cluster-wide options</description>
         </property>
         <property>

@@ -99,18 +99,19 @@ public class GenerateAlertNotificationsJob {
 
 		final ValidationType validationType = calculateValidationType(compatibilityLevel);
 
-		if (validationType == null) {
-			log.warn("The compatibility is non managed by the validator engine");
-			return;
-		}
-
-		final String topic = TOPIC_PREFIX + StringUtils.upperCase(validationType.toString());
-
-		log.info("topic: {}", topic);
-
 		final SparkConf conf = new SparkConf();
 
 		SparkSessionSupport.runWithSparkSession(conf, isSparkSessionManaged, spark -> {
+
+            if (validationType == null) {
+                log.warn("The compatibility is non managed by the validator engine");
+                return;
+            }
+
+            final String topic = TOPIC_PREFIX + StringUtils.upperCase(validationType.toString());
+
+            log.info("topic: {}", topic);
+
 			final LongAccumulator total = spark.sparkContext().longAccumulator("total_alert_notifications");
 
 			final Dataset<ValidatorAlertMessage> payloads = spark
