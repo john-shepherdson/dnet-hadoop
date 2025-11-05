@@ -4,8 +4,8 @@ package eu.dnetlib.dhp.oa.graph.hostedbymap;
 import java.io.*;
 import java.util.Objects;
 
+import eu.dnetlib.dhp.utils.DHPUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -43,10 +43,8 @@ public class DownloadFile {
 		final String hdfsNameNode = parser.get("hdfsNameNode");
 		log.info("hdfsNameNode {}", hdfsNameNode);
 
-		Configuration conf = new Configuration();
-		conf.set("fs.defaultFS", hdfsNameNode);
-
-		FileSystem fileSystem = FileSystem.get(conf);
+		Path path = new Path(outputFile);
+		FileSystem fileSystem = path.getFileSystem(DHPUtils.getHadoopConfiguration(hdfsNameNode));
 
 		new DownloadFile().doDownload(fileURL, outputFile, fileSystem);
 

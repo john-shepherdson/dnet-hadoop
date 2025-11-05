@@ -32,7 +32,7 @@ public class HdfsSupport {
 		return rethrowAsRuntimeException(
 			() -> {
 				Path f = new Path(path);
-				FileSystem fileSystem = FileSystem.get(configuration);
+				FileSystem fileSystem = f.getFileSystem(configuration);
 				if (path.contains("*")) {
 					FileStatus[] fileStatus = fileSystem.globStatus(f);
 					if (fileStatus != null) {
@@ -56,7 +56,7 @@ public class HdfsSupport {
 		rethrowAsRuntimeException(
 			() -> {
 				Path f = new Path(path);
-				FileSystem fileSystem = FileSystem.get(configuration);
+				FileSystem fileSystem = f.getFileSystem(configuration);
 				if (fileSystem.exists(f)) {
 					fileSystem.delete(f, true);
 				}
@@ -72,9 +72,10 @@ public class HdfsSupport {
 	 */
 	public static List<String> listFiles(String path, Configuration configuration) {
 		logger.info("Listing files in path: {}", path);
+		Path f = new Path(path);
 		return rethrowAsRuntimeException(
 			() -> Arrays
-				.stream(FileSystem.get(configuration).listStatus(new Path(path)))
+				.stream(f.getFileSystem(configuration).listStatus(f))
 				.filter(FileStatus::isDirectory)
 				.map(x -> x.getPath().toString())
 				.collect(Collectors.toList()));

@@ -7,7 +7,6 @@ import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.clearspring.analytics.util.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -116,6 +115,10 @@ abstract class AbstractSparkAction implements Serializable {
 
 	protected static <T> void save(Dataset<T> dataset, String outPath, SaveMode mode) {
 		dataset.write().option("compression", "gzip").mode(mode).json(outPath);
+	}
+
+	protected static <T> void saveText(Dataset<T> dataset, String outPath, SaveMode mode) {
+		dataset.write().option("compression", "gzip").mode(mode).text(outPath);
 	}
 
 	protected static <T> void saveParquet(Dataset<T> dataset, String outPath, SaveMode mode) {

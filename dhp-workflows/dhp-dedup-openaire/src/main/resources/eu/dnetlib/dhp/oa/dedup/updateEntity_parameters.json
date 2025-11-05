@@ -1,5 +1,11 @@
 [
   {
+    "paramName": "asi",
+    "paramLongName": "actionSetId",
+    "paramDescription": "action set identifier (name of the orchestrator)",
+    "paramRequired": true
+  },
+  {
     "paramName": "i",
     "paramLongName": "graphBasePath",
     "paramDescription": "the base path of raw graph",
