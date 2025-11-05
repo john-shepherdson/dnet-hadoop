@@ -1,7 +1,7 @@
 
 package eu.dnetlib.dhp.collection.plugin.sftp;
 
-import java.util.Iterator;
+import java.io.IOException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Spliterator;
@@ -31,50 +31,56 @@ public class SftpCollectorPlugin implements CollectorPlugin {
 		final String url = api.getBaseUrl();
 
 		final String username = Optional
-			.ofNullable(api.getParams().get("username"))
-			.filter(StringUtils::isNotBlank)
-			.orElseThrow(() -> new CollectorException("Param 'username' is null or empty"));
+				.ofNullable(api.getParams().get("username"))
+				.filter(StringUtils::isNotBlank)
+				.orElseThrow(() -> new CollectorException("Param 'username' is null or empty"));
 
 		final int port = Optional
-			.ofNullable(api.getParams().get("port"))
-			.filter(StringUtils::isNotBlank)
-			.map(s -> NumberUtils.toInt(s, SFTP_PORT))
-			.orElse(SFTP_PORT);
+				.ofNullable(api.getParams().get("port"))
+				.filter(StringUtils::isNotBlank)
+				.map(s -> NumberUtils.toInt(s, SFTP_PORT))
+				.orElse(SFTP_PORT);
 
 		final boolean recursive = Optional
-			.ofNullable(api.getParams().get("recursive"))
-			.filter(StringUtils::isNotBlank)
-			.map(BooleanUtils::toBoolean)
-			.orElse(false);
+				.ofNullable(api.getParams().get("recursive"))
+				.filter(StringUtils::isNotBlank)
+				.map(BooleanUtils::toBoolean)
+				.orElse(false);
 
 		final Set<String> extensions = Optional
-			.ofNullable(api.getParams().get("extensions"))
-			.filter(StringUtils::isNotBlank)
-			.map(s -> Sets.newHashSet(Splitter.on(",").omitEmptyStrings().trimResults().split(s)))
-			.orElseThrow(() -> new CollectorException("Param 'extensions' is null or empty"));
+				.ofNullable(api.getParams().get("extensions"))
+				.filter(StringUtils::isNotBlank)
+				.map(s -> Sets.newHashSet(Splitter.on(",").omitEmptyStrings().trimResults().split(s)))
+				.orElseThrow(() -> new CollectorException("Param 'extensions' is null or empty"));
 
 		final String fromDate = api.getParams().get("fromDate");
-		if ((fromDate != null) && !fromDate.matches("\\d{4}-\\d{2}-\\d{2}")) {
-			throw new CollectorException("Invalid date (YYYY-MM-DD): " + fromDate);
-		}
-
-		final Iterator<String> iter;
+		if ((fromDate != null) && !fromDate.matches("\\d{4}-\\d{2}-\\d{2}")) { throw new CollectorException("Invalid date (YYYY-MM-DD): " + fromDate); }
 
 		final String authMethod = api.getParams().get("authMethod");
 		final String password = api.getParams().get("password");
 		final String privateKeyPath = api.getParams().get("privateKeyPath");
 
 		if ("key".equalsIgnoreCase(authMethod) && StringUtils.isNotBlank(privateKeyPath)) {
-			iter = new SftpIteratorWithAuthenticationKey(url, port, username, recursive, extensions, fromDate,
-				privateKeyPath);
-		} else if (!"key".equalsIgnoreCase(authMethod) && StringUtils.isNotBlank(password)) {
-			iter = new SftpIteratorWithPassword(url, port, username, recursive, extensions, fromDate, password);
-		} else {
-			throw new CollectorException(
-				"Invalid authentication params, verify the parameters: authMethod, password and privateKeyPath");
+			try (final SftpIteratorWithAuthenticationKey iter =
+					new SftpIteratorWithAuthenticationKey(url, port, username, recursive, extensions, fromDate,
+							privateKeyPath)) {
+				return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iter, Spliterator.ORDERED), false);
+			} catch (final IOException e) {
+				throw new CollectorException(e);
+			}
 		}
 
-		return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iter, Spliterator.ORDERED), false);
+		if (StringUtils.isNotBlank(password)) {
+			try (final SftpIteratorWithPassword iter = new SftpIteratorWithPassword(url, port, username, recursive, extensions, fromDate, password)) {
+				return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iter, Spliterator.ORDERED), false);
+			} catch (final IOException e) {
+				throw new CollectorException(e);
+			}
+		}
+
+		throw new CollectorException(
+				"Invalid authentication params, verify the parameters: authMethod, password and privateKeyPath");
+
 	}
 
 }
