@@ -1,7 +1,7 @@
 
 package eu.dnetlib.dhp.oa.dedup.model;
 
-import scala.Serializable;
+import java.io.Serializable;
 
 public class ParentChildRel implements Serializable {
 
