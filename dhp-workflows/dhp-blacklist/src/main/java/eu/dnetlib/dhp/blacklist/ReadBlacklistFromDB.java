@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import eu.dnetlib.dhp.utils.DHPUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -54,10 +55,10 @@ public class ReadBlacklistFromDB implements Closeable {
 		final String dbUrl = parser.get("postgresUrl");
 		final String dbUser = parser.get("postgresUser");
 		final String dbPassword = parser.get("postgresPassword");
-		final String hdfsPath = parser.get("hdfsPath") + "/blacklist";
+		final String hdfsOutPath = parser.get("hdfsPath") + "/blacklist";
 		final String hdfsNameNode = parser.get("hdfsNameNode");
 
-		try (final ReadBlacklistFromDB rbl = new ReadBlacklistFromDB(hdfsPath, hdfsNameNode, dbUrl, dbUser,
+		try (final ReadBlacklistFromDB rbl = new ReadBlacklistFromDB(hdfsOutPath, hdfsNameNode, dbUrl, dbUser,
 			dbPassword)) {
 
 			log.info("Processing blacklist...");
@@ -117,11 +118,11 @@ public class ReadBlacklistFromDB implements Closeable {
 
 		this.dbClient = new DbClient(dbUrl, dbUser, dbPassword);
 
-		Configuration conf = new Configuration();
-		conf.set("fs.defaultFS", hdfsNameNode);
-
-		FileSystem fileSystem = FileSystem.get(conf);
+		Configuration conf = DHPUtils.getHadoopConfiguration(hdfsNameNode);
 		Path hdfsWritePath = new Path(hdfsPath);
+
+		FileSystem fileSystem = hdfsWritePath.getFileSystem(conf);
+
 		FSDataOutputStream fsDataOutputStream = null;
 		if (fileSystem.exists(hdfsWritePath)) {
 			fsDataOutputStream = fileSystem.append(hdfsWritePath);

@@ -11,13 +11,13 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import eu.dnetlib.pace.tree.support.TreeProcessor;
+import eu.dnetlib.pace.util.SparkCompatUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.FlatMapGroupsFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.*;
-import org.apache.spark.sql.catalyst.encoders.RowEncoder;
 import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructField;
@@ -136,7 +136,7 @@ public class SparkRefineMergeRels extends AbstractSparkAction {
 				.groupByKey((MapFunction<Row, String>) t -> t.getAs("groupId"), Encoders.STRING())
 				.flatMapGroups(
 					(FlatMapGroupsFunction<String, Row, Row>) (key, values) -> splitGroup(values, dedupConf),
-					RowEncoder.apply(rowSchema));
+						SparkCompatUtils.encoderFor(rowSchema));
 
 			Dataset<Relation> output = splitMergeRels
 					.flatMap(

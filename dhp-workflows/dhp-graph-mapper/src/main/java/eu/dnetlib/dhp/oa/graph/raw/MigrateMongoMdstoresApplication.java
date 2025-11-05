@@ -1,8 +1,6 @@
 
 package eu.dnetlib.dhp.oa.graph.raw;
 
-import static eu.dnetlib.dhp.utils.DHPUtils.getHadoopConfiguration;
-
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.HashMap;
@@ -49,18 +47,18 @@ public class MigrateMongoMdstoresApplication extends AbstractMigrationApplicatio
 		return null;
 	}
 
-	private static Map<String, MDStoreInfo> hdfsMDStoreInfo(FileSystem fs, final String basePath) throws IOException {
+	private static Map<String, MDStoreInfo> hdfsMDStoreInfo(final Path basePath) throws IOException {
 		final Map<String, MDStoreInfo> hdfs_store = new HashMap<>();
-		final Path p = new Path(basePath);
+		FileSystem fs = basePath.getFileSystem(getConf());
+		final Path p = basePath;
 		if (!fs.exists(p)) {
 			return hdfs_store;
 		}
 		final RemoteIterator<LocatedFileStatus> ls = fs.listFiles(p, true);
 		while (ls.hasNext()) {
-
 			String current = ls.next().getPath().toString();
 
-			final MDStoreInfo info = extractPath(current, basePath);
+			final MDStoreInfo info = extractPath(current, basePath.toString());
 			if (info != null) {
 				hdfs_store.put(info.getMdstore(), info);
 			}
@@ -68,12 +66,8 @@ public class MigrateMongoMdstoresApplication extends AbstractMigrationApplicatio
 		return hdfs_store;
 	}
 
-	private static String createMDStoreDir(final String basePath, final String mdStoreId) {
-		if (basePath.endsWith("/")) {
-			return basePath + mdStoreId;
-		} else {
-			return String.format("%s/%s", basePath, mdStoreId);
-		}
+	private static Path createMDStoreDir(final Path basePath, final String mdStoreId) {
+		return new Path(basePath, mdStoreId);
 	}
 
 	public static void main(final String[] args) throws Exception {
@@ -94,23 +88,21 @@ public class MigrateMongoMdstoresApplication extends AbstractMigrationApplicatio
 		final String mdLayout = parser.get("mdLayout");
 		final String mdInterpretation = parser.get("mdInterpretation");
 
-		final String hdfsPath = parser.get("hdfsPath");
+		final Path hdfsPath = new Path(parser.get("hdfsPath"));
 		final String nameNode = parser.get("nameNode");
-
-		final FileSystem fileSystem = FileSystem.get(getHadoopConfiguration(nameNode));
 
 		final MdstoreClient mdstoreClient = new MdstoreClient(mongoBaseUrl, mongoDb);
 
 		final List<MDStoreInfo> mongoMDStores = snapshotsMDStores(mdstoreClient, mdFormat, mdLayout, mdInterpretation);
 
-		final Map<String, MDStoreInfo> hdfsMDStores = hdfsMDStoreInfo(fileSystem, hdfsPath);
+		final Map<String, MDStoreInfo> hdfsMDStores = hdfsMDStoreInfo(hdfsPath);
 
 		mongoMDStores
 			.stream()
 			.filter(currentMDStore -> currentMDStore.getLatestTimestamp() != null)
 			.forEach(
 				consumeMDStore(
-					mdFormat, mdLayout, mdInterpretation, hdfsPath, fileSystem, mongoBaseUrl, mongoDb, hdfsMDStores));
+					mdFormat, mdLayout, mdInterpretation, hdfsPath, mongoBaseUrl, mongoDb, hdfsMDStores));
 
 		// TODO: DELETE MDStORE FOLDER NOT PRESENT IN MONGO
 
@@ -122,12 +114,11 @@ public class MigrateMongoMdstoresApplication extends AbstractMigrationApplicatio
 	 * @param mdLayout the MDStore'slayout
 	 * @param mdInterpretation the MDStore's interpretation
 	 * @param hdfsPath the basePath into hdfs where all MD-stores are stored
-	 * @param fileSystem The Hadoop File system client
 	 * @param hdfsMDStores A Map containing as Key the mdstore ID and as value the @{@link MDStoreInfo}
 	 * @return
 	 */
 	private static Consumer<MDStoreInfo> consumeMDStore(String mdFormat, String mdLayout, String mdInterpretation,
-		String hdfsPath, FileSystem fileSystem, final String mongoBaseUrl, final String mongoDb,
+		Path hdfsPath, final String mongoBaseUrl, final String mongoDb,
 		Map<String, MDStoreInfo> hdfsMDStores) {
 		return currentMDStore -> {
 			// If the key is missing it means that the mdstore is not present in hdfs
@@ -137,7 +128,7 @@ public class MigrateMongoMdstoresApplication extends AbstractMigrationApplicatio
 				log.info("Adding store {}", currentMDStore.getMdstore());
 				try {
 					synchMDStoreIntoHDFS(
-						mdFormat, mdLayout, mdInterpretation, hdfsPath, fileSystem, mongoBaseUrl, mongoDb,
+						mdFormat, mdLayout, mdInterpretation, hdfsPath, mongoBaseUrl, mongoDb,
 						currentMDStore);
 				} catch (IOException e) {
 					throw new RuntimeException(e);
@@ -149,15 +140,15 @@ public class MigrateMongoMdstoresApplication extends AbstractMigrationApplicatio
 				// new one in mongo so we have to synch the new mdstore and delete the old one
 				if (currentMDStore.getLatestTimestamp() > current.getLatestTimestamp()) {
 					log.info("Updating MDStore {}", currentMDStore.getMdstore());
-					final String mdstoreDir = createMDStoreDir(hdfsPath, currentMDStore.getMdstore());
-					final String rmPath = createMDStoreDir(mdstoreDir, current.getLatestTimestamp().toString());
+					final Path mdstoreDir = createMDStoreDir(hdfsPath, currentMDStore.getMdstore());
+					final Path rmPath = createMDStoreDir(mdstoreDir, current.getLatestTimestamp().toString());
 					try {
 						synchMDStoreIntoHDFS(
-							mdFormat, mdLayout, mdInterpretation, hdfsPath, fileSystem, mongoBaseUrl, mongoDb,
+							mdFormat, mdLayout, mdInterpretation, hdfsPath, mongoBaseUrl, mongoDb,
 							currentMDStore);
 						log.info("deleting {}", rmPath);
 						// DELETE THE OLD MDSTORE
-						fileSystem.delete(new Path(rmPath), true);
+						rmPath.getFileSystem(getConf()).delete(rmPath, true);
 					} catch (IOException e) {
 						throw new RuntimeException("Unable to synch and remove path " + rmPath, e);
 					}
@@ -173,18 +164,17 @@ public class MigrateMongoMdstoresApplication extends AbstractMigrationApplicatio
 	 * @param mdLayout the MDStore'slayout
 	 * @param mdInterpretation the MDStore's interpretation
 	 * @param hdfsPath the basePath into hdfs where all MD-stores are stored
-	 * @param fileSystem The Hadoop File system client
 	 * @param currentMDStore The current Mongo MDStore ID
 	 * @throws IOException
 	 */
-	private static void synchMDStoreIntoHDFS(String mdFormat, String mdLayout, String mdInterpretation, String hdfsPath,
-		FileSystem fileSystem, final String mongoBaseUrl, final String mongoDb, MDStoreInfo currentMDStore)
+	private static void synchMDStoreIntoHDFS(String mdFormat, String mdLayout, String mdInterpretation, Path hdfsPath,
+		final String mongoBaseUrl, final String mongoDb, MDStoreInfo currentMDStore)
 		throws IOException {
 		// FIRST CREATE the directory basePath/MDSTOREID
-		final String mdstoreDir = createMDStoreDir(hdfsPath, currentMDStore.getMdstore());
-		fileSystem.mkdirs(new Path(mdstoreDir));
+		final Path mdstoreDir = createMDStoreDir(hdfsPath, currentMDStore.getMdstore());
+		mdstoreDir.getFileSystem(getConf()).mkdirs(mdstoreDir);
 		// Then synch all the records into basePath/MDSTOREID/timestamp
-		final String currentIdDir = createMDStoreDir(mdstoreDir, currentMDStore.getLatestTimestamp().toString());
+		final Path currentIdDir = createMDStoreDir(mdstoreDir, currentMDStore.getLatestTimestamp().toString());
 		try (MigrateMongoMdstoresApplication app = new MigrateMongoMdstoresApplication(mongoBaseUrl, mongoDb,
 			currentIdDir)) {
 			app.execute(currentMDStore.getCurrentId(), mdFormat, mdLayout, mdInterpretation);
@@ -197,7 +187,7 @@ public class MigrateMongoMdstoresApplication extends AbstractMigrationApplicatio
 		log.info(String.format("Synchronized mdStore id : %s into path %s", currentMDStore.getMdstore(), currentIdDir));
 	}
 
-	public MigrateMongoMdstoresApplication(final String mongoBaseUrl, final String mongoDb, final String hdfsPath)
+	public MigrateMongoMdstoresApplication(final String mongoBaseUrl, final String mongoDb, final Path hdfsPath)
 		throws Exception {
 		super(hdfsPath);
 		this.mdstoreClient = new MdstoreClient(mongoBaseUrl, mongoDb);

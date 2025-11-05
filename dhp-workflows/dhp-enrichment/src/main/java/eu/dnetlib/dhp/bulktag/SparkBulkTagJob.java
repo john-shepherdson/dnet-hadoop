@@ -9,11 +9,11 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.utils.DHPUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
@@ -27,7 +27,6 @@ import org.apache.spark.sql.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
@@ -36,7 +35,6 @@ import eu.dnetlib.dhp.api.model.CommunityEntityMap;
 import eu.dnetlib.dhp.api.model.EntityCommunities;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.bulktag.community.*;
-import eu.dnetlib.dhp.common.DbClient;
 import eu.dnetlib.dhp.common.action.ReadDatasourceMasterDuplicateFromDB;
 import eu.dnetlib.dhp.common.action.model.MasterDuplicate;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
@@ -88,11 +86,11 @@ public class SparkBulkTagJob {
 		final String hdfsNameNode = parser.get("nameNode");
 		log.info("nameNode: {}", hdfsNameNode);
 
-		Configuration configuration = new Configuration();
-		configuration.set("fs.defaultFS", hdfsNameNode);
-		FileSystem fs = FileSystem.get(configuration);
+		Configuration configuration = DHPUtils.getHadoopConfiguration(hdfsNameNode);
+		Path protoPath = new Path(protoMappingPath);
+		FileSystem fs = protoPath.getFileSystem(configuration);
 
-		String temp = IOUtils.toString(fs.open(new Path(protoMappingPath)), StandardCharsets.UTF_8);
+		String temp = IOUtils.toString(fs.open(protoPath), StandardCharsets.UTF_8);
 		log.info("protoMap: {}", temp);
 		ProtoMap protoMap = new Gson().fromJson(temp, ProtoMap.class);
 		log.info("pathMap: {}", new Gson().toJson(protoMap));
@@ -153,13 +151,14 @@ public class SparkBulkTagJob {
 	private static void writeCommunityConfiguration(String configurationPath, String hdfsNameNode,
 		CommunityConfiguration cc) throws IOException {
 
-		Configuration conf = new Configuration();
-		conf.set("fs.defaultFS", hdfsNameNode);
-		FileSystem fileSystem = FileSystem.get(conf);
+		Configuration conf = DHPUtils.getHadoopConfiguration(hdfsNameNode);
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
 		String formattedDate = LocalDate.now().format(formatter);
-		FSDataOutputStream fos = fileSystem.create(new Path(configurationPath + formattedDate));
+		Path p = new Path(configurationPath + formattedDate);
+
+		FileSystem fileSystem = p.getFileSystem(conf);
+
+		FSDataOutputStream fos = fileSystem.create(p);
 
 		try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fos, StandardCharsets.UTF_8))) {
 			for (Community c : cc.getCommunities().values()) {
