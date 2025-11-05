@@ -1,4 +1,3 @@
-
 package eu.dnetlib.dhp.collection.plugin.sftp;
 
 import static org.junit.jupiter.api.Assertions.fail;
@@ -17,8 +16,8 @@ import com.google.common.collect.Sets;
 class SftpIteratorWithPasswordTest {
 
 	private static final String baseUrl = "sftp://sftp.medra.org/MSFTP0001/OPENAIRE/OUTPUT";
-	private static final String username = "medra";
-	private static final String password = "6!368FEVe";
+	private static final String username = "";
+	private static final String password = "";
 	private static final int port = 22;
 	private static final boolean isRecursive = true;
 	private static final Set<String> extensions = Sets.newHashSet("xml");
