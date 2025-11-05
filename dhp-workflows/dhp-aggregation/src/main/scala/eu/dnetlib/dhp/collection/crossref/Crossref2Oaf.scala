@@ -40,7 +40,7 @@ case class mappingAuthor(
   affiliation: Option[List[mappingAffiliation]]
 ) {}
 
-case class funderInfo(id: String, uri: String, name: String, synonym: List[String]) {}
+case class funderInfo(id: String, shortName: String, uri: String, name: String, synonym: List[String]) {}
 
 case class mappingFunder(name: String, DOI: Option[String], award: Option[List[String]]) {}
 
@@ -52,9 +52,9 @@ case object Crossref2Oaf {
   val logger: Logger = LoggerFactory.getLogger(Crossref2Oaf.getClass)
   val mapper = new ObjectMapper
 
-  val irishFunder: List[funderInfo] = {
+  val fundersInfo: List[funderInfo] = {
     val s = Source
-      .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/collection/crossref/irish_funder.json"))
+      .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/collection/crossref/funders_info.json"))
       .mkString
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     lazy val json: org.json4s.JValue = parse(s)
@@ -75,9 +75,9 @@ case object Crossref2Oaf {
 
   def getIrishId(doi: String): Option[String] = {
     val id = doi.split("/").last
-    irishFunder
+    fundersInfo
       .find(f => id.equalsIgnoreCase(f.id) || (f.synonym.nonEmpty && f.synonym.exists(s => s.equalsIgnoreCase(id))))
-      .map(f => f.id)
+      .map(f => f.shortName)
   }
 
   def createCrossrefCollectedFrom(): KeyValue = {
