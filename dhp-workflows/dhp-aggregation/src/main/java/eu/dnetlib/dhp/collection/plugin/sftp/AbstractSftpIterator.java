@@ -1,6 +1,8 @@
 
 package eu.dnetlib.dhp.collection.plugin.sftp;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -9,10 +11,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang3.StringUtils;
@@ -29,12 +30,14 @@ import com.jcraft.jsch.SftpException;
 /**
  * Created by andrea on 11/01/16.
  */
-public abstract class AbstractSftpIterator implements Iterator<String> {
+public abstract class AbstractSftpIterator implements Iterator<String>, Closeable {
 
 	private static final Logger log = LoggerFactory.getLogger(AbstractSftpIterator.class);
 
 	private static final int MAX_RETRIES = 5;
 	private static final long BACKOFF_MILLIS = 10000;
+
+	private static final String END_MESSAGE = "___END___";
 
 	private String sftpURIScheme;
 	private String sftpServerAddress;
@@ -48,7 +51,9 @@ public abstract class AbstractSftpIterator implements Iterator<String> {
 	private Session sftpSession;
 	private ChannelSftp sftpChannel;
 
-	private Queue<String> queue;
+	private final LinkedBlockingQueue<String> queue = new LinkedBlockingQueue<>();
+
+	private String nextElement = null;
 
 	private LocalDate fromDate = null;
 	private final DateTimeFormatter simpleDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -56,8 +61,8 @@ public abstract class AbstractSftpIterator implements Iterator<String> {
 	private static String EMPTY_RECORD = "<record/>";
 
 	public AbstractSftpIterator(final String baseUrl, final int port, final String username, final boolean isRecursive,
-		final Set<String> extensionsSet,
-		final String fromDate) {
+			final Set<String> extensionsSet,
+			final String fromDate) {
 
 		this.port = port;
 		this.username = username;
@@ -80,7 +85,7 @@ public abstract class AbstractSftpIterator implements Iterator<String> {
 		}
 	}
 
-	protected void connectToSftpServer() {
+	private void connectToSftpServer() {
 
 		try {
 			this.sftpSession = createSession(this.sftpServerAddress, this.port, this.username);
@@ -108,20 +113,35 @@ public abstract class AbstractSftpIterator implements Iterator<String> {
 
 	protected abstract Session createSession(String address, int port, String username) throws JSchException;
 
-	protected void disconnectFromSftpServer() {
-		this.sftpChannel.exit();
-		this.sftpSession.disconnect();
+	private void disconnectFromSftpServer() {
+		if ((this.sftpChannel != null) && !this.sftpChannel.isClosed()) {
+			this.sftpChannel.exit();
+		}
+		if ((this.sftpSession != null) && this.sftpSession.isConnected()) {
+			this.sftpSession.disconnect();
+			log.info("Disconnected from SFTP server " + this.sftpServerAddress);
+		}
 	}
 
-	protected void initializeQueue() {
-		this.queue = new LinkedList<>();
-		log
-			.info(
-				String
-					.format(
-						"SFTP collector plugin collecting from %s with recursion = %s, incremental = %s with fromDate=%s",
-						this.remoteSftpBasePath, this.isRecursive, this.incremental, this.fromDate));
-		listDirectoryRecursive(".", "");
+	protected void init() {
+		log.info(String
+				.format("SFTP collector plugin collecting from %s with recursion = %s, incremental = %s with fromDate=%s", this.remoteSftpBasePath, this.isRecursive, this.incremental, this.fromDate));
+
+		new Thread(() -> {
+			try {
+				connectToSftpServer();
+				listDirectoryRecursive(".", "");
+				this.queue.add(END_MESSAGE);
+			} finally {
+				disconnectFromSftpServer();
+			}
+		}).start();
+
+		try {
+			this.nextElement = this.queue.take();
+		} catch (final InterruptedException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	private void listDirectoryRecursive(final String parentDir, final String currentDir) {
@@ -157,62 +177,67 @@ public abstract class AbstractSftpIterator implements Iterator<String> {
 								final int mTime = attrs.getMTime();
 								// int times are values reduced by the milliseconds, hence we multiply per 1000L
 								final LocalDateTime dt = LocalDateTime
-									.ofInstant(Instant.ofEpochMilli(mTime * 1000L), TimeZone.getDefault().toZoneId());
+										.ofInstant(Instant.ofEpochMilli(mTime * 1000L), TimeZone.getDefault().toZoneId());
 								if (dt.isAfter(this.fromDate.atStartOfDay())) {
-									this.queue.add(currentFileName);
+									this.queue.add(prepareNextElement(currentFileName));
 									log.debug(currentFileName + " has changed and must be re-collected");
 								} else if (log.isDebugEnabled()) {
 									log.debug(currentFileName + " has not changed since last collection");
 								}
 							} else {
 								// if it is not incremental, just add it to the queue
-								this.queue.add(currentFileName);
+								this.queue.add(prepareNextElement(currentFileName));
 							}
 						}
 					}
 				}
 			}
 		} catch (final SftpException e) {
-			throw new RuntimeException("Cannot list the sftp remote directory", e);
+			throw new RuntimeException("Cannot list the sftp remote directory: " + dirToList, e);
 		}
 	}
 
 	@Override
 	public boolean hasNext() {
-		if (this.queue.isEmpty()) {
-			disconnectFromSftpServer();
-			return false;
-		}
-		return true;
+		return (!END_MESSAGE.equals(this.nextElement));
 	}
 
 	@Override
 	public String next() {
-		final String nextRemotePath = this.queue.remove();
+		try {
+			return this.nextElement;
+		} finally {
+			try {
+				this.nextElement = this.queue.take();
+			} catch (final InterruptedException e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+
+	private String prepareNextElement(final String remotePath) {
+
 		int nRepeat = 0;
-		String fullPathFile = nextRemotePath;
+
+		String fullPathFile = remotePath;
 		while (nRepeat < MAX_RETRIES) {
 			try {
 				final OutputStream baos = new ByteArrayOutputStream();
-				this.sftpChannel.get(nextRemotePath, baos);
+				this.sftpChannel.get(remotePath, baos);
 				if (log.isDebugEnabled()) {
-					fullPathFile = this.sftpChannel.pwd() + "/" + nextRemotePath;
+					fullPathFile = this.sftpChannel.pwd() + "/" + remotePath;
 					log.debug(String.format("Collected file from SFTP: %s%s", this.sftpServerAddress, fullPathFile));
 				}
 				final String doc = baos.toString();
-				if (StringUtils.isNotBlank(doc)) {
-					return doc;
-				}
+				if (StringUtils.isNotBlank(doc)) { return doc; }
+
 				return EMPTY_RECORD;
 			} catch (final SftpException e) {
 				nRepeat++;
 				log
-					.warn(
-						String
-							.format(
-								"An error occurred [%s] for %s%s, retrying.. [retried %s time(s)]", e
-									.getMessage(),
-								this.sftpServerAddress, fullPathFile, nRepeat));
+						.warn(String
+								.format("An error occurred [%s] for %s%s, retrying.. [retried %s time(s)]", e
+										.getMessage(), this.sftpServerAddress, fullPathFile, nRepeat));
 				// disconnectFromSftpServer();
 				try {
 					Thread.sleep(BACKOFF_MILLIS);
@@ -222,15 +247,18 @@ public abstract class AbstractSftpIterator implements Iterator<String> {
 			}
 		}
 		throw new RuntimeException(
-			String
-				.format(
-					"Impossible to retrieve FTP file %s after %s retries. Aborting FTP collection.", fullPathFile,
-					nRepeat));
+				String
+						.format("Impossible to retrieve FTP file %s after %s retries. Aborting FTP collection.", fullPathFile, nRepeat));
 	}
 
 	@Override
 	public void remove() {
 		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void close() throws IOException {
+		disconnectFromSftpServer();
 	}
 
 }

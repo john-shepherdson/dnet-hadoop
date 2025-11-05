@@ -16,16 +16,15 @@ public class SftpIteratorWithAuthenticationKey extends AbstractSftpIterator {
 	private final String privateKeyPath;
 
 	public SftpIteratorWithAuthenticationKey(final String baseUrl, final int port, final String username,
-		final boolean isRecursive,
-		final Set<String> extensionsSet,
-		final String fromDate, final String privateKeyPath) {
+			final boolean isRecursive,
+			final Set<String> extensionsSet,
+			final String fromDate, final String privateKeyPath) {
 
 		super(baseUrl, port, username, isRecursive, extensionsSet, fromDate);
 
 		this.privateKeyPath = privateKeyPath;
 
-		connectToSftpServer();
-		initializeQueue();
+		init();
 	}
 
 	@Override
