@@ -93,6 +93,7 @@ public abstract class AbstractSftpIterator implements Iterator<String>, Closeabl
 				listDirectoryRecursive(".");
 				this.queue.add(END_MESSAGE);
 			} catch (final Throwable e) {
+				log.error("Error in SFTP thread", e);
 				this.queue.add(FAIL_MESSAGE);
 			} finally {
 				disconnectFromSftpServer();
