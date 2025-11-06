@@ -1,7 +1,7 @@
 
 package eu.dnetlib.dhp.collection.plugin.sftp;
 
-import java.io.IOException;
+import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Spliterator;
@@ -60,26 +60,18 @@ public class SftpCollectorPlugin implements CollectorPlugin {
 		final String password = api.getParams().get("password");
 		final String privateKeyPath = api.getParams().get("privateKeyPath");
 
+		Iterator<String> iter;
 		if ("key".equalsIgnoreCase(authMethod) && StringUtils.isNotBlank(privateKeyPath)) {
-			try (final SftpIteratorWithAuthenticationKey iter =
+			iter =
 					new SftpIteratorWithAuthenticationKey(url, port, username, recursive, extensions, fromDate,
-							privateKeyPath)) {
-				return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iter, Spliterator.ORDERED), false);
-			} catch (final IOException e) {
-				throw new CollectorException(e);
-			}
+							privateKeyPath);
+		} else if (StringUtils.isNotBlank(password)) {
+			iter = new SftpIteratorWithPassword(url, port, username, recursive, extensions, fromDate, password);
+		} else {
+			throw new CollectorException("Invalid authentication params, verify the parameters: authMethod, password and privateKeyPath");
 		}
 
-		if (StringUtils.isNotBlank(password)) {
-			try (final SftpIteratorWithPassword iter = new SftpIteratorWithPassword(url, port, username, recursive, extensions, fromDate, password)) {
-				return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iter, Spliterator.ORDERED), false);
-			} catch (final IOException e) {
-				throw new CollectorException(e);
-			}
-		}
-
-		throw new CollectorException(
-				"Invalid authentication params, verify the parameters: authMethod, password and privateKeyPath");
+		return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iter, Spliterator.ORDERED), false);
 
 	}
 

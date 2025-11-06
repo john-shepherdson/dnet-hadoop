@@ -1,8 +1,6 @@
 
 package eu.dnetlib.dhp.collection.plugin.sftp;
 
-import java.io.Closeable;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -30,7 +28,7 @@ import com.jcraft.jsch.SftpException;
 /**
  * Created by andrea on 11/01/16.
  */
-public abstract class AbstractSftpIterator implements Iterator<String>, Closeable {
+public abstract class AbstractSftpIterator implements Iterator<String> {
 
 	private static final Logger log = LoggerFactory.getLogger(AbstractSftpIterator.class);
 
@@ -220,11 +218,6 @@ public abstract class AbstractSftpIterator implements Iterator<String>, Closeabl
 	@Override
 	public void remove() {
 		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void close() throws IOException {
-		disconnectFromSftpServer();
 	}
 
 }

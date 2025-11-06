@@ -28,34 +28,34 @@ class SftpIteratorWithPasswordTest {
 	@Test
 	@Disabled
 	public void testALL() throws IOException {
-		try (final SftpIteratorWithPassword iterator = new SftpIteratorWithPassword(baseUrl, port, username, isRecursive,
-				extensions, null, password)) {
+		final SftpIteratorWithPassword iterator = new SftpIteratorWithPassword(baseUrl, port, username, isRecursive,
+				extensions, null, password);
 
-			int count = 0;
-			while (iterator.hasNext()) {
-				final String s = iterator.next();
-				if (StringUtils.isBlank(s)) {
-					fail();
-				}
-				// System.out.println(s);
-				System.out.println(count++);
+		int count = 0;
+		while (iterator.hasNext()) {
+			final String s = iterator.next();
+			if (StringUtils.isBlank(s)) {
+				fail();
 			}
-			System.out.println("TOTAL: " + count);
+			// System.out.println(s);
+			System.out.println(count++);
 		}
+		System.out.println("TOTAL: " + count);
+
 	}
 
 	@Test
 	@Disabled
 	public void testOne() throws IOException {
-		try (SftpIteratorWithPassword iterator = new SftpIteratorWithPassword(baseUrl, port, username, isRecursive,
-				extensions, null, password)) {
-			if (iterator.hasNext()) {
-				final String s = iterator.next();
-				System.out.println(s);
-				return;
-			}
-			fail();
+		final SftpIteratorWithPassword iterator = new SftpIteratorWithPassword(baseUrl, port, username, isRecursive,
+				extensions, null, password);
+		if (iterator.hasNext()) {
+			final String s = iterator.next();
+			System.out.println(s);
+			return;
 		}
+		fail();
+
 	}
 
 	@Test
@@ -63,16 +63,16 @@ class SftpIteratorWithPasswordTest {
 	public void testWithStartDate() throws IOException {
 		final String startDate = "2025-11-05";
 
-		try (final SftpIteratorWithPassword iterator = new SftpIteratorWithPassword(baseUrl, port, username, isRecursive,
-				extensions, startDate, password)) {
+		final SftpIteratorWithPassword iterator = new SftpIteratorWithPassword(baseUrl, port, username, isRecursive,
+				extensions, startDate, password);
 
-			int count = 0;
-			while (iterator.hasNext()) {
-				final String s = iterator.next();
-				System.out.println(s);
-				count++;
-			}
-			System.out.println("TOTAL: " + count);
+		int count = 0;
+		while (iterator.hasNext()) {
+			final String s = iterator.next();
+			System.out.println(s);
+			count++;
 		}
+		System.out.println("TOTAL: " + count);
 	}
+
 }
