@@ -26,7 +26,7 @@ class SftpIteratorWithPasswordTest {
 	void setUp() throws Exception {}
 
 	@Test
-	// @Disabled
+	@Disabled
 	public void testALL() throws IOException {
 		try (final SftpIteratorWithPassword iterator = new SftpIteratorWithPassword(baseUrl, port, username, isRecursive,
 				extensions, null, password)) {
@@ -37,6 +37,7 @@ class SftpIteratorWithPasswordTest {
 				if (StringUtils.isBlank(s)) {
 					fail();
 				}
+				// System.out.println(s);
 				System.out.println(count++);
 			}
 			System.out.println("TOTAL: " + count);
