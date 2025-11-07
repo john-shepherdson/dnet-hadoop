@@ -242,13 +242,33 @@ public class ConstraintEvaluator implements Serializable {
                 }
             }
             ReadContext context = JsonPath.parse(leftJson);
-            if (protoMap.containsKey(con.getField())){
-                try {
-                    value = context.read(protoMap.get(con.getField()).getPath());
 
-                }catch (PathNotFoundException e) {
-                    value = null;
+            if (con.getField() != null) {
+                if (protoMap.containsKey(con.getField())){
+                    try {
+                        value = context.read(protoMap.get(con.getField()).getPath());
+
+                    }catch (PathNotFoundException e) {
+                        value = null;
+                    }
+                    Object comparisonValue = null;
+                    if (rightJson != null) {
+                        try {
+                            comparisonValue = JsonPath.parse(rightJson).read("comparisonValue");
+                        } catch (Exception e) {
+                            log.warn("Could not read comparisonValue from rightJson: {}", rightJson, e);
+                        }
+                    }
+                    if(comparisonValue == null)
+                        return con.verifyCriteria(value);
+                    return con.verifyCriteria(value, comparisonValue);
+
+                } else {
+                    throw new RuntimeException("No path to access for this field. Extend the path Map");
                 }
+            }else {
+                //in questo caso il controllo dipende solo da proprieta' dell'entita' relata, non importa cosa contiene il result che dobbiamo taggare
+                //quindi il criterio viene applicato al risultato
                 Object comparisonValue = null;
                 if (rightJson != null) {
                     try {
@@ -258,12 +278,10 @@ public class ConstraintEvaluator implements Serializable {
                     }
                 }
                 if(comparisonValue == null)
-                    return con.verifyCriteria(value);
-                return con.verifyCriteria(value, comparisonValue);
-
-            } else {
-                throw new RuntimeException("No path to access for this field. Extend the path Map");
+                    throw new RuntimeException("No field and no comparison value are provided. Nothing to check");
+                return con.verifyCriteria(comparisonValue);
             }
+
 
         }));
 

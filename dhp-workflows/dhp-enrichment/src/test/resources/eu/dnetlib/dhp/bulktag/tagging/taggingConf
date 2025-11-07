@@ -354,7 +354,7 @@
                     "selects":[
                         {
                             "tableName":"result",
-                            "tableSelect":"SELECT dataset.* , publication.title.value as comparisonValue FROM publication JOIN relation JOIN dataset on publication.id = relation.source AND dataset.id = relation.target WHERE relation.relClass = 'IsSupplementedBy'"
+                            "tableSelect":"SELECT dataset.* , publication.title.value as comparisonValue FROM publication JOIN relation JOIN dataset on publication.id = relation.source AND dataset.id = relation.target WHERE relation.relClass = 'IsSupplementedBy' AND publication.datainfo.deletedbyinference = false and dataset.datainfo.deletedbyinference = false"
                         }
                     ],
                     "entityToTag":"dataset",
@@ -370,6 +370,60 @@
                             ]
                         }
                     ]
-                }
+                },
+                         {
+                                     "id":"MA",
+                                     "inputs":{
+                                         "publication":"/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/graph/publication",
+                                         "relation":"/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/graph/relation",
+                                         "dataset":"/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/graph/dataset"
+                                     },
+                                     "selects":[
+                                         {
+                                             "tableName":"result",
+                                             "tableSelect":"SELECT dataset.* , publication.description.value as comparisonValue FROM publication JOIN relation JOIN dataset on publication.id = relation.source AND dataset.id = relation.target WHERE relation.relClass = 'IsSupplementedBy' AND publication.datainfo.deletedbyinference = false and dataset.datainfo.deletedbyinference = false"
+                                         }
+                                     ],
+                                     "entityToTag":"dataset",
+                                     "resultTable":"result",
+                                     "criteria":[
+                                         {
+                                             "constraint":[
+                                                 {
+                                                     "verb":"not_exist_forall",
+                                                     "field":"description",
+                                                     "value":null
+                                                 }
+                                             ]
+                                         }
+                                     ]
+                                 },
+                                                           {
+                                                                       "id":"RL",
+                                                                       "inputs":{
+                                                                           "publication":"/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/graph/publication",
+                                                                           "relation":"/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/graph/relation",
+                                                                           "dataset":"/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/graph/dataset"
+                                                                       },
+                                                                       "selects":[
+                                                                           {
+                                                                               "tableName":"result",
+                                                                               "tableSelect":"SELECT dataset.* , publication.instance.instanceType.classname as comparisonValue FROM publication JOIN relation JOIN dataset on publication.id = relation.source AND dataset.id = relation.target WHERE relation.relClass = 'IsSupplementedBy' AND publication.datainfo.deletedbyinference = false and dataset.datainfo.deletedbyinference = false"
+                                                                           }
+                                                                       ],
+                                                                       "entityToTag":"dataset",
+                                                                       "resultTable":"result",
+                                                                       "criteria":[
+                                                                           {
+                                                                               "constraint":[
+                                                                                   {
+                                                                                       "verb":"exist",
+                                                                                       "field":null,
+                                                                                       "value":["Article"]
+                                                                                   }
+                                                                               ]
+                                                                           }
+                                                                       ]
+                                                                   }
     ]
 }

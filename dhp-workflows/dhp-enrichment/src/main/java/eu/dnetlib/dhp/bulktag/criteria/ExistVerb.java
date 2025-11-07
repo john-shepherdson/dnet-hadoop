@@ -96,7 +96,24 @@ public class ExistVerb implements Selection, JsonPathAware, Serializable {
 
 	@Override
 	public boolean apply(Object value, Object otherEntityValue) throws IOException {
-		return false;
+		//si verifica che il valore sia presente in almeno un valore all'interno di otherEntityValue
+		//value deve essere una String
+		//otherEntityValue puo' essere una string o una lista di stringhe.
+
+		if (value instanceof String stringValue){
+			if(otherEntityValue instanceof String stringOtherEntity) {
+				return stringValue.trim().equalsIgnoreCase(stringOtherEntity.trim());
+			}
+			if(otherEntityValue instanceof List<?> lista){
+				return lista.stream().anyMatch(e -> (e instanceof String stringOtherEntity) && stringValue.trim().equalsIgnoreCase(stringOtherEntity.trim()));
+			}
+			else {
+				throw new RuntimeException("Parameters not allowed for this verb");
+			}
+		}
+		else {
+			throw new RuntimeException("Parameters not allowed for this verb");
+		}
 	}
 
 

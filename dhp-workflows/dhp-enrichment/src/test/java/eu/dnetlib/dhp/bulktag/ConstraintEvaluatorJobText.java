@@ -284,6 +284,26 @@ public class ConstraintEvaluatorJobText {
 
     }
 
+    @Test
+    void AssociatedLiteratureTest() throws Exception {
+
+        ConstraintEvaluator
+                .main(
+                        new String[] {
+                                "-isSparkSessionManaged", Boolean.FALSE.toString(),
+                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/taggingConf").getPath(),
+                                "-outputPath", workingDir.toString() + "/taggingOutcome/",
+                                "-pathMapPath", getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/pathMap").getPath() ,
+                                "-nameNode", "local"
+                        });
+
+        org.apache.spark.sql.Dataset<Row> df = spark.read().json(workingDir.toString() + "/taggingOutcome/").filter((FilterFunction<Row>) r -> r.getAs("_2").equals("RL"));;
+
+        Assertions.assertEquals(2, df.count());
+
+
+    }
+
 //    @Test
 //    void bulktagBySubjectNoPreviousContextTest() throws Exception {
 //        final String sourcePath = getClass()

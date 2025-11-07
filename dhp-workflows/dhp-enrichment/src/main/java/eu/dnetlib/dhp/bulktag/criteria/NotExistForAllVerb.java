@@ -31,7 +31,9 @@ public class NotExistForAllVerb implements Selection, JsonPathAware, Serializabl
 
 	@Override
 	public boolean apply(Object value, Object otherEntityValue) throws IOException {
-		return false;
+		ExistForAllVerb efa = new ExistForAllVerb(params);
+		efa.setJsonPath(jsonPath);
+		return !efa.apply(value, otherEntityValue);
 	}
 
 

@@ -4,6 +4,7 @@ package eu.dnetlib.dhp.bulktag.criteria;
 import com.cloudera.com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ReadContext;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -25,21 +26,10 @@ public class ExistForAllVerb implements Selection, JsonPathAware, Serializable {
 	@Override
 	public boolean apply(Object value)  {
 
-        List<Object> parsed = null;
-		if(value instanceof List<?> lista)
-			parsed = (List<Object>) lista;
-		else {
-			try {
-				parsed = new ObjectMapper().readValue((String)value, List.class);
-			} catch (IOException e) {
-				return false;
-			}
-		}
+		List<Object> parsed = getParsed(value);
+		if (parsed == null) return false;
 
-		if(parsed.isEmpty())
-			return false;
-
-        return parsed.stream().allMatch(o -> {
+		return parsed.stream().allMatch(o -> {
 			ExistVerb exist = new ExistVerb(params);
 			exist.setJsonPath(jsonPath);
 			return exist.apply(o);
@@ -48,9 +38,35 @@ public class ExistForAllVerb implements Selection, JsonPathAware, Serializable {
 
 	}
 
+	private static @Nullable List<Object> getParsed(Object value) {
+		List<Object> parsed = null;
+		if(value instanceof List<?> lista)
+			parsed = (List<Object>) lista;
+		else {
+			try {
+				parsed = new ObjectMapper().readValue((String) value, List.class);
+			} catch (IOException e) {
+				return null;
+			}
+		}
+
+		if(parsed.isEmpty())
+			return null;
+		return parsed;
+	}
+
 	@Override
 	public boolean apply(Object value, Object otherEntityValue) throws IOException {
-		return false;
+		List<Object> parsed = getParsed(value);
+		return parsed.stream().allMatch(o -> {
+			ExistVerb exist = new ExistVerb(params);
+			exist.setJsonPath(jsonPath);
+            try {
+                return exist.apply(o, otherEntityValue);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
 	}
 
 
