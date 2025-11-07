@@ -12,10 +12,13 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.spark.SparkConf;
+import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.broker.model.OaNotification;
 import eu.dnetlib.dhp.broker.oa.util.BrokerIndexClient;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
 import eu.dnetlib.dhp.collection.ApiDescriptor;
@@ -32,7 +35,7 @@ public class IndexAlertNotificationsJob {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 				IOUtils
 						.toString(IndexAlertNotificationsJob.class
-								.getResourceAsStream("/eu/dnetlib/dhp/broker/oa_alert/index_alert_notifications.json")));
+								.getResourceAsStream("/eu/dnetlib/dhp/broker/oa_alerts/index_alert_notifications.json")));
 		parser.parseArgument(args);
 
 		final ApiDescriptor api = DHPUtils.MAPPER.readValue(parser.get("apidescriptor"), ApiDescriptor.class);
@@ -52,15 +55,27 @@ public class IndexAlertNotificationsJob {
 		final String brokerApiBaseUrl = parser.get("brokerApiBaseUrl");
 		log.info("brokerApiBaseUrl: {}", brokerApiBaseUrl);
 
+		final SparkConf conf = new SparkConf();
+
+		final SparkSession spark = SparkSession.builder().config(conf).getOrCreate();
+
+		final boolean isEmpty = ClusterUtils
+				.readPath(spark, notificationsPath, OaNotification.class)
+				.isEmpty();
+
 		try (final BrokerIndexClient feeder = new BrokerIndexClient(indexHost)) {
 			log.info("*** Clean old notifications");
 			feeder.deleteUsingExactField(index, "map.datasourceId", dsId, true);
 
-			final FileSystem fileSystem = FileSystem.get(new Configuration());
-			final List<Path> files = ClusterUtils.listFiles(notificationsPath, fileSystem, ".gz");
-
-			log.info("*** Start indexing");
-			feeder.parallelBulkIndex(files, 4, fileSystem, new ConvertJSONWithId("\"notificationId\":\"((\\d|\\w|-)*)\"", index));
+			if (!isEmpty) {
+				final FileSystem fileSystem = FileSystem.get(new Configuration());
+				final List<Path> files = ClusterUtils.listFiles(notificationsPath, fileSystem, ".gz");
+				log.info("*** Start indexing");
+				feeder.parallelBulkIndex(files, 4, fileSystem, new ConvertJSONWithId("\"notificationId\":\"((\\d|\\w|-)*)\"", index));
+				log.info("*** Indexing completed");
+			} else {
+				log.info("*** Skip indexing (no notifications)");
+			}
 
 			feeder.refreshIndex(index);
 		}

@@ -102,7 +102,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Generate Alert Notifications</name>
+            <name>Index Alert Notifications</name>
             <class>eu.dnetlib.dhp.broker.oa_alerts.IndexAlertNotificationsJob</class>
             <jar>dhp-broker-events-${projectVersion}.jar</jar>
             <spark-opts>

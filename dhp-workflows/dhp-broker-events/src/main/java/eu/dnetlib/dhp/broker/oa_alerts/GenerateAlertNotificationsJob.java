@@ -103,14 +103,14 @@ public class GenerateAlertNotificationsJob {
 
 		SparkSessionSupport.runWithSparkSession(conf, isSparkSessionManaged, spark -> {
 
-            if (validationType == null) {
-                log.warn("The compatibility is non managed by the validator engine");
-                return;
-            }
+			if (validationType == null) {
+				log.warn("The compatibility is non managed by the validator engine");
+				return;
+			}
 
-            final String topic = TOPIC_PREFIX + StringUtils.upperCase(validationType.toString());
+			final String topic = TOPIC_PREFIX + StringUtils.upperCase(validationType.toString());
 
-            log.info("topic: {}", topic);
+			log.info("topic: {}", topic);
 
 			final LongAccumulator total = spark.sparkContext().longAccumulator("total_alert_notifications");
 
@@ -118,6 +118,7 @@ public class GenerateAlertNotificationsJob {
 					.read()
 					.parquet(inputPath)
 					.as(Encoders.bean(MetadataRecord.class))
+					.filter((FilterFunction<MetadataRecord>) r -> r.getValidationResults() != null)
 					.filter((FilterFunction<MetadataRecord>) r -> r.getValidationResults().containsKey(validationType))
 					.map((MapFunction<MetadataRecord, ValidatorAlertMessage>) r -> generatePayload(r.getOriginalId(), dsId, dsName, r.getValidationResults()
 							.get(validationType)), Encoders
