@@ -43,7 +43,7 @@
         </property>
         <property>
             <name>runValidation</name>
-            <value>false</value>
+            <value>true</value>
             <description>Should create the validation report</description>
         </property>
 
