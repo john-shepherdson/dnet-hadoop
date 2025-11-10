@@ -34,6 +34,8 @@ public class BipProjectModel {
 
 	String totalCitationCount;
 
+	String totalFilteredCitationCount;
+
 	public String getProjectId() {
 		return projectId;
 	}
@@ -72,7 +74,8 @@ public class BipProjectModel {
 				createMeasure("numOfInfluentialResults", numOfInfluentialResults),
 				createMeasure("numOfPopularResults", numOfPopularResults),
 				createMeasure("totalImpulse", totalImpulse),
-				createMeasure("totalCitationCount", totalCitationCount));
+				createMeasure("totalCitationCount", totalCitationCount),
+				createMeasure("totalFilteredCitationCount", totalFilteredCitationCount));
 	}
 
 }

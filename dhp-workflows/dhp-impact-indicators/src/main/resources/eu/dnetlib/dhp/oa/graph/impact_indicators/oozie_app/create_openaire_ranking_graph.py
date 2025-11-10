@@ -29,8 +29,9 @@ from timeit import default_timer as timer
 # from datetime import timedelta, datetime
 # -------------------------------- #
 
-if len(sys.argv) < 5:
-	print ("Usage: ./create_openaire_ranking_graph.py <openaire_graph_data_folder> <current_year> <num_partitions> <output_folder>")
+if len(sys.argv) < 6:
+	print ("Usage: ./create_openaire_ranking_graph.py <openaire_graph_data_folder> <current_year> <num_partitions> <output_folder> <apply_filters>")
+	print ("  apply_filters: 'true' to filter by data sources (opencitations, crossref, mag) and result types, 'false' to skip both filters")
 	sys.exit(0)
 
 # Inputs will be:
@@ -43,6 +44,8 @@ current_year = int(sys.argv[2])
 num_partitions = int(sys.argv[3])
 # 4. where to write output
 output_folder = sys.argv[4]
+# 5. whether to apply filters (data sources and result types)
+apply_filters = sys.argv[5].lower() == 'true'
 
 # Lists of results types we want to inclued in the citations
 # valid_result_types = ['publication', 'other']
@@ -81,13 +84,12 @@ for sub_folder in ["publication", "dataset", "software", "otherresearchproduct"]
 		# Clear memory
 		sub_df.unpersist(True)
 
-# Remove those records without year
-oa_objects_df = oa_objects_df.where(F.col('year').isNotNull())
-
-
-# Now replace years where > (current_year+1) with 0
-oa_objects_df = oa_objects_df.withColumn('clean_year', F.when(F.col('year').cast('int') > (current_year+1), 0).otherwise(F.col('year')))\
-			     .drop('year').withColumnRenamed('clean_year', 'year').repartition(num_partitions, 'id')
+# Clean years: set NULL years and years > (current_year+1) to 0
+oa_objects_df = oa_objects_df.withColumn('year', 
+			F.when(F.col('year').isNull(), 0)
+			.when(F.col('year').cast('int') > (current_year+1), 0)
+			.otherwise(F.col('year')))\
+				.repartition(num_partitions, 'id')
 
 # -------------------------------------------------------------------- #
 '''
@@ -138,15 +140,20 @@ cites_df  = spark.read.json(graph_folder + "/relation")\
                 & (F.col('dataInfo.invisible') == "false"))\
 				.drop('dataInfo.deletedbyinference').drop('dataInfo.invisible')\
 				.drop('deletedbyinference').drop('invisible')\
-				.repartition(num_partitions, 'citing').drop('relClass')\
-				.withColumn('collected_lower', F.expr('transform(value, x -> lower(x))'))\
-				.drop('collectedfrom.value')\
-				.drop('value')\
+				.repartition(num_partitions, 'citing').drop('relClass')
+
+# Apply data source filtering if requested
+if apply_filters:
+	cites_df = cites_df.withColumn('collected_lower', F.expr('transform(value, x -> lower(x))'))\
 				.where(
 					(F.array_contains(F.col('collected_lower'), "opencitations"))
             | 		(F.array_contains(F.col('collected_lower'), "crossref"))
             | 		(F.array_contains(F.col('collected_lower'), "microsoft academic graph"))
 				).drop('collected_lower')
+
+# Drop collectedfrom columns
+cites_df = cites_df.drop('collectedfrom.value').drop('value')
+
 # print ("Cited df has: " + str(cites_df.count()) + " entries")	 
 
 # DEPRECATED 
@@ -160,7 +167,12 @@ cites_df  = spark.read.json(graph_folder + "/relation")\
 # references_df = references_df.repartition(num_partitions, 'cited').join(oa_objects_df.select('id'), references_df.cited == oa_objects_df.id).drop('id').distinct().repartition(num_partitions, 'citing').cache()
 # print ("References df now has: " + str(references_df.count()) +  " entries")
 
-cites_df = cites_df.join(oa_objects_df.select('id', 'classname'), cites_df.citing == oa_objects_df.id).where( F.col('classname').isin(valid_result_types) ).drop('id').drop('classname')
+# Apply result type filtering if requested
+if apply_filters:
+	cites_df = cites_df.join(oa_objects_df.select('id', 'classname'), cites_df.citing == oa_objects_df.id).where( F.col('classname').isin(valid_result_types) ).drop('id').drop('classname')
+else:
+	cites_df = cites_df.join(oa_objects_df.select('id'), cites_df.citing == oa_objects_df.id).drop('id')
+
 cites_df = cites_df.repartition(num_partitions, 'cited').join(oa_objects_df.select('id'), cites_df.cited == oa_objects_df.id).distinct().repartition(num_partitions, 'citing').cache()
 # TODO: add here a clause filtering out the citations 
 # originating from "other" types of research objects which we consider valid

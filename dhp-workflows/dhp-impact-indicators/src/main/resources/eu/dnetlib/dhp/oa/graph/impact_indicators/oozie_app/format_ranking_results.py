@@ -584,9 +584,9 @@ elif mode == 'json':
 elif mode == 'json-5-way':
 
 	# Read the remaining input files
-	if len(sys.argv) < 9:
+	if len(sys.argv) < 10:
 		print ("\n\nInsufficient input for 'json-5-way' mode.")
-		print ("File list required: <pagerank> <attrank> <citation count> <3-year citation count> <tar-ram> <num_partitions> <graph_type>\n")
+		print ("File list required: <pagerank> <attrank> <citation count> <impulse> <tar-ram> <total_citation_count> <num_partitions> <graph_type>\n")
 		sys.exit(0)
 		
 	# Read number of partitions: 
@@ -602,6 +602,7 @@ elif mode == 'json-5-way':
 	cc_dir		= sys.argv[4]
 	impulse_dir	= sys.argv[5]
 	ram_dir		= sys.argv[6]
+	total_cc_dir	= sys.argv[7]
 	
 	# Score-specific dataframe - read inputs
 	pagerank_df = spark.read.schema(float_schema).option('delimiter', '\t').option('header',True).csv(pagerank_dir).repartition(num_partitions, 'id')
@@ -609,6 +610,7 @@ elif mode == 'json-5-way':
 	cc_df	    = spark.read.schema(int_schema).option('delimiter', '\t').option('header',True).csv(cc_dir).repartition(num_partitions, 'id')
 	impulse_df  = spark.read.schema(int_schema).option('delimiter', '\t').option('header',True).csv(impulse_dir).repartition(num_partitions, 'id')
 	ram_df      = spark.read.schema(float_schema).option('delimiter', '\t').option('header', True).csv(ram_dir).repartition(num_partitions, 'id')	
+	total_cc_df = spark.read.schema(int_schema).option('delimiter', '\t').option('header',True).csv(total_cc_dir).repartition(num_partitions, 'id')
 	# --- Join the data of the various scores --- #
 	
 	
@@ -684,6 +686,29 @@ elif mode == 'json-5-way':
 	cc_df = cc_df.select('id', 'influence_alt_key', F.expr('substring(influence_alt_values, 2, length(influence_alt_values))').alias('influence_alt_values'))
 	cc_df = cc_df.select('id', F.concat_ws(', ', F.col('influence_alt_key'), F.col('influence_alt_values')).alias('influence_alt_json'))
 	
+	# Replace 6-way classes with 5 way classes for total_cc			       		
+	total_cc_df = total_cc_df.withColumn('class', F.lit('C5'))
+	total_cc_df = total_cc_df.withColumn('class', F.when(F.col('5-way-class') == F.lit('D'), F.lit('C4')).otherwise(F.col('class')) )
+	total_cc_df = total_cc_df.withColumn('class', F.when(F.col('5-way-class') == F.lit('C'), F.lit('C3')).otherwise(F.col('class')) )
+	total_cc_df = total_cc_df.withColumn('class', F.when(F.col('5-way-class') == F.lit('B'), F.lit('C2')).otherwise(F.col('class')) )
+	total_cc_df = total_cc_df.withColumn('class', F.when(F.col('5-way-class') == F.lit('A'), F.lit('C1')).otherwise(F.col('class')) )
+	total_cc_df = total_cc_df.drop('5-way-class').withColumnRenamed('class', '5-way-class')		
+		
+	# Create json data for total_cc
+	total_cc_df = total_cc_df.select('id', F.map_concat(
+						F.create_map(F.lit('key'), F.lit('score')),
+					       	F.create_map(F.lit('value'), F.col('score'))).alias('score_map'),
+				   F.map_concat(
+					       	F.create_map(F.lit('key'), F.lit('class')),
+					       	F.create_map(F.lit('value'), F.col('5-way-class'))).alias('class_map'))
+				       		
+	total_cc_df = total_cc_df.select('id', F.create_map(F.lit('unit'), F.array([F.col('score_map'), F.col('class_map')]) ).alias('citationCount_values') )
+	total_cc_df = total_cc_df.select('id', F.create_map(F.lit('id'), F.lit('citationCount')).alias('id_map'), F.col('citationCount_values'))
+	total_cc_df = total_cc_df.select('id', F.to_json(F.create_map(F.lit('id'), F.lit('citationCount'))).alias('citationCount_key'), F.to_json(F.col('citationCount_values')).alias('citationCount_values') )
+	total_cc_df = total_cc_df.select('id', F.expr('substring(citationCount_key, 0, length(citationCount_key)-1)').alias('citationCount_key'), 'citationCount_values')
+	total_cc_df = total_cc_df.select('id', 'citationCount_key', F.expr('substring(citationCount_values, 2, length(citationCount_values))').alias('citationCount_values'))
+	total_cc_df = total_cc_df.select('id', F.concat_ws(', ', F.col('citationCount_key'), F.col('citationCount_values')).alias('citationCount_json'))
+	
 	# Replace 6-way classes with 5 way classes for attrank			       		
 	ram_df = ram_df.withColumn('class', F.lit('C5'))
 	ram_df = ram_df.withColumn('class', F.when(F.col('5-way-class') == F.lit('D'), F.lit('C4')).otherwise(F.col('class')) )
@@ -733,15 +758,16 @@ elif mode == 'json-5-way':
 	#Join dataframes together
 	results_df = pagerank_df.join(attrank_df, ['id'])
 	results_df = results_df.join(cc_df, ['id'])
+	results_df = results_df.join(total_cc_df, ['id'])
 	results_df = results_df.join(ram_df, ['id'])
 	results_df = results_df.join(impulse_df, ['id'])
 	
 	print ("Json encoding DOI keys")
 	# Json encode doi strings
-	results_df = results_df.select(json_encode_key('id').alias('id'), 'influence_json', 'popularity_json', 'influence_alt_json', 'popularity_alt_json', 'impulse_json')
+	results_df = results_df.select(json_encode_key('id').alias('id'), 'influence_json', 'popularity_json', 'influence_alt_json', 'citationCount_json', 'popularity_alt_json', 'impulse_json')
 
 	# Concatenate individual json columns
-	results_df = results_df.select('id', F.concat_ws(', ', F.col('influence_json'), F.col('popularity_json'), F.col('influence_alt_json'), F.col('popularity_alt_json'), F.col('impulse_json') ).alias('json_data'))
+	results_df = results_df.select('id', F.concat_ws(', ', F.col('influence_json'), F.col('popularity_json'), F.col('influence_alt_json'), F.col('citationCount_json'), F.col('popularity_alt_json'), F.col('impulse_json') ).alias('json_data'))
 	results_df = results_df.select('id', F.concat_ws('', F.lit('['), F.col('json_data'), F.lit(']')).alias('json_data') )
 	
 	# Filter out non-openaire ids if need

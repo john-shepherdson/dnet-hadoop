@@ -4,8 +4,8 @@ from pyspark import SparkConf, SparkContext
 import pyspark.sql.functions as F
 from pyspark.sql.types import StringType, IntegerType, StructType, StructField
 
-if len(sys.argv) < 8:
-    print("Usage: projects_impact.py <relations_folder> <influence_file> <popularity_file> <cc_file> <impulse_file> <num_partitions> <output_dir>")
+if len(sys.argv) < 9:
+    print("Usage: projects_impact.py <relations_folder> <influence_file> <popularity_file> <cc_file> <impulse_file> <total_cc_file> <num_partitions> <output_dir>")
     sys.exit(-1)
 
 appName = 'Project Impact Indicators'
@@ -20,8 +20,9 @@ influence_fd = sys.argv[2]
 popularity_fd = sys.argv[3]
 cc_fd = sys.argv[4]
 impulse_fd = sys.argv[5]
-num_partitions = int(sys.argv[6])
-output_dir = sys.argv[7]
+total_cc_fd = sys.argv[6]
+num_partitions = int(sys.argv[7])
+output_dir = sys.argv[8]
 
 # schema for impact indicator files
 impact_files_schema = StructType([
@@ -35,7 +36,8 @@ impact_indicators = [
     ('influence', influence_fd, 'class'),
     ('popularity', popularity_fd, 'class'),
     ('impulse', impulse_fd, 'score'),
-    ('citation_count', cc_fd, 'score')
+    ('citation_count', cc_fd, 'score'),
+    ('total_citation_count', total_cc_fd, 'score')
 ]
 
 '''
@@ -102,7 +104,8 @@ relations.groupBy('projectId')\
         F.sum('influence').alias('numOfInfluentialResults'),\
         F.sum('popularity').alias('numOfPopularResults'),\
         F.sum('impulse').alias('totalImpulse'),\
-        F.sum('citation_count').alias('totalCitationCount')\
+        F.sum('citation_count').alias('totalFilteredCitationCount'),\
+        F.sum('total_citation_count').alias('totalCitationCount')\
     )\
     .write.mode("overwrite")\
     .json(output_dir, compression="gzip")
