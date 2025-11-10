@@ -17,15 +17,14 @@ public class SftpIteratorWithPassword extends AbstractSftpIterator {
 	private final String password;
 
 	public SftpIteratorWithPassword(final String baseUrl, final int port, final String username,
-		final boolean isRecursive, final Set<String> extensionsSet,
-		final String fromDate, final String password) {
+			final boolean isRecursive, final Set<String> extensionsSet,
+			final String fromDate, final String password) {
 
 		super(baseUrl, port, username, isRecursive, extensionsSet, fromDate);
 
 		this.password = password;
 
-		connectToSftpServer();
-		initializeQueue();
+		init();
 	}
 
 	@Override
