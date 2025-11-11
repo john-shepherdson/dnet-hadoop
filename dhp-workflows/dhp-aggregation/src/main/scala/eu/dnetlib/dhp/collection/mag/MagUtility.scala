@@ -550,7 +550,7 @@ object MagUtility extends Serializable {
       )
     }
     instance.setAlternateIdentifier(pidList.asJava)
-    instance.setUrl(s"https://dx.doi.org/${paper.doi.getOrElse("")}")
+    instance.setUrl(List(s"https://dx.doi.org/${paper.doi.getOrElse("")}").asJava)
     instance.setCollectedfrom(MAGCollectedFrom)
     mapper.writeValueAsString(result)
   }
