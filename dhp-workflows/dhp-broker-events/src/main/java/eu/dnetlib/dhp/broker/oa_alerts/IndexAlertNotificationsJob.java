@@ -18,7 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.broker.model.OaNotification;
+import eu.dnetlib.dhp.broker.model.OaAlertNotification;
 import eu.dnetlib.dhp.broker.oa.util.BrokerIndexClient;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
 import eu.dnetlib.dhp.collection.ApiDescriptor;
@@ -60,7 +60,7 @@ public class IndexAlertNotificationsJob {
 		final SparkSession spark = SparkSession.builder().config(conf).getOrCreate();
 
 		final boolean isEmpty = ClusterUtils
-				.readPath(spark, notificationsPath, OaNotification.class)
+				.readPath(spark, notificationsPath, OaAlertNotification.class)
 				.isEmpty();
 
 		try (final BrokerIndexClient feeder = new BrokerIndexClient(indexHost)) {
