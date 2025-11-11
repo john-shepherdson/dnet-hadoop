@@ -65,7 +65,7 @@ public class IndexAlertNotificationsJob {
 
 		try (final BrokerIndexClient feeder = new BrokerIndexClient(indexHost)) {
 			log.info("*** Clean old notifications");
-			feeder.deleteUsingExactField(index, "map.datasourceId", dsId, true);
+			feeder.deleteUsingNestedField(index, "map.datasourceId", dsId, true);
 
 			if (!isEmpty) {
 				final FileSystem fileSystem = FileSystem.get(new Configuration());

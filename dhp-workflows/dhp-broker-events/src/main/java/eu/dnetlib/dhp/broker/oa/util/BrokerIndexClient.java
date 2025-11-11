@@ -15,14 +15,17 @@ public class BrokerIndexClient extends ESFeeder {
 		super(url);
 	}
 
-	public void deleteUsingExactField(final String index, final String field, final String value, final boolean waitTermination)
+	// Assumes field is nested, e.g. "a.b"
+	public void deleteUsingNestedField(final String index, final String field, final String value, final boolean waitTermination)
 			throws ElasticsearchException, IOException {
 
 		final DeleteByQueryRequest req = DeleteByQueryRequest.of(b -> b
 				.index(index)
 				.waitForCompletion(false)
 				.conflicts(Conflicts.Proceed)
-				.query(q -> q.term(t -> t.field(field).value(value))));
+				.query(q -> q.nested(n -> n
+						.path(field.substring(0, field.lastIndexOf('.')))
+						.query(nq -> nq.term(t -> t.field(field).value(value))))));
 
 		final DeleteByQueryResponse res = getEsClient().deleteByQuery(req);
 
