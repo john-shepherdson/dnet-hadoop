@@ -942,6 +942,11 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 		return s;
 	}
 
+    protected static LangAwareStructuredProperty cleanValue(LangAwareStructuredProperty s) {
+        s.setValue(s.getValue().replaceAll(CLEANING_REGEX, " "));
+        return s;
+    }
+
 	protected static Subject cleanValue(Subject s) {
 		s.setValue(s.getValue().replaceAll(CLEANING_REGEX, " "));
 		return s;
@@ -951,6 +956,11 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 		s.setValue(s.getValue().replaceAll(CLEANING_REGEX, " "));
 		return s;
 	}
+
+    protected static LangAwareField cleanValue(LangAwareField s) {
+        s.setValue(s.getValue().replaceAll(CLEANING_REGEX, " "));
+        return s;
+    }
 
 	public static OafEntity applyCoarVocabularies(OafEntity entity, VocabularyGroup vocs) {
 

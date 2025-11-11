@@ -51,6 +51,22 @@ public class OafMapperUtils {
 		return field;
 	}
 
+    public static LangAwareField langAwareField(final String value) {
+        return langAwareField(value, null, null);
+    }
+
+    public static LangAwareField langAwareField(final String value, final Qualifier lang, final DataInfo info) {
+        if (value == null || StringUtils.isBlank(value.toString())) {
+            return null;
+        }
+
+        final LangAwareField field = new LangAwareField();
+        field.setValue(value);
+        field.setDataInfo(info);
+        field.setLang(lang);
+        return field;
+    }
+
 	public static List<Field<String>> listFields(final DataInfo info, final String... values) {
 		return Arrays
 			.stream(values)
@@ -200,6 +216,41 @@ public class OafMapperUtils {
 		sp.setDataInfo(dataInfo);
 		return sp;
 	}
+
+    public static LangAwareStructuredProperty langAwareStructuredProperty(
+            final String value,
+            final String classid,
+            final String classname,
+            final String schemeid,
+            final String schemename) {
+
+        return langAwareStructuredProperty(value, qualifier(classid, classname, schemeid, schemename), null, null);
+    }
+
+    public static LangAwareStructuredProperty langAwareStructuredProperty(
+            final String value,
+            final Qualifier qualifier) {
+        if (value == null) {
+            return null;
+        }
+        return langAwareStructuredProperty(value, qualifier, null, null);
+    }
+
+    public static LangAwareStructuredProperty langAwareStructuredProperty(
+            final String value,
+            final Qualifier qualifier,
+            final Qualifier lang,
+            final DataInfo dataInfo) {
+        if (value == null) {
+            return null;
+        }
+        final LangAwareStructuredProperty sp = new LangAwareStructuredProperty();
+        sp.setValue(value);
+        sp.setQualifier(qualifier);
+        sp.setDataInfo(dataInfo);
+        sp.setLang(lang);
+        return sp;
+    }
 
 	public static ExtraInfo extraInfo(
 		final String name,

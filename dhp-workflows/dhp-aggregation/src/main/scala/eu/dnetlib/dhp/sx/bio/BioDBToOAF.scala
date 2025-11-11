@@ -141,7 +141,7 @@ object BioDBToOAF {
     if (title != null)
       d.setTitle(
         List(
-          OafMapperUtils.structuredProperty(title, ModelConstants.MAIN_TITLE_QUALIFIER, DATA_INFO)
+          OafMapperUtils.langAwareStructuredProperty(title, ModelConstants.MAIN_TITLE_QUALIFIER, null, DATA_INFO)
         ).asJava
       )
 
@@ -340,9 +340,10 @@ object BioDBToOAF {
       return List()
     d.setTitle(
       List(
-        OafMapperUtils.structuredProperty(
+        OafMapperUtils.langAwareStructuredProperty(
           title.toLowerCase().capitalize,
           ModelConstants.MAIN_TITLE_QUALIFIER,
+          null,
           DATA_INFO
         )
       ).asJava
@@ -474,9 +475,10 @@ object BioDBToOAF {
     d.setDataInfo(DATA_INFO)
     d.setTitle(
       List(
-        OafMapperUtils.structuredProperty(
+        OafMapperUtils.langAwareStructuredProperty(
           input.title,
           ModelConstants.MAIN_TITLE_QUALIFIER,
+          null,
           DATA_INFO
         )
       ).asJava

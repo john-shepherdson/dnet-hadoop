@@ -255,16 +255,17 @@ object PubMedToOaf {
       return null
     result.setTitle(
       List(
-        OafMapperUtils.structuredProperty(
+        OafMapperUtils.langAwareStructuredProperty(
           article.getTitle,
           ModelConstants.MAIN_TITLE_QUALIFIER,
+          null,
           dataInfo
         )
       ).asJava
     )
 
     if (article.getDescription != null && article.getDescription.nonEmpty)
-      result.setDescription(List(OafMapperUtils.field(article.getDescription, dataInfo)).asJava)
+      result.setDescription(List(OafMapperUtils.langAwareField(article.getDescription, null, dataInfo)).asJava)
 
     if (article.getLanguage != null) {
 

@@ -485,7 +485,7 @@ public class MergeUtils {
 		merge.setRelevantdate(mergeStructuredProperties(merge.getRelevantdate(), enrich.getRelevantdate(), trust));
 
 		if (merge.getDescription() == null || merge.getDescription().isEmpty() || trust == 0) {
-			merge.setDescription(longestLists(merge.getDescription(), enrich.getDescription()));
+			merge.setDescription(longestLangAwareFields(merge.getDescription(), enrich.getDescription()));
 		}
 
 		merge
@@ -947,6 +947,20 @@ public class MergeUtils {
 
 		return a.size() >= b.size() ? a : b;
 	}
+
+    /**
+     * Longest lists list.
+     *
+     * @param a the a
+     * @param b the b
+     * @return the list
+     */
+    private static List<LangAwareField> longestLangAwareFields(List<LangAwareField> a, List<LangAwareField> b) {
+        if (a == null || b == null)
+            return a == null ? b : a;
+
+        return a.size() >= b.size() ? a : b;
+    }
 
 	/**
 	 * This main method apply the enrichment of the instances

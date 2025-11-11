@@ -5,14 +5,8 @@ import eu.dnetlib.dhp.actionmanager.ror.GenerateRorActionSetJob
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
 import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf._
-import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.{field, qualifier, structuredProperty, subject}
-import eu.dnetlib.dhp.schema.oaf.utils.{
-  DoiCleaningRule,
-  GraphCleaningFunctions,
-  IdentifierFactory,
-  OafMapperUtils,
-  PidType
-}
+import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.{field, langAwareField, langAwareStructuredProperty, qualifier, structuredProperty, subject}
+import eu.dnetlib.dhp.schema.oaf.utils.{DoiCleaningRule, GraphCleaningFunctions, IdentifierFactory, OafMapperUtils, PidType}
 import eu.dnetlib.dhp.utils.DHPUtils
 import org.apache.commons.lang3.StringUtils
 import org.apache.spark.sql.Row
@@ -373,19 +367,18 @@ case object Crossref2Oaf {
     // TITLE
     val mainTitles =
       for { JString(title) <- json \ "title" if title.nonEmpty } yield {
-        structuredProperty(title, ModelConstants.MAIN_TITLE_QUALIFIER, null)
+        langAwareStructuredProperty(title, ModelConstants.MAIN_TITLE_QUALIFIER)
       }
     val originalTitles = for {
       JString(title) <- json \ "original-title" if title.nonEmpty
-    } yield structuredProperty(title, ModelConstants.ALTERNATIVE_TITLE_QUALIFIER, null)
+    } yield langAwareStructuredProperty(title, ModelConstants.ALTERNATIVE_TITLE_QUALIFIER)
     val shortTitles = for {
       JString(title) <- json \ "short-title" if title.nonEmpty
-    } yield structuredProperty(title, ModelConstants.ALTERNATIVE_TITLE_QUALIFIER, null)
+    } yield langAwareStructuredProperty(title, ModelConstants.ALTERNATIVE_TITLE_QUALIFIER)
     val subtitles =
-      for { JString(title) <- json \ "subtitle" if title.nonEmpty } yield structuredProperty(
+      for { JString(title) <- json \ "subtitle" if title.nonEmpty } yield langAwareStructuredProperty(
         title,
-        ModelConstants.SUBTITLE_QUALIFIER,
-        null
+        ModelConstants.SUBTITLE_QUALIFIER
       )
     result.setTitle((mainTitles ::: originalTitles ::: shortTitles ::: subtitles).asJava)
 
@@ -396,7 +389,7 @@ case object Crossref2Oaf {
 
     // DESCRIPTION
     val descriptionList =
-      for { JString(description) <- json \ "abstract" } yield field[String](description, null)
+      for { JString(description) <- json \ "abstract" } yield langAwareField(description)
     result.setDescription(descriptionList.asJava)
 
     // Source

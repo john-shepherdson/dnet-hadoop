@@ -429,16 +429,14 @@ object DataciteToOAFTransformation {
         .filter(t => t.title.nonEmpty)
         .map(t => {
           if (t.titleType.isEmpty) {
-            OafMapperUtils
-              .structuredProperty(t.title.get, ModelConstants.MAIN_TITLE_QUALIFIER, null)
+            OafMapperUtils.langAwareStructuredProperty(t.title.get, ModelConstants.MAIN_TITLE_QUALIFIER)
           } else {
-            OafMapperUtils.structuredProperty(
+            OafMapperUtils.langAwareStructuredProperty(
               t.title.get,
               t.titleType.get,
               t.titleType.get,
               ModelConstants.DNET_DATACITE_TITLE,
-              ModelConstants.DNET_DATACITE_TITLE,
-              null
+              ModelConstants.DNET_DATACITE_TITLE
             )
           }
         })
@@ -543,7 +541,7 @@ object DataciteToOAFTransformation {
     result.setDescription(
       descriptions
         .filter(d => d.description.isDefined)
-        .map(d => OafMapperUtils.field(d.description.get, null))
+        .map(d => OafMapperUtils.langAwareField(d.description.get))
         .filter(s => s != null)
         .asJava
     )

@@ -433,7 +433,7 @@ public class ProvisionModelSupport {
 		rs.setAuthor(asAuthor(r.getAuthor()));
 		rs.setMaintitle(getMaintitle(r.getTitle()));
 		rs.setOtherTitles(getOtherTitles(r.getTitle()));
-		rs.setDescription(mapFieldList(r.getDescription()));
+		rs.setDescription(mapLangAwareFieldList(r.getDescription()));
 		rs.setSubject(asSubject(r.getSubject()));
 		rs.setLanguage(asLanguage(r.getLanguage()));
 		rs.setPublicationdate(mapField(r.getDateofacceptance()));
@@ -525,7 +525,7 @@ public class ProvisionModelSupport {
 	}
 
 	@Nullable
-	private static List<String> getOtherTitles(List<StructuredProperty> titleList) {
+	private static List<String> getOtherTitles(List<LangAwareStructuredProperty> titleList) {
 		return Optional
 			.ofNullable(titleList)
 			.map(
@@ -543,7 +543,7 @@ public class ProvisionModelSupport {
 			.orElse(null);
 	}
 
-	private static String getMaintitle(List<StructuredProperty> titleList) {
+	private static String getMaintitle(List<LangAwareStructuredProperty> titleList) {
 		return Optional
 			.ofNullable(titleList)
 			.flatMap(
@@ -626,6 +626,13 @@ public class ProvisionModelSupport {
 			.map(v -> v.stream().map(Field::getValue).collect(Collectors.toList()))
 			.orElse(null);
 	}
+
+    private static List<String> mapLangAwareFieldList(List<eu.dnetlib.dhp.schema.oaf.LangAwareField> fl) {
+        return Optional
+                .ofNullable(fl)
+                .map(v -> v.stream().map(Field::getValue).collect(Collectors.toList()))
+                .orElse(null);
+    }
 
 	private static String mapQualifier(eu.dnetlib.dhp.schema.oaf.Qualifier q) {
 		return Optional.ofNullable(q).map(Qualifier::getClassname).orElse(null);

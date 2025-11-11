@@ -510,7 +510,7 @@ object MagUtility extends Serializable {
 
     result.setId(s"50|mag_________::${DHPUtils.md5(paper.paperId.get.toString)}")
 
-    val originalTitles = structuredProperty(paper.paperTitle.get, ModelConstants.MAIN_TITLE_QUALIFIER, null)
+    val originalTitles = langAwareStructuredProperty(paper.paperTitle.get, ModelConstants.MAIN_TITLE_QUALIFIER)
 
     result.setTitle(List(originalTitles).asJava)
 
@@ -582,7 +582,7 @@ object MagUtility extends Serializable {
     }
 
     if (paper.abstractText.isDefined)
-      result.setDescription(List(field(paper.abstractText.get, null)).asJava)
+      result.setDescription(List(langAwareField(paper.abstractText.get)).asJava)
     if (paper.authors.isDefined && paper.authors.get.nonEmpty) {
       result.setAuthor(
         paper.authors.get

@@ -235,7 +235,7 @@ public class CreateRelatedEntitiesJob_phase2 {
 				r.setAuthor(authors);
 			}
 			if (r.getDescription() != null) {
-				List<Field<String>> desc = r
+				List<LangAwareField> desc = r
 					.getDescription()
 					.stream()
 					.filter(Objects::nonNull)
@@ -247,7 +247,7 @@ public class CreateRelatedEntitiesJob_phase2 {
 				r.setDescription(desc);
 			}
 			if (r.getTitle() != null) {
-				List<StructuredProperty> titles = r
+				List<LangAwareStructuredProperty> titles = r
 					.getTitle()
 					.stream()
 					.filter(Objects::nonNull)
