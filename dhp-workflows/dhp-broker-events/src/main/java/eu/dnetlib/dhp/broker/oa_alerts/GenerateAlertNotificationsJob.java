@@ -99,20 +99,28 @@ public class GenerateAlertNotificationsJob {
 
 		final ValidationType validationType = calculateValidationType(compatibilityLevel);
 
+		if (validationType == null) {
+			log.warn("The compatibility is non managed by the validator engine");
+			return;
+		}
+
+		final String topic = TOPIC_PREFIX + StringUtils.upperCase(validationType.toString());
+
+		log.info("topic: {}", topic);
+
+		final List<Subscription> allSubscriptions = listSubscriptions(brokerApiBaseUrl);
+
+		final List<Subscription> validSubscriptions = allSubscriptions
+				.stream()
+				.filter(s -> s.getTopic().equalsIgnoreCase(topic))
+				.filter(s -> extractDatasourceId(s).equalsIgnoreCase(dsId))
+				.collect(Collectors.toList());
+
+		log.info("Number of valid subscriptions: {}/{}", validSubscriptions.size(), allSubscriptions.size());
+
 		final SparkConf conf = new SparkConf();
 
 		SparkSessionSupport.runWithSparkSession(conf, isSparkSessionManaged, spark -> {
-
-			if (validationType == null) {
-				log.warn("The compatibility is non managed by the validator engine");
-				return;
-			}
-
-			final String topic = TOPIC_PREFIX + StringUtils.upperCase(validationType.toString());
-
-			log.info("topic: {}", topic);
-
-			final LongAccumulator total = spark.sparkContext().longAccumulator("total_alert_notifications");
 
 			final Dataset<ValidatorAlertMessage> payloads = spark
 					.read()
@@ -124,28 +132,28 @@ public class GenerateAlertNotificationsJob {
 							.get(validationType)), Encoders
 									.bean(ValidatorAlertMessage.class));
 
+			final long count = payloads.count();
+
+			log.info("Number of events: {}", count);
+
 			final DatasourceStats stats = new DatasourceStats();
 			stats.setId(dsId);
 			stats.setName(dsName);
 			stats.setType("-"); // TODO
 			stats.setTopic(topic);
-			stats.setSize(payloads.count());
+			stats.setSize(count);
 
 			updateStats(brokerApiBaseUrl, stats);
 
-			final List<Subscription> subscriptions = listSubscriptions(brokerApiBaseUrl)
-					.stream()
-					.filter(s -> s.getTopic().equals(topic))
-					.filter(s -> extractDatasourceId(s).equalsIgnoreCase(dsId))
-					.collect(Collectors.toList());
-
 			final Long date = new Date().getTime();
+
 			log.info("date: {}", date);
 
-			if (subscriptions.size() > 0) {
+			final LongAccumulator total = spark.sparkContext().longAccumulator("total_alert_notifications");
 
+			if (validSubscriptions.size() > 0) {
 				final Dataset<OaAlertNotification> dataset =
-						payloads.flatMap((FlatMapFunction<ValidatorAlertMessage, OaAlertNotification>) p -> generateAlertNotifications(p, date, subscriptions), Encoders
+						payloads.flatMap((FlatMapFunction<ValidatorAlertMessage, OaAlertNotification>) p -> generateAlertNotifications(p, date, validSubscriptions), Encoders
 								.bean(OaAlertNotification.class))
 								.filter((FilterFunction<OaAlertNotification>) n -> StringUtils.isNotBlank(n.getPayload()));
 
@@ -153,6 +161,9 @@ public class GenerateAlertNotificationsJob {
 			} else {
 				ClusterUtils.save(spark.emptyDataset(Encoders.bean(OaAlertNotification.class)), outputPath, OaAlertNotification.class, total);
 			}
+
+			log.info("Number of notifications: {}", total.value());
+
 		});
 	}
 
