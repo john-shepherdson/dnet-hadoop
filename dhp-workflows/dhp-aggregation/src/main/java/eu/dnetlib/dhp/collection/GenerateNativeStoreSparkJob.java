@@ -121,7 +121,7 @@ public class GenerateNativeStoreSparkJob {
 		final boolean runValidation = Optional
 				.ofNullable(parser.get("runValidation"))
 				.map(Boolean::valueOf)
-				.orElse(Boolean.TRUE);
+				.orElse(Boolean.FALSE);
 		log.info("runValidation: {}", runValidation);
 
 		final SparkConf conf = new SparkConf();
