@@ -1,0 +1,31 @@
+{
+    "tags": [
+        {
+            "id": "DWA",
+            "inputs": {
+                "publication": "/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/abstractpresentnorelliteratue/graph/publication",
+                "relation": "/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/abstractpresentnorelliteratue/graph/relation",
+                "dataset": "/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/abstractpresentnorelliteratue/graph/dataset"
+            },
+            "selects": [
+                {
+                    "tableName": "result",
+                    "tableSelect": "WITH dats AS (SELECT * from dataset WHERE datainfo.deletedbyinference = false), supp AS (SELECT DISTINCT target FROM relation JOIN dats ON relation.target = dats.id WHERE relClass = 'IsSupplementedBy') SELECT dats.*, NULL AS comparisonValue  FROM dats WHERE dats.id NOT IN (SELECT * from supp)"
+                }
+            ],
+            "entityToTag": "dataset",
+            "resultTable": "result",
+            "criteria": [
+                {
+                    "constraint": [
+                        {
+                            "verb": "exist",
+                            "field": "description",
+                            "value": null
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

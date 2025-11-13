@@ -1,0 +1,23 @@
+{
+    "tags": [
+        {
+            "id": "DA",
+            "inputs": {"publication": "/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/noexistpublicationdate/graph/publication"},
+            "selects": null,
+            "entityToTag": "publication",
+            "resultTable": "publication",
+            "criteria": [
+                {
+                    "constraint": [
+                        {
+                            "verb": "not_exist",
+                            "field": "publicationDate",
+                            "value": null,
+                            "jsonPath": null
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

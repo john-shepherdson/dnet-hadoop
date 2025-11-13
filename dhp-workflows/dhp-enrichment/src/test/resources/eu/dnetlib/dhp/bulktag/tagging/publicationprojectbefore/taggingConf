@@ -1,0 +1,31 @@
+{
+    "tags": [
+        {
+            "id": "PB",
+            "inputs": {
+                "publication": "/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/publicationprojectbefore/graph/publication",
+                "relation": "/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/publicationprojectbefore/graph/relation",
+                "project": "/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/publicationprojectbefore/graph/project"
+            },
+            "selects": [
+                {
+                    "tableName": "result",
+                    "tableSelect": "SELECT publication.* , project.startDate.value as comparisonValue FROM publication JOIN relation JOIN project on publication.id = relation.source AND project.id = relation.target WHERE relation.relClass = 'isProducedBy'"
+                }
+            ],
+            "entityToTag": "publication",
+            "resultTable": "result",
+            "criteria": [
+                {
+                    "constraint": [
+                        {
+                            "verb": "before",
+                            "field": "publicationDate",
+                            "value": null
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

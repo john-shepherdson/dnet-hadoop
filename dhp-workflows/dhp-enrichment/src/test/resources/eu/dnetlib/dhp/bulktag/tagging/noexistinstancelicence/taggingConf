@@ -1,0 +1,23 @@
+{
+    "tags": [
+        {
+            "id": "MIL",
+            "inputs": {"publication": "/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/noexistinstancelicence/graph/publication"},
+            "selects": null,
+            "entityToTag": "publication",
+            "resultTable": "publication",
+            "criteria": [
+                {
+                    "constraint": [
+                        {
+                            "verb": "not_exist_forall",
+                            "field": "instance",
+                            "value": null,
+                            "jsonPath": "instanceLicence"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

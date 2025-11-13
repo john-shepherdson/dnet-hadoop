@@ -1,0 +1,44 @@
+{
+    "tags": [
+        {
+            "id": "AP",
+            "inputs": {"publication": "/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/noexistauthorpid/graph/publication"},
+            "selects": null,
+            "entityToTag": "publication",
+            "resultTable": "publication",
+            "criteria": [
+                {
+                    "constraint": [
+                        {
+                            "verb": "not_exist_forall",
+                            "field": "authorWhole",
+                            "value": [
+                                "orcid",
+                                "orcid_pending",
+                                "github",
+                                "lattes",
+                                "linkedin",
+                                "twitter",
+                                "gitlab",
+                                "acm",
+                                "dblp",
+                                "dia",
+                                "gepris",
+                                "ieee",
+                                "isni",
+                                "jst",
+                                "nii",
+                                "openid",
+                                "repec",
+                                "researcherid",
+                                "viaf",
+                                "zbmath"
+                            ],
+                            "jsonPath": "authorPids"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

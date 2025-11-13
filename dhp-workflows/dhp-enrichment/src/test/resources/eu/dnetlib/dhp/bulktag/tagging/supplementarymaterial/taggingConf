@@ -1,0 +1,103 @@
+{
+    "tags": [
+        {
+            "id": "SM",
+            "inputs": {"dataset": "/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/supplementarymaterial/graph/dataset"},
+            "selects": null,
+            "entityToTag": "dataset",
+            "resultTable": "dataset",
+            "criteria": [
+                {
+                    "constraint": [
+                        {
+                            "verb": "starts_with_caseinsensitive",
+                            "field": "title",
+                            "value": "supplementary material for"
+                        }
+                    ]
+                },
+                {
+                    "constraint": [
+                        {
+                            "verb": "starts_with_caseinsensitive",
+                            "field": "title",
+                            "value": "supplementary materials for"
+                        }
+                    ]
+                },
+                {
+                    "constraint": [
+                        {
+                            "verb": "starts_with_caseinsensitive",
+                            "field": "title",
+                            "value": "supplementary file for"
+                        }
+                    ]
+                },
+                {
+                    "constraint": [
+                        {
+                            "verb": "starts_with_caseinsensitive",
+                            "field": "title",
+                            "value": "supplementary document for"
+                        }
+                    ]
+                },
+                {
+                    "constraint": [
+                        {
+                            "verb": "starts_with_caseinsensitive",
+                            "field": "title",
+                            "value": "supplementary figure"
+                        }
+                    ]
+                },
+                {
+                    "constraint": [
+                        {
+                            "verb": "starts_with_caseinsensitive",
+                            "field": "title",
+                            "value": "supplemental figure"
+                        }
+                    ]
+                },
+                {
+                    "constraint": [
+                        {
+                            "verb": "starts_with_caseinsensitive",
+                            "field": "title",
+                            "value": "supplementary table"
+                        }
+                    ]
+                },
+                {
+                    "constraint": [
+                        {
+                            "verb": "starts_with_caseinsensitive",
+                            "field": "title",
+                            "value": "figure"
+                        }
+                    ]
+                },
+                {
+                    "constraint": [
+                        {
+                            "verb": "starts_with_caseinsensitive",
+                            "field": "title",
+                            "value": "table for"
+                        }
+                    ]
+                },
+                {
+                    "constraint": [
+                        {
+                            "verb": "starts_with_caseinsensitive",
+                            "field": "title",
+                            "value": "data from"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

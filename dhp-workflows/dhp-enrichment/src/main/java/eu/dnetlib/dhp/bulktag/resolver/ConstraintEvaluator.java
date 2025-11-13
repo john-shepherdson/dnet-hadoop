@@ -187,6 +187,7 @@ public class ConstraintEvaluator implements Serializable {
         }
 
         Dataset<Row> tmp = spark.sql("SELECT * FROM " + tag.getResultTable());
+tmp.show(false);
         String structCols ;
         String sql ;
         if (tag.getSelects() != null) {

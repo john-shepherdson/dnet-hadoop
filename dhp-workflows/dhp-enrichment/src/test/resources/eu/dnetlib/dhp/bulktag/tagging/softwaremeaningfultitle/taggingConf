@@ -1,0 +1,26 @@
+{
+    "tags": [
+        {
+            "id": "MT2",
+            "inputs": {
+
+                "software": "/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/softwaremeaningfultitle/graph/software"
+            },
+            "selects": null,
+            "entityToTag": "software",
+            "resultTable": "software",
+            "criteria": [
+                {
+                    "constraint": [
+                        {
+                            "verb": "apply_regexp",
+                            "field": "title",
+                            "value": "(?i)^(?!.*\\b(software|code)\\s+(on|in|from)\\s+github\\b)(?!.*\\brelease\\s*v?\\d+(\\.\\d+)*\\b)(?!.*\\b(source\\s*code|repository)\\b)(?!.*[a-z0-9_.-]+/[a-z0-9_.-]+)(?!.*:\\s*source\\s*code)(?!.*\\(v?\\d+(\\.\\d+)*\\)).{10,}$"
+
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

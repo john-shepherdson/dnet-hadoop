@@ -1,0 +1,31 @@
+{
+    "tags": [
+        {
+            "id": "MT",
+            "inputs": {
+                "publication": "/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/meaningfultitle/graph/publication",
+                "relation": "/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/meaningfultitle/graph/relation",
+                "dataset": "/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/meaningfultitle/graph/dataset"
+            },
+            "selects": [
+                {
+                    "tableName": "result",
+                    "tableSelect": "SELECT dataset.* , publication.title.value as comparisonValue FROM publication JOIN relation JOIN dataset on publication.id = relation.source AND dataset.id = relation.target WHERE relation.relClass = 'IsSupplementedBy' AND publication.datainfo.deletedbyinference = false and dataset.datainfo.deletedbyinference = false"
+                }
+            ],
+            "entityToTag": "dataset",
+            "resultTable": "result",
+            "criteria": [
+                {
+                    "constraint": [
+                        {
+                            "verb": "not_exist_forall",
+                            "field": "title",
+                            "value": null
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

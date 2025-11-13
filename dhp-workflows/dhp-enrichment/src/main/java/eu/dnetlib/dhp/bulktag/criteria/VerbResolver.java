@@ -51,4 +51,12 @@ public class VerbResolver implements Serializable {
 		// return Class.forName(tmp_map.get(name)).
 		return map.get(name).getDeclaredConstructor((Object.class)).newInstance(param);
 	}
+
+	public Selection getVerb(String name)
+			throws NoSuchMethodException, IllegalAccessException, InvocationTargetException,
+			InstantiationException {
+
+		// return Class.forName(tmp_map.get(name)).
+		return map.get(name).getDeclaredConstructor((Object.class)).newInstance();
+	}
 }

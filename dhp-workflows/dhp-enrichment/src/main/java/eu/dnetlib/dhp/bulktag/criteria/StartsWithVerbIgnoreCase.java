@@ -19,14 +19,21 @@ public class StartsWithVerbIgnoreCase implements Selection, Serializable {
 
 	}
 
+	private boolean apply(Object value, String sParam){
+		if(value instanceof String s  )
+			return s.toLowerCase().startsWith(sParam.toLowerCase());
+		if (value instanceof List<?> lista )
+			return lista.stream().anyMatch(l -> (l instanceof String sValue && sValue.toLowerCase().startsWith(sParam.toLowerCase())));
+		return false;
+	}
 
 	@Override
 	public boolean apply(Object value) {
-		if(params instanceof String sParam){
-			if(value instanceof String s  )
-				return s.toLowerCase().startsWith(sParam.toLowerCase());
-			if (value instanceof List<?> lista )
-				return lista.stream().anyMatch(l -> (l instanceof String sValue && sValue.toLowerCase().startsWith(sParam.toLowerCase())));
+		if(params instanceof String sParam)
+			return apply(value, sParam);
+		if(params instanceof List<?> lista){
+			Boolean ret =  lista.stream().anyMatch(l -> (l instanceof String sParam && apply(value, sParam)));
+			return ret;
 		}
 
 		return false;

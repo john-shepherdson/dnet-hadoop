@@ -1,0 +1,28 @@
+{
+    "tags": [
+        {
+            "id": "SWR",
+            "inputs": {
+
+                "software": "/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/softwarerepourl/graph/software"
+            },
+            "selects": null,
+            "entityToTag": "software",
+            "resultTable": "softwaream",
+            "criteria": [
+                {
+                    "constraint": [
+                        {
+                            "applyVerb": "starts_with_caseinsensitive",
+                            "field": "instance",
+                            "value": ["https://github.com", "https://www.softwareheritage.org", "https://archive.softwareheritage.org", "https://bio.tools"],
+                            "jsonPath":"instanceUrl",
+                            "verb":"forany_apply"
+
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

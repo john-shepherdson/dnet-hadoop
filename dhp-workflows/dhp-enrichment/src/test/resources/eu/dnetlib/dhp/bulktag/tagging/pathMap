@@ -25,6 +25,8 @@
     "instanceAlternateIdentifiers" : {"path": "$['alternateIdentifier'][*]['value']"},
     "instancePids": {"path": "$['pid'][*]['value']"},
     "instanceLicence":{"path":"$['license']['value']"},
+    "instanceUrl":{"path":"$['url']"},
+    "url":{"path":"$['instance'][*]['url']"},
     "publicationyear": {
         "path": "$['dateofacceptance'].value",
         "action": {

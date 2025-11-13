@@ -69,7 +69,7 @@ public class ConstraintEvaluatorJobText {
                 .main(
                         new String[] {
                                 "-isSparkSessionManaged", Boolean.FALSE.toString(),
-                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/taggingConf").getPath(),
+                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/publicationprojectbefore/taggingConf").getPath(),
                                 "-outputPath", workingDir.toString() + "/taggingOutcome/",
                                 "-pathMapPath", getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/pathMap").getPath() ,
                                 "-nameNode", "local"
@@ -89,7 +89,7 @@ public class ConstraintEvaluatorJobText {
                 .main(
                         new String[] {
                                 "-isSparkSessionManaged", Boolean.FALSE.toString(),
-                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/taggingConf").getPath(),
+                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/noexistabstract/taggingConf").getPath(),
                                 "-outputPath", workingDir.toString() + "/taggingOutcome/",
                                 "-pathMapPath", getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/pathMap").getPath() ,
                                 "-nameNode", "local"
@@ -99,8 +99,6 @@ public class ConstraintEvaluatorJobText {
         Assertions.assertEquals(2, df.count());
         Assertions.assertEquals(1, df.filter((FilterFunction<Row>) r -> r.getAs("_1").equals("50|4dc99724cf04::80cb462a2c32d579c78abd0fc4029fe3")).count());
         Assertions.assertEquals(1, df.filter((FilterFunction<Row>) r -> r.getAs("_1").equals("50|57a035e5b1ae::2172074b599ad664d6dc1028b3f53823")).count());
-
-        df.show(false);
     }
 
     @Test
@@ -110,7 +108,7 @@ public class ConstraintEvaluatorJobText {
                 .main(
                         new String[] {
                                 "-isSparkSessionManaged", Boolean.FALSE.toString(),
-                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/taggingConf").getPath(),
+                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/noexistauthorpid/taggingConf").getPath(),
                                 "-outputPath", workingDir.toString() + "/taggingOutcome/",
                                 "-pathMapPath", getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/pathMap").getPath() ,
                                 "-nameNode", "local"
@@ -119,8 +117,6 @@ public class ConstraintEvaluatorJobText {
         org.apache.spark.sql.Dataset<Row> df = spark.read().json(workingDir.toString() + "/taggingOutcome/").filter((FilterFunction<Row>) r -> r.getAs("_2").equals("AP"));;
 
         Assertions.assertEquals(11, df.count());
-
-        df.show(false);
     }
 
     @Test
@@ -130,7 +126,7 @@ public class ConstraintEvaluatorJobText {
                 .main(
                         new String[] {
                                 "-isSparkSessionManaged", Boolean.FALSE.toString(),
-                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/taggingConf").getPath(),
+                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/noexistpublicationdate/taggingConf").getPath(),
                                 "-outputPath", workingDir.toString() + "/taggingOutcome/",
                                 "-pathMapPath", getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/pathMap").getPath() ,
                                 "-nameNode", "local"
@@ -151,7 +147,7 @@ public class ConstraintEvaluatorJobText {
                 .main(
                         new String[] {
                                 "-isSparkSessionManaged", Boolean.FALSE.toString(),
-                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/taggingConf").getPath(),
+                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/noexistresultpid/taggingConf").getPath(),
                                 "-outputPath", workingDir.toString() + "/taggingOutcome/",
                                 "-pathMapPath", getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/pathMap").getPath() ,
                                 "-nameNode", "local"
@@ -171,7 +167,7 @@ public class ConstraintEvaluatorJobText {
                 .main(
                         new String[] {
                                 "-isSparkSessionManaged", Boolean.FALSE.toString(),
-                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/taggingConf").getPath(),
+                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/noexisthostedby/taggingConf").getPath(),
                                 "-outputPath", workingDir.toString() + "/taggingOutcome/",
                                 "-pathMapPath", getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/pathMap").getPath() ,
                                 "-nameNode", "local"
@@ -191,7 +187,7 @@ public class ConstraintEvaluatorJobText {
                 .main(
                         new String[] {
                                 "-isSparkSessionManaged", Boolean.FALSE.toString(),
-                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/taggingConf").getPath(),
+                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/noexistinstancepid/taggingConf").getPath(),
                                 "-outputPath", workingDir.toString() + "/taggingOutcome/",
                                 "-pathMapPath", getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/pathMap").getPath() ,
                                 "-nameNode", "local"
@@ -211,7 +207,7 @@ public class ConstraintEvaluatorJobText {
                 .main(
                         new String[] {
                                 "-isSparkSessionManaged", Boolean.FALSE.toString(),
-                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/taggingConf").getPath(),
+                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/noexistinstanceidentifier/taggingConf").getPath(),
                                 "-outputPath", workingDir.toString() + "/taggingOutcome/",
                                 "-pathMapPath", getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/pathMap").getPath() ,
                                 "-nameNode", "local"
@@ -231,7 +227,7 @@ public class ConstraintEvaluatorJobText {
                 .main(
                         new String[] {
                                 "-isSparkSessionManaged", Boolean.FALSE.toString(),
-                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/taggingConf").getPath(),
+                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/noexistinstancelicence/taggingConf").getPath(),
                                 "-outputPath", workingDir.toString() + "/taggingOutcome/",
                                 "-pathMapPath", getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/pathMap").getPath() ,
                                 "-nameNode", "local"
@@ -251,7 +247,7 @@ public class ConstraintEvaluatorJobText {
                 .main(
                         new String[] {
                                 "-isSparkSessionManaged", Boolean.FALSE.toString(),
-                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/taggingConf").getPath(),
+                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/supplementarymaterial/taggingConf").getPath(),
                                 "-outputPath", workingDir.toString() + "/taggingOutcome/",
                                 "-pathMapPath", getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/pathMap").getPath() ,
                                 "-nameNode", "local"
@@ -271,7 +267,7 @@ public class ConstraintEvaluatorJobText {
                 .main(
                         new String[] {
                                 "-isSparkSessionManaged", Boolean.FALSE.toString(),
-                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/taggingConf").getPath(),
+                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/meaningfultitle/taggingConf").getPath(),
                                 "-outputPath", workingDir.toString() + "/taggingOutcome/",
                                 "-pathMapPath", getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/pathMap").getPath() ,
                                 "-nameNode", "local"
@@ -291,7 +287,7 @@ public class ConstraintEvaluatorJobText {
                 .main(
                         new String[] {
                                 "-isSparkSessionManaged", Boolean.FALSE.toString(),
-                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/taggingConf").getPath(),
+                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/associatedliterature/taggingConf").getPath(),
                                 "-outputPath", workingDir.toString() + "/taggingOutcome/",
                                 "-pathMapPath", getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/pathMap").getPath() ,
                                 "-nameNode", "local"
@@ -304,7 +300,105 @@ public class ConstraintEvaluatorJobText {
 
     }
 
-//    @Test
+
+    @Test
+    void MeaningfulAbstractTest() throws Exception {
+
+        ConstraintEvaluator
+                .main(
+                        new String[] {
+                                "-isSparkSessionManaged", Boolean.FALSE.toString(),
+                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/meaningfulabstract/taggingConf").getPath(),
+                                "-outputPath", workingDir.toString() + "/taggingOutcome/",
+                                "-pathMapPath", getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/pathMap").getPath() ,
+                                "-nameNode", "local"
+                        });
+
+        org.apache.spark.sql.Dataset<Row> df = spark.read().json(workingDir.toString() + "/taggingOutcome/").filter((FilterFunction<Row>) r -> r.getAs("_2").equals("DMA"));;
+
+        Assertions.assertEquals(2, df.count());
+
+
+    }
+
+
+    @Test
+    void AbstractNoRelLiteratureTest() throws Exception {
+
+        ConstraintEvaluator
+                .main(
+                        new String[] {
+                                "-isSparkSessionManaged", Boolean.FALSE.toString(),
+                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/abstractpresentnorelliteratue/taggingConf").getPath(),
+                                "-outputPath", workingDir.toString() + "/taggingOutcome/",
+                                "-pathMapPath", getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/pathMap").getPath() ,
+                                "-nameNode", "local"
+                        });
+
+        org.apache.spark.sql.Dataset<Row> df = spark.read().json(workingDir.toString() + "/taggingOutcome/").filter((FilterFunction<Row>) r -> r.getAs("_2").equals("DWA"));;
+
+        Assertions.assertEquals(7, df.count());
+
+
+    }
+
+    @Test
+    void SoftwareMinTitleTest() throws Exception {
+
+//        String regex = "(?i)^(?!.*\\b(software|code)\\s+(on|in|from)\\s+github\\b)"
+//                + "(?!.*\\brelease\\s*v?\\d+(\\.\\d+)*\\b)"
+//                + "(?!.*\\b(source\\s*code|repository)\\b)"
+//                + "(?!.*[a-z0-9_.-]+/[a-z0-9_.-]+)"
+//                + "(?!.*:\\s*source\\s*code)"
+//                + "(?!.*\\(v?\\d+(\\.\\d+)*\\)).{10,}$";
+//        System.out.println("Heterogeneous effects of fibroblast-myocyte coupling in different regions of the human atria under conditions of atrial fibrillation"
+//                .matches(regex));
+//
+//        System.out.println("Pippo: software from github"
+//                .matches(regex));
+
+
+        ConstraintEvaluator
+                .main(
+                        new String[] {
+                                "-isSparkSessionManaged", Boolean.FALSE.toString(),
+                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/softwaremeaningfultitle/taggingConf").getPath(),
+                                "-outputPath", workingDir.toString() + "/taggingOutcome/",
+                                "-pathMapPath", getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/pathMap").getPath() ,
+                                "-nameNode", "local"
+                        });
+
+        org.apache.spark.sql.Dataset<Row> df = spark.read().json(workingDir.toString() + "/taggingOutcome/").filter((FilterFunction<Row>) r -> r.getAs("_2").equals("MT2"));;
+
+        Assertions.assertEquals(2, df.count());
+        Assertions.assertEquals(1, df.filter((FilterFunction<Row>)  e -> e.getAs("_1").equals("50|RECOLECTA___::e156f1a857bb4698c5a20bc5b23f619c")).count());
+        Assertions.assertEquals(1, df.filter((FilterFunction<Row>)  e -> e.getAs("_1").equals("50|__bioTools__::077abc9d71c1ca8e1529b00bf764458a")).count());
+
+
+    }
+
+    @Test
+    void SoftwareRepoUrlTest() throws Exception {
+
+        ConstraintEvaluator
+                .main(
+                        new String[] {
+                                "-isSparkSessionManaged", Boolean.FALSE.toString(),
+                                "-taggingPath",  getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/softwarerepourl/taggingConf").getPath(),
+                                "-outputPath", workingDir.toString() + "/taggingOutcome/",
+                                "-pathMapPath", getClass().getResource("/eu/dnetlib/dhp/bulktag/tagging/pathMap").getPath() ,
+                                "-nameNode", "local"
+                        });
+
+        org.apache.spark.sql.Dataset<Row> df = spark.read().json(workingDir.toString() + "/taggingOutcome/").filter((FilterFunction<Row>) r -> r.getAs("_2").equals("SWR"));;
+
+        df.show(false);
+
+
+    }
+
+
+    //    @Test
 //    void bulktagBySubjectNoPreviousContextTest() throws Exception {
 //        final String sourcePath = getClass()
 //                .getResource("/eu/dnetlib/dhp/bulktag/sample/dataset/update_subject/nocontext/")

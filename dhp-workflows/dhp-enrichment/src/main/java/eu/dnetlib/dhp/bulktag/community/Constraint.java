@@ -6,6 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import eu.dnetlib.dhp.bulktag.criteria.ApplyOtherVerbAware;
 import eu.dnetlib.dhp.bulktag.criteria.JsonPathAware;
 import eu.dnetlib.dhp.bulktag.criteria.Selection;
 import eu.dnetlib.dhp.bulktag.criteria.VerbResolver;
@@ -15,7 +16,15 @@ public class Constraint implements Serializable {
 	private String field;
 	private Object value;
 	private String jsonPath;
+	private String applyVerb;
 
+	public String getApplyVerb() {
+		return applyVerb;
+	}
+
+	public void setApplyVerb(String applyVerb) {
+		this.applyVerb = applyVerb;
+	}
 
 	@JsonIgnore
 	private Selection selection;
@@ -65,6 +74,8 @@ public class Constraint implements Serializable {
 		if (selection instanceof JsonPathAware jpa) {
 			jpa.setJsonPath(jsonPath);
 		}
+		if (selection instanceof ApplyOtherVerbAware aova)
+			aova.setApplyVerb(applyVerb);
 	}
 
 	public boolean verifyCriteria(Object metadata) {

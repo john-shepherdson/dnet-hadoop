@@ -1,0 +1,33 @@
+{
+    "tags": [
+        {
+            "id": "NP",
+            "inputs": {"publication": "/Users/miriam/Develop/Gitea/dnet-hadoop/dhp-workflows/dhp-enrichment/src/test/resources/eu/dnetlib/dhp/bulktag/tagging/noexistresultpid/graph/publication"},
+            "selects": null,
+            "entityToTag": "publication",
+            "resultTable": "publication",
+            "criteria": [
+                {
+                    "constraint": [
+                        {
+                            "verb": "not_exist",
+                            "field": "pidScheme",
+                            "value": [
+                                "doi",
+                                "pmid",
+                                "pmc",
+                                "pmcid",
+                                "ark",
+                                "omid",
+                                "crossref",
+                                "openalex",
+                                "arxiv",
+                                "handle"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
