@@ -48,15 +48,17 @@ class SparkCreateScholexplorerDump(propertyPath: String, args: Array[String], lo
   override def run(): Unit = {
     val sourcePath = parser.get("sourcePath")
     log.info("sourcePath: {}", sourcePath)
+    val workingPath = parser.get("workingPath")
+    log.info("workingPath: {}", workingPath)
     val targetPath = parser.get("targetPath")
     log.info("targetPath: {}", targetPath)
-    generateBidirectionalRelations(sourcePath, targetPath, spark)
-    generateScholixResource(sourcePath, targetPath, spark)
-    generateFlatScholix(targetPath, spark)
-    generateSummary(targetPath, spark)
+    generateBidirectionalRelations(sourcePath, workingPath, spark)
+    generateScholixResource(sourcePath, workingPath, spark)
+    generateFlatScholix(workingPath,targetPath, spark)
+    generateSummary(workingPath, targetPath, spark)
   }
 
-  def generateSummary(outputPath: String, spark: SparkSession): Unit = {
+  def generateSummary(workingPath:String, outputPath: String, spark: SparkSession): Unit = {
     import spark.implicits._
     implicit val scholixEncoder: Encoder[ScholixFlat] = Encoders.bean(classOf[ScholixFlat])
 
@@ -65,12 +67,12 @@ class SparkCreateScholexplorerDump(propertyPath: String, args: Array[String], lo
     val sid = scholix.selectExpr("sourceId as id").distinct()
     val tid = scholix.selectExpr("targetId as id").distinct()
     val ids = sid.union(tid).distinct()
-    val resource = spark.read.load(s"$outputPath/resource")
+    val resource = spark.read.load(s"$workingPath/resource")
     resource.join(ids, resource("dnetIdentifier") === ids("id"), "leftsemi")
       .write
       .option("compression", "gzip")
       .mode(SaveMode.Overwrite)
-      .json(s"$outputPath/summary_json")
+      .json(s"$outputPath/summary")
   }
   def generateScholixResource(inputPath: String, outputPath: String, spark: SparkSession): Unit = {
     val entityMap: Map[String, StructType] = Map(
@@ -142,19 +144,19 @@ class SparkCreateScholexplorerDump(propertyPath: String, args: Array[String], lo
 
   }
 
-  def generateFlatScholix(outputPath: String, spark: SparkSession): Unit = {
+  def generateFlatScholix(workingPath:String, outputPath: String, spark: SparkSession): Unit = {
     import spark.implicits._
     implicit val scholixResourceEncoder: Encoder[ScholixResource] = Encoders.bean(classOf[ScholixResource])
     implicit val scholixEncoder: Encoder[ScholixFlat] = Encoders.bean(classOf[ScholixFlat])
-    val relations = spark.read.load(s"$outputPath/relation").as[RelationInfo]
-    val resource = spark.read.load(s"$outputPath/resource").as[ScholixResource]
+    val relations = spark.read.load(s"$workingPath/relation").as[RelationInfo]
+    val resource = spark.read.load(s"$workingPath/resource").as[ScholixResource]
 
     resource
       .map(s => ScholexplorerUtils.generateSummaryResource(s))
       .write
       .mode(SaveMode.Overwrite)
-      .save(s"$outputPath/summary")
-    val summaries = spark.read.load(s"$outputPath/summary").as[SummaryResource]
+      .save(s"$workingPath/summary")
+    val summaries = spark.read.load(s"$workingPath/summary").as[SummaryResource]
 
     val scholix_source = relations
       .joinWith(summaries, relations("source") === summaries("id"))
@@ -171,32 +173,6 @@ class SparkCreateScholexplorerDump(propertyPath: String, args: Array[String], lo
       .mode(SaveMode.Overwrite)
       .option("compression", "gzip")
       .json(s"$outputPath/scholix")
-  }
-
-  def generateScholix(outputPath: String, spark: SparkSession): Unit = {
-    implicit val scholixResourceEncoder: Encoder[ScholixResource] = Encoders.bean(classOf[ScholixResource])
-    implicit val scholixEncoder: Encoder[Scholix] = Encoders.kryo(classOf[Scholix])
-
-    import spark.implicits._
-    val relations = spark.read.load(s"$outputPath/relation").as[RelationInfo]
-    val resource = spark.read.load(s"$outputPath/resource").as[ScholixResource]
-
-    val scholix_one_verse = relations
-      .joinWith(resource, relations("source") === resource("dnetIdentifier"), "inner")
-      .map(res => ScholexplorerUtils.generateScholix(res._1, res._2))
-      .map(s => (s.getIdentifier, s))(Encoders.tuple(Encoders.STRING, Encoders.kryo(classOf[Scholix])))
-
-    val resourceTarget = relations
-      .joinWith(resource, relations("target") === resource("dnetIdentifier"), "inner")
-      .map(res => (res._1.id, res._2))(Encoders.tuple(Encoders.STRING, Encoders.kryo(classOf[ScholixResource])))
-
-    scholix_one_verse
-      .joinWith(resourceTarget, scholix_one_verse("_1") === resourceTarget("_1"), "inner")
-      .map(k => ScholexplorerUtils.updateTarget(k._1._2, k._2._2))
-      .write
-      .mode(SaveMode.Overwrite)
-      .option("compression", "gzip")
-      .text(s"$outputPath/scholix")
   }
 }
 
