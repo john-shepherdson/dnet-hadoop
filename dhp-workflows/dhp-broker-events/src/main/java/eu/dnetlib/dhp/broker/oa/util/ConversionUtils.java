@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.schema.oaf.*;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -29,21 +30,6 @@ import eu.dnetlib.broker.objects.OaBrokerRelatedPublication;
 import eu.dnetlib.broker.objects.OaBrokerRelatedSoftware;
 import eu.dnetlib.broker.objects.OaBrokerTypedValue;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.Author;
-import eu.dnetlib.dhp.schema.oaf.Dataset;
-import eu.dnetlib.dhp.schema.oaf.Datasource;
-import eu.dnetlib.dhp.schema.oaf.ExternalReference;
-import eu.dnetlib.dhp.schema.oaf.Field;
-import eu.dnetlib.dhp.schema.oaf.Instance;
-import eu.dnetlib.dhp.schema.oaf.Journal;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
-import eu.dnetlib.dhp.schema.oaf.Project;
-import eu.dnetlib.dhp.schema.oaf.Publication;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.schema.oaf.Result;
-import eu.dnetlib.dhp.schema.oaf.Software;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
-import eu.dnetlib.dhp.schema.oaf.Subject;
 
 public class ConversionUtils {
 
@@ -255,11 +241,11 @@ public class ConversionUtils {
 		return kv != null ? kv.getValue() : null;
 	}
 
-	private static String fieldValue(final Field<String> f) {
+	private static <T extends Field<String>> String fieldValue(final T f) {
 		return f != null ? f.getValue() : null;
 	}
 
-	private static String fieldValue(final List<Field<String>> fl) {
+	private static <T extends Field<String>> String fieldValue(final List<T> fl) {
 		return fl != null ? fl.stream().map(Field::getValue).filter(StringUtils::isNotBlank).findFirst().orElse(null)
 				: null;
 	}
@@ -268,13 +254,13 @@ public class ConversionUtils {
 		return q != null ? q.getClassid() : null;
 	}
 
-	private static String structPropValue(final List<StructuredProperty> props) {
+	private static <T extends StructuredProperty> String structPropValue(final List<T> props) {
 		return props != null
 				? props.stream().map(StructuredProperty::getValue).filter(StringUtils::isNotBlank).findFirst().orElse(null)
 				: null;
 	}
 
-	private static List<String> fieldList(final List<Field<String>> fl) {
+	private static <T extends Field<String>> List<String> fieldList(final List<T> fl) {
 		return fl != null
 				? fl
 						.stream()
@@ -286,7 +272,7 @@ public class ConversionUtils {
 				: new ArrayList<>();
 	}
 
-	private static List<String> structPropList(final List<StructuredProperty> props) {
+	private static <T extends StructuredProperty> List<String> structPropList(final List<T> props) {
 		return props != null
 				? props
 						.stream()

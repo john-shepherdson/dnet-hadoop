@@ -1,18 +1,7 @@
 
 package eu.dnetlib.dhp.oa.graph.raw;
 
-import static eu.dnetlib.dhp.schema.common.ModelConstants.AFFILIATION;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_PID_TYPES;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.HAS_AUTHOR_INSTITUTION;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_AUTHOR_INSTITUTION_OF;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_PRODUCED_BY;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.OUTCOME;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.PRODUCES;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.REPOSITORY_PROVENANCE_ACTIONS;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.RESULT_ORGANIZATION;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.RESULT_PROJECT;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.UNKNOWN;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.createOpenaireId;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.dataInfo;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.field;
@@ -23,6 +12,7 @@ import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.oaiIProvenance;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.qualifier;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.structuredProperty;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.subject;
+import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.langAwareStructuredProperty;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -533,9 +523,9 @@ public abstract class AbstractMdRecordToOafMapper {
 
 	protected abstract Field<String> preparePublisher(Document doc, DataInfo info);
 
-	protected abstract List<Field<String>> prepareDescriptions(Document doc, DataInfo info);
+	protected abstract List<LangAwareField> prepareDescriptions(Document doc, DataInfo info);
 
-	protected abstract List<StructuredProperty> prepareTitles(Document doc, DataInfo info);
+	protected abstract List<LangAwareStructuredProperty> prepareTitles(Document doc, DataInfo info);
 
 	protected abstract List<Subject> prepareSubjects(Document doc, DataInfo info);
 
@@ -680,6 +670,26 @@ public abstract class AbstractMdRecordToOafMapper {
 			.collect(Collectors.toList());
 	}
 
+    protected List<LangAwareStructuredProperty> prepareListLangAwareStructProps(
+            final Node node,
+            final String xpath,
+            final Qualifier qualifier,
+            final DataInfo info) {
+        final List<LangAwareStructuredProperty> res = new ArrayList<>();
+        for (final Object o : node.selectNodes(xpath)) {
+            final Node n = (Node) o;
+
+            final Qualifier langQualifier = Optional.of(n instanceof Element && StringUtils.isNotBlank(((Element) n).attributeValue("lang")))
+                    .filter(b -> b)
+                    .map(b -> ((Element) n).attributeValue("lang"))
+                    .map(lang -> qualifier(lang, lang, ModelConstants.DNET_LANGUAGES, DNET_LANGUAGES))
+                    .orElse(null);
+
+            res.add(langAwareStructuredProperty(n.getText(), qualifier, langQualifier, info));
+        }
+        return res;
+    }
+
 	protected List<StructuredProperty> prepareListStructProps(
 		final Node node,
 		final String xpath,
@@ -776,6 +786,13 @@ public abstract class AbstractMdRecordToOafMapper {
 	protected Field<String> prepareField(final Node node, final String xpath, final DataInfo info) {
 		return field(node.valueOf(xpath), info);
 	}
+
+    protected List<LangAwareField> prepareListLanAwareFields(
+            final Node node,
+            final String xpath,
+            final DataInfo info) {
+        return listFields(info, prepareListString(node, xpath));
+    }
 
 	protected List<Field<String>> prepareListFields(
 		final Node node,

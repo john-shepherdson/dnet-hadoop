@@ -41,9 +41,9 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	}
 
 	@Override
-	protected List<StructuredProperty> prepareTitles(final Document doc, final DataInfo info) {
+	protected List<LangAwareStructuredProperty> prepareTitles(final Document doc, final DataInfo info) {
 
-		final List<StructuredProperty> title = Lists.newArrayList();
+		final List<LangAwareStructuredProperty> title = Lists.newArrayList();
 		final String xpath = "//*[local-name()='titles']/*[local-name()='title']|//*[local-name()='resource']/*[local-name()='title']";
 
 		for (Object o : doc.selectNodes(xpath)) {

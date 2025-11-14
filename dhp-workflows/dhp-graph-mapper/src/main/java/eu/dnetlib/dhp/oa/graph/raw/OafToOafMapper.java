@@ -99,12 +99,12 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 	}
 
 	@Override
-	protected List<StructuredProperty> prepareTitles(final Document doc, final DataInfo info) {
-		return prepareListStructProps(doc, "//dc:title", MAIN_TITLE_QUALIFIER, info);
+	protected List<LangAwareStructuredProperty> prepareTitles(final Document doc, final DataInfo info) {
+		return prepareListLangAwareStructProps(doc, "//dc:title", MAIN_TITLE_QUALIFIER, info);
 	}
 
 	@Override
-	protected List<Field<String>> prepareDescriptions(final Document doc, final DataInfo info) {
+	protected List<LangAwareField> prepareDescriptions(final Document doc, final DataInfo info) {
 		return prepareListFields(doc, "//dc:description", info)
 			.stream()
 			.map(d -> {
