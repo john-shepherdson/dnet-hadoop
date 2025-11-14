@@ -1149,6 +1149,10 @@
 
         <profile>
             <id>spark40</id>
+            <modules>
+                <module>s3-committer</module>
+            </modules>
+
             <build>
                 <plugins>
                     <plugin>
