@@ -7,6 +7,15 @@ public class OrganizationAPIModel implements Serializable {
 	private String orgId;
 	private String description;
 	private boolean subscribed;
+	private String logoUrl;
+
+	public String getLogoUrl() {
+		return logoUrl;
+	}
+
+	public void setLogoUrl(String logoUrl) {
+		this.logoUrl = logoUrl;
+	}
 
 	public String getOrgId() {
 		return orgId;

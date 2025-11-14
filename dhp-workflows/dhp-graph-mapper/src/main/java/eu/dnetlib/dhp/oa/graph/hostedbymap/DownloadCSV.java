@@ -2,13 +2,11 @@
 package eu.dnetlib.dhp.oa.graph.hostedbymap;
 
 import java.io.*;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Optional;
 
+import eu.dnetlib.dhp.utils.DHPUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
@@ -55,13 +53,10 @@ public class DownloadCSV {
 			.orElse(DEFAULT_DELIMITER);
 		log.info("delimiter {}", delimiter);
 
-		Configuration conf = new Configuration();
-		conf.set("fs.defaultFS", hdfsNameNode);
-
-		FileSystem fileSystem = FileSystem.get(conf);
+		Path path = new Path(outputFile);
+		FileSystem fileSystem = path.getFileSystem(DHPUtils.getHadoopConfiguration(hdfsNameNode));
 
 		new DownloadCSV().doDownload(fileURL, outputFile, classForName, delimiter, fileSystem);
-
 	}
 
 	protected void doDownload(String fileURL, String outputFile, String classForName,

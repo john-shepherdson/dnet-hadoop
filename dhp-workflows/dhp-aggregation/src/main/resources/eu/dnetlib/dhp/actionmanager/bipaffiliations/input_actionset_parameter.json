@@ -5,40 +5,18 @@
     "paramDescription": "when true will stop SparkSession after job execution",
     "paramRequired": false
   },
-  {
-    "paramName": "cip",
-    "paramLongName": "crossrefInputPath",
-    "paramDescription": "the path to get the input data from Crossref",
-    "paramRequired": true
-  },
-  {
-    "paramName": "pip",
-    "paramLongName": "pubmedInputPath",
-    "paramDescription": "the path to get the input data from Pubmed",
-    "paramRequired": true
-  },
+
   {
     "paramName": "oip",
     "paramLongName": "openapcInputPath",
     "paramDescription": "the path to get the input data from OpenAPC",
     "paramRequired": true
   },
+
   {
-    "paramName": "dip",
-    "paramLongName": "dataciteInputPath",
-    "paramDescription": "the path to get the input data from Datacite",
-    "paramRequired": true
-  },
-  {
-  "paramName": "wip",
-  "paramLongName": "webCrawlInputPath",
-  "paramDescription": "the path to get the input data from Web Crawl",
-  "paramRequired": true
-  },
-  {
-    "paramName": "pub",
-    "paramLongName": "publisherInputPath",
-    "paramDescription": "the path to get the input data from publishers",
+    "paramName": "ip",
+    "paramLongName": "inputPaths",
+    "paramDescription": "the upper path where all the results reconstructed for oalex, oaire, iis, crossref, pubmed, datacite and publishers are stored. Each one in its own directory equal to the name",
     "paramRequired": true
   },
   {
@@ -46,5 +24,11 @@
     "paramLongName": "outputPath",
     "paramDescription": "the path of the new ActionSet",
     "paramRequired": true
+  },
+  {
+    "paramName": "iis",
+    "paramLongName": "importIIS",
+    "paramDescription": "if to import affiliation got from raw affiliation strings extracted from IIS",
+    "paramRequired": false
   }
 ]

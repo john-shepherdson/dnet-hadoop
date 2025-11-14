@@ -8,12 +8,9 @@ import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
@@ -38,12 +35,6 @@ public class GraphHiveTableImporterJob {
 			.orElse(Boolean.TRUE);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-		int numPartitions = Optional
-			.ofNullable(parser.get("numPartitions"))
-			.map(Integer::valueOf)
-			.orElse(-1);
-		log.info("numPartitions: {}", numPartitions);
-
 		String inputPath = parser.get("inputPath");
 		log.info("inputPath: {}", inputPath);
 
@@ -62,26 +53,19 @@ public class GraphHiveTableImporterJob {
 		conf.set("hive.metastore.uris", hiveMetastoreUris);
 
 		runWithSparkHiveSession(
-			conf, isSparkSessionManaged, spark -> loadGraphTable(spark, inputPath, hiveDbName, clazz, numPartitions));
+			conf, isSparkSessionManaged, spark -> loadGraphTable(spark, inputPath, hiveDbName, clazz));
 	}
 
 	// protected for testing
 	private static <T extends Oaf> void loadGraphTable(SparkSession spark, String inputPath, String hiveDbName,
-		Class<T> clazz, int numPartitions) {
+		Class<T> clazz) {
 
 		final Encoder<T> clazzEncoder = Encoders.bean(clazz);
 
-		Dataset<Row> dataset = spark
+		spark
 			.read()
 			.schema(clazzEncoder.schema())
-			.json(inputPath);
-
-		if (numPartitions > 0) {
-			log.info("repartitioning {} to {} partitions", clazz.getSimpleName(), numPartitions);
-			dataset = dataset.repartition(numPartitions);
-		}
-
-		dataset
+			.json(inputPath)
 			.write()
 			.mode(SaveMode.Overwrite)
 			.saveAsTable(tableIdentifier(hiveDbName, clazz));

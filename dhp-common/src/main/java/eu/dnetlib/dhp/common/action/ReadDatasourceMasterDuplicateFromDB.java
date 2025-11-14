@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import eu.dnetlib.dhp.utils.DHPUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -35,10 +36,10 @@ public class ReadDatasourceMasterDuplicateFromDB {
 		throws IOException {
 		int count = 0;
 		try (DbClient dbClient = new DbClient(dbUrl, dbUser, dbPassword)) {
-			Configuration conf = new Configuration();
-			conf.set("fs.defaultFS", hdfsNameNode);
-			FileSystem fileSystem = FileSystem.get(conf);
-			FSDataOutputStream fos = fileSystem.create(new Path(hdfsPath));
+			Configuration conf = DHPUtils.getHadoopConfiguration(hdfsNameNode);
+			Path p = new Path(hdfsPath);
+			FileSystem fileSystem = p.getFileSystem(conf);
+			FSDataOutputStream fos = fileSystem.create(p);
 
 			log.info("running query: {}", QUERY);
 			log.info("storing results in: {}", hdfsPath);

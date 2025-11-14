@@ -114,7 +114,6 @@
             <artifactId>elasticsearch-hadoop</artifactId>
 
         </dependency>
-
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
@@ -182,6 +181,10 @@
             </exclusions>
         </dependency>
 
+        <dependency>
+            <groupId>co.elastic.clients</groupId>
+            <artifactId>elasticsearch-java</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

@@ -30,14 +30,13 @@ class GenerateRorActionSetJobTest {
 	private static final String local_file_path = "/Users/michele/Downloads/ror-data-2021-04-06.json";
 
 	@BeforeEach
-	void setUp() throws Exception {
-	}
+	void setUp() throws Exception {}
 
 	@Test
 	void testConvertRorOrg() throws Exception {
 		final RorOrganization r = mapper
-			.readValue(IOUtils.toString(getClass().getResourceAsStream("ror_org.json")), RorOrganization.class);
-		final List<AtomicAction<? extends Oaf>> aas = GenerateRorActionSetJob.convertRorOrg(r);
+				.readValue(IOUtils.toString(getClass().getResourceAsStream("ror_org.json")), RorOrganization.class);
+		final List<AtomicAction<? extends Oaf>> aas = GenerateRorActionSetJob.convertRorOrg(r, false);
 
 		Assertions.assertEquals(1, aas.size());
 		assertEquals(Organization.class, aas.get(0).getClazz());
@@ -56,13 +55,39 @@ class GenerateRorActionSetJobTest {
 	}
 
 	@Test
+	void testConvertRorOrgWirthRels() throws Exception {
+		final RorOrganization r = mapper
+				.readValue(IOUtils.toString(getClass().getResourceAsStream("ror_org.json")), RorOrganization.class);
+		final List<AtomicAction<? extends Oaf>> aas = GenerateRorActionSetJob.convertRorOrg(r, true);
+
+		Assertions.assertEquals(2, aas.size());
+		assertEquals(Organization.class, aas.get(0).getClazz());
+		assertEquals(Relation.class, aas.get(1).getClazz());
+
+		final Organization o = (Organization) aas.get(0).getPayload();
+		final Relation rel = (Relation) aas.get(1).getPayload();
+
+		assertNotNull(o);
+		assertNotNull(rel);
+
+		assertEquals(o.getId(), rel.getSource());
+		assertNotNull(rel.getTarget());
+
+		assertEquals(ModelConstants.IS_PARENT_OF, rel.getRelClass());
+		assertEquals(ModelConstants.ORG_ORG_RELTYPE, rel.getRelType());
+
+		System.out.println(mapper.writeValueAsString(rel));
+
+	}
+
+	@Test
 	@Disabled
 	void testConvertAllRorOrg() throws Exception {
 		final RorOrganization[] arr = mapper
-			.readValue(IOUtils.toString(new FileInputStream(local_file_path)), RorOrganization[].class);
+				.readValue(IOUtils.toString(new FileInputStream(local_file_path)), RorOrganization[].class);
 
 		for (final RorOrganization r : arr) {
-			final List<AtomicAction<? extends Oaf>> aas = GenerateRorActionSetJob.convertRorOrg(r);
+			final List<AtomicAction<? extends Oaf>> aas = GenerateRorActionSetJob.convertRorOrg(r, false);
 			Assertions.assertFalse(aas.isEmpty());
 			Assertions.assertNotNull(aas.get(0));
 			final Organization o = (Organization) aas.get(0).getPayload();
