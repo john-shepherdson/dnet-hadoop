@@ -35,7 +35,9 @@
                 </creator>
             </creators>
             <titles>
-                <title>Helen Bayly and Catherine Disney as influences in the life of Sir William Rowan Hamilton</title>
+                <title xml:lang="en">Helen Bayly and Catherine Disney as influences in the life of Sir William Rowan Hamilton</title>
+                <title xml:lang="en" titleType="Subtitle">Example engligh subtitle</title>
+                <title titleType="Subtitle">Example other subtitle</title>
             </titles>
             <publisher>Zenodo</publisher>
             <publicationYear>2018</publicationYear>
@@ -55,7 +57,7 @@
                 <rights rightsURI="info:eu-repo/semantics/openAccess">Open Access</rights>
             </rightsList>
             <descriptions>
-                <description descriptionType="Abstract"><p>In the 1880s Robert Graves published a biography about Sir William Rowan Hamilton (1805-1865), to which in a 1980 biography Thomas Hankins added further information. From these biographies a picture emerged of a man who was unhappily married because he had lost the love of his life, which raised the question how such an unhappy man could produce so much beautiful mathematics. In this article it is stated that a main cause for the unhappy picture is that Graves ignored the influence on one another of Hamilton and his wife Helen Bayly, and Hankins that of Hamilton and his first and lost love Catherine Disney. It is then shown that if these influences are taken into account a very different view on Hamilton;s private life arises, in which he was happily married to a wife who enabled him to work as he needed to.</p></description>
+                <description xml:lang="en" descriptionType="Abstract"><p>In the 1880s Robert Graves published a biography about Sir William Rowan Hamilton (1805-1865), to which in a 1980 biography Thomas Hankins added further information. From these biographies a picture emerged of a man who was unhappily married because he had lost the love of his life, which raised the question how such an unhappy man could produce so much beautiful mathematics. In this article it is stated that a main cause for the unhappy picture is that Graves ignored the influence on one another of Hamilton and his wife Helen Bayly, and Hankins that of Hamilton and his first and lost love Catherine Disney. It is then shown that if these influences are taken into account a very different view on Hamilton;s private life arises, in which he was happily married to a wife who enabled him to work as he needed to.</p></description>
             </descriptions>
         </resource>
         <oaf:identifier identifierType="doi">10.5281/zenodo.3406824</oaf:identifier>

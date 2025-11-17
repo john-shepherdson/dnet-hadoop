@@ -19,13 +19,13 @@
         <oaf:datasourceprefix>od_________3</oaf:datasourceprefix>
     </header>
     <metadata xmlns="http://namespace.openaire.eu/">
-        <dc:title>CONSOLE Project - Deliverable 5.1 - "Guidelines for Community of Practice (CoP)
+        <dc:title xml:lang="en">CONSOLE Project - Deliverable 5.1 - "Guidelines for Community of Practice (CoP)
             management at local level"</dc:title>
         <dc:creator>Blanco-Velázquez, Francisco José</dc:creator>
         <dc:creator>Runge, Tania</dc:creator>
         <dc:creator>Anaya-Romero, María</dc:creator>
         <dc:date>2020-05-11</dc:date>
-        <dc:description>The Community of Practice (CoP) is foreseen to play a key role in boosting
+        <dc:description xml:lang="en">The Community of Practice (CoP) is foreseen to play a key role in boosting
             innovation in the effective and long-lasting delivery of agri-environmental-climate
             public goods (AECPGs). The CONSOLE CoP will be organized around practitioners
             experienced in the provision of AECPGs and those interested in it and will be nourished

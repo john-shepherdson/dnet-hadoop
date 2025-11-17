@@ -116,7 +116,7 @@ public class EoscIFTag {
 		return false;
 	}
 
-	private static Set<String> getWordsSP(List<StructuredProperty> elem) {
+	private static <T extends StructuredProperty> Set<String> getWordsSP(List<T> elem) {
 		Set<String> words = new HashSet<>();
 		Optional
 			.ofNullable(elem)
@@ -129,7 +129,7 @@ public class EoscIFTag {
 		return words;
 	}
 
-	private static Set<String> getWordsF(List<Field<String>> elem) {
+	private static <T extends Field<String>> Set<String> getWordsF(List<T> elem) {
 		Set<String> words = new HashSet<>();
 		Optional
 			.ofNullable(elem)

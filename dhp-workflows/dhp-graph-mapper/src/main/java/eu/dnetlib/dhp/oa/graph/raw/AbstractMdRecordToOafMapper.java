@@ -2,17 +2,7 @@
 package eu.dnetlib.dhp.oa.graph.raw;
 
 import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
-import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.createOpenaireId;
-import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.dataInfo;
-import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.field;
-import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.journal;
-import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.keyValue;
-import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.listFields;
-import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.oaiIProvenance;
-import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.qualifier;
-import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.structuredProperty;
-import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.subject;
-import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.langAwareStructuredProperty;
+import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,6 +25,7 @@ import org.dom4j.DocumentFactory;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.Node;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -679,18 +670,16 @@ public abstract class AbstractMdRecordToOafMapper {
         for (final Object o : node.selectNodes(xpath)) {
             final Node n = (Node) o;
 
-            final Qualifier langQualifier = Optional.of(n instanceof Element && StringUtils.isNotBlank(((Element) n).attributeValue("lang")))
-                    .filter(b -> b)
-                    .map(b -> ((Element) n).attributeValue("lang"))
-                    .map(lang -> qualifier(lang, lang, ModelConstants.DNET_LANGUAGES, DNET_LANGUAGES))
-                    .orElse(null);
+            final Qualifier langQualifier = getLangQualifier(n);
 
             res.add(langAwareStructuredProperty(n.getText(), qualifier, langQualifier, info));
         }
         return res;
     }
 
-	protected List<StructuredProperty> prepareListStructProps(
+    protected abstract Qualifier getLangQualifier(Node n);
+
+    protected List<StructuredProperty> prepareListStructProps(
 		final Node node,
 		final String xpath,
 		final Qualifier qualifier,
@@ -787,13 +776,6 @@ public abstract class AbstractMdRecordToOafMapper {
 		return field(node.valueOf(xpath), info);
 	}
 
-    protected List<LangAwareField> prepareListLanAwareFields(
-            final Node node,
-            final String xpath,
-            final DataInfo info) {
-        return listFields(info, prepareListString(node, xpath));
-    }
-
 	protected List<Field<String>> prepareListFields(
 		final Node node,
 		final String xpath,
@@ -811,6 +793,18 @@ public abstract class AbstractMdRecordToOafMapper {
 		}
 		return res;
 	}
+
+    protected List<LangAwareField> prepareListLangAwareField(final Document doc, final String xpath, final DataInfo info) {
+        final List<LangAwareField> res = new ArrayList<>();
+        for (final Object o : doc.selectNodes(xpath)) {
+            final Node node = (Node) o;
+            final String s = Optional.ofNullable(node.getStringValue()).map(String::trim).orElse(null);
+            if (StringUtils.isNotBlank(s)) {
+                res.add(langAwareField(s, getLangQualifier(node), info));
+            }
+        }
+        return res;
+    }
 
 	protected Set<String> validateUrl(final Collection<String> url) {
 

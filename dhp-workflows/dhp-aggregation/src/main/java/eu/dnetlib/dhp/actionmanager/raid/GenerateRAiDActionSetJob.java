@@ -10,6 +10,7 @@ import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
 
 import java.util.*;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
@@ -34,7 +35,7 @@ import scala.Tuple2;
 
 public class GenerateRAiDActionSetJob {
 
-	private static final Logger log = LoggerFactory
+    private static final Logger log = LoggerFactory
 		.getLogger(eu.dnetlib.dhp.actionmanager.raid.GenerateRAiDActionSetJob.class);
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -50,8 +51,9 @@ public class GenerateRAiDActionSetJob {
 
 	private static final DataInfo RAID_DATA_INFO = dataInfo(
 		false, OPENAIRE_DATASOURCE_NAME, true, false, RAID_INFERENCE_QUALIFIER, "0.92");
+    public static final Qualifier LANG_QUALIFIER = OafMapperUtils.qualifier("en", "English", ModelConstants.DNET_LANGUAGES, ModelConstants.DNET_LANGUAGES);
 
-	public static void main(final String[] args) throws Exception {
+    public static void main(final String[] args) throws Exception {
 
 		final String jsonConfiguration = IOUtils
 			.toString(
@@ -199,11 +201,12 @@ public class GenerateRAiDActionSetJob {
 			.setTitle(
 				Collections
 					.singletonList(
-						structuredProperty(
+						langAwareStructuredProperty(
 							r.getTitle(),
-							qualifier("main title", "main title", DNET_DATACITE_TITLE, DNET_DATACITE_TITLE),
+							ModelConstants.MAIN_TITLE_QUALIFIER,
+                            LANG_QUALIFIER,
 							RAID_DATA_INFO)));
-		orp.setDescription(listFields(RAID_DATA_INFO, r.getDescription()));
+		orp.setDescription(Lists.newArrayList(langAwareField(r.getDescription(), LANG_QUALIFIER, RAID_DATA_INFO)));
 
 		Instance instance = new Instance();
 		instance.setInstancetype(RAID_QUALIFIER);

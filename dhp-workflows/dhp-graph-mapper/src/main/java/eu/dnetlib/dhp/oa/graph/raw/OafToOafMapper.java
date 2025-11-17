@@ -5,12 +5,10 @@ import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
 
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
@@ -105,7 +103,7 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 
 	@Override
 	protected List<LangAwareField> prepareDescriptions(final Document doc, final DataInfo info) {
-		return prepareListFields(doc, "//dc:description", info)
+		return prepareListLangAwareField(doc, "//dc:description", info)
 			.stream()
 			.map(d -> {
 				d.setValue(StringUtils.left(d.getValue(), ModelHardLimits.MAX_ABSTRACT_LENGTH));
@@ -234,7 +232,16 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 			.orElse(null);
 	}
 
-	@Override
+    @Override
+    protected Qualifier getLangQualifier(Node n) {
+        return Optional.of(n instanceof Element && StringUtils.isNotBlank(((Element) n).attributeValue("lang")))
+                .filter(b -> b)
+                .map(b -> ((Element) n).attributeValue("lang"))
+                .map(lang -> qualifier(lang, lang, ModelConstants.DNET_LANGUAGES, DNET_LANGUAGES))
+                .orElse(null);
+    }
+
+    @Override
 	protected List<Field<String>> prepareSources(final Document doc, final DataInfo info) {
 		return prepareListFields(doc, "//dc:source", info);
 	}

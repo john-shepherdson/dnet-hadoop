@@ -971,16 +971,27 @@ class MappersTest {
 		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("oaf-bologna.xml")));
 		final List<Oaf> list = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
 
-		System.out.println("***************");
-		System.out.println(new ObjectMapper().writeValueAsString(list));
-		System.out.println("***************");
-
 		final Publication p = (Publication) list.get(0);
 		assertValidId(p.getId());
 		assertValidId(p.getCollectedfrom().get(0).getKey());
-		System.out.println(p.getTitle().get(0).getValue());
-		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
-		System.out.println(p.getTitle().get(0).getValue());
+
+        LangAwareStructuredProperty mainTitle = p.getTitle()
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Expected title not found"));
+
+        assertNotNull(mainTitle.getQualifier());
+        assertEquals("main title", mainTitle.getQualifier().getClassid());
+
+        assertNotNull(mainTitle.getLang());
+        assertEquals("en", mainTitle.getLang().getClassid());
+
+        assertNotNull(p.getDescription());
+        assertFalse(p.getDescription().isEmpty());
+
+        assertTrue(p.getDescription().stream().allMatch(d -> StringUtils.isNotBlank(d.getValue())));
+        assertTrue(p.getDescription().stream().map(LangAwareField::getLang).allMatch(Objects::nonNull));
+        assertTrue(p.getDescription().stream().map(LangAwareField::getLang).findFirst().map(Qualifier::getClassid).map("en"::equals).orElse(false));
 	}
 
 	@Test
@@ -1036,8 +1047,49 @@ class MappersTest {
 
 		assertNotNull(p.getTitle());
 		assertFalse(p.getTitle().isEmpty());
-		assertEquals(1, p.getTitle().size());
-		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
+		assertEquals(3, p.getTitle().size());
+		assertTrue(p.getTitle().stream().allMatch(t -> StringUtils.isNotBlank(t.getValue())));
+
+        LangAwareStructuredProperty mainTitle = p.getTitle()
+                .stream()
+                .filter(t -> StringUtils.startsWith(t.getValue(), "Helen Bayly and Catherine Disney"))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Expected title not found"));
+
+        assertNotNull(mainTitle.getQualifier());
+        assertEquals("main title", mainTitle.getQualifier().getClassid());
+
+        assertNotNull(mainTitle.getLang());
+        assertEquals("en", mainTitle.getLang().getClassid());
+
+        LangAwareStructuredProperty subtitle1 = p.getTitle()
+                .stream()
+                .filter(t -> "Example engligh subtitle".equals(t.getValue()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Expected title not found"));
+
+        assertNotNull(subtitle1.getQualifier());
+        assertEquals("Subtitle", subtitle1.getQualifier().getClassid());
+
+        assertNotNull(subtitle1.getLang());
+        assertEquals("en", subtitle1.getLang().getClassid());
+
+        LangAwareStructuredProperty subtitle2 = p.getTitle()
+                .stream()
+                .filter(t -> "Example other subtitle".equals(t.getValue()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Expected title not found"));
+
+        assertNotNull(subtitle2.getQualifier());
+        assertEquals("Subtitle", subtitle2.getQualifier().getClassid());
+
+        assertNull(subtitle2.getLang());
+
+        assertNotNull(p.getDescription());
+        assertFalse(p.getDescription().isEmpty());
+
+        assertTrue(p.getDescription().stream().allMatch(d -> StringUtils.isNotBlank(d.getValue())));
+        assertTrue(p.getDescription().stream().map(LangAwareField::getLang).allMatch(Objects::nonNull));
 
 		assertNotNull(p.getAuthor());
 		assertEquals(2, p.getAuthor().size());

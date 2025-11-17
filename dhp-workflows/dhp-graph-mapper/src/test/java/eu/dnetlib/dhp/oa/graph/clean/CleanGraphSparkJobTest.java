@@ -572,7 +572,7 @@ public class CleanGraphSparkJobTest {
 				.get(0)
 				.getId());
 
-		List<StructuredProperty> titles = pubs
+		List<LangAwareStructuredProperty> titles = pubs
 			.filter(
 				(FilterFunction<Publication>) p -> p
 					.getId()

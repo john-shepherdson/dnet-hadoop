@@ -9,6 +9,7 @@ import java.net.URLDecoder;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
@@ -48,15 +49,21 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 		for (Object o : doc.selectNodes(xpath)) {
 			Element e = (Element) o;
+
+            final Qualifier langQualifier = getLangQualifier(e);
+
 			final String titleValue = e.getTextTrim();
 			final String titleType = e.attributeValue("titleType");
+
 			if (StringUtils.isNotBlank(titleType)) {
-				title
+                final Qualifier titleTypeQualifier = qualifier(
+                    titleType, titleType, ModelConstants.DNET_DATACITE_TITLE, DNET_DATACITE_TITLE);
+                title
 					.add(
-						structuredProperty(
-							titleValue, titleType, titleType, DNET_DATACITE_TITLE, DNET_DATACITE_TITLE, info));
+						langAwareStructuredProperty(
+							titleValue, titleTypeQualifier, langQualifier, info));
 			} else {
-				title.add(structuredProperty(titleValue, MAIN_TITLE_QUALIFIER, info));
+				title.add(langAwareStructuredProperty(titleValue, MAIN_TITLE_QUALIFIER, langQualifier, info));
 			}
 		}
 
@@ -263,7 +270,16 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 			.orElse(null);
 	}
 
-	@Override
+    @Override
+    protected Qualifier getLangQualifier(Node n) {
+        return Optional.of(n instanceof Element && StringUtils.isNotBlank(((Element) n).attributeValue("lang")))
+                .filter(b -> b)
+                .map(b -> ((Element) n).attributeValue("lang"))
+                .map(lang -> qualifier(lang, lang, ModelConstants.DNET_LANGUAGES, DNET_LANGUAGES))
+                .orElse(null);
+    }
+
+    @Override
 	protected List<Field<String>> prepareSources(final Document doc, final DataInfo info) {
 		return new ArrayList<>(); // Not present in ODF ???
 	}
@@ -315,8 +331,8 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	}
 
 	@Override
-	protected List<Field<String>> prepareDescriptions(final Document doc, final DataInfo info) {
-		return prepareListFields(doc, "//datacite:description[./@descriptionType='Abstract'] | //dc:description", info);
+	protected List<LangAwareField> prepareDescriptions(final Document doc, final DataInfo info) {
+		return prepareListLangAwareField(doc, "//*[local-name()='description' and ./@descriptionType='Abstract']", info);
 	}
 
 	@Override
