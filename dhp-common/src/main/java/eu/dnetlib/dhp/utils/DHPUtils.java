@@ -27,8 +27,6 @@ import com.google.common.collect.Maps;
 import com.jayway.jsonpath.JsonPath;
 
 import eu.dnetlib.dhp.schema.mdstore.MDStoreWithInfo;
-import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
-import eu.dnetlib.dhp.schema.oaf.utils.PidCleaner;
 import net.minidev.json.JSONArray;
 import scala.collection.JavaConverters;
 import scala.collection.Seq;
@@ -128,9 +126,10 @@ public class DHPUtils {
 	public static void writeHdfsFile(final Configuration conf, final String content, final String path)
 		throws IOException {
 
-		log.info("writing file {}, size {}", path, content.length());
-		try (FileSystem fs = FileSystem.get(conf);
-			BufferedOutputStream os = new BufferedOutputStream(fs.create(new Path(path)))) {
+		log.info("writing file {}, size {}", path, content);
+		Path f = new Path(path);
+		try (FileSystem fs = f.getFileSystem(conf);
+			BufferedOutputStream os = new BufferedOutputStream(fs.create(f))) {
 			os.write(content.getBytes(StandardCharsets.UTF_8));
 			os.flush();
 		}
@@ -138,9 +137,8 @@ public class DHPUtils {
 
 	public static String readHdfsFile(Configuration conf, String path) throws IOException {
 		log.info("reading file {}", path);
-
-		try (FileSystem fs = FileSystem.get(conf)) {
-			final Path p = new Path(path);
+		final Path p = new Path(path);
+		try (FileSystem fs = p.getFileSystem(conf)) {
 			if (!fs.exists(p)) {
 				throw new FileNotFoundException(path);
 			}
@@ -162,16 +160,29 @@ public class DHPUtils {
 	}
 
 	public static Configuration getHadoopConfiguration(String nameNode) {
-		// ====== Init HDFS File System Object
-		Configuration conf = new Configuration();
-		// Set FileSystem URI
-		conf.set("fs.defaultFS", nameNode);
-		// Because of Maven
-		conf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
-		conf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName());
+		Configuration hadoopConf = new Configuration();
+		Properties systemProps = System.getProperties();
 
-		System.setProperty("hadoop.home.dir", "/");
-		return conf;
+		for (Map.Entry<Object, Object> entry : systemProps.entrySet()) {
+			String key = entry.getKey().toString();
+			String value = entry.getValue().toString();
+
+			if (key.startsWith("spark.hadoop.")) {
+				String hadoopKey = key.substring("spark.hadoop.".length());
+				hadoopConf.set(hadoopKey, value);
+			}
+		}
+		if (hadoopConf.size() <= 0) {
+			// Set FileSystem URI
+			hadoopConf.set("fs.defaultFS", nameNode);
+			// Because of Maven
+			hadoopConf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
+			hadoopConf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName());
+
+			System.setProperty("hadoop.home.dir", "/");
+		}
+
+		return hadoopConf;
 	}
 
 	public static void populateOOZIEEnv(final Map<String, String> report) throws IOException {

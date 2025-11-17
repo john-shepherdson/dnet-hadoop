@@ -9,12 +9,15 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.io.Charsets;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -107,17 +110,24 @@ public class GenerateNativeStoreSparkJobTest extends AbstractVocabularyTest {
 				getClass().getResourceAsStream("/eu/dnetlib/dhp/collection/sequence_file"),
 				new FileOutputStream(mdStoreV1.getHdfsPath() + "/sequence_file"));
 
+        final String apiDescriptor =
+                IOUtils.toString(
+                        Objects.requireNonNull(
+                                getClass().getResourceAsStream("/eu/dnetlib/dhp/collection/apiDescriptor.json")),
+                        Charsets.UTF_8);
+
 		GenerateNativeStoreSparkJob
 			.main(
 				new String[] {
-					"-isSparkSessionManaged", Boolean.FALSE.toString(),
-					"-encoding", encoding,
-					"-dateOfCollection", dateOfCollection,
-					"-provenance", provenance,
-					"-xpath", xpath,
-					"-mdStoreVersion", OBJECT_MAPPER.writeValueAsString(mdStoreV1),
-					"-readMdStoreVersion", "",
-					"-workflowId", "abc"
+					"--isSparkSessionManaged", Boolean.FALSE.toString(),
+					"--encoding", encoding,
+					"--dateOfCollection", dateOfCollection,
+					"--provenance", provenance,
+                    "--apidescriptor", apiDescriptor,
+					"--xpath", xpath,
+					"--mdStoreVersion", OBJECT_MAPPER.writeValueAsString(mdStoreV1),
+					"--readMdStoreVersion", "",
+					"--workflowId", "abc"
 				});
 
 		verify(mdStoreV1);
@@ -135,19 +145,26 @@ public class GenerateNativeStoreSparkJobTest extends AbstractVocabularyTest {
 				getClass().getResourceAsStream("/eu/dnetlib/dhp/collection/sequence_file"),
 				new FileOutputStream(mdStoreV2.getHdfsPath() + "/sequence_file"));
 
+        final String apiDescriptor =
+                IOUtils.toString(
+                    Objects.requireNonNull(
+                        getClass().getResourceAsStream("/eu/dnetlib/dhp/collection/apiDescriptor.json")),
+                Charsets.UTF_8);
+
 		MDStoreVersion mdStoreV1 = prepareVersion("/eu/dnetlib/dhp/collection/mdStoreVersion_1.json");
 
 		GenerateNativeStoreSparkJob
 			.main(
 				new String[] {
-					"-isSparkSessionManaged", Boolean.FALSE.toString(),
-					"-encoding", encoding,
-					"-dateOfCollection", dateOfCollection,
-					"-provenance", provenance,
-					"-xpath", xpath,
-					"-mdStoreVersion", OBJECT_MAPPER.writeValueAsString(mdStoreV2),
-					"-readMdStoreVersion", OBJECT_MAPPER.writeValueAsString(mdStoreV1),
-					"-workflowId", "abc"
+					"--isSparkSessionManaged", Boolean.FALSE.toString(),
+					"--encoding", encoding,
+					"--dateOfCollection", dateOfCollection,
+					"--provenance", provenance,
+                    "--apidescriptor", apiDescriptor,
+					"--xpath", xpath,
+					"--mdStoreVersion", OBJECT_MAPPER.writeValueAsString(mdStoreV2),
+					"--readMdStoreVersion", OBJECT_MAPPER.writeValueAsString(mdStoreV1),
+					"--workflowId", "abc"
 				});
 
 		verify(mdStoreV2);

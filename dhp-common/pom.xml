@@ -181,6 +181,7 @@
 		<dependency>
 			<groupId>co.elastic.clients</groupId>
 			<artifactId>elasticsearch-java</artifactId>
+            <scope>provided</scope>
 		</dependency>
 
 

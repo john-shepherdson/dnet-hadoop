@@ -8,6 +8,11 @@
             <name>rorActionSetPath</name>
             <description>path where to store the action set</description>
         </property>
+        <property>
+            <name>withRels</name>
+            <value>false</value>
+            <description>boolean flag indicating whether the parent/child relationships should be included in the ActionSet</description>
+        </property>
     </parameters>
 
     <start to="deleteoutputpath"/>
@@ -46,6 +51,7 @@
             </spark-opts>
             <arg>--inputPath</arg><arg>${rorJsonInputPath}</arg>
             <arg>--outputPath</arg><arg>${rorActionSetPath}</arg>
+            <arg>--withRels</arg><arg>${withRels}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

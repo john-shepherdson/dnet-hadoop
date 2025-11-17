@@ -10,7 +10,7 @@ import java.util.*;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.io.compress.GzipCodec;
+import org.apache.hadoop.io.compress.BZip2Codec;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -29,10 +29,8 @@ import eu.dnetlib.dhp.actionmanager.opencitations.model.COCI;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.*;
-import eu.dnetlib.dhp.utils.DHPUtils;
 import scala.Tuple2;
 
 public class CreateActionSetSparkJob implements Serializable {
@@ -88,7 +86,7 @@ public class CreateActionSetSparkJob implements Serializable {
 	private static void extractContent(SparkSession spark, String inputPath, String outputPath) {
 
 		getTextTextJavaPairRDD(spark, inputPath)
-			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
+			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, BZip2Codec.class);
 	}
 
 	private static JavaPairRDD<Text, Text> getTextTextJavaPairRDD(SparkSession spark, String inputPath) {

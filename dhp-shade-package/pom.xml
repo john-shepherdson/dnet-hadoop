@@ -98,6 +98,19 @@
 <!--        </dependency>-->
     </dependencies>
 
+    <profiles>
+        <profile>
+            <id>spark40</id>
+
+            <dependencies>
+                <dependency>
+                    <groupId>eu.dnetlib.dhp</groupId>
+                    <artifactId>s3-committer</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 
     <build>
         <plugins>

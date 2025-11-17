@@ -97,6 +97,8 @@ public class EnrichPublisherAndCreatePersonRelationsTest {
 			.json(workingDir.toString() + "/graph/relation")
 			.as(Encoders.bean(Relation.class));
 
+		relations.show(false);
+
 		Assertions.assertEquals(19, relations.count());
 		Assertions
 			.assertEquals(
@@ -110,9 +112,11 @@ public class EnrichPublisherAndCreatePersonRelationsTest {
 		Assertions.assertEquals("30|orcid_______::" + DHPUtils.md5("0000-0001-8255-3618"), relation.getSource());
 		Assertions.assertEquals("50|doi_________::" + DHPUtils.md5("10.11646/phytotaxa.379.3.5"), relation.getTarget());
 
-		Assertions.assertEquals(1, relation.getProperties().size());
-		Assertions.assertEquals("declared_affiliation", relation.getProperties().get(0).getKey());
-		Assertions.assertEquals("https://ror.org/029m7xn54", relation.getProperties().get(0).getValue());
+		Assertions.assertEquals(2, relation.getProperties().size());
+		relation.getProperties().forEach(r -> Assertions.assertEquals("declared_affiliation", r.getKey()));
+		Assertions.assertTrue(relation.getProperties().stream().anyMatch(r -> r.getValue().equalsIgnoreCase("https://ror.org/029m7xn54")));
+		Assertions.assertTrue(relation.getProperties().stream().anyMatch(r -> r.getValue().equalsIgnoreCase("OpenOrgs: 0000002097")));
+
 		Assertions
 			.assertEquals(
 				1,
@@ -179,7 +183,7 @@ public class EnrichPublisherAndCreatePersonRelationsTest {
 		Assertions.assertEquals("30|orcid_______::" + DHPUtils.md5("0000-0001-8255-3618"), relation.getSource());
 		Assertions.assertEquals("50|doi_________::" + DHPUtils.md5("10.11646/phytotaxa.379.3.5"), relation.getTarget());
 
-		Assertions.assertEquals(2, relation.getProperties().size());
+		Assertions.assertEquals(3, relation.getProperties().size());
 		relation.getProperties().forEach(p -> Assertions.assertEquals("declared_affiliation", p.getKey()));
 		Assertions
 			.assertTrue(
@@ -187,6 +191,7 @@ public class EnrichPublisherAndCreatePersonRelationsTest {
 		Assertions
 			.assertTrue(
 				relation.getProperties().stream().anyMatch(p -> p.getValue().equals("https://ror.org/029m7fake")));
+		Assertions.assertTrue(relation.getProperties().stream().anyMatch(r -> r.getValue().equalsIgnoreCase("OpenOrgs: 0000002097")));
 		Assertions
 			.assertEquals(
 				1,
@@ -249,6 +254,7 @@ public class EnrichPublisherAndCreatePersonRelationsTest {
 			.json(workingDir.toString() + "/graph/relation")
 			.as(Encoders.bean(Relation.class));
 
+
 		Assertions.assertEquals(19, relations.count());
 		Assertions
 			.assertEquals(
@@ -262,9 +268,10 @@ public class EnrichPublisherAndCreatePersonRelationsTest {
 		Assertions.assertEquals("30|orcid_______::" + DHPUtils.md5("0000-0001-8255-3618"), relation.getSource());
 		Assertions.assertEquals("50|doi_________::" + DHPUtils.md5("10.11646/phytotaxa.379.3.5"), relation.getTarget());
 
-		Assertions.assertEquals(1, relation.getProperties().size());
-		Assertions.assertEquals("declared_affiliation", relation.getProperties().get(0).getKey());
-		Assertions.assertEquals("https://ror.org/029m7xn54", relation.getProperties().get(0).getValue());
+		Assertions.assertEquals(2, relation.getProperties().size());
+		relation.getProperties().forEach(r -> Assertions.assertEquals("declared_affiliation", r.getKey()));
+		Assertions.assertTrue(relation.getProperties().stream().anyMatch(r -> r.getValue().equalsIgnoreCase("https://ror.org/029m7xn54")));
+		Assertions.assertTrue(relation.getProperties().stream().anyMatch(r -> r.getValue().equalsIgnoreCase("OpenOrgs: 0000002097")));
 		Assertions
 			.assertEquals(
 				1,
@@ -329,7 +336,7 @@ public class EnrichPublisherAndCreatePersonRelationsTest {
 		Assertions.assertEquals("30|orcid_______::" + DHPUtils.md5("0000-0001-8255-3618"), relation.getSource());
 		Assertions.assertEquals("50|doi_________::" + DHPUtils.md5("10.11646/phytotaxa.379.3.5"), relation.getTarget());
 
-		Assertions.assertEquals(2, relation.getProperties().size());
+		Assertions.assertEquals(3, relation.getProperties().size());
 		relation.getProperties().forEach(p -> Assertions.assertEquals("declared_affiliation", p.getKey()));
 		Assertions
 			.assertTrue(
@@ -337,6 +344,7 @@ public class EnrichPublisherAndCreatePersonRelationsTest {
 		Assertions
 			.assertTrue(
 				relation.getProperties().stream().anyMatch(p -> p.getValue().equals("https://ror.org/029m7fake")));
+		Assertions.assertTrue(relation.getProperties().stream().anyMatch(r -> r.getValue().equalsIgnoreCase("OpenOrgs: 0000002097")));
 		Assertions
 			.assertEquals(
 				1,
@@ -406,13 +414,15 @@ public class EnrichPublisherAndCreatePersonRelationsTest {
 				relations
 					.filter((FilterFunction<Relation>) r -> r.getSubRelType().equalsIgnoreCase("authorship"))
 					.count());
+
 		Relation relation = relations
 			.filter((FilterFunction<Relation>) r -> r.getSubRelType().equalsIgnoreCase("authorship"))
 			.first();
+
 		Assertions.assertEquals("30|orcid_______::" + DHPUtils.md5("0000-0001-8255-3618"), relation.getSource());
 		Assertions.assertEquals("50|doi_________::" + DHPUtils.md5("10.11646/phytotaxa.379.3.5"), relation.getTarget());
 
-		Assertions.assertEquals(2, relation.getProperties().size());
+		Assertions.assertEquals(3, relation.getProperties().size());
 		relation.getProperties().forEach(p -> Assertions.assertEquals("declared_affiliation", p.getKey()));
 		Assertions
 			.assertTrue(
@@ -420,6 +430,9 @@ public class EnrichPublisherAndCreatePersonRelationsTest {
 		Assertions
 			.assertTrue(
 				relation.getProperties().stream().anyMatch(p -> p.getValue().equals("https://ror.org/029m7fake")));
+		Assertions
+				.assertTrue(
+						relation.getProperties().stream().anyMatch(p -> p.getValue().equals("OpenOrgs: 0000002097")));
 		Assertions
 			.assertEquals(
 				1,
@@ -443,6 +456,63 @@ public class EnrichPublisherAndCreatePersonRelationsTest {
 							.getRelClass()
 							.equalsIgnoreCase(ModelConstants.PERSON_PERSON_HASCOAUTHORED))
 					.count());
+
+	}
+
+
+	@Test
+	void testNewRelationWithRoles() throws Exception {
+		final String sourcePathPubs = getClass()
+				.getResource("/eu/dnetlib/dhp/person/testNewRelationsWithRoles/graph/publication")
+				.getPath();
+		final String sourcePathRels = getClass()
+				.getResource("/eu/dnetlib/dhp/person/testNewRelationsWithRoles/graph/relation")
+				.getPath();
+		final String publisherPath = getClass()
+				.getResource("/eu/dnetlib/dhp/person/testNewRelationsWithRoles/publisher/")
+				.getPath();
+
+		spark.read().json(sourcePathPubs).write().json(workingDir.toString() + "/graph/publication");
+		spark.read().json(sourcePathRels).write().json(workingDir.toString() + "/graph/relation");
+		spark.read().json(publisherPath).write().json(workingDir.toString() + "/publisher");
+
+		EnrichExternalDataWithGraphORCID.main(new String[] {
+
+				"--orcidPath", workingDir.toString() + "/graph",
+				"--targetPath", workingDir.toString() + "/graph",
+				"--graphPath", workingDir.toString() + "/publisher",
+				"--workingDir", workingDir.toString() + "/working",
+				"--master", "yarn",
+				"--matchingSource", "graph"
+		});
+
+		// Anthony R Burrell arricchito con l'orcid' (0000-0001-8255-3618) dal grafo ha
+		// {"Provenance":"AffRo","PID":"ROR","Value":"https:\/\/ror.org\/029m7xn54","Confidence":1,"Status":"active"},{"Provenance":"AffRo","PID":"OpenOrgs","Value":"0000002097","Confidence":1,"Status":"active"}
+
+		org.apache.spark.sql.Dataset<Relation> relations = spark
+				.read()
+				.schema(Encoders.bean(Relation.class).schema())
+				.json(workingDir.toString() + "/graph/relation")
+				.as(Encoders.bean(Relation.class));
+
+		relations.foreach((ForeachFunction<Relation>) r -> System.out.println(new ObjectMapper().writeValueAsString(r)));
+		Assertions.assertEquals(1, relations
+				.filter((FilterFunction<Relation>) r -> r.getSubRelType().equalsIgnoreCase("authorship"))
+				.count());
+		Relation relation = relations.filter((FilterFunction<Relation>)  r -> r.getSubRelType().equalsIgnoreCase("authorship")).first();
+		Assertions.assertEquals(7, relation.getProperties().size());
+		Assertions.assertEquals(3, relation.getProperties().stream().filter(p -> p.getKey().equalsIgnoreCase("declared_affiliation")).count());
+		Assertions.assertEquals(3, relation.getProperties().stream().filter(p -> p.getKey().equalsIgnoreCase("role")).count());
+		Assertions.assertEquals(1, relation.getProperties().stream().filter(p -> p.getKey().equalsIgnoreCase("corresponding")).count());
+
+		Assertions.assertTrue(relation.getProperties().stream().filter(p -> p.getKey().equalsIgnoreCase("role"))
+				.anyMatch(p -> p.getValue().equalsIgnoreCase("CReDIT http://credit.niso.org/contributor-roles/investigation")));
+		Assertions.assertTrue(relation.getProperties().stream().filter(p -> p.getKey().equalsIgnoreCase("role"))
+				.anyMatch(p -> p.getValue().equalsIgnoreCase("CReDit http://credit.niso.org/contributor-roles/methodology")));
+		Assertions.assertTrue(relation.getProperties().stream().filter(p -> p.getKey().equalsIgnoreCase("role"))
+				.anyMatch(p -> p.getValue().equalsIgnoreCase("CReDIT http://credit.niso.org/contributor-roles/writing-original-draft")));
+
+		Assertions.assertFalse(Boolean.parseBoolean(relation.getProperties().stream().filter(p -> p.getKey().equalsIgnoreCase("corresponding")).findFirst().get().getValue()));
 
 	}
 

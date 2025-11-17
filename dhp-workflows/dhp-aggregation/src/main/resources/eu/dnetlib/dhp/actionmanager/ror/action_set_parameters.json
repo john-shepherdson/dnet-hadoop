@@ -10,5 +10,11 @@
 		"paramLongName": "outputPath",
 		"paramDescription": "the path of the new ActionSet",
 		"paramRequired": true
+	},
+	{
+		"paramName": "rels",
+		"paramLongName": "withRels",
+		"paramDescription": "boolean flag indicating whether the parent/child relationships should be included in the ActionSet",
+		"paramRequired": false
 	}
 ]

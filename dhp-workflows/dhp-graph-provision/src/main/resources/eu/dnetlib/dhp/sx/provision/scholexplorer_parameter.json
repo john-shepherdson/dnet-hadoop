@@ -22,5 +22,11 @@
     "paramLongName": "indexHost",
     "paramDescription": "the index host",
     "paramRequired": true
+  },
+  {
+    "paramName": "tc",
+    "paramLongName": "threadCount",
+    "paramDescription": "the inumber of threads to use",
+    "paramRequired": false
   }
 ]

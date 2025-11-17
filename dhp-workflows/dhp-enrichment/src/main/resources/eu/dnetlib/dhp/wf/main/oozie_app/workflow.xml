@@ -369,7 +369,7 @@
     </action>
     <action name="publisher_propagation">
         <sub-workflow>
-            <app-path>${wf:appPath()}/person_propagation
+            <app-path>${wf:appPath()}/publisher_propagation
             </app-path>
             <propagate-configuration/>
             <configuration>

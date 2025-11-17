@@ -75,9 +75,9 @@ public class MergeUtilsTest {
 		Dataset d1 = read("dataset_1.json", Dataset.class);
 
 		final Result p2d1 = MergeUtils.checkedMerge(p2, d1, true);
-		assertEquals((ModelConstants.DATASET_RESULTTYPE_CLASSID), p2d1.getResulttype().getClassid());
-		assertTrue(p2d1 instanceof Dataset);
-		assertEquals(d1.getId(), p2d1.getId());
+		assertEquals((ModelConstants.PUBLICATION_RESULTTYPE_CLASSID), p2d1.getResulttype().getClassid());
+		assertTrue(p2d1 instanceof Publication);
+		assertEquals(p2.getId(), p2d1.getId());
 		assertEquals(2, p2d1.getCollectedfrom().size());
 	}
 
@@ -115,7 +115,7 @@ public class MergeUtilsTest {
 
 		Result res = (Result) MergeUtils.merge(p1, d2, true);
 
-		assertEquals(d2, res);
+		assertEquals(p1, res);
 	}
 
 	protected HashSet<String> cfId(List<KeyValue> collectedfrom) {

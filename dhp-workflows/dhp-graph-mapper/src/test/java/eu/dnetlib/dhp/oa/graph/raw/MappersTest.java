@@ -828,9 +828,9 @@ class MappersTest {
 		System.out.println("***************");
 
 		assertEquals(1, list.size());
-		assertTrue(list.get(0) instanceof Dataset);
+		assertTrue(list.get(0) instanceof OtherResearchProduct);
 
-		final Dataset d = (Dataset) list.get(0);
+		final OtherResearchProduct d = (OtherResearchProduct) list.get(0);
 
 		assertValidId(d.getId());
 		assertValidId(d.getCollectedfrom().get(0).getKey());

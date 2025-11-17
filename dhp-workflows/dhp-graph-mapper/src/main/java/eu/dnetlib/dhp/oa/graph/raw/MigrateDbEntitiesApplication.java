@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -136,13 +137,16 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 						.execute(
 							"queryProjectOrganization.sql", smdbe::processProjectOrganization, verifyNamespacePrefix);
 					break;
-				case openorgs_dedup: // generates organization entities and relations for openorgs dedup
+				case openorgs_dedup: // generates organization entities and relations for openorgs dedup from openorgs
 					log.info("Processing Openorgs...");
 					smdbe
 						.execute("queryOpenOrgsForOrgsDedup.sql", smdbe::processOrganization, verifyNamespacePrefix);
 
 					log.info("Processing Openorgs Sim Rels...");
 					smdbe.execute("queryOpenOrgsSimilarityForOrgsDedup.sql", smdbe::processOrgOrgSimRels);
+
+					log.info("Processing Parent/Child Rels...");
+					smdbe.execute("queryOpenOrgsParentChildRelsForOrgsDedup.sql", smdbe::processOrgOrgParentChildRels);
 					break;
 
 				case openorgs: // generates organization entities and relations for provision
@@ -154,13 +158,16 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 					smdbe.execute("queryOpenOrgsSimilarityForProvision.sql", smdbe::processOrgOrgMergeRels);
 
 					log.info("Processing Openorgs Parent/Child Rels...");
-					smdbe.execute("queryParentChildRelsOpenOrgs.sql", smdbe::processOrgOrgParentChildRels);
+					smdbe.execute("queryOpenOrgsParentChildRelsForProvision.sql", smdbe::processOrgOrgParentChildRels);
 					break;
 
-				case openaire_organizations:
+				case openaire_organizations: // generates organization entities and relations for openorgs dedup from openaire
 
 					log.info("Processing Organizations...");
 					smdbe.execute("queryOrganizations.sql", smdbe::processOrganization, verifyNamespacePrefix);
+
+					log.info("Processing Parent/Child Rels...");
+					smdbe.execute("queryParentChildRelsForOrgsDedup.sql", smdbe::processOrgOrgParentChildRels);
 					break;
 			}
 			log.info("All done.");
@@ -178,7 +185,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 		final String hdfsPath, final String dbUrl, final String dbUser, final String dbPassword,
 		final String isLookupUrl)
 		throws Exception {
-		super(hdfsPath);
+		super(new Path(hdfsPath));
 		this.dbClient = new DbClient(dbUrl, dbUser, dbPassword);
 		this.lastUpdateTimestamp = new Date().getTime();
 		this.vocs = VocabularyGroup.loadVocsFromIS(ISLookupClientFactory.getLookUpService(isLookupUrl));

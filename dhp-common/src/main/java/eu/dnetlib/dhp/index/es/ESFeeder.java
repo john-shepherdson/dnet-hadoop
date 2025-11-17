@@ -47,6 +47,8 @@ public class ESFeeder implements Closeable {
     private final Logger logger  = LoggerFactory.getLogger(ESFeeder.class);
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
+    private static int BUFFER_SIZE = 10000; // 10MB buffer size
+
     /**
      * Constructs an ESFeeder with the given Elasticsearch URL.
      *
@@ -108,7 +110,7 @@ public class ESFeeder implements Closeable {
                 List<BulkOperation> operations = new ArrayList<>();
                 while ((line = reader.readLine()) != null) {
                     operations.add(converter.apply(line));
-                    if (operations.size() == 1000) {
+                    if (operations.size() == BUFFER_SIZE) {
                         br.operations(operations);
                         tryBulk(getEsClient(), br.build(), 3);
                         br = new BulkRequest.Builder();

@@ -5,6 +5,8 @@ import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.schema.oaf.Person;
+import eu.dnetlib.dhp.schema.solr.Author;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -800,12 +802,26 @@ public class ProvisionModelSupport {
 					.stream()
 					.limit(maxAuthors)
 					.map(
-						a -> eu.dnetlib.dhp.schema.solr.Author
-							.newInstance(
-								StringUtils.left(a.getFullname(), ModelHardLimits.MAX_AUTHOR_FULLNAME_LENGTH),
-								a.getName(),
-								a.getSurname(),
-								a.getRank(), asPid(a.getPid())))
+						a -> {
+                            final Author author = Author
+                                    .newInstance(
+                                            StringUtils.left(a.getFullname(), ModelHardLimits.MAX_AUTHOR_FULLNAME_LENGTH),
+                                            a.getName(),
+                                            a.getSurname(),
+                                            a.getRank(), asPid(a.getPid()));
+
+                            Optional.ofNullable(a.getPid())
+                                    .flatMap(pid -> pid.stream()
+                                        .filter(p -> ModelConstants.ORCID.equals(p.getQualifier().getClassid())).findFirst())
+                                        .ifPresent(orcid -> author.setId(
+                                            StringUtils.substringAfter(
+                                                IdentifierFactory.idFromPid(
+                                                        ModelSupport.getIdPrefix(Person.class),
+                                                        ModelConstants.ORCID,
+                                                        orcid.getValue(), true),
+                                                IdentifierFactory.ID_PREFIX_SEPARATOR)));
+                            return author;
+                        })
 					.collect(Collectors.toList()))
 			.orElse(null);
 	}
