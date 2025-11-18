@@ -71,7 +71,7 @@
         </configuration>
     </global>
 
-    <start to="preparedataset"/>
+    <start to="deleteoutputpath"/>
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>

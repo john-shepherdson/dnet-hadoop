@@ -3,11 +3,7 @@ package eu.dnetlib.dhp.actionmanager.personentity;
 
 import static eu.dnetlib.dhp.actionmanager.personentity.ASConstants.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
-import static eu.dnetlib.dhp.common.person.Constants.PERSON_PREFIX;
-import static eu.dnetlib.dhp.common.person.Constants.SEPARATOR;
-import static eu.dnetlib.dhp.common.person.Constants.PROJECT_ID_PREFIX;
-import static eu.dnetlib.dhp.common.person.Constants.ORCID_KEY;
-import static eu.dnetlib.dhp.common.person.Constants.ORCIDDATAINFO;
+import static eu.dnetlib.dhp.common.person.Constants.*;
 
 
 import java.io.BufferedWriter;
@@ -119,7 +115,7 @@ public class ExtractPerson implements Serializable {
 		// Read the publishers output
 		Dataset<Row> df = spark
 			.read()
-			.schema(PUBLISHER_INPUT_SCHEMA)
+			.schema(Constants.PUBLISHER_INPUT_SCHEMA)
 
 			.json(inputPath)
 			.where("doi is not null");
@@ -206,7 +202,7 @@ public class ExtractPerson implements Serializable {
 		String target = DOI_PREFIX
 			+ IdentifierFactory
 				.md5(PidCleaner.normalizePidValue(PidType.doi.toString(), removePrefixUrl(a.getAs("doi"))));
-		;
+
 		String source = PERSON_PREFIX + SEPARATOR + IdentifierFactory.md5(removePrefixUrl(a.getAs("orcid")));
 
 		Relation relation = OafMapperUtils

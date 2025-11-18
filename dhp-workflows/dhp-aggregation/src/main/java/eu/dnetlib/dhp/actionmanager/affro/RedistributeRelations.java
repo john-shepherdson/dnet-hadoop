@@ -118,7 +118,7 @@ public class RedistributeRelations implements Serializable {
         // Perform salted join
         Dataset<Row> joined = explodedWithSalt
                 .join(saltedMatchings,
-                        explodedWithSalt.col("raw_affiliation_string").equalTo(saltedMatchings.col("Affiliation"))
+                        explodedWithSalt.col("raw_affiliation_string").equalTo(saltedMatchings.col("affiliation"))
                                 .and(explodedWithSalt.col("salt").equalTo(saltedMatchings.col("salt"))))
                 .filter(col("matchings").isNotNull().and(size(col("matchings")).gt(0)))
                 .select(
@@ -132,10 +132,6 @@ public class RedistributeRelations implements Serializable {
                 .withColumn("key", expr("insertKey(id, fullname)"));
 
 
-//        Dataset<Row> joined = exploded.join(matchings, exploded.col("raw_affiliation_string").equalTo(matchings.col("Affiliation")))
-//                .filter(col("Matchings").isNotNull().and(size(col("Matchings")).gt(0)))
-//                .select("id", "fullname", "raw_affiliation_string", "Matchings", "corresponding","contributor_roles")
-//                .withColumn("key", expr("insertKey(id, fullname)"));
 
         Dataset<Row> groupedDf = joined
                 .groupBy("key")

@@ -63,10 +63,12 @@ public class Constants {
 													"matchings", DataTypes
 															.createArrayType(
 																	new StructType()
-																			.add("PID", DataTypes.StringType)
-																			.add("Value", DataTypes.StringType)
-																			.add("Confidence", DataTypes.DoubleType)
-																			.add("Status", DataTypes.StringType)))
+																			.add("pid", DataTypes.StringType)
+																			.add("value", DataTypes.StringType)
+																			.add("name", DataTypes.StringType)
+																			.add("confidence", DataTypes.DoubleType)
+																			.add("status", DataTypes.StringType)
+																			.add("country", DataTypes.StringType)))
 											.add(
 													"pids", DataTypes
 															.createArrayType(
