@@ -43,6 +43,7 @@ public class IdentifierFactory implements Serializable {
 		PID_AUTHORITY.get(PidType.doi).put(DATACITE_ID, "Datacite");
 		PID_AUTHORITY.get(PidType.doi).put(ZENODO_OD_ID, "ZENODO");
 		PID_AUTHORITY.get(PidType.doi).put(ZENODO_R3_ID, "Zenodo");
+        PID_AUTHORITY.get(PidType.doi).put("10|openaire____::8687d924ebc4162c13d0030e57a632ac", "mEDRA");
 
 		PID_AUTHORITY.put(PidType.pmc, HashBiMap.create());
 		PID_AUTHORITY.get(PidType.pmc).put(EUROPE_PUBMED_CENTRAL_ID, "Europe PubMed Central");
