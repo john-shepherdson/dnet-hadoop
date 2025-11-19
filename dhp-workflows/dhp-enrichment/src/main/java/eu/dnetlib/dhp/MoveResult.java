@@ -68,7 +68,7 @@ public class MoveResult implements Serializable {
 			.forEach(e -> {
 				Class<R> resultClazz = ModelSupport.entityTypes.get(e);
 				Dataset<R> resultDataset = readPath(spark, inputPath + e.name(), resultClazz);
-				if (resultDataset.count() > 0) {
+				if (!resultDataset.isEmpty()) {
 
 					resultDataset
 						.write()

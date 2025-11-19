@@ -1036,7 +1036,7 @@
         <unidecode.version>0.0.7</unidecode.version>
         <vtd.version>[2.12,3.0)</vtd.version>
 
-        <uoa-validator-engine.version>2.1.0</uoa-validator-engine.version>
+        <uoa-validator-engine.version>2.2.0</uoa-validator-engine.version>
         <uoa-validator-models.version>2.1.0</uoa-validator-models.version>
 
         <zookeeper.version>3.4.6</zookeeper.version>
@@ -1149,6 +1149,10 @@
 
         <profile>
             <id>spark40</id>
+            <modules>
+                <module>s3-committer</module>
+            </modules>
+
             <build>
                 <plugins>
                     <plugin>

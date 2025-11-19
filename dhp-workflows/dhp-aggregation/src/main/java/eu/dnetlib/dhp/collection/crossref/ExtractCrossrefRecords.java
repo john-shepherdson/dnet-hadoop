@@ -37,6 +37,6 @@ public class ExtractCrossrefRecords {
         conf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName());
         FileSystem fs = FileSystem.get(URI.create(workingPath), conf);
 
-        doExtract(fs, outputPath, workingPath.concat("/").concat(crossrefFileNameTarGz));
+        doExtract("", outputPath, workingPath.concat("/").concat(crossrefFileNameTarGz));
     }
 }
