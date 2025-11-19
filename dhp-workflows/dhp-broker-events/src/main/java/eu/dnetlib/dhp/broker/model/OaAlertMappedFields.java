@@ -8,6 +8,7 @@ public class OaAlertMappedFields implements Serializable {
 	private static final long serialVersionUID = 4050762012154946651L;
 
 	private String originalId;
+	private String title;
 	private String datasourceId;
 	private String datasourceName;
 
@@ -17,6 +18,14 @@ public class OaAlertMappedFields implements Serializable {
 
 	public void setOriginalId(final String originalId) {
 		this.originalId = originalId;
+	}
+
+	public String getTitle() {
+		return this.title;
+	}
+
+	public void setTitle(final String title) {
+		this.title = title;
 	}
 
 	public String getDatasourceId() {

@@ -25,6 +25,8 @@ import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.util.LongAccumulator;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -128,7 +130,8 @@ public class GenerateAlertNotificationsJob {
 					.as(Encoders.bean(MetadataRecord.class))
 					.filter((FilterFunction<MetadataRecord>) r -> r.getValidationResults() != null)
 					.filter((FilterFunction<MetadataRecord>) r -> r.getValidationResults().containsKey(validationType))
-					.map((MapFunction<MetadataRecord, ValidatorAlertMessage>) r -> generatePayload(r.getOriginalId(), dsId, dsName, r.getValidationResults()
+					.map((MapFunction<MetadataRecord, ValidatorAlertMessage>) r -> generatePayload(r.getOriginalId(), extractTitle(r), dsId, dsName, r
+							.getValidationResults()
 							.get(validationType)), Encoders
 									.bean(ValidatorAlertMessage.class));
 
@@ -167,6 +170,17 @@ public class GenerateAlertNotificationsJob {
 		});
 	}
 
+	private static String extractTitle(final MetadataRecord r) {
+		try {
+			for (final Object o : DocumentHelper.parseText(r.getBody()).selectNodes("//*[local-name() = 'title']")) {
+				final String title = ((Node) o).getText();
+				if (StringUtils.isNotBlank(title)) { return title; }
+			}
+		} catch (final Throwable e) {}
+
+		return "-";
+	}
+
 	private static ValidationType calculateValidationType(final String compatibilityLevel) {
 		if ("openaire2.0".equalsIgnoreCase(compatibilityLevel)) { return ValidationType.openaire2_0; }
 		if ("openaire3.0".equalsIgnoreCase(compatibilityLevel)) { return ValidationType.openaire3_0; }
@@ -183,6 +197,7 @@ public class GenerateAlertNotificationsJob {
 
 		final OaAlertMappedFields fields = new OaAlertMappedFields();
 		fields.setOriginalId(alertMessage.getOriginalId());
+		fields.setTitle(alertMessage.getTitle());
 		fields.setDatasourceId(alertMessage.getDatasourceId());
 		fields.setDatasourceName(alertMessage.getDatasourceName());
 
@@ -237,12 +252,14 @@ public class GenerateAlertNotificationsJob {
 	}
 
 	private static ValidatorAlertMessage generatePayload(final String originalId,
+			final String title,
 			final String dsId,
 			final String dsName,
 			final StandardValidationResult standardValidationResult) {
 
 		final ValidatorAlertMessage res = new ValidatorAlertMessage();
 		res.setOriginalId(originalId);
+		res.setTitle(title);
 		res.setDatasourceId(dsId);
 		res.setDatasourceName(dsName);
 		res.setErrors(standardValidationResult

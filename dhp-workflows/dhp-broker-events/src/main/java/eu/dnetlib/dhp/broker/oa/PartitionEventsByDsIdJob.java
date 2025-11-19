@@ -41,16 +41,15 @@ public class PartitionEventsByDsIdJob {
 	public static void main(final String[] args) throws Exception {
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
-			IOUtils
-				.toString(
-					PartitionEventsByDsIdJob.class
-						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/od_partitions_params.json")));
+				IOUtils
+						.toString(PartitionEventsByDsIdJob.class
+								.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/od_partitions_params.json")));
 		parser.parseArgument(args);
 
 		final Boolean isSparkSessionManaged = Optional
-			.ofNullable(parser.get("isSparkSessionManaged"))
-			.map(Boolean::valueOf)
-			.orElse(Boolean.TRUE);
+				.ofNullable(parser.get("isSparkSessionManaged"))
+				.map(Boolean::valueOf)
+				.orElse(Boolean.TRUE);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
 		final SparkConf conf = new SparkConf();
@@ -65,27 +64,24 @@ public class PartitionEventsByDsIdJob {
 		log.info("opendoarIds: {}", opendoarIds);
 
 		final Set<String> validOpendoarIds = new HashSet<>();
-		if (!opendoarIds.trim().equals("-")) {
+		if (!"-".equals(opendoarIds.trim())) {
 			validOpendoarIds
-				.addAll(
-					Arrays
-						.stream(opendoarIds.split(","))
-						.map(String::trim)
-						.filter(StringUtils::isNotBlank)
-						.map(s -> OPENDOAR_NSPREFIX + DigestUtils.md5Hex(s))
-						.collect(Collectors.toSet()));
+					.addAll(Arrays
+							.stream(opendoarIds.split(","))
+							.map(String::trim)
+							.filter(StringUtils::isNotBlank)
+							.map(s -> OPENDOAR_NSPREFIX + DigestUtils.md5Hex(s))
+							.collect(Collectors.toSet()));
 		}
 		log.info("validOpendoarIds: {}", validOpendoarIds);
 
-		runWithSparkSession(
-			conf, isSparkSessionManaged, spark -> ClusterUtils
+		runWithSparkSession(conf, isSparkSessionManaged, spark -> ClusterUtils
 				.readPath(spark, eventsPath, Event.class)
 				.filter((FilterFunction<Event>) e -> StringUtils.isNotBlank(e.getMap().getTargetDatasourceId()))
 				.filter((FilterFunction<Event>) e -> e.getMap().getTargetDatasourceId().startsWith(OPENDOAR_NSPREFIX))
 				.filter((FilterFunction<Event>) e -> validOpendoarIds.contains(e.getMap().getTargetDatasourceId()))
-				.map(
-					(MapFunction<Event, ShortEventMessageWithGroupId>) e -> messageFromNotification(e),
-					Encoders.bean(ShortEventMessageWithGroupId.class))
+				.map((MapFunction<Event, ShortEventMessageWithGroupId>) PartitionEventsByDsIdJob::messageFromNotification, Encoders
+						.bean(ShortEventMessageWithGroupId.class))
 				.coalesce(1)
 				.write()
 				.partitionBy("group")
@@ -125,7 +121,7 @@ public class PartitionEventsByDsIdJob {
 		res.setTitle(payload.getResult().getTitles().stream().filter(StringUtils::isNotBlank).findFirst().orElse(null));
 		res.setTopic(e.getTopic());
 		res.setTrust(payload.getTrust());
-		res.generateMessageFromObject(payload.getHighlight());
+		res.generateMessageFromEventPayload(payload);
 		res.setGroup(StringUtils.substringAfter(e.getMap().getTargetDatasourceId(), OPENDOAR_NSPREFIX));
 
 		return res;
