@@ -138,7 +138,7 @@ public class RedistributeRelations implements Serializable {
                 .agg(collect_list(struct(joined.col("*"))).alias("group"))
                 .withColumn("aggAuthor", expr("aggregateAuthor(group)"))
                 .select("aggAuthor.*");
-        if(!datasource.equals("oaire") && !datasource.equalsIgnoreCase("pubmed") ) {
+        if(!datasource.equals("oaire") && !datasource.equalsIgnoreCase("pubmed") && !datasource.equals("crossref")) {
 
             Dataset<Row> resultDf = groupedDf
                     .groupBy("id")
