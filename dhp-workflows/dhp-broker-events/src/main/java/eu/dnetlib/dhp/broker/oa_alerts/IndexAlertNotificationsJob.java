@@ -87,7 +87,7 @@ public class IndexAlertNotificationsJob {
 	}
 
 	private static String sendAlertNotifications(final String brokerApiBaseUrl, final String dsId) throws IOException {
-		final String url = brokerApiBaseUrl + "/api/openaire-alerts/notifications/sendMailForNotifications?dsId=" + dsId;
+		final String url = brokerApiBaseUrl + "/api/openaire-alerts/notifications/sendNotificationsForDatasource?dsId=" + dsId;
 		final HttpGet req = new HttpGet(url);
 
 		try (final CloseableHttpClient client = HttpClients.createDefault()) {
