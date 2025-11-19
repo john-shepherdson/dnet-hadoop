@@ -446,13 +446,15 @@ authors.show(false);
 		// "`Matchings`: ARRAY<STRUCT<`PID`:STRING, `Value`:STRING,`Confidence`:DOUBLE, `Status`:STRING>>,
 		sb.setAffs(affiliations.stream().map(
 				aff -> {
-					if(aff.getAs("Status").equals("active")){
+					if(aff.getAs("status").equals("active")){
 						SerializationOrg so = new SerializationOrg();
-						if("ror".equalsIgnoreCase(aff.getAs("PID")))
-							so.setRor(aff.getAs("Value"));
+						if("ror".equalsIgnoreCase(aff.getAs("pid")))
+							so.setRor(aff.getAs("value"));
 						else
-							so.setOpenOrgs(aff.getAs("Value"));
-						so.setConfidence(aff.getAs("Confidence"));
+							so.setOpenOrgs(aff.getAs("value"));
+						so.setConfidence(aff.getAs("confidence"));
+						so.setName(aff.getAs("name"));
+						so.setCountry(aff.getAs("country"));
 						return so;
 					}
 					return null;
