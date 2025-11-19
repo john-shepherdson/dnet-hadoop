@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -242,7 +243,8 @@ public class GenerateAlertNotificationsJob {
 		final HttpPost req = new HttpPost(brokerApiBaseUrl + "/api/openaire-alerts/stats/update");
 		req.setHeader("Accept", "application/json");
 		req.setHeader("Content-type", "application/json");
-		req.setEntity(new StringEntity(DHPUtils.MAPPER.writeValueAsString(stats)));
+
+		req.setEntity(new StringEntity(DHPUtils.MAPPER.writeValueAsString(stats), ContentType.APPLICATION_JSON));
 
 		try (final CloseableHttpClient client = HttpClients.createDefault()) {
 			try (final CloseableHttpResponse response = client.execute(req)) {
