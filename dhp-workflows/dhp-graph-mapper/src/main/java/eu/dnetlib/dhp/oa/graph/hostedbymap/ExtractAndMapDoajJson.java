@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Objects;
 
+import eu.dnetlib.dhp.utils.DHPUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
@@ -58,35 +59,36 @@ public class ExtractAndMapDoajJson {
 		Configuration conf = new Configuration();
 		conf.set("fs.defaultFS", hdfsNameNode);
 
+
 		FileSystem fs = FileSystem.get(conf);
+		doExtract(hdfsNameNode, workingPath, compressedInput);
+
 		CompressionCodecFactory factory = new CompressionCodecFactory(conf);
 		CompressionCodec codec = factory.getCodecByClassName("org.apache.hadoop.io.compress.GzipCodec");
-		doExtract(fs, workingPath, compressedInput);
-		doMap(fs, workingPath, outputPath, codec);
+		doMap(hdfsNameNode, workingPath, outputPath, codec);
 
 	}
 
-	private static void doMap(FileSystem fs, String workingPath, String outputPath, CompressionCodec codec)
+	private static void doMap(String nameNode, String workingPath, String outputPath, CompressionCodec codec)
 		throws IOException {
-		RemoteIterator<LocatedFileStatus> fileStatusListIterator = fs
-			.listFiles(
-				new Path(workingPath), true);
+		Configuration conf = DHPUtils.getHadoopConfiguration(nameNode);
+		Path wrkdir = new Path(workingPath);
+		FileSystem wrkdirfs = wrkdir.getFileSystem(conf);
+
+		RemoteIterator<LocatedFileStatus> fileStatusListIterator = wrkdirfs.listFiles(wrkdir, true);
 
 		Path hdfsWritePath = new Path(outputPath);
-		if (fs.exists(hdfsWritePath)) {
-			fs.delete(hdfsWritePath, true);
-
+		FileSystem writefs = hdfsWritePath.getFileSystem(conf);
+		if (writefs.exists(hdfsWritePath)) {
+			writefs.delete(hdfsWritePath, true);
 		}
-		try (
-
-			FSDataOutputStream out = fs
-				.create(hdfsWritePath);
+		try (FSDataOutputStream out = writefs.create(hdfsWritePath);
 			PrintWriter writer = new PrintWriter(new BufferedOutputStream(out))) {
 
 			while (fileStatusListIterator.hasNext()) {
 				Path path = fileStatusListIterator.next().getPath();
-				if (!fs.isDirectory(path)) {
-					FSDataInputStream is = fs.open(path);
+				if (!wrkdirfs.isDirectory(path)) {
+					FSDataInputStream is = wrkdirfs.open(path);
 					CompressionInputStream compressionInputStream = codec.createInputStream(is);
 					DOAJEntry[] doajEntries = new ObjectMapper()
 						.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)

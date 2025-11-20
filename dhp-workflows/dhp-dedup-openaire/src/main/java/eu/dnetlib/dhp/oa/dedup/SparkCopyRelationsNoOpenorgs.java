@@ -2,10 +2,12 @@
 package eu.dnetlib.dhp.oa.dedup;
 
 import java.io.IOException;
+import java.util.Collections;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.function.FlatMapFunction;
+import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
@@ -56,20 +58,24 @@ public class SparkCopyRelationsNoOpenorgs extends AbstractSparkAction {
 		final String relationPath = DedupUtility.createEntityPath(graphBasePath, "relation");
 		final String outputPath = DedupUtility.createEntityPath(dedupGraphPath, "relation");
 
-		JavaRDD<Relation> simRels = spark
+		Dataset<Relation> simRels = spark
 			.read()
 			.schema(Encoders.bean(Relation.class).schema())
 			.json(relationPath)
 			.as(Encoders.bean(Relation.class))
-			.map(patchRelFn(), Encoders.bean(Relation.class))
-			.toJavaRDD()
-			.filter(x -> !isOpenorgsDedupRel(x));
+				.flatMap((FlatMapFunction<Relation, Relation>)  r -> {
+					r = patchRelFn().call(r);
+					if (!isOpenorgsDedupRel(r)) {
+						return Collections.singletonList(r).iterator();
+					}
+					return Collections.emptyIterator();
+				}, Encoders.bean(Relation.class));
 
 		if (log.isDebugEnabled()) {
 			log.debug("Number of non-Openorgs relations collected: {}", simRels.count());
 		}
 
-		save(spark.createDataset(simRels.rdd(), Encoders.bean(Relation.class)), outputPath, SaveMode.Overwrite);
+		save(simRels, outputPath, SaveMode.Overwrite);
 	}
 
 }

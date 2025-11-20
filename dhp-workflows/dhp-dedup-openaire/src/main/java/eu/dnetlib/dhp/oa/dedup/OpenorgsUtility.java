@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.oa.dedup;
 
 import static org.apache.spark.sql.functions.col;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import eu.dnetlib.dhp.utils.DHPUtils;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.expressions.UserDefinedFunction;
@@ -22,14 +24,13 @@ import com.kwartile.lib.cc.ConnectedComponent;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import scala.Tuple2;
 import scala.Tuple3;
-import scala.collection.JavaConversions;
 
 public class OpenorgsUtility {
 
 	public static final String GROUP_PREFIX = "group::";
 
 	public static long hash(final String id) {
-		return Hashing.murmur3_128().hashString(id).asLong();
+		return Hashing.murmur3_128().hashString(id, StandardCharsets.UTF_8).asLong();
 	}
 
 	// create families (group of connected components using specified relation): <id, familyId>
@@ -66,7 +67,7 @@ public class OpenorgsUtility {
 		// groupId is kept numeric as its string value is not used
 		// ("id", "familyId")
 		return cliques
-			.join(vertexIdMap, JavaConversions.asScalaBuffer(Collections.singletonList("vertexId")), "inner")
+			.join(vertexIdMap, DHPUtils.toSeq(Collections.singletonList("vertexId")).toSeq(), "inner")
 			.drop("vertexId")
 			.distinct();
 	}

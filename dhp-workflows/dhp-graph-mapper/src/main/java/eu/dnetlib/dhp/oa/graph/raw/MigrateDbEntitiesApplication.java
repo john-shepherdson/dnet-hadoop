@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -184,7 +185,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 		final String hdfsPath, final String dbUrl, final String dbUser, final String dbPassword,
 		final String isLookupUrl)
 		throws Exception {
-		super(hdfsPath);
+		super(new Path(hdfsPath));
 		this.dbClient = new DbClient(dbUrl, dbUser, dbPassword);
 		this.lastUpdateTimestamp = new Date().getTime();
 		this.vocs = VocabularyGroup.loadVocsFromIS(ISLookupClientFactory.getLookUpService(isLookupUrl));

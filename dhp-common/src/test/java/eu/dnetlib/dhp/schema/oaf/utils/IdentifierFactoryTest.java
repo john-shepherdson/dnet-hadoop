@@ -37,6 +37,9 @@ class IdentifierFactoryTest {
 		verifyIdentifier(
 			"publication_doi5.json", "50|doi_________::3bef95c0ca26dd55451fc8839ea69d27", true);
 
+        verifyIdentifier(
+            "publication_doi6.json", "50|medra_______::00009e51a596341c4f31e041d602c09a", true);
+
 		verifyIdentifier(
 			"publication_pmc1.json", "50|DansKnawCris::0829b5191605bdbea36d6502b8c1ce1f", true);
 
