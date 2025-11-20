@@ -1,6 +1,7 @@
 
 package eu.dnetlib.dhp.broker.oa;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -10,10 +11,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.MapFunction;
@@ -33,6 +30,7 @@ import eu.dnetlib.dhp.broker.model.Event;
 import eu.dnetlib.dhp.broker.model.OaMappedFields;
 import eu.dnetlib.dhp.broker.model.OaNotification;
 import eu.dnetlib.dhp.broker.model.Subscription;
+import eu.dnetlib.dhp.broker.oa.util.BrokerApiClient;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
 import eu.dnetlib.dhp.broker.oa.util.OaNotificationGroup;
 import eu.dnetlib.dhp.broker.oa.util.SubscriptionUtils;
@@ -66,11 +64,11 @@ public class GenerateNotificationsJob {
 
 		final long startTime = new Date().getTime();
 
-		final List<Subscription> subscriptions = listSubscriptions(brokerApiBaseUrl);
+		final Subscription[] subscriptions = BrokerApiClient.listSubscriptions(brokerApiBaseUrl);
 
-		log.info("Number of subscriptions: " + subscriptions.size());
+		log.info("Number of subscriptions: " + subscriptions.length);
 
-		if (subscriptions.size() > 0) {
+		if (subscriptions.length > 0) {
 			final Map<String, Map<String, List<ConditionParams>>> conditionsMap = prepareConditionsMap(subscriptions);
 
 			log.info("ConditionsMap: " + new ObjectMapper().writeValueAsString(conditionsMap));
@@ -87,18 +85,19 @@ public class GenerateNotificationsJob {
 	}
 
 	protected static Map<String, Map<String, List<ConditionParams>>> prepareConditionsMap(
-			final List<Subscription> subscriptions) {
+			final Subscription[] subscriptions) {
 		final Map<String, Map<String, List<ConditionParams>>> map = new HashMap<>();
-		subscriptions.forEach(s -> map.put(s.getSubscriptionId(), s.conditionsAsMap()));
+		for (final Subscription s : subscriptions) {
+			map.put(s.getSubscriptionId(), s.conditionsAsMap());
+		}
 		return map;
 	}
 
 	protected static OaNotificationGroup generateNotifications(final Event e,
-			final List<Subscription> subscriptions,
+			final Subscription[] subscriptions,
 			final Map<String, Map<String, List<ConditionParams>>> conditionsMap,
 			final long date) {
-		final List<OaNotification> list = subscriptions
-				.stream()
+		final List<OaNotification> list = Arrays.stream(subscriptions)
 				.filter(s -> StringUtils.isBlank(s.getTopic()) || "*".equals(s.getTopic()) || s.getTopic().equals(e.getTopic()))
 				.filter(s -> verifyConditions(e.getMap(), conditionsMap.get(s.getSubscriptionId())))
 				.map(s -> generateNotification(s, e, date))
@@ -158,21 +157,6 @@ public class GenerateNotificationsJob {
 						.stream()
 						.allMatch(c -> SubscriptionUtils.verifyListExact(map.getTargetSubjects(), c.getValue()));
 
-	}
-
-	private static List<Subscription> listSubscriptions(final String brokerApiBaseUrl) throws Exception {
-		final String url = brokerApiBaseUrl + "/api/subscriptions";
-		final HttpGet req = new HttpGet(url);
-
-		final ObjectMapper mapper = new ObjectMapper();
-
-		try (final CloseableHttpClient client = HttpClients.createDefault()) {
-			try (final CloseableHttpResponse response = client.execute(req)) {
-				final String s = IOUtils.toString(response.getEntity().getContent());
-				return mapper
-						.readValue(s, mapper.getTypeFactory().constructCollectionType(List.class, Subscription.class));
-			}
-		}
 	}
 
 }

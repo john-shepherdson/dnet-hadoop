@@ -1,17 +1,12 @@
 
 package eu.dnetlib.dhp.broker.oa_alerts;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
@@ -19,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.broker.model.OaAlertNotification;
+import eu.dnetlib.dhp.broker.oa.util.BrokerApiClient;
 import eu.dnetlib.dhp.broker.oa.util.BrokerIndexClient;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
 import eu.dnetlib.dhp.collection.ApiDescriptor;
@@ -81,20 +77,9 @@ public class IndexAlertNotificationsJob {
 		}
 
 		log.info("*** sendNotifications (emails, ...)");
-		sendAlertNotifications(brokerApiBaseUrl, dsId);
+		BrokerApiClient.sendAlertNotifications(brokerApiBaseUrl, dsId);
 		log.info("*** ALL done.");
 
-	}
-
-	private static String sendAlertNotifications(final String brokerApiBaseUrl, final String dsId) throws IOException {
-		final String url = brokerApiBaseUrl + "/api/openaire-alerts/notifications/sendNotificationsForDatasource?dsId=" + dsId;
-		final HttpGet req = new HttpGet(url);
-
-		try (final CloseableHttpClient client = HttpClients.createDefault()) {
-			try (final CloseableHttpResponse response = client.execute(req)) {
-				return IOUtils.toString(response.getEntity().getContent());
-			}
-		}
 	}
 
 }

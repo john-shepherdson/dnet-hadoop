@@ -1,7 +1,6 @@
 
 package eu.dnetlib.dhp.broker.oa;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -9,10 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
@@ -20,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.broker.model.OaNotification;
+import eu.dnetlib.dhp.broker.oa.util.BrokerApiClient;
 import eu.dnetlib.dhp.broker.oa.util.BrokerIndexClient;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
 import eu.dnetlib.dhp.index.es.ConvertJSONWithId;
@@ -74,22 +70,11 @@ public class IndexNotificationsJob {
 			log.warn("brokerApiBaseUrl is not set, skipping sendNotifications");
 		} else {
 			log.info("*** sendNotifications (emails, ...)");
-			sendNotifications(brokerApiBaseUrl, date - 1000);
+			BrokerApiClient.sendNotifications(brokerApiBaseUrl, date - 1000);
 		}
 
 		log.info("*** ALL done.");
 
-	}
-
-	private static String sendNotifications(final String brokerApiBaseUrl, final long l) throws IOException {
-		final String url = brokerApiBaseUrl + "/api/openaireBroker/notifications/send/" + l;
-		final HttpGet req = new HttpGet(url);
-
-		try (final CloseableHttpClient client = HttpClients.createDefault()) {
-			try (final CloseableHttpResponse response = client.execute(req)) {
-				return IOUtils.toString(response.getEntity().getContent());
-			}
-		}
 	}
 
 }

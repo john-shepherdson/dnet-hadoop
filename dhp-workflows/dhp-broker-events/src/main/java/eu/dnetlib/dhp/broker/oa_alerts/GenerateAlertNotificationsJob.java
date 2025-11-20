@@ -1,7 +1,7 @@
 
 package eu.dnetlib.dhp.broker.oa_alerts;
 
-import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -12,13 +12,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.FlatMapFunction;
@@ -32,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.broker.objects.alerts.ValidatorAlertMessage;
 import eu.dnetlib.broker.objects.alerts.ValidatorErrorMessage;
@@ -41,6 +33,7 @@ import eu.dnetlib.dhp.broker.model.MapCondition;
 import eu.dnetlib.dhp.broker.model.OaAlertMappedFields;
 import eu.dnetlib.dhp.broker.model.OaAlertNotification;
 import eu.dnetlib.dhp.broker.model.Subscription;
+import eu.dnetlib.dhp.broker.oa.util.BrokerApiClient;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
 import eu.dnetlib.dhp.broker.oa.util.aggregators.stats.DatasourceStats;
 import eu.dnetlib.dhp.collection.ApiDescriptor;
@@ -111,15 +104,14 @@ public class GenerateAlertNotificationsJob {
 
 		log.info("topic: {}", topic);
 
-		final List<Subscription> allSubscriptions = listSubscriptions(brokerApiBaseUrl);
+		final Subscription[] allSubscriptions = BrokerApiClient.listSubscriptions(brokerApiBaseUrl);
 
-		final List<Subscription> validSubscriptions = allSubscriptions
-				.stream()
+		final List<Subscription> validSubscriptions = Arrays.stream(allSubscriptions)
 				.filter(s -> s.getTopic().equalsIgnoreCase(topic))
 				.filter(s -> extractDatasourceId(s).equalsIgnoreCase(dsId))
 				.collect(Collectors.toList());
 
-		log.info("Number of valid subscriptions: {}/{}", validSubscriptions.size(), allSubscriptions.size());
+		log.info("Number of valid subscriptions: {}/{}", validSubscriptions.size(), allSubscriptions.length);
 
 		final SparkConf conf = new SparkConf();
 
@@ -147,7 +139,7 @@ public class GenerateAlertNotificationsJob {
 			stats.setTopic(topic);
 			stats.setSize(count);
 
-			updateStats(brokerApiBaseUrl, stats);
+			BrokerApiClient.updateAlertStats(brokerApiBaseUrl, stats);
 
 			final Long date = new Date().getTime();
 
@@ -221,36 +213,6 @@ public class GenerateAlertNotificationsJob {
 			n.setTopic(s.getTopic());
 			return n;
 		}).iterator();
-	}
-
-	private static List<Subscription> listSubscriptions(final String brokerApiBaseUrl) throws Exception {
-		final String url = brokerApiBaseUrl + "/api/subscriptions";
-		final HttpGet req = new HttpGet(url);
-
-		final ObjectMapper mapper = new ObjectMapper();
-
-		try (final CloseableHttpClient client = HttpClients.createDefault()) {
-			try (final CloseableHttpResponse response = client.execute(req)) {
-				final String s = IOUtils.toString(response.getEntity().getContent());
-				return mapper
-						.readValue(s, mapper.getTypeFactory().constructCollectionType(List.class, Subscription.class));
-			}
-		}
-	}
-
-	private static void updateStats(final String brokerApiBaseUrl, final DatasourceStats stats) throws IOException {
-
-		final HttpPost req = new HttpPost(brokerApiBaseUrl + "/api/openaire-alerts/stats/update");
-		req.setHeader("Accept", "application/json");
-		req.setHeader("Content-type", "application/json");
-
-		req.setEntity(new StringEntity(DHPUtils.MAPPER.writeValueAsString(stats), ContentType.APPLICATION_JSON));
-
-		try (final CloseableHttpClient client = HttpClients.createDefault()) {
-			try (final CloseableHttpResponse response = client.execute(req)) {
-
-			}
-		}
 	}
 
 	private static ValidatorAlertMessage generatePayload(final String originalId,

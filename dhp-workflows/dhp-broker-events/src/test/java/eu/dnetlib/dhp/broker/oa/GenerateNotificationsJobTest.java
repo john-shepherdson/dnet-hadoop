@@ -3,7 +3,6 @@ package eu.dnetlib.dhp.broker.oa;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +17,7 @@ import eu.dnetlib.dhp.broker.oa.util.OaNotificationGroup;
 
 class GenerateNotificationsJobTest {
 
-	private List<Subscription> subscriptions;
+	private final Subscription[] subscriptions = new Subscription[1];
 
 	private Map<String, Map<String, List<ConditionParams>>> conditionsMap;
 
@@ -26,11 +25,11 @@ class GenerateNotificationsJobTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
-		final Subscription s = new Subscription();
-		s.setTopic("ENRICH/MISSING/PID");
-		s
+		this.subscriptions[0] = new Subscription();
+		this.subscriptions[0].setTopic("ENRICH/MISSING/PID");
+		this.subscriptions[0]
 				.setConditions("[{\"field\":\"targetDatasourceName\",\"fieldType\":\"STRING\",\"operator\":\"EXACT\",\"listParams\":[{\"value\":\"reposiTUm\"}]},{\"field\":\"trust\",\"fieldType\":\"FLOAT\",\"operator\":\"RANGE\",\"listParams\":[{\"value\":\"0\",\"otherValue\":\"1\"}]}]");
-		this.subscriptions = Arrays.asList(s);
+
 		this.conditionsMap = GenerateNotificationsJob.prepareConditionsMap(this.subscriptions);
 	}
 
