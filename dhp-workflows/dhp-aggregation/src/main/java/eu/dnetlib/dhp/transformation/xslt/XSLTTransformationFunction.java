@@ -2,12 +2,11 @@
 package eu.dnetlib.dhp.transformation.xslt;
 
 import java.io.Serializable;
+import java.io.StringReader;
 import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
 
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.spark.api.java.function.MapFunction;
 
 import eu.dnetlib.dhp.aggregation.common.AggregationCounter;
@@ -62,15 +61,15 @@ public class XSLTTransformationFunction implements MapFunction<MetadataRecord, M
 		comp.setParameter(datasourceNameParam, new XdmAtomicValue(value.getProvenance().getDatasourceName()));
 		XsltExecutable xslt;
 		XdmNode source;
-		try {
-			xslt = comp
-				.compile(new StreamSource(IOUtils.toInputStream(transformationRule, StandardCharsets.UTF_8)));
-			source = processor
-				.newDocumentBuilder()
-				.build(new StreamSource(IOUtils.toInputStream(value.getBody(), StandardCharsets.UTF_8)));
-		} catch (Throwable e) {
-			throw new RuntimeException("Error on parsing xslt", e);
-		}
+        try {
+            // Use a Reader to provide characters directly to the parser and avoid malformed UTF-8 byte errors
+            xslt = comp.compile(new StreamSource(new StringReader(transformationRule)));
+            source = processor
+                    .newDocumentBuilder()
+                    .build(new StreamSource(new StringReader(value.getBody())));
+        } catch (Throwable e) {
+            throw new RuntimeException("Error on parsing xslt", e);
+        }
 		try {
 			XsltTransformer trans = xslt.load();
 			trans.setInitialContextNode(source);
