@@ -155,7 +155,8 @@ public class GenerateNativeStoreSparkJob {
 			res.put(ValidationType.fair_data, new FAIR_Data_GuidelinesProfile());
 			break;
 		default:
-			throw new IllegalStateException("Unexpected value: " + compatibilityLevel);
+            log.info(String.format("Skipping validation for compatibility: %s", compatibilityLevel));
+			return res;
         }
 
 		return res;

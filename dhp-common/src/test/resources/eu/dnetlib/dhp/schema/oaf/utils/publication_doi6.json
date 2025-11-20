@@ -1,0 +1,38 @@
+{
+  "id": "50|medra_______::00009e51a596341c4f31e041d602c09a",
+  "resuttype": {
+    "classid": "publication"
+  },
+  "pid": [
+    {
+      "qualifier": {
+        "classid": "doi"
+      },
+      "value": "10.3233/FI-1991-15107"
+    },
+    {
+      "qualifier": {
+        "classid": "urn"
+      },
+      "value": "urn:nbn:nl:ui:29-f3ed5f9e-edf6-457e-8848-61b58a4075e2"
+    },
+    {
+      "qualifier": {
+        "classid": "scp-number"
+      },
+      "value": "79953761260"
+    },
+    {
+      "qualifier": {
+        "classid": "pmc"
+      },
+      "value": "21459329"
+    }
+  ],
+  "collectedfrom": [
+    {
+      "key": "10|openaire____::8687d924ebc4162c13d0030e57a632ac",
+      "value": "mEDRA"
+    }
+  ]
+}
