@@ -503,10 +503,10 @@ object MagUtility extends Serializable {
     if (result == null)
       return null
 
-   if (!result.isInstanceOf[Publication])
-    return  null
+//   if (!result.isInstanceOf[Publication])
+//    return  null
 
-    patchTypology(result)
+//    patchTypology(result)
     result.setCollectedfrom(List(MAGCollectedFrom).asJava)
     var pidList = List(
       structuredProperty(
