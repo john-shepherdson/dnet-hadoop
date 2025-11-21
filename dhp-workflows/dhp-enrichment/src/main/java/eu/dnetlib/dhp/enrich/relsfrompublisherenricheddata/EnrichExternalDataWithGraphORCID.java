@@ -484,7 +484,7 @@ authors.show(false);
 			}).filter(Objects::nonNull).collect(Collectors.toList()));
 
 		if(Optional.ofNullable(a.getAs("corresponding")).isPresent())
-			sb.setCorresponding(Boolean.valueOf(a.getAs("corresponding")));
+			sb.setCorresponding(a.getAs("corresponding"));
 
 		author.setPid(pids);
 		// in this case the rawaffiliation string is used as an accumulator to create relations
