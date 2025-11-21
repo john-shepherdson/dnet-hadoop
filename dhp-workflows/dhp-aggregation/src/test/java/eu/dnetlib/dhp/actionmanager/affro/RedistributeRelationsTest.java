@@ -66,14 +66,14 @@ public class RedistributeRelationsTest {
 
 
         String explodedResultPath = getClass()
-                .getResource("/eu/dnetlib/dhp/actionmanager/affro/exploded")
+                .getResource("/eu/dnetlib/dhp/actionmanager/affro/exploded/")
                 .getPath();
 
         String matchingsPath = getClass()
                 .getResource("/eu/dnetlib/dhp/actionmanager/affro/matchings")
                 .getPath();
 
-        String outputPath = workingDir.toString() + "/actionSet";
+        String outputPath = workingDir.toString() + "/" ;
 
 
         RedistributeRelations
@@ -87,7 +87,7 @@ public class RedistributeRelationsTest {
 
                                 "-workingDir", workingDir.toString()
                         });
-    final String stringa = outputPath ;
+    final String stringa = outputPath + "oalex";
         System.out.println(stringa);
         Dataset<Row> dataset = spark.read().schema(RESULT_MATCHED_SCHEMA).json(stringa);
         Assertions.assertEquals(32, dataset.count());

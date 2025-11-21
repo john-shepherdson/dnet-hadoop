@@ -24,11 +24,10 @@ public class AggregateResultUDF implements UDF1<WrappedArray<Row>, Row> {
 
         for (int i = 0; i < group.length(); i++) {
             Row entry = group.apply(i);
-            String authorName = entry.getAs("fullname");
 
             // affiliations: WrappedArray<Row> → List<Row>
             WrappedArray<Row> affArray = entry.getAs("affiliations");
-            Row author = RowFactory.create(authorName, affArray, entry.getAs("corresponding"), entry.getAs("contributor_roles"), entry.getAs("pids"));
+            Row author = RowFactory.create(entry.getAs("fullname"), entry.getAs("firstname"), entry.getAs("lastname"), affArray, entry.getAs("corresponding"), entry.getAs("contributor_roles"), entry.getAs("pids"));
             authors.add(author);
             if (id == null) id = entry.getAs("id");
             List<Row> matchList = new ArrayList<>();
@@ -39,9 +38,7 @@ public class AggregateResultUDF implements UDF1<WrappedArray<Row>, Row> {
                 }
             }
 
-
             allMatchings.add(matchList);
-
         }
 
         List<Row> organizations = regroupAndSelectDistinctMatch(allMatchings);

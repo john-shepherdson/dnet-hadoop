@@ -132,6 +132,8 @@ public class Constants implements Serializable {
     public final static StructType AUTHOR_AGGREGATED_SCHEMA = new StructType()
             .add("id", StringType)
             .add("fullname", StringType)
+            .add("firstname", StringType)
+            .add("lastname", StringType)
             .add("affiliations", DataTypes.createArrayType(
                     new StructType()
                             .add("raw_affiliation_string", StringType)

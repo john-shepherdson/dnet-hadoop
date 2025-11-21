@@ -19,6 +19,8 @@ public class AggregateAuthorUDF implements UDF1<WrappedArray<Row>, Row> {
 
         String id = null;
         String fullname = null;
+        String firstname = null;
+        String lastname = null;
         Boolean corresponding = null;
         WrappedArray<Row> contributor_roles = null;
         WrappedArray<Row> pids = null;
@@ -27,6 +29,8 @@ public class AggregateAuthorUDF implements UDF1<WrappedArray<Row>, Row> {
             Row entry = group.apply(i);
             if (id == null) id = entry.getAs("id");
             if (fullname == null) fullname = entry.getAs("fullname");
+            if(firstname == null) firstname = entry.getAs("firstname");
+            if(lastname == null) firstname = entry.getAs("lastname");
             if(corresponding == null) corresponding = entry.getAs("corresponding");
             if(contributor_roles == null) contributor_roles = entry.getAs("contributor_roles");
             if(pids == null) pids = entry.getAs("pids");
@@ -45,7 +49,7 @@ public class AggregateAuthorUDF implements UDF1<WrappedArray<Row>, Row> {
         }
 
 
-        return RowFactory.create(id, fullname, affiliations, corresponding, contributor_roles, pids);
+        return RowFactory.create(id, fullname, firstname, lastname, affiliations, corresponding, contributor_roles, pids);
     }
 
     private List<Row> regroupAndSelectDistinctMatch(List<Row> inputGroups) {

@@ -105,6 +105,7 @@ public class RedistributeRelations implements Serializable {
         Dataset<Row> matchings = spark.read().schema(eu.dnetlib.dhp.actionmanager.affro.Constants.AFFILIATION_SCHEMA)
                 .json(matchingsPath);
 
+
         int numSalts = 100;
 
         // Add a salt key to the larger dataset (exploded)
@@ -124,6 +125,8 @@ public class RedistributeRelations implements Serializable {
                 .select(
                         explodedWithSalt.col("id"),
                         explodedWithSalt.col("fullname"),
+                        explodedWithSalt.col("firstname"),
+                        explodedWithSalt.col("lastname"),
                         explodedWithSalt.col("raw_affiliation_string"),
                         col("matchings"),
                         col("corresponding"),
@@ -138,6 +141,8 @@ public class RedistributeRelations implements Serializable {
                 .agg(collect_list(struct(joined.col("*"))).alias("group"))
                 .withColumn("aggAuthor", expr("aggregateAuthor(group)"))
                 .select("aggAuthor.*");
+
+
         if(!datasource.equals("oaire") && !datasource.equalsIgnoreCase("pubmed") && !datasource.equals("crossref")) {
 
             Dataset<Row> resultDf = groupedDf
