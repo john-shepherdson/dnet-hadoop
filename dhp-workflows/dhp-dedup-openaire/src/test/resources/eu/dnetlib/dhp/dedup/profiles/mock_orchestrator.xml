@@ -12,11 +12,7 @@
                 <ENTITY code="20" label="Organization" name="organization"/>
                 <ACTION_SET id="test-orchestrator"/>
                 <SCAN_SEQUENCE>
-                    <SCAN id="organization"/>
-                    <SCAN id="publication"/>
-                    <SCAN id="software"/>
-                    <SCAN id="dataset"/>
-                    <SCAN id="otherresearchproduct"/>
+                    <SCAN id="authors"/>
                 </SCAN_SEQUENCE>
             </DEDUPLICATION>
         </CONFIGURATION>

@@ -1,0 +1,143 @@
+{
+  "wf": {
+    "threshold": "0.99",
+    "dedupRun": "001",
+    "entityType": "result",
+    "subEntityType": "authors",
+    "subEntityValue": "authors",
+    "orderField": "key",
+    "queueMaxSize": "2000",
+    "groupMaxSize": "100",
+    "maxChildren": "100",
+    "slidingWindowSize": "50",
+    "rootBuilder": [
+      "result",
+      "resultProject_outcome_isProducedBy",
+      "resultResult_publicationDataset_isRelatedTo",
+      "resultResult_similarity_isAmongTopNSimilarDocuments",
+      "resultResult_similarity_hasAmongTopNSimilarDocuments",
+      "resultOrganization_affiliation_isAffiliatedWith",
+      "resultResult_part_hasPart",
+      "resultResult_part_isPartOf",
+      "resultResult_supplement_isSupplementTo",
+      "resultResult_supplement_isSupplementedBy",
+      "resultResult_version_isVersionOf"
+    ],
+    "includeChildren": "true",
+    "maxIterations": 20,
+    "idPath": "$.id"
+  },
+  "pace": {
+    "clustering": [
+      {
+        "name": "lowercase",
+        "fields": ["key"],
+        "params": {}
+      }
+    ],
+    "decisionTree": {
+      "start": {
+        "fields": [
+          {
+            "field": "coauthors",
+            "comparator": "authorsMatch",
+            "weight": 1.0,
+            "countIfUndefined": "false",
+            "params": {
+              "surname_th": 0.9,
+              "fullname_th": 0.9,
+              "threshold": 0.9,
+              "mode": "full",
+              "type": "count"
+            }
+          }
+        ],
+        "threshold": 3,
+        "aggregation": "MAX",
+        "positive": "MATCH",
+        "negative": "fullnames_weak",
+        "undefined": "fullnames_weak",
+        "ignoreUndefined": "true"
+      },
+      "fullnames_weak": {
+        "fields": [
+          {
+            "field": "coauthors",
+            "comparator": "authorsMatch",
+            "weight": 1.0,
+            "countIfUndefined": "false",
+            "params": {
+              "surname_th": 0.75,
+              "fullname_th": 0.75,
+              "threshold": 0.6,
+              "mode": "surname",
+              "type": "count"
+            }
+          }
+        ],
+        "threshold": 2,
+        "aggregation": "MAX",
+        "positive": "topicsCheckWeak",
+        "negative": "NO_MATCH",
+        "undefined": "topicsCheckStrong",
+        "ignoreUndefined": "true"
+      },
+      "topicsCheckStrong": {
+        "fields": [
+          {
+            "field": "lda_topics",
+            "comparator": "cosineSimilarity",
+            "weight": 1.0,
+            "countIfUndefined": "false",
+            "params": {}
+          }
+        ],
+        "threshold": 0.95,
+        "aggregation": "MAX",
+        "positive": "MATCH",
+        "negative": "NO_MATCH",
+        "undefined": "NO_MATCH",
+        "ignoreUndefined": "true"
+      },
+      "topicsCheckWeak": {
+        "fields": [
+          {
+            "field": "lda_topics",
+            "comparator": "cosineSimilarity",
+            "weight": 1.0,
+            "countIfUndefined": "false",
+            "params": {}
+          }
+        ],
+        "threshold": 0.7,
+        "aggregation": "MAX",
+        "positive": "MATCH",
+        "negative": "NO_MATCH",
+        "undefined": "NO_MATCH",
+        "ignoreUndefined": "true"
+      }
+    },
+    "model": [
+      {
+        "name": "lda_topics",
+        "type": "DoubleArray",
+        "path": "$.lda_topics"
+
+      },
+      {
+        "name": "coauthors",
+        "type": "List",
+        "path": "$.coauthors[*].fullname",
+        "size": 200,
+        "filter": [] 
+      },
+      {
+        "name": "key",
+        "type": "String",
+        "path": "$.key"
+      }
+    ],
+    "blacklists": {},
+    "synonyms": {}
+  }
+}
