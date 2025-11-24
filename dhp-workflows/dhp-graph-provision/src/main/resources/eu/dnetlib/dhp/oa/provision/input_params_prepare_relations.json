@@ -6,9 +6,15 @@
     "paramRequired": false
   },
   {
-    "paramName": "irp",
-    "paramLongName": "inputRelationsPath",
-    "paramDescription": "path to input relations prepare",
+    "paramName": "it",
+    "paramLongName": "inputType",
+    "paramDescription": "hdfs path or db name where graph is located",
+    "paramRequired": true
+  },
+  {
+    "paramName": "ig",
+    "paramLongName": "inputGraph",
+    "paramDescription": "path or DB where the graph is located",
     "paramRequired": true
   },
   {

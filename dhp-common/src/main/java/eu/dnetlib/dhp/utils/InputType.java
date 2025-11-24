@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.oa.provision;
+package eu.dnetlib.dhp.utils;
 
 public enum InputType {
     HDFS_JSON,

@@ -2,7 +2,11 @@
 
     <parameters>
         <property>
-            <name>inputGraphRootPath</name>
+            <name>inputType</name>
+            <description>hdfs path or DB</description>
+        </property>
+        <property>
+            <name>inputGraph</name>
             <description>root location of input materialized graph</description>
         </property>
         <property>
@@ -126,7 +130,8 @@
                 ${sparkResourceOpts}
                 --conf spark.sql.shuffle.partitions=15000
             </spark-opts>
-            <arg>--inputRelationsPath</arg><arg>${inputGraphRootPath}/relation</arg>
+            <arg>--inputType</arg><arg>${inputType}</arg>
+            <arg>--inputGraph</arg><arg>${inputGraph}</arg>
             <arg>--outputPath</arg><arg>${workingDir}/relation</arg>
             <arg>--sourceMaxRelations</arg><arg>${sourceMaxRelations}</arg>
             <arg>--targetMaxRelations</arg><arg>${targetMaxRelations}</arg>
@@ -160,9 +165,10 @@
                 ${sparkResourceOpts}
                 --conf spark.sql.shuffle.partitions=15000
             </spark-opts>
-            <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
-            <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/publication</arg>
+            <arg>--inputType</arg><arg>${inputType}</arg>
+            <arg>--inputGraph</arg><arg>${inputGraph}</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
+            <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_partial/publication</arg>
         </spark>
         <ok to="wait_joins"/>
@@ -181,9 +187,10 @@
                 ${sparkResourceOpts}
                 --conf spark.sql.shuffle.partitions=15000
             </spark-opts>
-            <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
-            <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/dataset</arg>
+            <arg>--inputType</arg><arg>${inputType}</arg>
+            <arg>--inputGraph</arg><arg>${inputGraph}</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
+            <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_partial/dataset</arg>
         </spark>
         <ok to="wait_joins"/>
@@ -202,9 +209,10 @@
                 ${sparkResourceOpts}
                 --conf spark.sql.shuffle.partitions=8000
             </spark-opts>
-            <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
-            <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/otherresearchproduct</arg>
+            <arg>--inputType</arg><arg>${inputType}</arg>
+            <arg>--inputGraph</arg><arg>${inputGraph}</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
+            <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_partial/otherresearchproduct</arg>
         </spark>
         <ok to="wait_joins"/>
@@ -223,9 +231,10 @@
                 ${sparkResourceOpts}
                 --conf spark.sql.shuffle.partitions=2000
             </spark-opts>
-            <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
-            <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/software</arg>
+            <arg>--inputType</arg><arg>${inputType}</arg>
+            <arg>--inputGraph</arg><arg>${inputGraph}</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
+            <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_partial/software</arg>
         </spark>
         <ok to="wait_joins"/>
@@ -244,9 +253,10 @@
                 ${sparkResourceOpts}
                 --conf spark.sql.shuffle.partitions=1000
             </spark-opts>
-            <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
-            <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/datasource</arg>
+            <arg>--inputType</arg><arg>${inputType}</arg>
+            <arg>--inputGraph</arg><arg>${inputGraph}</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Datasource</arg>
+            <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_partial/datasource</arg>
         </spark>
         <ok to="wait_joins"/>
@@ -265,9 +275,10 @@
                 ${sparkResourceOpts}
                 --conf spark.sql.shuffle.partitions=5000
             </spark-opts>
-            <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
-            <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/organization</arg>
+            <arg>--inputType</arg><arg>${inputType}</arg>
+            <arg>--inputGraph</arg><arg>${inputGraph}</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Organization</arg>
+            <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_partial/organization</arg>
         </spark>
         <ok to="wait_joins"/>
@@ -286,9 +297,10 @@
                 ${sparkResourceOpts}
                 --conf spark.sql.shuffle.partitions=5000
             </spark-opts>
-            <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
-            <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/project</arg>
+            <arg>--inputType</arg><arg>${inputType}</arg>
+            <arg>--inputGraph</arg><arg>${inputGraph}</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Project</arg>
+            <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_partial/project</arg>
         </spark>
         <ok to="wait_joins"/>
@@ -307,9 +319,10 @@
                 ${sparkResourceOpts}
                 --conf spark.sql.shuffle.partitions=5000
             </spark-opts>
-            <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
-            <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/person</arg>
+            <arg>--inputType</arg><arg>${inputType}</arg>
+            <arg>--inputGraph</arg><arg>${inputGraph}</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Person</arg>
+            <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_partial/person</arg>
         </spark>
         <ok to="wait_joins"/>
@@ -341,7 +354,8 @@
                 ${sparkResourceOpts}
                 --conf spark.sql.shuffle.partitions=15000
             </spark-opts>
-            <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/publication</arg>
+            <arg>--inputType</arg><arg>${inputType}</arg>
+            <arg>--inputGraph</arg><arg>${inputGraph}</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--inputRelatedEntitiesPath</arg><arg>${workingDir}/join_partial</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_entities/publication</arg>

@@ -7,6 +7,8 @@ import java.security.MessageDigest;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.schema.oaf.Relation;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -17,8 +19,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.SaveMode;
+import org.apache.spark.sql.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -190,4 +191,50 @@ public class DHPUtils {
 
 		populateOOZIEEnv(report);
 	}
+
+    /**
+     * Reads graph contents from given input based on specified input type and the specified entityType.
+     *
+     * @param spark the spark session
+     * @param inputType type of input (HDFS JSON files or DB Parquet tables)
+     * @param input must be either the graph base path on HDFS storing the newline delimited json records, or the DB name
+     * @param entityClazz identifies the graph entity to be read (e.g., "relation", "publication", etc.)
+     * @param encoder the encoder for the graph entity
+     * @return the dataset representing the graph entity
+     */
+    private static <T extends Oaf> Dataset<Row> _readGraph(SparkSession spark, InputType inputType, String input, Class<T> entityClazz, Encoder<T> encoder) {
+        switch (inputType) {
+            case HDFS_JSON:
+                return spark
+                        .read()
+                        .schema(encoder.schema())
+                        .json(input + "/" + entityClazz.getSimpleName().toLowerCase());
+            case DB_PARQUET:
+                return spark
+                        .read()
+                        .table(input + "." + entityClazz.getSimpleName().toLowerCase());
+            default:
+                throw new IllegalArgumentException("Unsupported inputType: " + inputType);
+        }
+    }
+
+    /**
+     * Reads graph contents from given input based on specified input type and the specified entityType.
+     *
+     * @param spark the spark session
+     * @param inputType type of input (HDFS JSON files or DB Parquet tables)
+     * @param input must be either the graph base path on HDFS storing the newline delimited json records, or the DB name
+     * @param entityClazz identifies the graph entity to be read (e.g., "relation", "publication", etc.)
+     * @return the dataset representing the graph entity
+     */
+    public static <T extends Oaf> Dataset<Row> readGraph(SparkSession spark, InputType inputType, String input, Class<T> entityClazz) {
+        final Encoder<T> encoder = Encoders.bean(entityClazz);
+        return _readGraph(spark, inputType, input, entityClazz, encoder);
+    }
+
+    public static <T extends Oaf> Dataset<T> readGraphAs(SparkSession spark, InputType inputType, String input, Class<T> entityClazz) {
+        final Encoder<T> encoder = Encoders.bean(entityClazz);
+        return _readGraph(spark, inputType, input, entityClazz, encoder)
+                .as(encoder);
+    }
 }

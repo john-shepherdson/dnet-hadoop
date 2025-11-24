@@ -12,9 +12,15 @@
     "paramRequired": true
   },
   {
-    "paramName": "iep",
-    "paramLongName": "inputEntityPath",
-    "paramDescription": "path to input entity from the graph",
+    "paramName": "it",
+    "paramLongName": "inputType",
+    "paramDescription": "hdfs path or db name where graph is located",
+    "paramRequired": true
+  },
+  {
+    "paramName": "ig",
+    "paramLongName": "inputGraph",
+    "paramDescription": "path or DB where the graph is located",
     "paramRequired": true
   },
   {
