@@ -137,6 +137,7 @@
             <arg>--targetMaxRelations</arg><arg>${targetMaxRelations}</arg>
             <arg>--relationFilter</arg><arg>${relationFilter}</arg>
             <arg>--relPartitions</arg><arg>15000</arg>
+            <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
         </spark>
         <ok to="fork_join_related_entities"/>
         <error to="Kill"/>
@@ -170,6 +171,7 @@
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_partial/publication</arg>
+            <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
         </spark>
         <ok to="wait_joins"/>
         <error to="Kill"/>
@@ -192,6 +194,7 @@
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_partial/dataset</arg>
+            <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
         </spark>
         <ok to="wait_joins"/>
         <error to="Kill"/>
@@ -214,6 +217,7 @@
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_partial/otherresearchproduct</arg>
+            <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
         </spark>
         <ok to="wait_joins"/>
         <error to="Kill"/>
@@ -236,6 +240,7 @@
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_partial/software</arg>
+            <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
         </spark>
         <ok to="wait_joins"/>
         <error to="Kill"/>
@@ -258,6 +263,7 @@
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Datasource</arg>
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_partial/datasource</arg>
+            <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
         </spark>
         <ok to="wait_joins"/>
         <error to="Kill"/>
@@ -280,6 +286,7 @@
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Organization</arg>
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_partial/organization</arg>
+            <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
         </spark>
         <ok to="wait_joins"/>
         <error to="Kill"/>
@@ -302,6 +309,7 @@
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Project</arg>
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_partial/project</arg>
+            <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
         </spark>
         <ok to="wait_joins"/>
         <error to="Kill"/>
@@ -324,6 +332,7 @@
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Person</arg>
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_partial/person</arg>
+            <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
         </spark>
         <ok to="wait_joins"/>
         <error to="Kill"/>
@@ -360,6 +369,7 @@
             <arg>--inputRelatedEntitiesPath</arg><arg>${workingDir}/join_partial</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_entities/publication</arg>
             <arg>--numPartitions</arg><arg>30000</arg>
+            <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
         </spark>
         <ok to="wait_join_phase2"/>
         <error to="Kill"/>
@@ -382,6 +392,7 @@
             <arg>--inputRelatedEntitiesPath</arg><arg>${workingDir}/join_partial</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_entities/dataset</arg>
             <arg>--numPartitions</arg><arg>20000</arg>
+            <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
         </spark>
         <ok to="wait_join_phase2"/>
         <error to="Kill"/>
@@ -404,6 +415,7 @@
             <arg>--inputRelatedEntitiesPath</arg><arg>${workingDir}/join_partial</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_entities/otherresearchproduct</arg>
             <arg>--numPartitions</arg><arg>10000</arg>
+            <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
         </spark>
         <ok to="wait_join_phase2"/>
         <error to="Kill"/>
@@ -426,6 +438,7 @@
             <arg>--inputRelatedEntitiesPath</arg><arg>${workingDir}/join_partial</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_entities/software</arg>
             <arg>--numPartitions</arg><arg>10000</arg>
+            <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
         </spark>
         <ok to="wait_join_phase2"/>
         <error to="Kill"/>
@@ -448,6 +461,7 @@
             <arg>--inputRelatedEntitiesPath</arg><arg>${workingDir}/join_partial</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_entities/datasource</arg>
             <arg>--numPartitions</arg><arg>1000</arg>
+            <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
         </spark>
         <ok to="wait_join_phase2"/>
         <error to="Kill"/>
@@ -470,6 +484,7 @@
             <arg>--inputRelatedEntitiesPath</arg><arg>${workingDir}/join_partial</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_entities/organization</arg>
             <arg>--numPartitions</arg><arg>20000</arg>
+            <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
         </spark>
         <ok to="wait_join_phase2"/>
         <error to="Kill"/>
@@ -492,6 +507,7 @@
             <arg>--inputRelatedEntitiesPath</arg><arg>${workingDir}/join_partial</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_entities/project</arg>
             <arg>--numPartitions</arg><arg>10000</arg>
+            <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
         </spark>
         <ok to="wait_join_phase2"/>
         <error to="Kill"/>
@@ -514,6 +530,7 @@
             <arg>--inputRelatedEntitiesPath</arg><arg>${workingDir}/join_partial</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_entities/person</arg>
             <arg>--numPartitions</arg><arg>10000</arg>
+            <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
         </spark>
         <ok to="wait_join_phase2"/>
         <error to="Kill"/>

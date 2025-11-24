@@ -1,7 +1,7 @@
 
 package eu.dnetlib.dhp.oa.provision;
 
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 
 import java.util.List;
 import java.util.Objects;
@@ -22,7 +22,6 @@ import org.apache.spark.sql.expressions.Aggregator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
@@ -45,8 +44,6 @@ import scala.collection.Seq;
 public class CreateRelatedEntitiesJob_phase2 {
 
 	private static final Logger log = LoggerFactory.getLogger(CreateRelatedEntitiesJob_phase2.class);
-
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	public static void main(String[] args) throws Exception {
 
@@ -88,11 +85,15 @@ public class CreateRelatedEntitiesJob_phase2 {
 
 		Class<? extends OafEntity> entityClazz = (Class<? extends OafEntity>) Class.forName(graphTableClassName);
 
-		SparkConf conf = new SparkConf();
+        String hiveMetastoreUris = parser.get("hiveMetastoreUris");
+        log.info("hiveMetastoreUris: {}", hiveMetastoreUris);
+
+        SparkConf conf = new SparkConf();
+        conf.set("hive.metastore.uris", hiveMetastoreUris);
 		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
 		conf.registerKryoClasses(ProvisionModelSupport.getModelClasses());
 
-		runWithSparkSession(
+        runWithSparkHiveSession(
 			conf,
 			isSparkSessionManaged,
 			spark -> {
@@ -209,18 +210,6 @@ public class CreateRelatedEntitiesJob_phase2 {
 				(MapFunction<RelatedEntityWrapper, Tuple2<String, RelatedEntityWrapper>>) value -> new Tuple2<>(
 					value.getRelation().getSource(), value),
 				Encoders.tuple(Encoders.STRING(), Encoders.kryo(RelatedEntityWrapper.class)));
-	}
-
-	private static <E extends OafEntity> Dataset<Tuple2<String, E>> readPathEntity(
-		SparkSession spark, InputType inputType, String inputGraph, Class<E> entityClazz) {
-
-		log.info("Reading Graph table from: {}", inputGraph);
-		return DHPUtils.readGraphAs(spark, inputType, inputGraph, entityClazz)
-			.filter("dataInfo.invisible == false")
-			.map((MapFunction<E, E>) e -> pruneOutliers(entityClazz, e), Encoders.bean(entityClazz))
-			.map(
-				(MapFunction<E, Tuple2<String, E>>) e -> new Tuple2<>(e.getId(), e),
-				Encoders.tuple(Encoders.STRING(), Encoders.kryo(entityClazz)));
 	}
 
 	private static <E extends OafEntity> E pruneOutliers(Class<E> entityClazz, E e) {

@@ -1,14 +1,13 @@
 
 package eu.dnetlib.dhp.oa.provision;
 
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 import static org.apache.spark.sql.functions.col;
 
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import eu.dnetlib.dhp.utils.DHPUtils;
 import eu.dnetlib.dhp.utils.InputType;
@@ -20,8 +19,6 @@ import org.apache.spark.sql.expressions.WindowSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Sets;
 
@@ -93,11 +90,15 @@ public class PrepareRelationsJob {
 			.orElse(MAX_RELS);
 		log.info("targetMaxRelations: {}", targetMaxRelations);
 
-		SparkConf conf = new SparkConf();
+        String hiveMetastoreUris = parser.get("hiveMetastoreUris");
+        log.info("hiveMetastoreUris: {}", hiveMetastoreUris);
+
+        SparkConf conf = new SparkConf();
+        conf.set("hive.metastore.uris", hiveMetastoreUris);
 		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
 		conf.registerKryoClasses(ProvisionModelSupport.getModelClasses());
 
-		runWithSparkSession(
+		runWithSparkHiveSession(
 			conf,
 			isSparkSessionManaged,
 			spark -> {

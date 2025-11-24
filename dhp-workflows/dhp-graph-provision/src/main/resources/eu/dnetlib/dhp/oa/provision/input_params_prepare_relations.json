@@ -6,6 +6,12 @@
     "paramRequired": false
   },
   {
+    "paramName": "hmu",
+    "paramLongName": "hiveMetastoreUris",
+    "paramDescription": "the hive metastore uris",
+    "paramRequired": true
+  },
+  {
     "paramName": "it",
     "paramLongName": "inputType",
     "paramDescription": "hdfs path or db name where graph is located",

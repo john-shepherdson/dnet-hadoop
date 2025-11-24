@@ -6,6 +6,12 @@
     "paramRequired": false
   },
   {
+    "paramName": "hmu",
+    "paramLongName": "hiveMetastoreUris",
+    "paramDescription": "the hive metastore uris",
+    "paramRequired": true
+  },
+  {
     "paramName": "irp",
     "paramLongName": "inputRelatedEntitiesPath",
     "paramDescription": "path to input relations from the graph",

@@ -1,7 +1,7 @@
 
 package eu.dnetlib.dhp.oa.provision;
 
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 
 import java.util.Comparator;
 import java.util.List;
@@ -22,8 +22,6 @@ import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.oa.provision.model.ProvisionModelSupport;
@@ -41,8 +39,6 @@ import scala.Tuple2;
 public class CreateRelatedEntitiesJob_phase1 {
 
 	private static final Logger log = LoggerFactory.getLogger(CreateRelatedEntitiesJob_phase1.class);
-
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	public static void main(final String[] args) throws Exception {
 
@@ -82,11 +78,15 @@ public class CreateRelatedEntitiesJob_phase1 {
 		@SuppressWarnings("unchecked")
 		final Class<? extends OafEntity> entityClazz = (Class<? extends OafEntity>) Class.forName(graphTableClassName);
 
-		final SparkConf conf = new SparkConf();
+        String hiveMetastoreUris = parser.get("hiveMetastoreUris");
+        log.info("hiveMetastoreUris: {}", hiveMetastoreUris);
+
+        SparkConf conf = new SparkConf();
+        conf.set("hive.metastore.uris", hiveMetastoreUris);
 		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
 		conf.registerKryoClasses(ProvisionModelSupport.getModelClasses());
 
-		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
+        runWithSparkHiveSession(conf, isSparkSessionManaged, spark -> {
 			removeOutputDir(spark, outputPath);
 			joinRelationEntity(spark, inputRelationsPath, inputType, inputGraph, entityClazz, outputPath);
 		});
