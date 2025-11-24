@@ -1,18 +1,10 @@
 package eu.dnetlib.dhp.sx.graph
 
 import eu.dnetlib.dhp.application.AbstractScalaApplication
-import eu.dnetlib.dhp.schema.oaf.{
-  KeyValue,
-  OtherResearchProduct,
-  Publication,
-  Relation,
-  Result,
-  Software,
-  Dataset => OafDataset
-}
+import eu.dnetlib.dhp.schema.oaf.{KeyValue, OtherResearchProduct, Publication, Relation, Result, Software, Dataset => OafDataset}
 import eu.dnetlib.dhp.schema.sx.scholix.flat.ScholixFlat
 import eu.dnetlib.dhp.schema.sx.scholix.{Scholix, ScholixResource}
-import org.apache.spark.sql.functions.{col, concat, expr, first, md5}
+import org.apache.spark.sql.functions.{array, col, concat, expr, first, inline, md5, struct}
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql._
 import org.slf4j.{Logger, LoggerFactory}
@@ -118,15 +110,30 @@ class SparkCreateScholexplorerDump(propertyPath: String, args: Array[String], lo
 
     import org.apache.spark.sql.functions.udf
     val inverseRelationUDF = udf(invRel)
-    val inverseRelation = relDF.select(
-      col("target").alias("source"),
-      col("source").alias("target"),
-      col("collectedfrom"),
-      inverseRelationUDF(col("relClass")).alias("relClass")
-    )
+//    SELECT INLINE(ARRAY(
+//      STRUCT('A' AS tag, col1 AS v),
+//      STRUCT('B' AS tag, col2 AS v)
+//    ))
+
+
+
+    val inverseRelation = relDF.select(inline(array(
+       struct(
+        col("target").alias("source"),
+        col("source").alias("target"),
+        col("collectedfrom"),
+        inverseRelationUDF(col("relClass")).alias("relClass")
+      ),
+      struct(
+        col("source"),
+        col("target"),
+        col("collectedfrom"),
+        col("relClass")
+      ),
+    )))
 
     val bidRel = inverseRelation
-      .union(relDF)
+//      .union(relDF)
       .withColumn("id", md5(concat(col("source"), col("relClass"), col("target"))))
       .withColumn("cf", expr("transform(collectedfrom, x -> struct(x.key, x.value))"))
       .drop("collectedfrom")
@@ -140,7 +147,7 @@ class SparkCreateScholexplorerDump(propertyPath: String, args: Array[String], lo
         first("collectedfrom").alias("collectedfrom")
       )
 
-    bidRel.write.mode(SaveMode.Overwrite).save(s"$otuputPath/relation")
+    bidRel.write.mode(SaveMode.Overwrite).save(s"$otuputPath/rela tion")
 
   }
 
