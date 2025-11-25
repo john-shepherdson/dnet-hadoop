@@ -65,12 +65,6 @@ public class PrepareRelationsJob {
 		String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
 
-		int relPartitions = Optional
-			.ofNullable(parser.get("relPartitions"))
-			.map(Integer::valueOf)
-			.orElse(DEFAULT_NUM_PARTITIONS);
-		log.info("relPartitions: {}", relPartitions);
-
 		Set<String> relationFilter = Optional
 			.ofNullable(parser.get("relationFilter"))
 			.map(String::toLowerCase)
@@ -95,6 +89,9 @@ public class PrepareRelationsJob {
 
         SparkConf conf = new SparkConf();
         conf.set("hive.metastore.uris", hiveMetastoreUris);
+        conf.set("spark.hadoop.hive.metastore.uris", hiveMetastoreUris);
+        conf.set("spark.sql.catalogImplementation", "hive");
+
 		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
 		conf.registerKryoClasses(ProvisionModelSupport.getModelClasses());
 
@@ -104,8 +101,7 @@ public class PrepareRelationsJob {
 			spark -> {
 				removeOutputDir(spark, outputPath);
 				prepareRelationsRDD(
-					spark, inputType, inputGraph, outputPath, relationFilter, sourceMaxRelations, targetMaxRelations,
-					relPartitions);
+					spark, inputType, inputGraph, outputPath, relationFilter, sourceMaxRelations, targetMaxRelations);
 			});
 	}
 
@@ -121,10 +117,9 @@ public class PrepareRelationsJob {
 	 * @param relationFilter set of relation filters applied to the `relClass` field
 	 * @param sourceMaxRelations maximum number of allowed outgoing edges grouping by relation.source
 	 * @param targetMaxRelations maximum number of allowed outgoing edges grouping by relation.target
-	 * @param relPartitions number of partitions for the output RDD
 	 */
 	private static void prepareRelationsRDD(SparkSession spark, InputType inputType, String inputGraph, String outputPath,
-                                            Set<String> relationFilter, int sourceMaxRelations, int targetMaxRelations, int relPartitions) {
+                                            Set<String> relationFilter, int sourceMaxRelations, int targetMaxRelations) {
 
 		WindowSpec source_w = Window
 			.partitionBy("source", "subRelType")
@@ -147,7 +142,6 @@ public class PrepareRelationsJob {
 			.withColumn("target_w_pos", functions.row_number().over(target_w))
 			.where("target_w_pos < " + targetMaxRelations)
 			.drop("target_w_pos")
-			.coalesce(relPartitions)
 			.write()
 			.mode(SaveMode.Overwrite)
 			.parquet(outputPath);

@@ -2,16 +2,19 @@
 package eu.dnetlib.dhp.utils;
 
 import java.io.*;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.google.common.base.Splitter;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.math3.geometry.spherical.oned.ArcsSet;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -191,6 +194,49 @@ public class DHPUtils {
 
 		populateOOZIEEnv(report);
 	}
+
+    /**
+     * Reads graph contents from given input based on specified input type and the specified entityType.
+     *
+     * @param spark the spark session
+     * @param input must be either the graph base path on HDFS storing the newline delimited json records, or the DB name
+     * @param entityClazz identifies the graph entity to be read (e.g., "relation", "publication", etc.)
+     * @param encoder the encoder for the graph entity
+     * @return the dataset representing the graph entity
+     */
+    private static <T extends Oaf> Dataset<Row> _readGraph(SparkSession spark, URI input, Class<T> entityClazz, Encoder<T> encoder) {
+
+        log.info("reading graph from {}", input);
+
+        final GraphUriScheme scheme = StringUtils.isBlank(input.getScheme()) ?
+                GraphUriScheme.FILE : GraphUriScheme.valueOf(input.getScheme().toUpperCase());
+
+        switch (scheme) {
+            case HDFS:
+            case S3A:
+            case FILE:
+                final String path = input + "/" + entityClazz.getSimpleName().toLowerCase();
+                return spark
+                        .read()
+                        .schema(encoder.schema())
+                        .json(path);
+            case HIVE:
+                final Iterator<String> pathParts = Splitter.on("/")
+                        .omitEmptyStrings()
+                        .trimResults()
+                        .split(input.getPath())
+                        .iterator();
+                if (!pathParts.hasNext()) {
+                    throw new IllegalArgumentException("Invalid path: " + input.getPath());
+                }
+                final String dbName = pathParts.next();
+                return spark
+                        .read()
+                        .table(dbName + "." + entityClazz.getSimpleName().toLowerCase());
+            default:
+                throw new IllegalArgumentException("Unsupported input URI scheme: " + input.getScheme());
+        }
+    }
 
     /**
      * Reads graph contents from given input based on specified input type and the specified entityType.

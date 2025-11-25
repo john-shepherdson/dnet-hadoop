@@ -83,6 +83,9 @@ public class CreateRelatedEntitiesJob_phase1 {
 
         SparkConf conf = new SparkConf();
         conf.set("hive.metastore.uris", hiveMetastoreUris);
+        conf.set("spark.hadoop.hive.metastore.uris", hiveMetastoreUris);
+        conf.set("spark.sql.catalogImplementation", "hive");
+
 		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
 		conf.registerKryoClasses(ProvisionModelSupport.getModelClasses());
 
@@ -105,7 +108,6 @@ public class CreateRelatedEntitiesJob_phase1 {
 				(MapFunction<Relation, Tuple2<String, Relation>>) r -> new Tuple2<>(r.getTarget(),
 					r),
 				Encoders.tuple(Encoders.STRING(), Encoders.kryo(Relation.class)));
-
 
         final Dataset<Tuple2<String, RelatedEntity>> entities = DHPUtils.readGraphAs(spark, inputType, inputGraph, clazz)
                 .filter("dataInfo.invisible == false")

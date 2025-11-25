@@ -136,7 +136,6 @@
             <arg>--sourceMaxRelations</arg><arg>${sourceMaxRelations}</arg>
             <arg>--targetMaxRelations</arg><arg>${targetMaxRelations}</arg>
             <arg>--relationFilter</arg><arg>${relationFilter}</arg>
-            <arg>--relPartitions</arg><arg>15000</arg>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
         </spark>
         <ok to="fork_join_related_entities"/>
@@ -368,7 +367,6 @@
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--inputRelatedEntitiesPath</arg><arg>${workingDir}/join_partial</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_entities/publication</arg>
-            <arg>--numPartitions</arg><arg>30000</arg>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
         </spark>
         <ok to="wait_join_phase2"/>
@@ -387,11 +385,11 @@
                 ${sparkResourceOpts}
                 --conf spark.sql.shuffle.partitions=10000
             </spark-opts>
-            <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/dataset</arg>
+            <arg>--inputType</arg><arg>${inputType}</arg>
+            <arg>--inputGraph</arg><arg>${inputGraph}</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--inputRelatedEntitiesPath</arg><arg>${workingDir}/join_partial</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_entities/dataset</arg>
-            <arg>--numPartitions</arg><arg>20000</arg>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
         </spark>
         <ok to="wait_join_phase2"/>
@@ -410,11 +408,11 @@
                 ${sparkResourceOpts}
                 --conf spark.sql.shuffle.partitions=8000
             </spark-opts>
-            <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/otherresearchproduct</arg>
+            <arg>--inputType</arg><arg>${inputType}</arg>
+            <arg>--inputGraph</arg><arg>${inputGraph}</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--inputRelatedEntitiesPath</arg><arg>${workingDir}/join_partial</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_entities/otherresearchproduct</arg>
-            <arg>--numPartitions</arg><arg>10000</arg>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
         </spark>
         <ok to="wait_join_phase2"/>
@@ -433,11 +431,11 @@
                 ${sparkResourceOpts}
                 --conf spark.sql.shuffle.partitions=5000
             </spark-opts>
-            <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/software</arg>
+            <arg>--inputType</arg><arg>${inputType}</arg>
+            <arg>--inputGraph</arg><arg>${inputGraph}</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--inputRelatedEntitiesPath</arg><arg>${workingDir}/join_partial</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_entities/software</arg>
-            <arg>--numPartitions</arg><arg>10000</arg>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
         </spark>
         <ok to="wait_join_phase2"/>
@@ -456,11 +454,11 @@
                 ${sparkResourceOpts}
                 --conf spark.sql.shuffle.partitions=8000
             </spark-opts>
-            <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/datasource</arg>
+            <arg>--inputType</arg><arg>${inputType}</arg>
+            <arg>--inputGraph</arg><arg>${inputGraph}</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Datasource</arg>
             <arg>--inputRelatedEntitiesPath</arg><arg>${workingDir}/join_partial</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_entities/datasource</arg>
-            <arg>--numPartitions</arg><arg>1000</arg>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
         </spark>
         <ok to="wait_join_phase2"/>
@@ -479,11 +477,11 @@
                 ${sparkResourceOpts}
                 --conf spark.sql.shuffle.partitions=10000
             </spark-opts>
-            <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/organization</arg>
+            <arg>--inputType</arg><arg>${inputType}</arg>
+            <arg>--inputGraph</arg><arg>${inputGraph}</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Organization</arg>
             <arg>--inputRelatedEntitiesPath</arg><arg>${workingDir}/join_partial</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_entities/organization</arg>
-            <arg>--numPartitions</arg><arg>20000</arg>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
         </spark>
         <ok to="wait_join_phase2"/>
@@ -502,11 +500,11 @@
                 ${sparkResourceOpts}
                 --conf spark.sql.shuffle.partitions=5000
             </spark-opts>
-            <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/project</arg>
+            <arg>--inputType</arg><arg>${inputType}</arg>
+            <arg>--inputGraph</arg><arg>${inputGraph}</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Project</arg>
             <arg>--inputRelatedEntitiesPath</arg><arg>${workingDir}/join_partial</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_entities/project</arg>
-            <arg>--numPartitions</arg><arg>10000</arg>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
         </spark>
         <ok to="wait_join_phase2"/>
@@ -525,11 +523,11 @@
                 ${sparkResourceOpts}
                 --conf spark.sql.shuffle.partitions=5000
             </spark-opts>
-            <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/person</arg>
+            <arg>--inputType</arg><arg>${inputType}</arg>
+            <arg>--inputGraph</arg><arg>${inputGraph}</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Person</arg>
             <arg>--inputRelatedEntitiesPath</arg><arg>${workingDir}/join_partial</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_entities/person</arg>
-            <arg>--numPartitions</arg><arg>10000</arg>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
         </spark>
         <ok to="wait_join_phase2"/>

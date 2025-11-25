@@ -77,9 +77,6 @@ public class CreateRelatedEntitiesJob_phase2 {
 		String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
 
-		int numPartitions = Integer.parseInt(parser.get("numPartitions"));
-		log.info("numPartitions: {}", numPartitions);
-
 		String graphTableClassName = parser.get("graphTableClassName");
 		log.info("graphTableClassName: {}", graphTableClassName);
 
@@ -90,6 +87,9 @@ public class CreateRelatedEntitiesJob_phase2 {
 
         SparkConf conf = new SparkConf();
         conf.set("hive.metastore.uris", hiveMetastoreUris);
+        conf.set("spark.hadoop.hive.metastore.uris", hiveMetastoreUris);
+        conf.set("spark.sql.catalogImplementation", "hive");
+
 		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
 		conf.registerKryoClasses(ProvisionModelSupport.getModelClasses());
 
@@ -99,7 +99,7 @@ public class CreateRelatedEntitiesJob_phase2 {
 			spark -> {
 				removeOutputDir(spark, outputPath);
 				joinEntityWithRelatedEntities(
-					spark, inputRelatedEntitiesPath, inputType, inputGraph, outputPath, numPartitions, entityClazz);
+					spark, inputRelatedEntitiesPath, inputType, inputGraph, outputPath, entityClazz);
 			});
 	}
 
@@ -109,7 +109,6 @@ public class CreateRelatedEntitiesJob_phase2 {
         final InputType inputType,
         final String inputGraph,
 		final String outputPath,
-		int numPartitions,
 		Class<E> entityClazz) {
 
         log.info("Reading Graph table from: {}", inputGraph);

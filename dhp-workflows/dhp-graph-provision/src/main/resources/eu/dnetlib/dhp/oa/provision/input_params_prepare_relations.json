@@ -30,12 +30,6 @@
     "paramRequired": true
   },
   {
-    "paramName": "rp",
-    "paramLongName": "relPartitions",
-    "paramDescription": "number or partitions for the relations Dataset",
-    "paramRequired": false
-  },
-  {
     "paramName": "rf",
     "paramLongName": "relationFilter",
     "paramDescription": "filter applied reading relations (by relClass)",
