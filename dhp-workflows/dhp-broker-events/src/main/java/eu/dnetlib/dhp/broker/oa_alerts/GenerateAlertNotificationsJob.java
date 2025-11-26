@@ -1,11 +1,14 @@
 
 package eu.dnetlib.dhp.broker.oa_alerts;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -93,74 +96,93 @@ public class GenerateAlertNotificationsJob {
 
 		if (StringUtils.isAnyBlank(dsId, compatibilityLevel, inputPath, brokerApiBaseUrl)) { throw new RuntimeException("A required information is missing"); }
 
-		final ValidationType validationType = calculateValidationType(compatibilityLevel);
+		final List<ValidationType> validationTypes = calculateValidationTypes(compatibilityLevel);
 
-		if (validationType == null) {
+		if (validationTypes.isEmpty()) {
 			log.warn("The compatibility is non managed by the validator engine");
-			return;
 		}
 
-		final String topic = TOPIC_PREFIX + StringUtils.upperCase(validationType.toString());
+		final Set<String> topics = validationTypes.stream()
+				.map(GenerateAlertNotificationsJob::asTopic)
+				.collect(Collectors.toSet());
 
-		log.info("topic: {}", topic);
+		topics.forEach(t -> log.info("topic: {}", t));
 
 		final Subscription[] allSubscriptions = BrokerApiClient.listSubscriptions(brokerApiBaseUrl);
 
-		final List<Subscription> validSubscriptions = Arrays.stream(allSubscriptions)
-				.filter(s -> s.getTopic().equalsIgnoreCase(topic))
+		final Map<String, List<Subscription>> validSubscriptions = Arrays.stream(allSubscriptions)
+				.filter(s -> topics.contains(s.getTopic()))
 				.filter(s -> extractDatasourceId(s).equalsIgnoreCase(dsId))
-				.collect(Collectors.toList());
+				.collect(Collectors.groupingBy(Subscription::getTopic));
 
-		log.info("Number of valid subscriptions: {}/{}", validSubscriptions.size(), allSubscriptions.length);
+		log.info("Number of valid subscriptions: {}/{}", validSubscriptions.values()
+				.stream()
+				.flatMap(List::stream)
+				.count(), allSubscriptions.length);
+
+		final Long date = new Date().getTime();
+		log.info("date: {}", date);
 
 		final SparkConf conf = new SparkConf();
 
 		SparkSessionSupport.runWithSparkSession(conf, isSparkSessionManaged, spark -> {
 
-			final Dataset<ValidatorAlertMessage> payloads = spark
-					.read()
-					.parquet(inputPath)
-					.as(Encoders.bean(MetadataRecord.class))
-					.filter((FilterFunction<MetadataRecord>) r -> r.getValidationResults() != null)
-					.filter((FilterFunction<MetadataRecord>) r -> r.getValidationResults().containsKey(validationType))
-					.map((MapFunction<MetadataRecord, ValidatorAlertMessage>) r -> generatePayload(r.getOriginalId(), extractTitle(r), dsId, dsName, r
-							.getValidationResults()
-							.get(validationType)), Encoders
-									.bean(ValidatorAlertMessage.class));
+			final List<Dataset<OaAlertNotification>> datasets = new ArrayList<>();
 
-			final long count = payloads.count();
+			for (final ValidationType type : validationTypes) {
+				final String topic = asTopic(type);
 
-			log.info("Number of events: {}", count);
+				final Dataset<ValidatorAlertMessage> payloads = spark
+						.read()
+						.parquet(inputPath)
+						.as(Encoders.bean(MetadataRecord.class))
+						.filter((FilterFunction<MetadataRecord>) r -> r.getValidationResults() != null)
+						.filter((FilterFunction<MetadataRecord>) r -> r.getValidationResults().containsKey(type))
+						.map((MapFunction<MetadataRecord, ValidatorAlertMessage>) r -> generatePayload(r.getOriginalId(), extractTitle(r), dsId, dsName, r
+								.getValidationResults()
+								.get(type)), Encoders
+										.bean(ValidatorAlertMessage.class));
 
-			final DatasourceStats stats = new DatasourceStats();
-			stats.setId(dsId);
-			stats.setName(dsName);
-			stats.setType("-"); // TODO
-			stats.setTopic(topic);
-			stats.setSize(count);
+				final long count = payloads.count();
 
-			BrokerApiClient.updateAlertStats(brokerApiBaseUrl, stats);
+				log.info("Number of events for topic {}: {}", topic, count);
 
-			final Long date = new Date().getTime();
+				final DatasourceStats stats = new DatasourceStats();
+				stats.setId(dsId);
+				stats.setName(dsName);
+				stats.setType("-"); // TODO
+				stats.setTopic(topic);
+				stats.setSize(count);
 
-			log.info("date: {}", date);
+				BrokerApiClient.updateAlertStats(brokerApiBaseUrl, stats);
+
+				if (validSubscriptions.size() > 0) {
+					final Dataset<OaAlertNotification> alertDataset = payloads
+							.flatMap((FlatMapFunction<ValidatorAlertMessage, OaAlertNotification>) p -> generateAlertNotifications(p, date, validSubscriptions
+									.get(topic)), Encoders
+											.bean(OaAlertNotification.class))
+							.filter((FilterFunction<OaAlertNotification>) n -> StringUtils.isNotBlank(n.getPayload()));
+
+					datasets.add(alertDataset);
+				} else {
+					datasets.add(spark.emptyDataset(Encoders.bean(OaAlertNotification.class)));
+				}
+			}
+
+			final Dataset<OaAlertNotification> toSaveDataset = datasets.stream()
+					.reduce(Dataset::union)
+					.orElseGet(() -> spark.emptyDataset(Encoders.bean(OaAlertNotification.class)));
 
 			final LongAccumulator total = spark.sparkContext().longAccumulator("total_alert_notifications");
-
-			if (validSubscriptions.size() > 0) {
-				final Dataset<OaAlertNotification> dataset =
-						payloads.flatMap((FlatMapFunction<ValidatorAlertMessage, OaAlertNotification>) p -> generateAlertNotifications(p, date, validSubscriptions), Encoders
-								.bean(OaAlertNotification.class))
-								.filter((FilterFunction<OaAlertNotification>) n -> StringUtils.isNotBlank(n.getPayload()));
-
-				ClusterUtils.save(dataset, outputPath, OaAlertNotification.class, total);
-			} else {
-				ClusterUtils.save(spark.emptyDataset(Encoders.bean(OaAlertNotification.class)), outputPath, OaAlertNotification.class, total);
-			}
+			ClusterUtils.save(toSaveDataset, outputPath, OaAlertNotification.class, total);
 
 			log.info("Number of notifications: {}", total.value());
 
 		});
+	}
+
+	private static String asTopic(final ValidationType t) {
+		return TOPIC_PREFIX + StringUtils.upperCase(t.toString());
 	}
 
 	private static String extractTitle(final MetadataRecord r) {
@@ -174,14 +196,21 @@ public class GenerateAlertNotificationsJob {
 		return "-";
 	}
 
-	private static ValidationType calculateValidationType(final String compatibilityLevel) {
-		if ("openaire2.0".equalsIgnoreCase(compatibilityLevel)) { return ValidationType.openaire2_0; }
-		if ("openaire3.0".equalsIgnoreCase(compatibilityLevel)) { return ValidationType.openaire3_0; }
-		if ("openaire4.0".equalsIgnoreCase(compatibilityLevel)) { return ValidationType.openaire4_0; }
-		if ("fair_data".equalsIgnoreCase(compatibilityLevel)) { return ValidationType.fair_data; }
-		if ("fair_literature_v4".equalsIgnoreCase(compatibilityLevel)) { return ValidationType.fair_literature_v4; }
+	private static List<ValidationType> calculateValidationTypes(final String compatibilityLevel) {
 
-		return null;
+		switch (compatibilityLevel) {
+		case "openaire2.0":
+			return Arrays.asList(ValidationType.openaire2_0);
+		case "openaire3.0":
+			return Arrays.asList(ValidationType.openaire3_0);
+		case "openaire4.0":
+			return Arrays.asList(ValidationType.openaire4_0, ValidationType.fair_literature_v4);
+		case "openaire2.0_data":
+			return Arrays.asList(ValidationType.fair_data);
+		default:
+			return new ArrayList<>();
+		}
+
 	}
 
 	private static Iterator<OaAlertNotification> generateAlertNotifications(final ValidatorAlertMessage alertMessage,
