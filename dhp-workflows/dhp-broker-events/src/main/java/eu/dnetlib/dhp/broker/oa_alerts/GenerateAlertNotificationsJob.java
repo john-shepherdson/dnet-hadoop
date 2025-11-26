@@ -123,9 +123,9 @@ public class GenerateAlertNotificationsJob {
 		final Long date = new Date().getTime();
 		log.info("date: {}", date);
 
-		final SparkConf conf = new SparkConf();
+		BrokerApiClient.clearAlertStats(brokerApiBaseUrl, dsId);
 
-		SparkSessionSupport.runWithSparkSession(conf, isSparkSessionManaged, spark -> {
+		SparkSessionSupport.runWithSparkSession(new SparkConf(), isSparkSessionManaged, spark -> {
 
 			final List<Dataset<OaAlertNotification>> datasets = new ArrayList<>();
 

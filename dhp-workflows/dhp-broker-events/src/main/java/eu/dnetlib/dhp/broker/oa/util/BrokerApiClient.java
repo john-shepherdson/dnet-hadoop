@@ -44,6 +44,11 @@ public class BrokerApiClient {
 		return performHttpGet(url, String.class, res -> IOUtils.toString(res.getEntity().getContent()));
 	}
 
+	public static String clearAlertStats(final String brokerApiBaseUrl, final String dsId) throws IOException {
+		final String url = brokerApiBaseUrl + "/api/openaire-alerts/stats/clearForDatasource?dsId=" + dsId;
+		return performHttpGet(url, String.class, res -> IOUtils.toString(res.getEntity().getContent()));
+	}
+
 	public static void updateAlertStats(final String brokerApiBaseUrl, final DatasourceStats stats) throws IOException {
 		final String url = brokerApiBaseUrl + "/api/openaire-alerts/stats/update";
 		performHttpPostJson(url, stats);
