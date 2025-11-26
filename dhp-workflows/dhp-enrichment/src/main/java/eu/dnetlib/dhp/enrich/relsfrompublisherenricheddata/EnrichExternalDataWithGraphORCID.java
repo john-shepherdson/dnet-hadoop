@@ -33,6 +33,7 @@ import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import eu.dnetlib.dhp.utils.DHPUtils;
 import eu.dnetlib.dhp.utils.ORCIDAuthorEnricherResult;
 import eu.dnetlib.dhp.utils.OrcidAuthor;
+import scala.Option;
 import scala.Tuple2;
 
 public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthors {
@@ -139,7 +140,7 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 					return new Tuple2<>(k, pa);
 				}, Encoders.tuple(Encoders.STRING(), Encoders.bean(PublisherAuthors.class)))
 			.selectExpr("_1 as id", "_2.publisherAuthorList as graph_authors");
-authors.show(false);
+//authors.show(false);
 		orcidDnet
 			.join(authors, "id")
 			.write()
@@ -216,15 +217,20 @@ authors.show(false);
 
 	}
 
+	private static String getValue(List<Row> authorPids, String classid){
+		Optional<Row> tmp = authorPids.stream().filter(p -> {
+			if (p == null)
+				return false;
+			Row qualifier = p.getAs("qualifier");
+			return qualifier.getAs("classid").equals(classid);
+		}).findFirst();
+        return tmp.<String>map(row -> row.getAs("value")).orElse(null);
+    }
+
 	private static String getOrcid(Row a) {
 		List<Row> authorPids = a.getList(a.fieldIndex("pid"));
-		return authorPids.stream().filter(p -> {
-			Row qualifier = p.getAs("qualifier");
-			return qualifier.getAs("classid").equals("orcid");
-		}).findFirst().map(p -> (String) p.getAs("value")).orElse(authorPids.stream().filter(p -> {
-			Row qualifier = p.getAs("qualifier");
-			return qualifier.getAs("classid").equals("orcid_pending");
-		}).findFirst().map(p -> (String) p.getAs("value")).orElse(null));
+		String value = getValue(authorPids, "orcid");
+		return value != null ? value : getValue(authorPids, "orcid_pending");
 
 	}
 
@@ -332,17 +338,23 @@ authors.show(false);
 		List<Row> eauthors = r.getList(r.fieldIndex("enriched_author"));
 
 		eauthors.forEach(author -> {
+
 			List<Row> pids = author.getList(author.fieldIndex("pid"));
 
-			List<Row> pidList = pids
-				.stream()
-				.filter(
-					p -> {
-						Row qualifier = p.getAs("qualifier");
-						return ModelConstants.ORCID.equalsIgnoreCase(qualifier.getAs("classid"))
-							|| ModelConstants.ORCID_PENDING.equalsIgnoreCase(qualifier.getAs("classid"));
+			List<Row> pidList = Optional.ofNullable(pids)
+					.map(p -> p.stream().filter(pid -> {
+
+						if(Optional.ofNullable(pid).isPresent() && Optional.ofNullable(pid.getAs("qualifier")).isPresent()){
+							Row q = pid.getAs("qualifier");
+							return ModelConstants.ORCID.equalsIgnoreCase(q.getAs("classid"))
+									|| ModelConstants.ORCID_PENDING.equalsIgnoreCase(q.getAs("classid"));
+						}
+						return false;
 					})
-				.collect(Collectors.toList());
+
+							.collect(Collectors.toList()))
+				.orElse(new ArrayList<>())
+				;
 			pidList
 				.forEach(
 					p -> relationList
@@ -426,7 +438,7 @@ authors.show(false);
 		return rel;
 	}
 
-	private static @NotNull Author getAuthor(Row a) throws JsonProcessingException {
+	private static Author getAuthor(Row a) throws JsonProcessingException {
 		Author author = new Author();
 
 		author.setName(a.getAs("firstname"));
@@ -440,26 +452,27 @@ authors.show(false);
 			publisherPids = a.getList(a.fieldIndex("pids"));
 
 		publisherPids.forEach(pid -> pids.add(getPid(pid)));
-
-		List<Row> affiliations = a.getList(a.fieldIndex("affiliations"));
 		SerializationBean sb = new SerializationBean();
-		// "`Matchings`: ARRAY<STRUCT<`PID`:STRING, `Value`:STRING,`Confidence`:DOUBLE, `Status`:STRING>>,
-		sb.setAffs(affiliations.stream().map(
-				aff -> {
-					if(aff.getAs("status").equals("active")){
-						SerializationOrg so = new SerializationOrg();
-						if("ror".equalsIgnoreCase(aff.getAs("pid")))
-							so.setRor(aff.getAs("value"));
-						else
-							so.setOpenOrgs(aff.getAs("value"));
-						so.setConfidence(aff.getAs("confidence"));
-						so.setName(aff.getAs("name"));
-						so.setCountry(aff.getAs("country"));
-						return so;
-					}
-					return null;
-				}
-		).filter(Objects::nonNull).collect(Collectors.toList()));
+		List<Row> affiliations = a.getList(a.fieldIndex("affiliations"));
+		sb.setAffs(Optional.ofNullable(affiliations)
+				.map(v -> v.stream().map(
+						aff -> {
+							if(aff.getAs("status").equals("active")){
+								SerializationOrg so = new SerializationOrg();
+								if("ror".equalsIgnoreCase(aff.getAs("pid")))
+									so.setRor(aff.getAs("value"));
+								else
+									so.setOpenOrgs(aff.getAs("value"));
+								so.setConfidence(aff.getAs("confidence"));
+								so.setName(aff.getAs("name"));
+								so.setCountry(aff.getAs("country"));
+								return so;
+							}
+							return null;
+						}
+				).filter(Objects::nonNull).collect(Collectors.toList()))
+				.orElse(Collections.emptyList()));
+
 
 		List<Row> roles = a.getList(a.fieldIndex("roles"));
 		if(Optional.ofNullable(roles).isPresent())
