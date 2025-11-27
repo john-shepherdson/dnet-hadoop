@@ -1,7 +1,7 @@
 
 package eu.dnetlib.dhp.oa.provision;
 
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 
 import java.util.List;
 import java.util.Objects;
@@ -9,6 +9,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import eu.dnetlib.dhp.oa.provision.model.SemiJoinedEntity;
+import eu.dnetlib.dhp.utils.DHPUtils;
+import eu.dnetlib.dhp.utils.InputType;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
@@ -20,7 +22,6 @@ import org.apache.spark.sql.expressions.Aggregator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
@@ -44,8 +45,6 @@ public class CreateRelatedEntitiesJob_phase2 {
 
 	private static final Logger log = LoggerFactory.getLogger(CreateRelatedEntitiesJob_phase2.class);
 
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
 	public static void main(String[] args) throws Exception {
 
 		String jsonConfiguration = IOUtils
@@ -67,43 +66,59 @@ public class CreateRelatedEntitiesJob_phase2 {
 		String inputRelatedEntitiesPath = parser.get("inputRelatedEntitiesPath");
 		log.info("inputRelatedEntitiesPath: {}", inputRelatedEntitiesPath);
 
-		String inputEntityPath = parser.get("inputEntityPath");
-		log.info("inputEntityPath: {}", inputEntityPath);
+        final InputType inputType = Optional.ofNullable(parser.get("inputType"))
+                .map(InputType::valueOf)
+                .orElse(InputType.HDFS_JSON);
+        log.info("inputType: {}", inputType);
+
+        final String inputGraph = parser.get("inputGraph");
+        log.info("inputGraph: {}", inputGraph);
 
 		String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
-
-		int numPartitions = Integer.parseInt(parser.get("numPartitions"));
-		log.info("numPartitions: {}", numPartitions);
 
 		String graphTableClassName = parser.get("graphTableClassName");
 		log.info("graphTableClassName: {}", graphTableClassName);
 
 		Class<? extends OafEntity> entityClazz = (Class<? extends OafEntity>) Class.forName(graphTableClassName);
 
-		SparkConf conf = new SparkConf();
+        String hiveMetastoreUris = parser.get("hiveMetastoreUris");
+        log.info("hiveMetastoreUris: {}", hiveMetastoreUris);
+
+        SparkConf conf = new SparkConf();
+        conf.set("hive.metastore.uris", hiveMetastoreUris);
+        conf.set("spark.hadoop.hive.metastore.uris", hiveMetastoreUris);
+        conf.set("spark.sql.catalogImplementation", "hive");
+
 		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
 		conf.registerKryoClasses(ProvisionModelSupport.getModelClasses());
 
-		runWithSparkSession(
+        runWithSparkHiveSession(
 			conf,
 			isSparkSessionManaged,
 			spark -> {
 				removeOutputDir(spark, outputPath);
 				joinEntityWithRelatedEntities(
-					spark, inputRelatedEntitiesPath, inputEntityPath, outputPath, numPartitions, entityClazz);
+					spark, inputRelatedEntitiesPath, inputType, inputGraph, outputPath, entityClazz);
 			});
 	}
 
 	private static <E extends OafEntity> void joinEntityWithRelatedEntities(
-		SparkSession spark,
-		String relatedEntitiesPath,
-		String entityPath,
-		String outputPath,
-		int numPartitions,
+		final SparkSession spark,
+		final String relatedEntitiesPath,
+        final InputType inputType,
+        final String inputGraph,
+		final String outputPath,
 		Class<E> entityClazz) {
 
-		Dataset<Tuple2<String, E>> entities = readPathEntity(spark, entityPath, entityClazz);
+        log.info("Reading Graph table from: {}", inputGraph);
+        Dataset<Tuple2<String, E>> entities = DHPUtils.readGraphAs(spark, inputType, inputGraph, entityClazz)
+                .filter("dataInfo.invisible == false")
+                .map((MapFunction<E, E>) e -> pruneOutliers(entityClazz, e), Encoders.bean(entityClazz))
+                .map(
+                        (MapFunction<E, Tuple2<String, E>>) e -> new Tuple2<>(e.getId(), e),
+                        Encoders.tuple(Encoders.STRING(), Encoders.kryo(entityClazz)));
+
 		Dataset<Tuple2<String, RelatedEntityWrapper>> relatedEntities = readRelatedEntities(
 			spark, relatedEntitiesPath, entityClazz);
 
@@ -194,23 +209,6 @@ public class CreateRelatedEntitiesJob_phase2 {
 				(MapFunction<RelatedEntityWrapper, Tuple2<String, RelatedEntityWrapper>>) value -> new Tuple2<>(
 					value.getRelation().getSource(), value),
 				Encoders.tuple(Encoders.STRING(), Encoders.kryo(RelatedEntityWrapper.class)));
-	}
-
-	private static <E extends OafEntity> Dataset<Tuple2<String, E>> readPathEntity(
-		SparkSession spark, String inputEntityPath, Class<E> entityClazz) {
-
-		log.info("Reading Graph table from: {}", inputEntityPath);
-		return spark
-			.read()
-			.textFile(inputEntityPath)
-			.map(
-				(MapFunction<String, E>) value -> OBJECT_MAPPER.readValue(value, entityClazz),
-				Encoders.bean(entityClazz))
-			.filter("dataInfo.invisible == false")
-			.map((MapFunction<E, E>) e -> pruneOutliers(entityClazz, e), Encoders.bean(entityClazz))
-			.map(
-				(MapFunction<E, Tuple2<String, E>>) e -> new Tuple2<>(e.getId(), e),
-				Encoders.tuple(Encoders.STRING(), Encoders.kryo(entityClazz)));
 	}
 
 	private static <E extends OafEntity> E pruneOutliers(Class<E> entityClazz, E e) {
