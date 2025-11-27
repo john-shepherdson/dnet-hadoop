@@ -1,28 +1,24 @@
 
 package eu.dnetlib.dhp.oa.provision;
 
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 import static org.apache.spark.sql.functions.col;
 
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
+import eu.dnetlib.dhp.utils.DHPUtils;
+import eu.dnetlib.dhp.utils.InputType;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.SaveMode;
-import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.*;
 import org.apache.spark.sql.expressions.Window;
 import org.apache.spark.sql.expressions.WindowSpec;
-import org.apache.spark.sql.functions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Sets;
 
@@ -38,8 +34,6 @@ import eu.dnetlib.dhp.schema.oaf.Relation;
 public class PrepareRelationsJob {
 
 	private static final Logger log = LoggerFactory.getLogger(PrepareRelationsJob.class);
-
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	public static final int MAX_RELS = 100;
 
@@ -60,17 +54,16 @@ public class PrepareRelationsJob {
 			.orElse(Boolean.TRUE);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-		String inputRelationsPath = parser.get("inputRelationsPath");
-		log.info("inputRelationsPath: {}", inputRelationsPath);
+        InputType inputType = Optional.ofNullable(parser.get("inputType"))
+                .map(InputType::valueOf)
+                .orElse(InputType.HDFS_JSON);
+        log.info("inputType: {}", inputType);
+
+		String inputGraph = parser.get("inputGraph");
+		log.info("inputGraph: {}", inputGraph);
 
 		String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
-
-		int relPartitions = Optional
-			.ofNullable(parser.get("relPartitions"))
-			.map(Integer::valueOf)
-			.orElse(DEFAULT_NUM_PARTITIONS);
-		log.info("relPartitions: {}", relPartitions);
 
 		Set<String> relationFilter = Optional
 			.ofNullable(parser.get("relationFilter"))
@@ -91,18 +84,24 @@ public class PrepareRelationsJob {
 			.orElse(MAX_RELS);
 		log.info("targetMaxRelations: {}", targetMaxRelations);
 
-		SparkConf conf = new SparkConf();
+        String hiveMetastoreUris = parser.get("hiveMetastoreUris");
+        log.info("hiveMetastoreUris: {}", hiveMetastoreUris);
+
+        SparkConf conf = new SparkConf();
+        conf.set("hive.metastore.uris", hiveMetastoreUris);
+        conf.set("spark.hadoop.hive.metastore.uris", hiveMetastoreUris);
+        conf.set("spark.sql.catalogImplementation", "hive");
+
 		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
 		conf.registerKryoClasses(ProvisionModelSupport.getModelClasses());
 
-		runWithSparkSession(
+		runWithSparkHiveSession(
 			conf,
 			isSparkSessionManaged,
 			spark -> {
 				removeOutputDir(spark, outputPath);
 				prepareRelationsRDD(
-					spark, inputRelationsPath, outputPath, relationFilter, sourceMaxRelations, targetMaxRelations,
-					relPartitions);
+					spark, inputType, inputGraph, outputPath, relationFilter, sourceMaxRelations, targetMaxRelations);
 			});
 	}
 
@@ -112,15 +111,15 @@ public class PrepareRelationsJob {
 	 * prioritized according to the weights indicated in eu.dnetlib.dhp.oa.provision.model.SortableRelation.
 	 *
 	 * @param spark the spark session
-	 * @param inputRelationsPath source path for the graph relations
+     * @param inputType type of input relations
+	 * @param inputGraph source path for the graph relations
 	 * @param outputPath output path for the processed relations
 	 * @param relationFilter set of relation filters applied to the `relClass` field
 	 * @param sourceMaxRelations maximum number of allowed outgoing edges grouping by relation.source
 	 * @param targetMaxRelations maximum number of allowed outgoing edges grouping by relation.target
-	 * @param relPartitions number of partitions for the output RDD
 	 */
-	private static void prepareRelationsRDD(SparkSession spark, String inputRelationsPath, String outputPath,
-		Set<String> relationFilter, int sourceMaxRelations, int targetMaxRelations, int relPartitions) {
+	private static void prepareRelationsRDD(SparkSession spark, InputType inputType, String inputGraph, String outputPath,
+                                            Set<String> relationFilter, int sourceMaxRelations, int targetMaxRelations) {
 
 		WindowSpec source_w = Window
 			.partitionBy("source", "subRelType")
@@ -130,10 +129,7 @@ public class PrepareRelationsJob {
 			.partitionBy("target", "subRelType")
 			.orderBy(col("source").desc_nulls_last());
 
-		spark
-			.read()
-			.schema(Encoders.bean(Relation.class).schema())
-			.json(inputRelationsPath)
+        DHPUtils.readGraph(spark, inputType, inputGraph, Relation.class)
 			.where("source NOT LIKE 'unresolved%' AND  target  NOT LIKE 'unresolved%'")
 			.where("datainfo.deletedbyinference != true")
 			.where(
@@ -146,13 +142,12 @@ public class PrepareRelationsJob {
 			.withColumn("target_w_pos", functions.row_number().over(target_w))
 			.where("target_w_pos < " + targetMaxRelations)
 			.drop("target_w_pos")
-			.coalesce(relPartitions)
 			.write()
 			.mode(SaveMode.Overwrite)
 			.parquet(outputPath);
 	}
 
-	private static void removeOutputDir(SparkSession spark, String path) {
+    private static void removeOutputDir(SparkSession spark, String path) {
 		HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
 	}
 }
