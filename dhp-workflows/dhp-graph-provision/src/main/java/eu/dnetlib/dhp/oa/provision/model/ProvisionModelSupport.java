@@ -577,7 +577,7 @@ public class ProvisionModelSupport {
 						i.setAlternateIdentifier(asPid(instance.getAlternateIdentifier()));
 						i.setAccessright(mapAccessRight(instance.getAccessright()));
 						i.setInstancetype(mapQualifier(instance.getInstancetype()));
-						i.setLicense(mapField(instance.getLicense()));
+						i.setLicense(Optional.ofNullable(instance.getLicense()).map(License::getCleaned).orElse(null));
 						i.setUrl(instance.getUrl());
 						i.setRefereed(mapQualifier(instance.getRefereed()));
 						i.setDateofacceptance(mapField(instance.getDateofacceptance()));

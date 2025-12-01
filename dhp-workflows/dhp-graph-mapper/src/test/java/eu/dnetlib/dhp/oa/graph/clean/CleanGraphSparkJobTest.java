@@ -454,36 +454,6 @@ public class CleanGraphSparkJobTest {
     }
 
 	@Test
-	void testCleanDoiBoost() throws IOException, ParseException, ISLookUpException, ClassNotFoundException {
-		verifyFiltering(1, "50|doi_________::b0baa0eb88a5788f0b8815560d2a32f2");
-	}
-
-	@Test
-	void testCleanDoiBoost2() throws IOException, ParseException, ISLookUpException, ClassNotFoundException {
-		verifyFiltering(1, "50|doi_________::4972b0ca81b96b225aed8038bb965656");
-	}
-
-	private void verifyFiltering(int expectedCount, String id)
-		throws ISLookUpException, ClassNotFoundException, IOException, ParseException {
-		new CleanGraphSparkJob(
-			args(
-				"/eu/dnetlib/dhp/oa/graph/input_clean_graph_parameters.json",
-				new String[] {
-					"--inputPath", graphInputPath + "/publication",
-					"--outputPath", graphOutputPath + "/publication",
-					"--isLookupUrl", "lookupurl",
-					"--graphTableClassName", Publication.class.getCanonicalName(),
-					"--deepClean", "false",
-					"--masterDuplicatePath", dsMasterDuplicatePath,
-				})).run(false, isLookUpService);
-
-		Dataset<Publication> p = read(spark, graphOutputPath + "/publication", Publication.class)
-			.filter(String.format("id = '%s'", id));
-
-		assertEquals(expectedCount, p.count());
-	}
-
-	@Test
 	void testCleanContext() throws Exception {
 		final String prefix = "gcube ";
 

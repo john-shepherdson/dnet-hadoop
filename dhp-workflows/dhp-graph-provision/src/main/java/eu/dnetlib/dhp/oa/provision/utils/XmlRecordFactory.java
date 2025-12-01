@@ -1199,9 +1199,9 @@ public class XmlRecordFactory implements Serializable {
 								instanceFields.add(XmlSerializationUtils.mapQualifier("refereed", i.getRefereed()));
 							}
 
-							if (i.getLicense() != null && isNotBlank(i.getLicense().getValue())) {
+							if (i.getLicense() != null && isNotBlank(i.getLicense().getCleaned())) {
 								instanceFields
-									.add(XmlSerializationUtils.asXmlElement("license", i.getLicense().getValue()));
+									.add(XmlSerializationUtils.asXmlElement("license", i.getLicense().getCleaned()));
 							}
 							if (isNotBlank(i.getFulltext())) {
 								instanceFields.add(XmlSerializationUtils.asXmlElement("fulltext", i.getFulltext()));
@@ -1621,7 +1621,7 @@ public class XmlRecordFactory implements Serializable {
 				.ifPresent(d -> instance.getDateofacceptance().add(d.getValue()));
 			Optional
 				.ofNullable(i.getLicense())
-				.ifPresent(license -> instance.getLicense().add(license.getValue()));
+				.ifPresent(license -> instance.getLicense().add(license.getCleaned()));
 			Optional
 				.ofNullable(i.getDistributionlocation())
 				.ifPresent(dl -> instance.getDistributionlocation().add(dl));

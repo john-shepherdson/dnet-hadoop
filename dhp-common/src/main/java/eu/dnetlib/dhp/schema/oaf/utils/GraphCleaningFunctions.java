@@ -602,12 +602,12 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 							i.setRefereed(qualifier("0000", "Unknown", ModelConstants.DNET_REVIEW_LEVELS));
 						}
 
-						if (Objects.nonNull(i.getLicense()) && Objects.nonNull(i.getLicense().getValue())) {
+						if (Objects.nonNull(i.getLicense()) && Objects.nonNull(i.getLicense().getPreCleaned())) {
 							vocs
 								.find(DNET_LICENSES)
-								.map(voc -> voc.getTermBySynonym(i.getLicense().getValue()))
+								.map(voc -> voc.getTermBySynonym(i.getLicense().getPreCleaned()))
 								.map(VocabularyTerm::getId)
-								.ifPresent(license -> i.getLicense().setValue(license));
+								.ifPresent(license -> i.getLicense().setCleaned(license));
 						}
 
 						// from the script from Dimitris

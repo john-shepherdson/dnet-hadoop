@@ -608,7 +608,7 @@ object DataciteToOAFTransformation {
           )
         )
       if (license.isDefined)
-        instance.setLicense(OafMapperUtils.field(license.get, null))
+        instance.setLicense(OafMapperUtils.license(license.get))
     }
 
     val awardUris: List[String] = for {

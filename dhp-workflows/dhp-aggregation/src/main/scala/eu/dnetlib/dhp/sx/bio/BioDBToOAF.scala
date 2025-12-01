@@ -165,7 +165,7 @@ object BioDBToOAF {
 
     i.setAccessright(ModelConstants.OPEN_ACCESS_RIGHT())
     val ccby: Qualifier = vocabularies.getSynonymAsQualifier("dnet:licenses", "CC BY")
-    i.setLicense(OafMapperUtils.field(ccby.getClassname, null))
+    i.setLicense(OafMapperUtils.license(ccby.getClassname))
 
     i.setCollectedfrom(collectedFromMap("uniprot"))
     d.setInstance(List(i).asJava)
@@ -383,7 +383,7 @@ object BioDBToOAF {
     i.setInstanceTypeMapping(List(itm).asJava)
     i.setAccessright(ModelConstants.OPEN_ACCESS_RIGHT())
     val cc0: Qualifier = vocabularies.getSynonymAsQualifier("dnet:licenses", "cc0")
-    i.setLicense(OafMapperUtils.field(cc0.getClassname, null))
+    i.setLicense(OafMapperUtils.license(cc0.getClassname))
 
     i.setCollectedfrom(collectedFromMap("pdb"))
     d.setInstance(List(i).asJava)
@@ -513,7 +513,7 @@ object BioDBToOAF {
       )
     )
     i.setAccessright(ModelConstants.OPEN_ACCESS_RIGHT())
-    i.setLicense(OafMapperUtils.field("CC 0", null))
+    i.setLicense(OafMapperUtils.license("CC 0"))
     val itm = new InstanceTypeMapping
     itm.setOriginalType("Bioentity")
     itm.setVocabularyName(ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1)

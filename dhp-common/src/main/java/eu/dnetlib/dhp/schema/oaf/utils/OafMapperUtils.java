@@ -40,6 +40,10 @@ public class OafMapperUtils {
 		return list;
 	}
 
+    public static License license(String original) {
+        return License.from(original, null, null);
+    }
+
 	public static <T> Field<T> field(final T value, final DataInfo info) {
 		if (value == null || StringUtils.isBlank(value.toString())) {
 			return null;

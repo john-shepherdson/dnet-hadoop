@@ -618,7 +618,10 @@ class MappersTest {
 		assertEquals(ModelConstants.DNET_PUBLICATION_RESOURCE, i.getInstancetype().getSchemeid());
 		assertEquals(ModelConstants.DNET_PUBLICATION_RESOURCE, i.getInstancetype().getSchemename());
 
-		assertNull(i.getLicense());
+		assertNotNull(i.getLicense());
+        assertTrue(StringUtils.isBlank(i.getLicense().getOriginal()));
+        assertTrue(StringUtils.isBlank(i.getLicense().getPreCleaned()));
+        assertTrue(StringUtils.isBlank(i.getLicense().getCleaned()));
 		assertNotNull(i.getDateofacceptance());
 		assertEquals("2014-11-11", i.getDateofacceptance().getValue());
 
@@ -717,7 +720,10 @@ class MappersTest {
 		assertEquals(ModelConstants.DNET_PUBLICATION_RESOURCE, i.getInstancetype().getSchemeid());
 		assertEquals(ModelConstants.DNET_PUBLICATION_RESOURCE, i.getInstancetype().getSchemename());
 
-		assertNull(i.getLicense());
+        assertNotNull(i.getLicense());
+		assertTrue(StringUtils.isBlank(i.getLicense().getOriginal()));
+        assertTrue(StringUtils.isBlank(i.getLicense().getPreCleaned()));
+        assertTrue(StringUtils.isBlank(i.getLicense().getCleaned()));
 		assertNotNull(i.getDateofacceptance());
 		assertEquals("2020-06-04", i.getDateofacceptance().getValue());
 
@@ -958,7 +964,7 @@ class MappersTest {
 		assertValidId(p.getInstance().get(0).getCollectedfrom().getKey());
 		assertValidId(p.getInstance().get(0).getHostedby().getKey());
 		assertEquals(
-			"http://creativecommons.org/licenses/by/3.0/de/legalcode", p.getInstance().get(0).getLicense().getValue());
+			"http://creativecommons.org/licenses/by/3.0/de/legalcode", p.getInstance().get(0).getLicense().getOriginal());
 
 		assertEquals(1, p.getInstance().size());
 		assertNotNull(p.getInstance().get(0).getAlternateIdentifier());

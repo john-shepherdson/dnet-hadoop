@@ -165,12 +165,12 @@ case object Crossref2Oaf {
     )
   }
 
-  def decideAccessRight(lic: Field[String], date: String): AccessRight = {
+  def decideAccessRight(lic: License, date: String): AccessRight = {
     if (lic == null) {
       //Default value Unknown
       return getUnknownQualifier()
     }
-    val license: String = lic.getValue
+    val license: String = lic.getOriginal
     //CC licenses
     if (
       license.startsWith("cc") ||
@@ -478,8 +478,8 @@ case object Crossref2Oaf {
       JObject(license)                                    <- json \ "license"
       JField("URL", JString(lic))                         <- license
       JField("content-version", JString(content_version)) <- license
-    } yield (field[String](lic, null), content_version)
-    val l = license.filter(d => StringUtils.isNotBlank(d._1.getValue))
+    } yield (OafMapperUtils.license(lic), content_version)
+    val l = license.filter(d => StringUtils.isNotBlank(d._1.getOriginal))
     if (l.nonEmpty) {
       if (l exists (d => d._2.equals("vor"))) {
         for (d <- l) {
@@ -649,7 +649,7 @@ case object Crossref2Oaf {
       if (uw.best_oa_location != null) {
         i.setUrl(List(uw.best_oa_location.url).asJava)
         if (uw.best_oa_location.license.isDefined) {
-          i.setLicense(field[String](uw.best_oa_location.license.get, null))
+          i.setLicense(OafMapperUtils.license(uw.best_oa_location.license.get))
         }
         val colour = get_unpaywall_color(uw.oa_status)
         if (colour.isDefined) {

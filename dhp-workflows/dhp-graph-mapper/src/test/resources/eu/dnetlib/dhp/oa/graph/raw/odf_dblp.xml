@@ -7,32 +7,40 @@
         xmlns:oai="http://www.openarchives.org/OAI/2.0/"
         xmlns:dc="http://purl.org/dc/elements/1.1/"
         xmlns:dri="http://www.driver-repository.eu/namespace/dri">
-    <header xmlns="HTTP://www.openarchives.org/OAI/2.0/">
+    <oai:header>
         <dr:dateOfTransformation>2025-10-06T09:55:36Z</dr:dateOfTransformation>
         <dri:objIdentifier>dblp________::422d68936426194dd5797cba242c62b1</dri:objIdentifier>
-    </header>
+    </oai:header>
     <metadata>
-        <datacite:title>A software assignment algorithm for minimizing worm damage in networked systems.</datacite:title>
-        <datacite:creators>
-            <datacite:creator>
-                <datacite:creatorName>Chu Huang</datacite:creatorName>
-            </datacite:creator>
-            <datacite:creator>
-                <datacite:creatorName>Sencun Zhu</datacite:creatorName>
-            </datacite:creator>
-            <datacite:creator>
-                <datacite:creatorName>Quanlong Guan</datacite:creatorName>
-                <datacite:nameIdentifier nameIdentifierScheme="ORCID" schemeURI="http://orcid.org">0000-0001-6911-3853</datacite:nameIdentifier>
-            </datacite:creator>
-            <datacite:creator>
-                <datacite:creatorName>Yongzhong He</datacite:creatorName>
-            </datacite:creator>
-        </datacite:creators>
-        <datacite:resourceType resourceTypeGeneral="literature"
-                               uri="http://purl.org/coar/resource_type/c_2df8fbb1">article</datacite:resourceType>
-        <datacite:date>2023-08-28</datacite:date>
-        <datacite:identifier identifierType="DOI">10.1016/j.jisa.2017.05.004</datacite:identifier>
+        <datacite:resource>
+            <datacite:identifier identifierType="DOI">10.1016/j.jisa.2017.05.004</datacite:identifier>
+            <datacite:creators>
+                <datacite:creator>
+                    <datacite:creatorName>Chu Huang</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>Sencun Zhu</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>Quanlong Guan</datacite:creatorName>
+                    <datacite:nameIdentifier nameIdentifierScheme="ORCID" schemeURI="http://orcid.org">0000-0001-6911-3853</datacite:nameIdentifier>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>Yongzhong He</datacite:creatorName>
+                </datacite:creator>
+            </datacite:creators>
+            <datacite:titles>
+                <datacite:title>A software assignment algorithm for minimizing worm damage in networked systems.</datacite:title>
+            </datacite:titles>
+            <datacite:publisher>Not specified</datacite:publisher>
+            <datacite:publicationYear>2023</datacite:publicationYear>
+            <datacite:dates>
+                <datacite:date dateType="Issued">2023-08-28</datacite:date>
+            </datacite:dates>
+            <datacite:resourceType resourceTypeGeneral="text">article</datacite:resourceType>
+        </datacite:resource>
         <oaf:identifier identifierType="doi">10.1016/j.jisa.2017.05.004</oaf:identifier>
+        <oaf:collectedFrom name="DBLP" id="openaire____::dblp"/>
         <dr:CobjCategory type="publication">0001</dr:CobjCategory>
         <oaf:journal eissn=""
                      iss=""
