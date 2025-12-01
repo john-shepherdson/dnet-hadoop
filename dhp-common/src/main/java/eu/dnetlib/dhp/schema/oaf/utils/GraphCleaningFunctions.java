@@ -32,8 +32,6 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 
 	public static final String DNET_PUBLISHERS = "dnet:publishers";
 
-	public static final String DNET_LICENSES = "dnet:licenses";
-
 	public static final String ORCID_CLEANING_REGEX = ".*([0-9]{4}).*[-–—−=].*([0-9]{4}).*[-–—−=].*([0-9]{4}).*[-–—−=].*([0-9x]{4})";
 	public static final int ORCID_LEN = 19;
 	public static final String CLEANING_REGEX = "(?:\\n|\\r|\\t)";
@@ -600,14 +598,6 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 						}
 						if (Objects.isNull(i.getRefereed()) || StringUtils.isBlank(i.getRefereed().getClassid())) {
 							i.setRefereed(qualifier("0000", "Unknown", ModelConstants.DNET_REVIEW_LEVELS));
-						}
-
-						if (Objects.nonNull(i.getLicense()) && Objects.nonNull(i.getLicense().getPreCleaned())) {
-							vocs
-								.find(DNET_LICENSES)
-								.map(voc -> voc.getTermBySynonym(i.getLicense().getPreCleaned()))
-								.map(VocabularyTerm::getId)
-								.ifPresent(license -> i.getLicense().setCleaned(license));
 						}
 
 						// from the script from Dimitris

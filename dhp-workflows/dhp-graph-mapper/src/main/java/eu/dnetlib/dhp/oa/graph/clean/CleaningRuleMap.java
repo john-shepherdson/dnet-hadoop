@@ -5,12 +5,9 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
-import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import eu.dnetlib.dhp.common.Constants;
 import eu.dnetlib.dhp.common.FunctionalInterfaceSupport.SerializableConsumer;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyTerm;
@@ -18,6 +15,8 @@ import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 
 public class CleaningRuleMap extends HashMap<Class<?>, SerializableConsumer<Object>> implements Serializable {
+
+    public static final String DNET_LICENSES = "dnet:licenses";
 
 	/**
 	 * Creates the mapping for the Oaf types subject to cleaning
@@ -30,6 +29,7 @@ public class CleaningRuleMap extends HashMap<Class<?>, SerializableConsumer<Obje
 		mapping.put(AccessRight.class, o -> cleanQualifier(vocabularies, (AccessRight) o));
 		mapping.put(Country.class, o -> cleanCountry(vocabularies, (Country) o));
 		mapping.put(Relation.class, o -> cleanRelation(vocabularies, (Relation) o));
+        mapping.put(License.class, o -> cleanLicense(vocabularies, (License) o));
 
 		// commenting out the subject cleaning until we decide if we want to it or not and the implementation will
 		// be completed. At the moment it is not capable of expanding the whole hierarchy.
@@ -37,7 +37,20 @@ public class CleaningRuleMap extends HashMap<Class<?>, SerializableConsumer<Obje
 		return mapping;
 	}
 
-	private static void cleanSubject(VocabularyGroup vocabularies, Subject subject) {
+    private static void cleanLicense(VocabularyGroup vocabularies, License license) {
+
+        //TODO add pre cleaning steps
+
+        if (Objects.nonNull(license) && Objects.nonNull(license.getPreCleaned())) {
+            vocabularies
+                    .find(DNET_LICENSES)
+                    .map(voc -> voc.getTermBySynonym(license.getPreCleaned()))
+                    .map(VocabularyTerm::getId)
+                    .ifPresent(license::setCleaned);
+        }
+    }
+
+    private static void cleanSubject(VocabularyGroup vocabularies, Subject subject) {
 		cleanSubjectForVocabulary(ModelConstants.DNET_SUBJECT_FOS_CLASSID, vocabularies, subject);
 		// TODO cleaning based on different subject vocabs can be added here
 	}
