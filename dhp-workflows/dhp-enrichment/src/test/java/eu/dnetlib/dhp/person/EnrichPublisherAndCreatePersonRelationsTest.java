@@ -544,8 +544,6 @@ public class EnrichPublisherAndCreatePersonRelationsTest {
 				"--matchingSource", "graph"
 		});
 
-		// Anthony R Burrell arricchito con l'orcid' (0000-0001-8255-3618) dal grafo ha
-		// {"Provenance":"AffRo","PID":"ROR","Value":"https:\/\/ror.org\/029m7xn54","Confidence":1,"Status":"active"},{"Provenance":"AffRo","PID":"OpenOrgs","Value":"0000002097","Confidence":1,"Status":"active"}
 
 
 		org.apache.spark.sql.Dataset<Relation> relations = spark
@@ -563,23 +561,7 @@ public class EnrichPublisherAndCreatePersonRelationsTest {
 		Assertions.assertEquals(1991, relations.filter((FilterFunction<Relation>) r -> r.getRelClass().equalsIgnoreCase("hasAuthored") && !r.getProperties().isEmpty()).count());
 
 		Assertions.assertEquals(8, relations.filter((FilterFunction<Relation>) r -> !r.getProperties().isEmpty() && r.getProperties().stream().anyMatch(p -> p.getKey().equalsIgnoreCase("declared_affiliation"))).count());
-//		Assertions.assertEquals(1, relations
-//				.filter((FilterFunction<Relation>) r -> r.getSubRelType().equalsIgnoreCase("authorship"))
-//				.count());
-//		Relation relation = relations.filter((FilterFunction<Relation>)  r -> r.getSubRelType().equalsIgnoreCase("authorship")).first();
-//		Assertions.assertEquals(7, relation.getProperties().size());
-//		Assertions.assertEquals(3, relation.getProperties().stream().filter(p -> p.getKey().equalsIgnoreCase("declared_affiliation")).count());
-//		Assertions.assertEquals(3, relation.getProperties().stream().filter(p -> p.getKey().equalsIgnoreCase("role")).count());
-//		Assertions.assertEquals(1, relation.getProperties().stream().filter(p -> p.getKey().equalsIgnoreCase("corresponding")).count());
-//
-//		Assertions.assertTrue(relation.getProperties().stream().filter(p -> p.getKey().equalsIgnoreCase("role"))
-//				.anyMatch(p -> p.getValue().equalsIgnoreCase("CReDIT http://credit.niso.org/contributor-roles/investigation")));
-//		Assertions.assertTrue(relation.getProperties().stream().filter(p -> p.getKey().equalsIgnoreCase("role"))
-//				.anyMatch(p -> p.getValue().equalsIgnoreCase("CReDit http://credit.niso.org/contributor-roles/methodology")));
-//		Assertions.assertTrue(relation.getProperties().stream().filter(p -> p.getKey().equalsIgnoreCase("role"))
-//				.anyMatch(p -> p.getValue().equalsIgnoreCase("CReDIT http://credit.niso.org/contributor-roles/writing-original-draft")));
-//
-//		Assertions.assertFalse(Boolean.parseBoolean(relation.getProperties().stream().filter(p -> p.getKey().equalsIgnoreCase("corresponding")).findFirst().get().getValue()));
+
 
 	}
 
