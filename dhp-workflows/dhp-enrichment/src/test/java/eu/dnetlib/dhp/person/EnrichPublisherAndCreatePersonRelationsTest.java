@@ -99,7 +99,6 @@ public class EnrichPublisherAndCreatePersonRelationsTest {
 			.json(workingDir.toString() + "/graph/relation")
 			.as(Encoders.bean(Relation.class));
 
-		relations.show(false);
 
 		Assertions.assertEquals(19, relations.count());
 		Assertions

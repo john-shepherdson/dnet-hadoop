@@ -111,7 +111,7 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 			.selectExpr("_1 as id", "_2.orcidAuthorList as orcid_authors");// in this case the id is the doi
 
 		orcidDnet.write().mode(SaveMode.Overwrite).option("compression", "gzip").parquet(targetPath + "/graph_authors");
-		orcidDnet.show(false);
+
 		Dataset<Row> df = spark
 			.read()
 			.schema(Constants.PUBLISHER_INPUT_SCHEMA)
@@ -140,7 +140,7 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 					return new Tuple2<>(k, pa);
 				}, Encoders.tuple(Encoders.STRING(), Encoders.bean(PublisherAuthors.class)))
 			.selectExpr("_1 as id", "_2.publisherAuthorList as graph_authors");
-//authors.show(false);
+
 		orcidDnet
 			.join(authors, "id")
 			.write()
@@ -172,7 +172,7 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 
 		Dataset<Row> graph = spark.read().parquet(workingDir + "/graph_authors");
 
-//non faccio la coAuthorship perche' ci potrebbero essere dei problemi nel numero di prodotti co-autorati (eventuali doppioni)
+//      Co-Authorship removed because we will end producing duplicate relations - we already have them from the graph
 //		Dataset<Relation> coAuthorshipRels = graph
 //			.joinWith(matched, graph.col("id").equalTo(matched.col("id")))
 //			.flatMap(
