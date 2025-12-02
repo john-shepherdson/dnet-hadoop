@@ -170,9 +170,8 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 			.selectExpr("id", "enriched_author");
 		// gets new coAuthorship relations if any to build
 
-		Dataset<Row> graph = spark.read().parquet(workingDir + "/graph_authors");
-
-//      Co-Authorship removed because we will end producing duplicate relations - we already have them from the graph
+		//      Co-Authorship removed because we will end producing duplicate relations - we already have them from the graph
+//		Dataset<Row> graph = spark.read().parquet(workingDir + "/graph_authors");
 //		Dataset<Relation> coAuthorshipRels = graph
 //			.joinWith(matched, graph.col("id").equalTo(matched.col("id")))
 //			.flatMap(
@@ -343,6 +342,7 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 
 			List<Row> pids = author.getList(author.fieldIndex("pid"));
 
+			//By construction there is only one pid
 			List<Row> pidList = Optional.ofNullable(pids)
 					.map(p -> p.stream().filter(pid -> {
 
@@ -373,8 +373,7 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 
 	private static Relation getRelations(String doi, List<String> rawAffiliationString, String orcid) {
 		Relation rel = OafMapperUtils
-			.getRelation(Constants.PERSON_PREFIX + Constants.SEPARATOR
-				+ DHPUtils.md5(orcid), "50|doi_________::" + DHPUtils.md5(doi),
+			.getRelation(Constants.getPersonId(orcid), "50|doi_________::" + DHPUtils.md5(doi),
 				ModelConstants.RESULT_PERSON_RELTYPE, ModelConstants.RESULT_PERSON_SUBRELTYPE,
 				ModelConstants.RESULT_PERSON_HASAUTHORED,
 				null, DATAINFO, null);
@@ -382,7 +381,10 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
             try {
                 SerializationBean sb = new ObjectMapper().readValue(raf, SerializationBean.class);
 				List<KeyValue> keyValueList = new ArrayList<>();
-
+//				KeyValue orcidPair = new KeyValue();
+//				orcidPair.setKey("orcid");
+//				orcidPair.setValue(orcid);
+//				keyValueList.add(orcidPair);
 				if(Optional.ofNullable(sb.getCorresponding()).isPresent()) {
 					KeyValue kv = new KeyValue();
 					kv.setKey("corresponding");
