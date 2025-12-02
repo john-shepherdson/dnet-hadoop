@@ -382,10 +382,7 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
             try {
                 SerializationBean sb = new ObjectMapper().readValue(raf, SerializationBean.class);
 				List<KeyValue> keyValueList = new ArrayList<>();
-				KeyValue orcidPair = new KeyValue();
-				orcidPair.setKey("orcid");
-				orcidPair.setValue(orcid);
-				keyValueList.add(orcidPair);
+
 				if(Optional.ofNullable(sb.getCorresponding()).isPresent()) {
 					KeyValue kv = new KeyValue();
 					kv.setKey("corresponding");
