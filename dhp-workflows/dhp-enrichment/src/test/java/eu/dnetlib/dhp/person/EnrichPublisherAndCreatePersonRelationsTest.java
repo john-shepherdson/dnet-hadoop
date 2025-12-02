@@ -4,13 +4,14 @@ package eu.dnetlib.dhp.person;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.ForeachFunction;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.SparkSession;
+import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.sql.*;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -24,6 +25,7 @@ import eu.dnetlib.dhp.enrich.relsfrompublisherenricheddata.EnrichExternalDataWit
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.utils.DHPUtils;
+import scala.Tuple2;
 
 public class EnrichPublisherAndCreatePersonRelationsTest {
 	private static final Logger log = LoggerFactory.getLogger(EnrichPublisherAndCreatePersonRelationsTest.class);
@@ -513,6 +515,71 @@ public class EnrichPublisherAndCreatePersonRelationsTest {
 				.anyMatch(p -> p.getValue().equalsIgnoreCase("CReDIT http://credit.niso.org/contributor-roles/writing-original-draft")));
 
 		Assertions.assertFalse(Boolean.parseBoolean(relation.getProperties().stream().filter(p -> p.getKey().equalsIgnoreCase("corresponding")).findFirst().get().getValue()));
+
+	}
+
+	@Test
+	void testNewModel() throws Exception {
+		final String sourcePathPubs = getClass()
+				.getResource("/eu/dnetlib/dhp/person/publisherEnrichment/graph/publication")
+				.getPath();
+		final String sourcePathRels = getClass()
+				.getResource("/eu/dnetlib/dhp/person/publisherEnrichment/graph/relation")
+				.getPath();
+		final String publisherPath = getClass()
+				.getResource("/eu/dnetlib/dhp/person/publisherEnrichment/publisher/")
+				.getPath();
+
+		spark.read().json(sourcePathPubs).write().json(workingDir.toString() + "/graph/publication");
+		spark.read().json(sourcePathRels).write().json(workingDir.toString() + "/graph/relation");
+		spark.read().json(publisherPath).write().json(workingDir.toString() + "/publisher");
+
+		EnrichExternalDataWithGraphORCID.main(new String[] {
+
+				"--orcidPath", workingDir.toString() + "/graph",
+				"--targetPath", workingDir.toString() + "/graph",
+				"--graphPath", workingDir.toString() + "/publisher",
+				"--workingDir", workingDir.toString() + "/working",
+				"--master", "yarn",
+				"--matchingSource", "graph"
+		});
+
+		// Anthony R Burrell arricchito con l'orcid' (0000-0001-8255-3618) dal grafo ha
+		// {"Provenance":"AffRo","PID":"ROR","Value":"https:\/\/ror.org\/029m7xn54","Confidence":1,"Status":"active"},{"Provenance":"AffRo","PID":"OpenOrgs","Value":"0000002097","Confidence":1,"Status":"active"}
+
+
+		org.apache.spark.sql.Dataset<Relation> relations = spark
+				.read()
+				.schema(Encoders.bean(Relation.class).schema())
+				.json(workingDir.toString() + "/graph/relation")
+				.as(Encoders.bean(Relation.class))
+				;
+		relations.filter((FilterFunction<Relation>) r -> r.getRelClass().equalsIgnoreCase("hasAuthored")).coalesce(1).write().mode(SaveMode.Overwrite).json("/tmp/Relations");
+//ci sono 51 result che terminano con x invece che con X per gli orcid.
+		//X e' il valore che c'er anei dati per cui le relazioni sono state fatte =>
+		//ce ne sono 51 in piu'
+		Assertions.assertEquals(2054, relations.filter((FilterFunction<Relation>) r -> r.getRelClass().equalsIgnoreCase("hasAuthored")).count());
+		//le 51 aggiunte piu' i 12 orcid che non matchano = 63 2054 - 63 = 1991
+		Assertions.assertEquals(1991, relations.filter((FilterFunction<Relation>) r -> r.getRelClass().equalsIgnoreCase("hasAuthored") && !r.getProperties().isEmpty()).count());
+
+		Assertions.assertEquals(8, relations.filter((FilterFunction<Relation>) r -> !r.getProperties().isEmpty() && r.getProperties().stream().anyMatch(p -> p.getKey().equalsIgnoreCase("declared_affiliation"))).count());
+//		Assertions.assertEquals(1, relations
+//				.filter((FilterFunction<Relation>) r -> r.getSubRelType().equalsIgnoreCase("authorship"))
+//				.count());
+//		Relation relation = relations.filter((FilterFunction<Relation>)  r -> r.getSubRelType().equalsIgnoreCase("authorship")).first();
+//		Assertions.assertEquals(7, relation.getProperties().size());
+//		Assertions.assertEquals(3, relation.getProperties().stream().filter(p -> p.getKey().equalsIgnoreCase("declared_affiliation")).count());
+//		Assertions.assertEquals(3, relation.getProperties().stream().filter(p -> p.getKey().equalsIgnoreCase("role")).count());
+//		Assertions.assertEquals(1, relation.getProperties().stream().filter(p -> p.getKey().equalsIgnoreCase("corresponding")).count());
+//
+//		Assertions.assertTrue(relation.getProperties().stream().filter(p -> p.getKey().equalsIgnoreCase("role"))
+//				.anyMatch(p -> p.getValue().equalsIgnoreCase("CReDIT http://credit.niso.org/contributor-roles/investigation")));
+//		Assertions.assertTrue(relation.getProperties().stream().filter(p -> p.getKey().equalsIgnoreCase("role"))
+//				.anyMatch(p -> p.getValue().equalsIgnoreCase("CReDit http://credit.niso.org/contributor-roles/methodology")));
+//		Assertions.assertTrue(relation.getProperties().stream().filter(p -> p.getKey().equalsIgnoreCase("role"))
+//				.anyMatch(p -> p.getValue().equalsIgnoreCase("CReDIT http://credit.niso.org/contributor-roles/writing-original-draft")));
+//
+//		Assertions.assertFalse(Boolean.parseBoolean(relation.getProperties().stream().filter(p -> p.getKey().equalsIgnoreCase("corresponding")).findFirst().get().getValue()));
 
 	}
 

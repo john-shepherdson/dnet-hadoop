@@ -111,7 +111,7 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 			.selectExpr("_1 as id", "_2.orcidAuthorList as orcid_authors");// in this case the id is the doi
 
 		orcidDnet.write().mode(SaveMode.Overwrite).option("compression", "gzip").parquet(targetPath + "/graph_authors");
-
+		orcidDnet.show(false);
 		Dataset<Row> df = spark
 			.read()
 			.schema(Constants.PUBLISHER_INPUT_SCHEMA)
@@ -157,7 +157,7 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 
 		// creates new relations of authorship with the declared_affiliation property
 		Dataset<Relation> newRelations = getNewRelations(spark, workingDir);
-		newRelations.show(false);
+
 		// redirects new relations versus representatives if any
 		Dataset<Row> graph_relations = getMergesRelationships(spark, targetPath);
 		Dataset<Relation> redirectedRels = redirectNewRelationsOnRepresentatives(newRelations, graph_relations);
@@ -172,15 +172,16 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 
 		Dataset<Row> graph = spark.read().parquet(workingDir + "/graph_authors");
 
-
-		Dataset<Relation> coAuthorshipRels = graph
-			.joinWith(matched, graph.col("id").equalTo(matched.col("id")))
-			.flatMap(
-				(FlatMapFunction<Tuple2<Row, Row>, Relation>) EnrichExternalDataWithGraphORCID::coAuthorshipRels,
-				Encoders.bean(Relation.class));
+//non faccio la coAuthorship perche' ci potrebbero essere dei problemi nel numero di prodotti co-autorati (eventuali doppioni)
+//		Dataset<Relation> coAuthorshipRels = graph
+//			.joinWith(matched, graph.col("id").equalTo(matched.col("id")))
+//			.flatMap(
+//				(FlatMapFunction<Tuple2<Row, Row>, Relation>) EnrichExternalDataWithGraphORCID::coAuthorshipRels,
+//				Encoders.bean(Relation.class));
 
 		// need to merge the relations with same source target and semantics
-		mergeOldAndNewRelations(spark, targetPath, redirectedRels.union(coAuthorshipRels))
+		//mergeOldAndNewRelations(spark, targetPath, redirectedRels.union(coAuthorshipRels))
+		mergeOldAndNewRelations(spark, targetPath, redirectedRels)
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
@@ -292,6 +293,7 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 			.groupByKey(
 				(MapFunction<Relation, String>) r -> r.getSource() + r.getRelClass() + r.getTarget(), Encoders.STRING())
 			.mapGroups((MapGroupsFunction<String, Relation, Relation>) (k, it) -> {
+				//done like this because variable used in lambda should be final or effectively final
 				final Relation[] ret = {
 					it.next()
 				};
@@ -306,7 +308,7 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 			.joinWith(graph_relations, newRelations.col("target").equalTo(graph_relations.col("target")), "left")
 			.map((MapFunction<Tuple2<Relation, Row>, Relation>) t2 -> {
 				if (t2._2() != null)
-					t2._1().setTarget(t2._2().getAs("target"));
+					t2._1().setTarget(t2._2().getAs("source"));
 				return t2._1();
 			}, Encoders.bean(Relation.class));
 	}
@@ -380,6 +382,10 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
             try {
                 SerializationBean sb = new ObjectMapper().readValue(raf, SerializationBean.class);
 				List<KeyValue> keyValueList = new ArrayList<>();
+				KeyValue orcidPair = new KeyValue();
+				orcidPair.setKey("orcid");
+				orcidPair.setValue(orcid);
+				keyValueList.add(orcidPair);
 				if(Optional.ofNullable(sb.getCorresponding()).isPresent()) {
 					KeyValue kv = new KeyValue();
 					kv.setKey("corresponding");
