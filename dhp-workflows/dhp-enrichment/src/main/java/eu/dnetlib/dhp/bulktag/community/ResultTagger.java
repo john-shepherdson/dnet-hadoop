@@ -212,9 +212,7 @@ public class ResultTagger implements Serializable {
 								.getCommunityForZenodoCommunityValue(
 									c
 										.getId()
-										.substring(
-											c.getId().lastIndexOf("/") + 1)
-										.trim())));
+										)));
 		}
 
 		communities.addAll(czenodo);

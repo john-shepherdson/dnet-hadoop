@@ -12,6 +12,7 @@ import com.google.gson.GsonBuilder;
 
 import eu.dnetlib.dhp.bulktag.criteria.InterfaceAdapter;
 import eu.dnetlib.dhp.bulktag.criteria.Selection;
+import org.apache.commons.lang3.StringUtils;
 
 /** Created by miriam on 02/08/2018. */
 public class CommunityConfiguration implements Serializable {
@@ -190,8 +191,8 @@ public class CommunityConfiguration implements Serializable {
 	}
 
 	public List<String> getCommunityForZenodoCommunityValue(String value) {
-
-		return getContextIds(zenodocommunityMap.get(value.toLowerCase()));
+		final String zenodoCommunityId = StringUtils.stripEnd(value,"/").substring(value.lastIndexOf("/") + 1).toLowerCase().trim();
+		return getContextIds(zenodocommunityMap.get(zenodoCommunityId));
 	}
 
 	private List<String> getContextIds(List<Pair<String, SelectionConstraints>> list) {

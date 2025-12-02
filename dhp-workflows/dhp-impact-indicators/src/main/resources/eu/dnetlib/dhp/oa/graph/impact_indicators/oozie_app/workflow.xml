@@ -63,7 +63,7 @@
 	<action name="create-openaire-ranking-graph">
 		<spark xmlns="uri:oozie:spark-action:0.2">
 
-			<master>yarn-cluster</master>
+			<master>yarn</master>
 			<mode>cluster</mode>
 			<name>OpenAIRE Ranking Graph Creation</name>
 			<jar>create_openaire_ranking_graph.py</jar>
@@ -101,7 +101,7 @@
 	<action name="spark-cc">
 		<spark xmlns="uri:oozie:spark-action:0.2">
 
-			<master>yarn-cluster</master>
+			<master>yarn</master>
 			<mode>cluster</mode>
 			<name>Citation Count calculation</name>
 			<jar>CC.py</jar>
@@ -135,7 +135,7 @@
 	<action name="spark-ram">
 		<spark xmlns="uri:oozie:spark-action:0.2">
 
-			<master>yarn-cluster</master>
+			<master>yarn</master>
 			<mode>cluster</mode>
 			<name>RAM calculation</name>
 			<jar>TAR.py</jar>
@@ -171,7 +171,7 @@
 	<action name="spark-impulse">
 		<spark xmlns="uri:oozie:spark-action:0.2">
 
-			<master>yarn-cluster</master>
+			<master>yarn</master>
 			<mode>cluster</mode>
 			<name>Impulse calculation</name>
 			<jar>CC.py</jar>
@@ -205,7 +205,7 @@
 	<action name="spark-pagerank">
 		<spark xmlns="uri:oozie:spark-action:0.2">
 
-			<master>yarn-cluster</master>
+			<master>yarn</master>
 			<mode>cluster</mode>
 			<name>Pagerank calculation</name>
 			<jar>PageRank.py</jar>
@@ -242,7 +242,7 @@
 	<action name="spark-attrank">
 		<spark xmlns="uri:oozie:spark-action:0.2">
 
-			<master>yarn-cluster</master>
+			<master>yarn</master>
 			<mode>cluster</mode>
 			<name>AttRank calculation</name>
 			<jar>AttRank.py</jar>
@@ -306,7 +306,7 @@
 	<action name="format-json-files">
 		<spark xmlns="uri:oozie:spark-action:0.2">
 
-			<master>yarn-cluster</master>
+			<master>yarn</master>
 			<mode>cluster</mode>
 			<name>Format Ranking Results JSON</name>
 			<jar>format_ranking_results.py</jar>
@@ -346,7 +346,7 @@
 	<action name="project-impact-indicators">
 		<spark xmlns="uri:oozie:spark-action:0.2">
 
-			<master>yarn-cluster</master>
+			<master>yarn</master>
 			<mode>cluster</mode>
 			<name>Project Impact Indicators calculation</name>
 			<jar>projects_impact.py</jar>
@@ -397,7 +397,7 @@
 	<action name="create-actionset">
 		<spark xmlns="uri:oozie:spark-action:0.2">
 
-			<master>yarn-cluster</master>
+			<master>yarn</master>
 			<mode>cluster</mode>
 			<name>Produces the atomic action with the bip finder scores</name>
 			<class>eu.dnetlib.dhp.actionmanager.bipfinder.SparkAtomicActionScoreJob</class>

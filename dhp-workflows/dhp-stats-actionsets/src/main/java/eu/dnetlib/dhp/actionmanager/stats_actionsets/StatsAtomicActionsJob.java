@@ -96,8 +96,13 @@ public class StatsAtomicActionsJob implements Serializable {
 			.sql(
 				String
 					.format(
-						"select r.%s as id, is_gold, is_bronze_oa, is_hybrid,green_oa, in_diamond_journal,f.publicly_funded as publicly_funded "
-							+
+						"select r.%s as id, " +
+							"CASE WHEN g.is_gold = 1 THEN true ELSE false END as is_gold, " +
+							"CASE WHEN b.is_bronze_oa = 1 THEN true ELSE false END as is_bronze_oa, " +
+							"CASE WHEN h.is_hybrid = 1 THEN true ELSE false END as is_hybrid, " +
+							"CASE WHEN gr.green_oa = 1 THEN true ELSE false END as green_oa, " +
+							"CASE WHEN d.in_diamond_journal = 1 THEN true ELSE false END as in_diamond_journal, " +
+							"CASE WHEN f.publicly_funded = 1 THEN true ELSE false END as publicly_funded " +
 							"from %s.publication r " +
 							"left outer join %s.indi_pub_bronze_oa b on r.id=b.id " +
 							"left outer join %s.indi_pub_gold_oa g on r.id=g.id " +
