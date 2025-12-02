@@ -1,8 +1,6 @@
 
 package eu.dnetlib.dhp.common.person;
 
-import java.util.List;
-
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
@@ -95,5 +93,9 @@ public class Constants {
 
 		// if there is no known prefix to remove the string is returned as it is
 		return trimmed;
+	}
+
+	public static String getPersonId(String pid){
+		return DHPUtils.generateIdentifier(removePrefixUrl(pid).toLowerCase(), PERSON_PREFIX);
 	}
 }

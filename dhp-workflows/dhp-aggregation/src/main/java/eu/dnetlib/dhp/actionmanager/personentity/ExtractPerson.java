@@ -15,7 +15,6 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.common.person.Constants;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -46,10 +45,8 @@ import eu.dnetlib.dhp.common.person.CoAuthorshipIterator;
 import eu.dnetlib.dhp.common.person.Coauthors;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.*;
-import eu.dnetlib.dhp.utils.DHPUtils;
 import scala.Tuple2;
 
 public class ExtractPerson implements Serializable {
@@ -130,9 +127,9 @@ public class ExtractPerson implements Serializable {
 
 		Dataset<Row> authors = allAuthors
 			.selectExpr("explode (affs) as affiliation", "doi", "corresponding", "roles", "pid.value as orcid")
-			.where("affiliation.Status = 'active'")
+			.where("affiliation.status = 'active'")
 			.selectExpr(
-				"affiliation.Value as orgid", "affiliation.PID as orgpid", "affiliation.Confidence as trust", "doi",
+				"affiliation.value as orgid", "affiliation.pid as orgpid", "affiliation.confidence as trust", "doi",
 				"corresponding", "roles", "orcid");
 
 		authors = authors
@@ -151,22 +148,23 @@ public class ExtractPerson implements Serializable {
 			.map(
 				(MapFunction<Row, Relation>) ExtractPerson::getAuthorshipRelation
 					,
-				Encoders.bean(Relation.class))
-			.unionAll(
-				allAuthors
-					.selectExpr("doi", "pid.value as orcid")
-					.groupByKey((MapFunction<Row, String>) r -> r.getAs("doi"), Encoders.STRING())
-
-					.mapGroups(
-						(MapGroupsFunction<String, Row, Coauthors>) (k, it) -> extractCoAuthorsRow(it),
-						Encoders.bean(Coauthors.class))
-					.flatMap(
-						(FlatMapFunction<Coauthors, Relation>) c -> new CoAuthorshipIterator(c.getCoauthors()),
-						Encoders.bean(Relation.class))
-					.groupByKey((MapFunction<Relation, String>) r -> r.getSource() + r.getTarget(), Encoders.STRING())
-					.mapGroups(
-						(MapGroupsFunction<String, Relation, Relation>) (k, it) -> it.next(),
-						Encoders.bean(Relation.class)));
+				Encoders.bean(Relation.class));
+		//remove the coAuthorship relations
+//			.unionAll(
+//				allAuthors
+//					.selectExpr("doi", "pid.value as orcid")
+//					.groupByKey((MapFunction<Row, String>) r -> r.getAs("doi"), Encoders.STRING())
+//
+//					.mapGroups(
+//						(MapGroupsFunction<String, Row, Coauthors>) (k, it) -> extractCoAuthorsRow(it),
+//						Encoders.bean(Coauthors.class))
+//					.flatMap(
+//						(FlatMapFunction<Coauthors, Relation>) c -> new CoAuthorshipIterator(c.getCoauthors()),
+//						Encoders.bean(Relation.class))
+//					.groupByKey((MapFunction<Relation, String>) r -> r.getSource() + r.getTarget(), Encoders.STRING())
+//					.mapGroups(
+//						(MapGroupsFunction<String, Relation, Relation>) (k, it) -> it.next(),
+//						Encoders.bean(Relation.class)));
 
 		// produce one dataset with only one relation per source, target and semantics. Eventually extend the list of
 		// properties
@@ -202,7 +200,7 @@ public class ExtractPerson implements Serializable {
 			+ IdentifierFactory
 				.md5(PidCleaner.normalizePidValue(PidType.doi.toString(), removePrefixUrl(a.getAs("doi"))));
 		;
-		String source = PERSON_PREFIX + SEPARATOR + IdentifierFactory.md5(removePrefixUrl(a.getAs("orcid")));
+		String source = getPersonId(a.getAs("orcid"));
 
 		Relation relation = OafMapperUtils
 			.getRelation(
@@ -320,7 +318,7 @@ public class ExtractPerson implements Serializable {
 
 	private static Relation getProjectRelation(String project, String orcid, String role) {
 
-		String source = PERSON_PREFIX + SEPARATOR + IdentifierFactory.md5(orcid);
+		String source = getPersonId(orcid);
 
 		String target = PROJECT_ID_PREFIX + StringUtils.substringBefore(project, SEPARATOR) + SEPARATOR
 			+ IdentifierFactory.md5(StringUtils.substringAfter(project, SEPARATOR));
@@ -489,12 +487,11 @@ public class ExtractPerson implements Serializable {
 
 	private static @NotNull Person getPerson(Author op) {
 		Person person = new Person();
-		person.setId(DHPUtils.generateIdentifier(op.getOrcid(), PERSON_PREFIX));
+		person.setId(getPersonId(op.getOrcid()));
 		person
 			.setBiography(
 				Optional
 					.ofNullable(op.getBiography())
-
 					.orElse(""));
 		KeyValue kv = OafMapperUtils.keyValue(ORCID_KEY, ModelConstants.ORCID_DS);
 		kv.setDataInfo(null);
@@ -578,7 +575,7 @@ public class ExtractPerson implements Serializable {
 	}
 
 	private static Relation getAffiliationRelation(Employment row) {
-		String source = PERSON_PREFIX + SEPARATOR + IdentifierFactory.md5(row.getOrcid());
+		String source = getPersonId(row.getOrcid());
 		String target = ROR_PREFIX
 			+ IdentifierFactory.md5(PidCleaner.normalizePidValue("ROR", row.getAffiliationId().getValue()));
 		List<KeyValue> properties = new ArrayList<>();

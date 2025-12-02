@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.logging.Filter;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.common.person.Constants;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
@@ -469,7 +470,7 @@ public class SparkExtractPersonRelationsAndAddIndicators {
 
 	private static Relation getRelation(String orcid, String resultId) {
 
-		String source = PERSON_PREFIX + "::" + IdentifierFactory.md5(orcid);
+		String source = Constants.getPersonId(orcid);
 
 		Relation relation = OafMapperUtils
 			.getRelation(

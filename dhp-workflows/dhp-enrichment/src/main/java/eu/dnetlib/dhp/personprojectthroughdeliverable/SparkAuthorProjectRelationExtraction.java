@@ -7,6 +7,7 @@ import static eu.dnetlib.dhp.common.enrichment.Constants.PROPAGATION_DATA_INFO_T
 
 import java.util.*;
 
+import eu.dnetlib.dhp.common.enrichment.Constants;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FlatMapFunction;
@@ -158,7 +159,7 @@ public class SparkAuthorProjectRelationExtraction {
 					return false;
 			}).findFirst().get().getAs("value");
 
-		String source = PERSON_PREFIX + "::" + IdentifierFactory.md5(orcid);
+		String source = eu.dnetlib.dhp.common.person.Constants.getPersonId(orcid);
 
 		return OafMapperUtils
 			.getRelation(

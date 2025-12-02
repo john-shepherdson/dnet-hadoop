@@ -52,8 +52,8 @@ public class CoAuthorshipIterator implements Iterator<Relation> {
 	}
 
 	private Relation getRelation(String orcid1, String orcid2) {
-		String source = PERSON_PREFIX + SEPARATOR + IdentifierFactory.md5(orcid1);
-		String target = PERSON_PREFIX + SEPARATOR + IdentifierFactory.md5(orcid2);
+		String source = Constants.getPersonId(orcid1);
+		String target = Constants.getPersonId(orcid2);
 		Relation relation = OafMapperUtils
 			.getRelation(
 				source, target, ModelConstants.PERSON_PERSON_RELTYPE,
