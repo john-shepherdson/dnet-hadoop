@@ -21,6 +21,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
+import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.Dataset;
@@ -340,20 +341,6 @@ public class SparkBulkTagJob {
 		ProtoMap protoMappingParams,
 		CommunityConfiguration communityConfiguration) {
 
-//		communityConfiguration
-//			.getCommunities()
-//			.keySet()
-//			.forEach(c -> {
-//				try {
-//					log
-//						.info(
-//							"Community Configuration {}",
-//							new ObjectMapper().writeValueAsString(communityConfiguration.getCommunities().get(c)));
-//				} catch (Exception e) {
-//
-//				}
-//			});
-
 		ModelSupport.entityTypes
 			.keySet()
 			.parallelStream()
@@ -374,6 +361,35 @@ public class SparkBulkTagJob {
 					.mode(SaveMode.Overwrite)
 					.option("compression", "gzip")
 					.json(outputPath + e.name());// writing the tagging in the working dir for entity
+
+				readPath(spark, inputPath + e.name(), resultClazz)
+						.map(patchResult(), Encoders.bean(resultClazz))
+								.filter(Objects::nonNull)
+										.flatMap((FlatMapFunction<R, Tuple2<String, String>>) r -> {
+											final Map<String, List<String>> param = eu.dnetlib.dhp.bulktag.Utils.getParamMap(r, protoMappingParams);
+											return communityConfiguration
+													.getRemoveConstraintsMap()
+													.keySet()
+													.stream().map(
+															communityId -> {
+																// log.info("Remove constraints for " + communityId);
+																if (communityConfiguration.getRemoveConstraintsMap().keySet().contains(communityId) &&
+																		communityConfiguration.getRemoveConstraintsMap().get(communityId).getCriteria() != null &&
+																		!communityConfiguration.getRemoveConstraintsMap().get(communityId).getCriteria().isEmpty() &&
+																		communityConfiguration
+																				.getRemoveConstraintsMap()
+																				.get(communityId)
+																				.getCriteria()
+																				.stream()
+																				.anyMatch(crit -> crit.verifyCriteria(param)))
+																	return new Tuple2<>(r.getId(), communityId);
+																return null;
+															}).filter(Objects::nonNull).collect(Collectors.toList()).iterator();
+										} , Encoders.tuple(Encoders.STRING(), Encoders.STRING()))
+						.write()
+						.mode(SaveMode.Overwrite)
+						.option("compression","gzip")
+						.json("/tmp/removeconstraints/" + e.name());
 
 				readPath(spark, outputPath + e.name(), resultClazz) // copy the tagging in the actual result output path
 					.write()

@@ -10,6 +10,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.bulktag.Utils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,55 +41,6 @@ public class ResultTagger implements Serializable {
 		return (tmp != clist.size());
 	}
 
-	private Map<String, List<String>> getParamMap(final Result result, Map<String, MapModel> params)
-		throws NoSuchMethodException, InvocationTargetException {
-		Map<String, List<String>> param = new HashMap<>();
-		String json = new Gson().toJson(result, Result.class);
-		DocumentContext jsonContext = JsonPath.parse(json);
-
-		if (params == null) {
-			params = new HashMap<>();
-		}
-		for (String key : params.keySet()) {
-			MapModel mapModel = params.get(key);
-
-			try {
-				String path = mapModel.getPath();
-				Object obj = jsonContext.read(path);
-				List<String> pathValue;
-				if (obj instanceof java.lang.String)
-					pathValue = Arrays.asList((String) obj);
-				else
-					pathValue = (List<String>) obj;
-				if (Optional.ofNullable(mapModel.getAction()).isPresent()) {
-					Class<?> c = Class.forName(mapModel.getAction().getClazz());
-					Object class_instance = c.newInstance();
-					Method setField = c.getMethod("setValue", String.class);
-					setField.invoke(class_instance, pathValue.get(0));
-					for (Parameters p : mapModel.getAction().getParams()) {
-						setField = c.getMethod("set" + p.getParamName(), String.class);
-						setField.invoke(class_instance, p.getParamValue());
-					}
-
-					param
-						.put(
-							key, Arrays
-								.asList((String) c.getMethod(mapModel.getAction().getMethod()).invoke(class_instance)));
-
-				}
-
-				else {
-					param.put(key, pathValue);
-				}
-
-			} catch (PathNotFoundException | ClassNotFoundException | InstantiationException
-				| IllegalAccessException e) {
-				param.put(key, new ArrayList<>());
-			}
-		}
-		return param;
-
-	}
 
 	public <R extends Result> R enrichContextCriteria(
 		final R result, final CommunityConfiguration conf, final Map<String, MapModel> criteria)
@@ -101,7 +53,7 @@ public class ResultTagger implements Serializable {
 			return result;
 		}
 
-		final Map<String, List<String>> param = getParamMap(result, criteria);
+		final Map<String, List<String>> param = Utils.getParamMap(result, criteria);
 
 		// Execute the EOSCTag for the services
 		switch (result.getResulttype().getClassid()) {
@@ -119,26 +71,26 @@ public class ResultTagger implements Serializable {
 		}
 
 		// communities contains all the communities to be not added to the context
-		final Set<String> removeCommunities = new HashSet<>();
+		//final Set<String> removeCommunities = new HashSet<>();
 
 		// if (conf.getRemoveConstraintsMap().keySet().size() > 0)
-		conf
-			.getRemoveConstraintsMap()
-			.keySet()
-			.forEach(
-				communityId -> {
-					// log.info("Remove constraints for " + communityId);
-					if (conf.getRemoveConstraintsMap().keySet().contains(communityId) &&
-						conf.getRemoveConstraintsMap().get(communityId).getCriteria() != null &&
-						!conf.getRemoveConstraintsMap().get(communityId).getCriteria().isEmpty() &&
-						conf
-							.getRemoveConstraintsMap()
-							.get(communityId)
-							.getCriteria()
-							.stream()
-							.anyMatch(crit -> crit.verifyCriteria(param)))
-						removeCommunities.add(communityId);
-				});
+//		conf
+//			.getRemoveConstraintsMap()
+//			.keySet()
+//			.forEach(
+//				communityId -> {
+//					// log.info("Remove constraints for " + communityId);
+//					if (conf.getRemoveConstraintsMap().keySet().contains(communityId) &&
+//						conf.getRemoveConstraintsMap().get(communityId).getCriteria() != null &&
+//						!conf.getRemoveConstraintsMap().get(communityId).getCriteria().isEmpty() &&
+//						conf
+//							.getRemoveConstraintsMap()
+//							.get(communityId)
+//							.getCriteria()
+//							.stream()
+//							.anyMatch(crit -> crit.verifyCriteria(param)))
+//						removeCommunities.add(communityId);
+//				});
 
 		// communities contains all the communities to be added as context for the result
 		final Set<String> communities = new HashSet<>();
@@ -224,7 +176,7 @@ public class ResultTagger implements Serializable {
 			.getSelectionConstraintsMap()
 			.keySet()
 			.forEach(communityId -> {
-				if (!removeCommunities.contains(communityId) &&
+				if (//!removeCommunities.contains(communityId) &&
 					conf.getSelectionConstraintsMap().get(communityId).getCriteria() != null &&
 					!conf.getSelectionConstraintsMap().get(communityId).getCriteria().isEmpty() &&
 					conf
@@ -238,7 +190,7 @@ public class ResultTagger implements Serializable {
 
 		communities.addAll(aconstraints);
 
-		communities.removeAll(removeCommunities);
+		//communities.removeAll(removeCommunities);
 
 		if (aconstraints.size() > 0)
 			log.info("Found {} for advancedConstraints ", aconstraints.size());
