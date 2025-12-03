@@ -8,13 +8,15 @@ import static eu.dnetlib.dhp.common.enrichment.Constants.PROPAGATION_DATA_INFO_T
 import java.util.*;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.bulktag.community.ResultTagger;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
+import net.sf.saxon.functions.Remove;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.api.java.function.MapGroupsFunction;
+import org.apache.spark.sql.*;
 import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.SaveMode;
-import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,53 +57,75 @@ public class SparkResultToCommunityThroughSemRelJob {
 		SparkConf conf = new SparkConf();
 		conf.set("hive.metastore.uris", parser.get("hive_metastore_uris"));
 
-		final String resultClassName = parser.get("resultTableName");
-		log.info("resultTableName: {}", resultClassName);
+		final String removeContextPath = parser.get("removeContextPath");
+		log.info("removeContextPath: {}", removeContextPath);
 
-		final Boolean saveGraph = Optional
-			.ofNullable(parser.get("saveGraph"))
-			.map(Boolean::valueOf)
-			.orElse(Boolean.TRUE);
-		log.info("saveGraph: {}", saveGraph);
-
-		@SuppressWarnings("unchecked")
-		Class<? extends Result> resultClazz = (Class<? extends Result>) Class.forName(resultClassName);
 
 		runWithSparkHiveSession(
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				if (isTest(parser)) {
-					removeOutputDir(spark, outputPath);
-				}
-				if (saveGraph) {
-					execPropagation(
-						spark, inputPath, outputPath, preparedInfoPath, resultClazz);
-				}
-			});
+				execPropagation(
+						spark, inputPath, outputPath, preparedInfoPath, removeContextPath);
+
+			}
+		);
 	}
+
 
 	private static <R extends Result> void execPropagation(
 		SparkSession spark,
 		String inputPath,
 		String outputPath,
 		String preparedInfoPath,
-		Class<R> resultClazz) {
+		String removeContextPath) {
 
 		Dataset<ResultCommunityList> possibleUpdates = readPath(spark, preparedInfoPath, ResultCommunityList.class);
-		Dataset<R> result = readPath(spark, inputPath, resultClazz);
+		ModelSupport.entityTypes
+				.keySet()
+				.parallelStream()
+				.filter(ModelSupport::isResult)
+				.forEach(e -> {
+					removeOutputDir(spark, outputPath + e.name());
+					ResultTagger resultTagger = new ResultTagger();
+					Class<R> resultClazz = ModelSupport.entityTypes.get(e);
+					Dataset<R> result = readPath(spark, inputPath + e.name(), resultClazz);
+					result
+							.joinWith(
+									possibleUpdates,
+									result.col("id").equalTo(possibleUpdates.col("resultId")),
+									"left_outer")
+							.map(contextUpdaterFn(), Encoders.bean(resultClazz))
+							.write()
+							.mode(SaveMode.Overwrite)
+							.option("compression", "gzip")
+							.json(outputPath + e.name() + "_removed");
 
-		result
-			.joinWith(
-				possibleUpdates,
-				result.col("id").equalTo(possibleUpdates.col("resultId")),
-				"left_outer")
-			.map(contextUpdaterFn(), Encoders.bean(resultClazz))
-			.write()
-			.mode(SaveMode.Overwrite)
-			.option("compression", "gzip")
-			.json(outputPath);
+					Dataset<RemovePojo> toRemove = spark.read().schema(Encoders.tuple(Encoders.STRING(), Encoders.STRING()).schema()).json(removeContextPath + e.name())
+							.groupByKey((MapFunction<Row, String>) r -> (String) r.getAs("_1"), Encoders.STRING())
+							.mapGroups((MapGroupsFunction<String, Row, RemovePojo>) (k, it) -> {
+								List<String> ret = new ArrayList<>();
+								it.forEachRemaining(community -> ret.add(community.getAs("_2")));
+								return new RemovePojo(k, ret);
+							}, Encoders.bean(RemovePojo.class));
+					result.joinWith(toRemove, result.col("id").equalTo(toRemove.col("resultId")), "left")
+							.map((MapFunction<Tuple2<R, RemovePojo>, R>) t2 -> {
+								R r = t2._1();
+								if(t2._2() != null){
+									r.setContext(removeContextIds(t2._2().getContextList(), r.getContext()));
+								}
+								return r;
+							}, Encoders.bean(resultClazz))
+							.write()
+							.mode(SaveMode.Overwrite)
+							.option("compression","gzip")
+							.json(outputPath + e.name());
+				});
+	}
 
+	private static List<Context> removeContextIds(List<String> context, List<Context> contextList) {
+		return contextList.stream().filter(c -> context.stream().noneMatch(rc -> rc.equalsIgnoreCase(c.getId())))
+				.collect(Collectors.toList());
 	}
 
 	private static <R extends Result> MapFunction<Tuple2<R, ResultCommunityList>, R> contextUpdaterFn() {
@@ -140,4 +164,29 @@ public class SparkResultToCommunityThroughSemRelJob {
 		};
 	}
 
+}
+class RemovePojo {
+	String resultId;
+	List<String> contextList;
+
+	public String getResultId() {
+		return resultId;
+	}
+
+	public void setResultId(String resultId) {
+		this.resultId = resultId;
+	}
+
+	public List<String> getContextList() {
+		return contextList;
+	}
+
+	public void setContextList(List<String> contextList) {
+		this.contextList = contextList;
+	}
+
+	public RemovePojo(String resultId, List<String> contextList) {
+		this.resultId = resultId;
+		this.contextList = contextList;
+	}
 }

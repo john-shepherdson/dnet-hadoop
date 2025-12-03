@@ -47,6 +47,11 @@
     "paramLongName":"isTest",
     "paramDescription": "true if it is executing a test",
     "paramRequired": false
-  }
+  }, {
+  "paramName":"rc",
+  "paramLongName":"removeContextPath",
+  "paramDescription": "the path to get the association result id -> context id to be removed",
+  "paramRequired": true
+}
 
 ]

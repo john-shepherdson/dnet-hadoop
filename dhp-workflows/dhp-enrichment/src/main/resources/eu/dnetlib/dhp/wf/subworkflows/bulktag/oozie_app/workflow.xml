@@ -103,6 +103,7 @@
             <arg>--dbUser</arg><arg>${dbUser}</arg>
             <arg>--dbPassword</arg><arg>${dbPassword}</arg>
             <arg>--configurationPath</arg><arg>${bulkTaggingConfigurationPath}</arg>
+            <arg>--removeConstraintsPath</arg><arg>/tmp/removeconstraints/</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

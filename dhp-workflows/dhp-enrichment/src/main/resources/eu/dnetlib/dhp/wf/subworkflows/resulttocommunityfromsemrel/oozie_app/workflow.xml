@@ -189,7 +189,7 @@
             <arg>--sourcePath</arg><arg>${workingDir}/communitysemrel/preparedInfo/targetCommunityAssoc</arg>
             <arg>--outputPath</arg><arg>${workingDir}/communitysemrel/preparedInfo/mergedCommunityAssoc</arg>
         </spark>
-        <ok to="fork-join-exec-propagation"/>
+        <ok to="exec-propagation"/>
         <error to="Kill"/>
     </action>
 
@@ -200,7 +200,7 @@
         <path start="join_propagate_software"/>
     </fork>
 
-    <action name="join_propagate_publication">
+    <action name="exec-propagation">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
@@ -213,86 +213,14 @@
                 ${sparkApplicationOpts}
             </spark-opts>
             <arg>--preparedInfoPath</arg><arg>${workingDir}/communitysemrel/preparedInfo/mergedCommunityAssoc</arg>
-            <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}/</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/communitysemrel/publication</arg>
-
+            <arg>--outputPath</arg><arg>${workingDir}/communitysemrel/</arg>
+            <arg>--removeContextPath</arg><arg>/tmp/removeconstraints/</arg>
         </spark>
-        <ok to="wait2"/>
+        <ok to="move-results"/>
         <error to="Kill"/>
     </action>
-
-    <action name="join_propagate_dataset">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>Result2CommunitySemRelPropagation-Dataset</name>
-            <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.SparkResultToCommunityThroughSemRelJob</class>
-            <jar>dhp-enrichment-${projectVersion}.jar</jar>
-            <spark-opts>
-                ${sparkClusterOpts}
-                ${sparkResourceOpts}
-                ${sparkApplicationOpts}
-            </spark-opts>
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/communitysemrel/preparedInfo/mergedCommunityAssoc</arg>
-            <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/communitysemrel/dataset</arg>
-
-        </spark>
-        <ok to="wait2"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="join_propagate_otherresearchproduct">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>Result2CommunitySemRelPropagation-ORP</name>
-            <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.SparkResultToCommunityThroughSemRelJob</class>
-            <jar>dhp-enrichment-${projectVersion}.jar</jar>
-            <spark-opts>
-                ${sparkClusterOpts}
-                ${sparkResourceOpts}
-                ${sparkApplicationOpts}
-            </spark-opts>
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/communitysemrel/preparedInfo/mergedCommunityAssoc</arg>
-            <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/communitysemrel/otherresearchproduct</arg>
-
-        </spark>
-        <ok to="wait2"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="join_propagate_software">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>Result2CommunitySemRelPropagation-Software</name>
-            <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.SparkResultToCommunityThroughSemRelJob</class>
-            <jar>dhp-enrichment-${projectVersion}.jar</jar>
-            <spark-opts>
-                ${sparkClusterOpts}
-                ${sparkResourceOpts}
-                ${sparkApplicationOpts}
-            </spark-opts>
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/communitysemrel/preparedInfo/mergedCommunityAssoc</arg>
-            <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/communitysemrel/software</arg>
-
-        </spark>
-        <ok to="wait2"/>
-        <error to="Kill"/>
-    </action>
-
-    <join name="wait2" to="move-results"/>
 
     <action name="move-results">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -309,10 +237,17 @@
             <arg>--sourcePath</arg><arg>${workingDir}/communitysemrel/</arg>
             <arg>--outputPath</arg><arg>${sourcePath}/</arg>
         </spark>
+        <ok to="removeWorkingDir"/>
+        <error to="Kill"/>
+    </action>
+    <action name="removeWorkingDir">
+        <fs>
+            <delete path="${workingDir}"/>
+
+        </fs>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
-
     <end name="End"/>
 
 </workflow-app>

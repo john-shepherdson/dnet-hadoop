@@ -61,5 +61,10 @@
     "paramLongName": "configurationPath",
     "paramDescription": "the path where to store the configuration used to run the tagging",
     "paramRequired": true
-  }
+  },{
+  "paramName": "rp",
+  "paramLongName": "removeConstraintsPath",
+  "paramDescription": "the path where to store the configuration used to run the tagging",
+  "paramRequired": true
+}
 ]

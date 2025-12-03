@@ -103,6 +103,8 @@ public class SparkBulkTagJob {
 		log.info("dbPassword: {}", dbPassword);
 		final String hdfsPath = outputPath + "masterDuplicate";
 		log.info("hdfsPath: {}", hdfsPath);
+		final String removeConstraintsPath = parser.get("removeConstraintsPath");
+		log.info("removeConstraintsPath: {}", removeConstraintsPath);
 
 		final String configurationPath = parser.get("configurationPath");
 
@@ -129,7 +131,7 @@ public class SparkBulkTagJob {
 				ReadDatasourceMasterDuplicateFromDB.execute(dbUrl, dbUser, dbPassword, hdfsPath, hdfsNameNode);
 
 				execBulkTag(
-					spark, inputPath, outputPath, protoMap, cc);
+					spark, inputPath, outputPath, protoMap, cc, removeConstraintsPath);
 				execEntityTag(
 					spark, inputPath + "organization", outputPath + "organization",
 					mapWithRepresentativeOrganization(
@@ -339,7 +341,8 @@ public class SparkBulkTagJob {
 		String inputPath,
 		String outputPath,
 		ProtoMap protoMappingParams,
-		CommunityConfiguration communityConfiguration) {
+		CommunityConfiguration communityConfiguration,
+		String removeConstraintsPath) {
 
 		ModelSupport.entityTypes
 			.keySet()
@@ -389,7 +392,7 @@ public class SparkBulkTagJob {
 						.write()
 						.mode(SaveMode.Overwrite)
 						.option("compression","gzip")
-						.json("/tmp/removeconstraints/" + e.name());
+						.json(removeConstraintsPath + e.name());
 
 				readPath(spark, outputPath + e.name(), resultClazz) // copy the tagging in the actual result output path
 					.write()
