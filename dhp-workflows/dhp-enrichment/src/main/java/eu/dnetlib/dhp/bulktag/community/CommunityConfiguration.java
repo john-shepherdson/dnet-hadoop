@@ -191,8 +191,8 @@ public class CommunityConfiguration implements Serializable {
 	}
 
 	public List<String> getCommunityForZenodoCommunityValue(String value) {
-		final String zenodoCommunityId = StringUtils.stripEnd(value,"/").substring(value.lastIndexOf("/") + 1).toLowerCase().trim();
-		return getContextIds(zenodocommunityMap.get(zenodoCommunityId));
+		final String zenodoCommunityId = StringUtils.stripEnd(value,"/");
+		return getContextIds(zenodocommunityMap.get(zenodoCommunityId.substring(zenodoCommunityId.lastIndexOf("/") + 1).toLowerCase().trim()));
 	}
 
 	private List<String> getContextIds(List<Pair<String, SelectionConstraints>> list) {
