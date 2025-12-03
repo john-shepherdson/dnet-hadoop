@@ -163,11 +163,11 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 		Dataset<Relation> redirectedRels = redirectNewRelationsOnRepresentatives(newRelations, graph_relations);
 
 		// create nco authorship relations (need to merge author with pids from enriched and graph
-		Dataset<Row> matched = spark
-			.read()
-			.schema(Encoders.bean(ORCIDAuthorEnricherResult.class).schema())
-			.parquet(workingDir + "/publication_matched")
-			.selectExpr("id", "enriched_author");
+//		Dataset<Row> matched = spark
+//			.read()
+//			.schema(Encoders.bean(ORCIDAuthorEnricherResult.class).schema())
+//			.parquet(workingDir + "/publication_matched")
+//			.selectExpr("id", "enriched_author");
 		// gets new coAuthorship relations if any to build
 
 		//      Co-Authorship removed because we will end producing duplicate relations - we already have them from the graph
