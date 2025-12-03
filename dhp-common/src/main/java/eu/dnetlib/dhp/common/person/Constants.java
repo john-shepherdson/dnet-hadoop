@@ -96,6 +96,6 @@ public class Constants {
 	}
 
 	public static String getPersonId(String pid){
-		return DHPUtils.generateIdentifier(removePrefixUrl(pid).toLowerCase(), PERSON_PREFIX);
+		return DHPUtils.generateIdentifier(removePrefixUrl(pid).toUpperCase(), PERSON_PREFIX);
 	}
 }
