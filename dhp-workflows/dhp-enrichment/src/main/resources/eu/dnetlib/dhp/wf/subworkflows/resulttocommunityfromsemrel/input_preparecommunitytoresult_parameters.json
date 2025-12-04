@@ -34,11 +34,5 @@
     "paramLongName": "outputPath",
     "paramDescription": "the path used to store temporary output files",
     "paramRequired": true
-  },
-  {
-    "paramName":"tn",
-    "paramLongName":"resultTableName",
-    "paramDescription": "the name of the result table we are currently working on",
-    "paramRequired": true
   }
 ]

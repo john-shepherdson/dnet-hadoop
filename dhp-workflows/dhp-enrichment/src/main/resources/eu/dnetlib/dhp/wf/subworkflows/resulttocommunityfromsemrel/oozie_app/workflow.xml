@@ -69,87 +69,11 @@
             <delete path="${workingDir}"/>
             <mkdir path="${workingDir}"/>
         </fs>
-        <ok to="fork_prepare_assoc_step1"/>
+        <ok to="prepare_result"/>
         <error to="Kill"/>
     </action>
 
-    <fork name="fork_prepare_assoc_step1">
-        <path start="join_prepare_publication"/>
-        <path start="join_prepare_dataset"/>
-        <path start="join_prepare_otherresearchproduct"/>
-        <path start="join_prepare_software"/>
-    </fork>
-
-    <action name="join_prepare_publication">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>ResultToCommunitySemRel-PreparePhase1-Publications</name>
-            <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.PrepareResultCommunitySetStep1</class>
-            <jar>dhp-enrichment-${projectVersion}.jar</jar>
-            <spark-opts>
-                ${sparkClusterOpts}
-                ${sparkResourceOpts}
-                ${sparkApplicationOpts}
-            </spark-opts>
-            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/communitysemrel/preparedInfo/targetCommunityAssoc</arg>
-            <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
-            <arg>--baseURL</arg><arg>${baseURL}</arg>
-        </spark>
-        <ok to="wait"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="join_prepare_dataset">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>ResultToCommunitySemRel-PreparePhase1-Dataset</name>
-            <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.PrepareResultCommunitySetStep1</class>
-            <jar>dhp-enrichment-${projectVersion}.jar</jar>
-            <spark-opts>
-                ${sparkClusterOpts}
-                ${sparkResourceOpts}
-                ${sparkApplicationOpts}
-            </spark-opts>
-            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/communitysemrel/preparedInfo/targetCommunityAssoc</arg>
-            <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
-            <arg>--baseURL</arg><arg>${baseURL}</arg>
-        </spark>
-        <ok to="wait"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="join_prepare_otherresearchproduct">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>ResultToCommunitySemRel-PreparePhase1-ORP</name>
-            <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.PrepareResultCommunitySetStep1</class>
-            <jar>dhp-enrichment-${projectVersion}.jar</jar>
-            <spark-opts>
-                ${sparkClusterOpts}
-                ${sparkResourceOpts}
-                ${sparkApplicationOpts}
-            </spark-opts>
-            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/communitysemrel/preparedInfo/targetCommunityAssoc</arg>
-            <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
-            <arg>--baseURL</arg><arg>${baseURL}</arg>
-        </spark>
-        <ok to="wait"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="join_prepare_software">
+    <action name="prepare_result">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
@@ -161,18 +85,15 @@
                 ${sparkResourceOpts}
                 ${sparkApplicationOpts}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}/</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/communitysemrel/preparedInfo/targetCommunityAssoc</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/communitysemrel/preparedInfo/targetCommunityAssoc/</arg>
             <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
             <arg>--baseURL</arg><arg>${baseURL}</arg>
         </spark>
-        <ok to="wait"/>
+        <ok to="prepare_assoc_step2"/>
         <error to="Kill"/>
     </action>
-
-    <join name="wait" to="prepare_assoc_step2"/>
 
     <action name="prepare_assoc_step2">
         <spark xmlns="uri:oozie:spark-action:0.2">

@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.*;
@@ -142,8 +143,6 @@ public class PrepareResultCommunitySetStep1 {
 					inputPath,
 					outputPath,
 					allowedsemrel,
-					resultClazz,
-					resultType,
 					communityIdList);
 			});
 	}
@@ -153,52 +152,47 @@ public class PrepareResultCommunitySetStep1 {
 		String inputPath,
 		String outputPath,
 		String allowedsemrel,
-		Class<R> resultClazz,
-		String resultType,
 		String communityIdList) {
 
-		final String inputResultPath = inputPath + "/" + resultType;
-		log.info("Reading Graph table from: {}", inputResultPath);
+		ModelSupport.entityTypes
+				.keySet()
+				.parallelStream()
+				.filter(ModelSupport::isResult)
+				.forEach(e -> {
+					removeOutputDir(spark, outputPath + e.name());
+					Class<R> resultClazz = ModelSupport.entityTypes.get(e);
+					Dataset<R> result = readPath(spark, inputPath  + e.name(), resultClazz)
+							.where("datainfo.deletedbyinference != true AND datainfo.invisible != true");
+					result.createOrReplaceTempView("result");
+					Dataset<Relation> relation = readPath(spark, inputPath  + "relation", Relation.class);
+					relation.createOrReplaceTempView("relation");
+					String resultContextQuery = String
+							.format(
+									RESULT_CONTEXT_QUERY_TEMPLATE,
+									"AND  lower(co.id) IN " + communityIdList,
+									"AND lower(relClass) IN " + allowedsemrel);
+					Dataset<Row> result_context = spark.sql(resultContextQuery);
 
-		final String inputRelationPath = inputPath + "/relation";
-		log.info("Reading relation table from: {}", inputResultPath);
+					Dataset<Row> rwc = spark.sql(String.format(RESULT_WITH_CONTEXT, communityIdList));
+					Dataset<Row> patents = spark.sql(RESULT_PATENT);
+					Dataset<Row> relatedToRelations = spark.sql(IS_RELATED_TO_RELATIONS);
 
-		Dataset<Relation> relation = readPath(spark, inputRelationPath, Relation.class);
-		relation.createOrReplaceTempView("relation");
+					rwc.createOrReplaceTempView("resultWithContext");
+					patents.createOrReplaceTempView("patents");
+					relatedToRelations.createOrReplaceTempView("relatedTorelations");
 
-		Dataset<R> result = readPath(spark, inputResultPath, resultClazz)
-			.where("datainfo.deletedbyinference != true AND datainfo.invisible != true");
-		result.createOrReplaceTempView("result");
+					result_context = result_context.unionAll(spark.sql(RESULT_CONTEXT_QUERY_TEMPLATE_IS_RELATED_TO));
 
-		final String outputResultPath = outputPath + "/" + resultType;
-		log.info("writing output results to: {}", outputResultPath);
+					result_context.createOrReplaceTempView("result_context");
 
-		String resultContextQuery = String
-			.format(
-				RESULT_CONTEXT_QUERY_TEMPLATE,
-				"AND  lower(co.id) IN " + communityIdList,
-				"AND lower(relClass) IN " + allowedsemrel);
-		Dataset<Row> result_context = spark.sql(resultContextQuery);
-
-		Dataset<Row> rwc = spark.sql(String.format(RESULT_WITH_CONTEXT, communityIdList));
-		Dataset<Row> patents = spark.sql(RESULT_PATENT);
-		Dataset<Row> relatedToRelations = spark.sql(IS_RELATED_TO_RELATIONS);
-
-		rwc.createOrReplaceTempView("resultWithContext");
-		patents.createOrReplaceTempView("patents");
-		relatedToRelations.createOrReplaceTempView("relatedTorelations");
-
-		result_context = result_context.unionAll(spark.sql(RESULT_CONTEXT_QUERY_TEMPLATE_IS_RELATED_TO));
-
-		result_context.createOrReplaceTempView("result_context");
-
-		spark
-			.sql(RESULT_COMMUNITY_LIST_QUERY)
-			.as(Encoders.bean(ResultCommunityList.class))
-			.write()
-			.option("compression", "gzip")
-			.mode(SaveMode.Append)
-			.json(outputResultPath);
+					spark
+							.sql(RESULT_COMMUNITY_LIST_QUERY)
+							.as(Encoders.bean(ResultCommunityList.class))
+							.write()
+							.option("compression", "gzip")
+							.mode(SaveMode.Append)
+							.json(outputPath + e.name());
+				});
 
 	}
 
