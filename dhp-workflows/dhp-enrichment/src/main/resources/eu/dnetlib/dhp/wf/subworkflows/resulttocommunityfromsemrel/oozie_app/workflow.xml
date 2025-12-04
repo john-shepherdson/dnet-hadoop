@@ -193,18 +193,11 @@
         <error to="Kill"/>
     </action>
 
-    <fork name="fork-join-exec-propagation">
-        <path start="join_propagate_publication"/>
-        <path start="join_propagate_dataset"/>
-        <path start="join_propagate_otherresearchproduct"/>
-        <path start="join_propagate_software"/>
-    </fork>
-
     <action name="exec-propagation">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Result2CommunitySemRelPropagation-Publication</name>
+            <name>Result2CommunitySemRelPropagation</name>
             <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.SparkResultToCommunityThroughSemRelJob</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>

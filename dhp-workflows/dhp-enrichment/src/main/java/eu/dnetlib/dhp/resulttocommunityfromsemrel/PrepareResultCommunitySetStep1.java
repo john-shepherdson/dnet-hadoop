@@ -136,9 +136,7 @@ public class PrepareResultCommunitySetStep1 {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				if (isTest(parser)) {
-					removeOutputDir(spark, outputPath);
-				}
+
 				prepareInfo(
 					spark,
 					inputPath,
