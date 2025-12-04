@@ -34,7 +34,7 @@
     "paramName":"tn",
     "paramLongName":"resultTableName",
     "paramDescription": "the name of the result table we are currently working on",
-    "paramRequired": true
+    "paramRequired": false
   },
   {
     "paramName": "p",

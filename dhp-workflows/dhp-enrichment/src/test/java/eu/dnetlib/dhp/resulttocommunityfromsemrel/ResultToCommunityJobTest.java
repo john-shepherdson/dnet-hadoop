@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import eu.dnetlib.dhp.schema.oaf.Result;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -73,17 +74,21 @@ public class ResultToCommunityJobTest {
 		SparkResultToCommunityThroughSemRelJob
 			.main(
 				new String[] {
-					"-isTest", Boolean.TRUE.toString(),
+
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-sourcePath", getClass()
-						.getResource("/eu/dnetlib/dhp/resulttocommunityfromsemrel/sample")
+						.getResource("/eu/dnetlib/dhp/resulttocommunityfromsemrel/sample/")
 						.getPath(),
 					"-hive_metastore_uris", "",
-					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Dataset",
-					"-outputPath", workingDir.toString() + "/dataset",
+
+					"-outputPath", workingDir.toString() + "/",
 					"-preparedInfoPath", getClass()
 						.getResource("/eu/dnetlib/dhp/resulttocommunityfromsemrel/preparedInfo")
+						.getPath(),
+						"-removeContextPath", getClass()
+						.getResource("/eu/dnetlib/dhp/resulttocommunityfromsemrel/remove/")
 						.getPath()
+
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -105,7 +110,7 @@ public class ResultToCommunityJobTest {
 			+ "where MyD.inferenceprovenance = 'propagation'";
 
 		org.apache.spark.sql.Dataset<Row> resultExplodedProvenance = spark.sql(query);
-		Assertions.assertEquals(5, resultExplodedProvenance.count());
+		Assertions.assertEquals(3, resultExplodedProvenance.count());
 
 		Assertions
 			.assertEquals(
@@ -136,7 +141,7 @@ public class ResultToCommunityJobTest {
 
 		Assertions
 			.assertEquals(
-				3,
+				1,
 				resultExplodedProvenance
 					.filter("id = '50|dedup_wf_001::0a60e33b4f0986ebd9819451f2d87a28'")
 					.count());
@@ -149,9 +154,9 @@ public class ResultToCommunityJobTest {
 						"50|dedup_wf_001::0a60e33b4f0986ebd9819451f2d87a28"))
 			.sort(desc("community"))
 			.collectAsList();
-		Assertions.assertEquals("mes", rowList.get(0).getString(0));
-		Assertions.assertEquals("fam", rowList.get(1).getString(0));
-		Assertions.assertEquals("ee", rowList.get(2).getString(0));
+//		Assertions.assertEquals("mes", rowList.get(0).getString(0));
+//		Assertions.assertEquals("fam", rowList.get(1).getString(0));
+		Assertions.assertEquals("ee", rowList.get(0).getString(0));
 
 		Assertions
 			.assertEquals(
@@ -180,7 +185,7 @@ public class ResultToCommunityJobTest {
 
 		org.apache.spark.sql.Dataset<Row> resultCommunityId = spark.sql(query);
 
-		Assertions.assertEquals(10, resultCommunityId.count());
+		Assertions.assertEquals(8, resultCommunityId.count());
 
 		Assertions
 			.assertEquals(
@@ -202,7 +207,7 @@ public class ResultToCommunityJobTest {
 
 		Assertions
 			.assertEquals(
-				3,
+				1,
 				resultCommunityId
 					.filter("id = '50|dedup_wf_001::0a60e33b4f0986ebd9819451f2d87a28'")
 					.count());
@@ -215,9 +220,9 @@ public class ResultToCommunityJobTest {
 						"50|dedup_wf_001::0a60e33b4f0986ebd9819451f2d87a28"))
 			.sort(desc("community"))
 			.collectAsList();
-		Assertions.assertEquals("mes", rowList.get(0).getString(0));
-		Assertions.assertEquals("fam", rowList.get(1).getString(0));
-		Assertions.assertEquals("ee", rowList.get(2).getString(0));
+//		Assertions.assertEquals("mes", rowList.get(0).getString(0));
+//		Assertions.assertEquals("fam", rowList.get(1).getString(0));
+		Assertions.assertEquals("ee", rowList.get(0).getString(0));
 
 		Assertions
 			.assertEquals(

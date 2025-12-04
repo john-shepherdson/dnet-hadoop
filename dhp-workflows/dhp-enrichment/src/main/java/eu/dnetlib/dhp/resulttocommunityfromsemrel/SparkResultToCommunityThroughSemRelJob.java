@@ -87,7 +87,6 @@ public class SparkResultToCommunityThroughSemRelJob {
 				.filter(ModelSupport::isResult)
 				.forEach(e -> {
 					removeOutputDir(spark, outputPath + e.name());
-					ResultTagger resultTagger = new ResultTagger();
 					Class<R> resultClazz = ModelSupport.entityTypes.get(e);
 					Dataset<R> result = readPath(spark, inputPath + e.name(), resultClazz);
 					result
@@ -108,6 +107,7 @@ public class SparkResultToCommunityThroughSemRelJob {
 								it.forEachRemaining(community -> ret.add(community.getAs("_2")));
 								return new RemovePojo(k, ret);
 							}, Encoders.bean(RemovePojo.class));
+					result = readPath(spark, outputPath + e.name() + "_removed", resultClazz);
 					result.joinWith(toRemove, result.col("id").equalTo(toRemove.col("resultId")), "left")
 							.map((MapFunction<Tuple2<R, RemovePojo>, R>) t2 -> {
 								R r = t2._1();
@@ -164,29 +164,4 @@ public class SparkResultToCommunityThroughSemRelJob {
 		};
 	}
 
-}
-class RemovePojo {
-	String resultId;
-	List<String> contextList;
-
-	public String getResultId() {
-		return resultId;
-	}
-
-	public void setResultId(String resultId) {
-		this.resultId = resultId;
-	}
-
-	public List<String> getContextList() {
-		return contextList;
-	}
-
-	public void setContextList(List<String> contextList) {
-		this.contextList = contextList;
-	}
-
-	public RemovePojo(String resultId, List<String> contextList) {
-		this.resultId = resultId;
-		this.contextList = contextList;
-	}
 }
