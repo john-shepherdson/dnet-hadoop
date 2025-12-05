@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.logging.Filter;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.common.person.Constants;
 import eu.dnetlib.dhp.schema.oaf.rel.Authorship;
 import eu.dnetlib.dhp.schema.oaf.rel.CoAuthorship;
 import eu.dnetlib.dhp.schema.oaf.rel.beans.AuthorshipRoles;
@@ -393,6 +394,18 @@ public class SparkExtractPersonRelationsAndAddIndicators {
 			if(Optional.ofNullable(toMerge.getRoles()).isPresent())
 					toMerge.getRoles().forEach(role -> addRole(acc.getRoles(),role));
 		}
+		if(acc.getCorresponding() == null)
+			acc.setCorresponding(toMerge.getCorresponding());
+		if(acc.getDeclaredAffiliations() == null)
+			acc.setDeclaredAffiliations(toMerge.getDeclaredAffiliations());
+		else{
+			if(Optional.ofNullable(toMerge.getDeclaredAffiliations()).isPresent())
+				toMerge.getDeclaredAffiliations().forEach(affiliation -> addAffiliation(acc.getDeclaredAffiliations(), affiliation));
+		}
+		return acc;
+	}
+
+	private static void addAffiliation(List<DeclaredAffiliation> declaredAffiliations, DeclaredAffiliation affiliation) {
 	}
 
 	private static void addRole(List<Role> roles, Role role){
@@ -456,12 +469,14 @@ public class SparkExtractPersonRelationsAndAddIndicators {
 	}
 
 	private static Authorship getAuthorshipRelation(String orcid, String resultId, Integer rank, List<String> rawAffiliations) {
-		String source = PERSON_PREFIX + "::" + IdentifierFactory.md5(orcid);
+		String source = Constants.getPersonId(orcid);
 		Authorship authorship = new Authorship();
 		authorship.setPerson(source);
 		authorship.setProduct(resultId);
 		authorship.setRank(rank);
 		authorship.setDataInfo(DATAINFO);
+		//Maybe we should not add the string without a matching organization
+		//not in the relation anyway
 		authorship.setDeclaredAffiliations(rawAffiliations.stream().map(rawAffiliation -> {
 			DeclaredAffiliation da = new DeclaredAffiliation();
 			da.setRawAffiliation(rawAffiliation);

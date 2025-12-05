@@ -15,6 +15,7 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.common.person.Constants;
 import eu.dnetlib.dhp.schema.oaf.rel.AuthorAffiliation;
 import eu.dnetlib.dhp.schema.oaf.rel.Authorship;
 import eu.dnetlib.dhp.schema.oaf.rel.CoAuthorship;
@@ -30,13 +31,10 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.BZip2Codec;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
-import org.apache.hadoop.yarn.webapp.hamlet.Hamlet;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.*;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.types.DataTypes;
-import org.apache.spark.sql.types.StructType;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +53,6 @@ import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.*;
-import eu.dnetlib.dhp.utils.DHPUtils;
 import scala.Tuple2;
 import scala.collection.mutable.WrappedArray;
 
@@ -128,14 +125,15 @@ public class ExtractPerson implements Serializable {
 		// Read the publishers output
 		Dataset<Row> df = spark
 			.read()
-			.schema(schema)
+			.schema(RESULT_MATCHED_SCHEMA)
+
 			.json(inputPath)
-			.where("id is not null");
+			.where("doi is not null");
 
         //Select the relevant information
 		Dataset<Row> allAuthors = df
 				.withColumn("author", explode(col("authors")))
-				.select(col("id"),
+				.select(col("doi"),
 						col("author.contributor_roles").as("roles"),
 						col("author.corresponding").as("corresponding"),
 						col("author.affiliations").as("affiliations"),
@@ -148,45 +146,19 @@ public class ExtractPerson implements Serializable {
 
 		writeAuthorshipRelations(workingDir + "/authorship", allAuthors);
 
-		writeCoAuthorshipRelations(workingDir, allAuthors);
+
 
 	}
 
-	private static void writeCoAuthorshipRelations(String workingDir, Dataset<Row> allAuthors) {
-		Dataset<CoAuthorship> tmp = allAuthors
-				.selectExpr("id", "orcid")
-				.groupByKey((MapFunction<Row, String>) r -> r.getAs("id"), Encoders.STRING())
-				.mapGroups(
-						(MapGroupsFunction<String, Row, Coauthors>) (k, it) -> extractCoAuthorsRow(it),
-						Encoders.bean(Coauthors.class))
-				.flatMap(
-						(FlatMapFunction<Coauthors, CoAuthorship>) c -> new CoAuthorshipIterator(c.getCoauthors()),
-						Encoders.bean(CoAuthorship.class));
-
-				tmp.groupByKey((MapFunction<CoAuthorship, String>) r -> r.getAuthor1() + r.getAuthor2(), Encoders.STRING())
-				.mapGroups(
-						(MapGroupsFunction<String, CoAuthorship, CoAuthorship>) (k, it) -> {
-							CoAuthorship ca = it.next();
-							it.forEachRemaining(a -> ca.setCoauthoredProducts(ca.getCoauthoredProducts() + a.getCoauthoredProducts()));
-							ca.setCollectedfrom(OPENAIRE_COLLECTED_FROM);
-							ca.setDataInfo(OPENAIRE_DATAINFO);
-							return ca;
-						},
-						Encoders.bean(CoAuthorship.class))
-				.write()
-				.mode(SaveMode.Overwrite)
-				.option("compression","gzip")
-				.json(workingDir + "/coauthorship");
-	}
 
 	private static void writeAuthorshipRelations(String outputPath, Dataset<Row> allAuthors) {
 
 		allAuthors.map(
 				(MapFunction<Row, Authorship>) row -> {
-					String id = row.getAs("id");
+					String id = row.getAs("doi");
 					Boolean corresponding = Boolean.valueOf(row.getAs("corresponding"));
 
-					String orcid = PERSON_PREFIX + SEPARATOR + IdentifierFactory.md5(row.getAs("orcid"));
+					String orcid = Constants.getPersonId(row.getAs("orcid"));
 
 					// --- Gestione Affiliazioni (senza explode) ---
 					WrappedArray<Row> affRows = row.getAs("affiliations");
@@ -198,7 +170,7 @@ public class ExtractPerson implements Serializable {
 							String rawAff = aff.getAs("raw_affiliation_string");
 
 							// Matchings non esplosi
-							WrappedArray<Row> matchingRows = aff.getAs("Matchings");
+							WrappedArray<Row> matchingRows = aff.getAs("matchings");
 							List<MatchingOrganization> mos = new ArrayList<>();
 
 							if (matchingRows != null) {
@@ -311,7 +283,7 @@ public class ExtractPerson implements Serializable {
 
 	private static ProjectParticipation getProjectRelation(String project, String orcid, String role) {
 
-		String source = PERSON_PREFIX + SEPARATOR + IdentifierFactory.md5(orcid);
+		String source = Constants.getPersonId(orcid);
 
 		String target = PROJECT_ID_PREFIX + StringUtils.substringBefore(project, SEPARATOR) + SEPARATOR
 			+ IdentifierFactory.md5(StringUtils.substringAfter(project, SEPARATOR));
@@ -389,7 +361,7 @@ public class ExtractPerson implements Serializable {
 
 	private static @NotNull Person getPerson(Author op) {
 		Person person = new Person();
-		person.setId(DHPUtils.generateIdentifier(op.getOrcid(), PERSON_PREFIX));
+		person.setId(Constants.getPersonId(op.getOrcid()));
 		person
 			.setBiography(
 				Optional
@@ -458,7 +430,7 @@ public class ExtractPerson implements Serializable {
 	private static AuthorAffiliation getAffiliationRelation(Employment row) {
 		AuthorAffiliation aa = new AuthorAffiliation();
 
-		String source = PERSON_PREFIX + SEPARATOR + IdentifierFactory.md5(row.getOrcid());
+		String source = Constants.getPersonId(row.getOrcid());
 		String target = ROR_PREFIX
 			+ IdentifierFactory.md5(PidCleaner.normalizePidValue("ROR", row.getAffiliationId().getValue()));
 		aa.setPerson(source);
@@ -500,10 +472,6 @@ public class ExtractPerson implements Serializable {
 				.map((MapFunction<String, Authorship>) values -> OBJECT_MAPPER.readValue(values, Authorship.class),
 						Encoders.bean(Authorship.class));
 
-		Dataset<CoAuthorship> coAuthorshipDataset = spark.read().textFile(workingDir + "/coauthorship")
-				.map((MapFunction<String, CoAuthorship>) values -> OBJECT_MAPPER.readValue(values, CoAuthorship.class),
-						Encoders.bean(CoAuthorship.class));
-
 		Dataset<AuthorAffiliation> authorAffiliationDataset = spark.read().textFile(workingDir + "/affiliation")
 				.map((MapFunction<String, AuthorAffiliation>) values -> OBJECT_MAPPER.readValue(values, AuthorAffiliation.class),
 						Encoders.bean(AuthorAffiliation.class));
@@ -519,10 +487,6 @@ public class ExtractPerson implements Serializable {
 					authorshipDataset
 							.toJavaRDD()
 									.map(r -> new AtomicAction(r.getClass(), r))
-			)
-			.union(coAuthorshipDataset
-								.toJavaRDD()
-								.map(r -> new AtomicAction(r.getClass(), r))
 			)
 				.union(authorAffiliationDataset
 						.toJavaRDD()

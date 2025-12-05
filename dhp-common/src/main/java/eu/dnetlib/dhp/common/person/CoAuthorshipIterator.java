@@ -55,8 +55,8 @@ public class CoAuthorshipIterator implements Iterator<CoAuthorship> {
 	private CoAuthorship getRelation(String orcid1, String orcid2) {
 		CoAuthorship coAuthorship = new CoAuthorship();
 
-		String source = PERSON_PREFIX + SEPARATOR + IdentifierFactory.md5(orcid1);
-		String target = PERSON_PREFIX + SEPARATOR + IdentifierFactory.md5(orcid2);
+		String source = Constants.getPersonId(orcid1);
+		String target = Constants.getPersonId(orcid2);
 		coAuthorship.setAuthor1(source);
 		coAuthorship.setAuthor2(target);
 		coAuthorship.setCoauthoredProducts(1);
