@@ -406,10 +406,29 @@ public class SparkExtractPersonRelationsAndAddIndicators {
 	}
 
 	private static void addAffiliation(List<DeclaredAffiliation> declaredAffiliations, DeclaredAffiliation affiliation) {
+
+		Optional<DeclaredAffiliation> sameaff = declaredAffiliations.stream()
+				.filter(a -> a.getRawAffiliation().equalsIgnoreCase(affiliation.getRawAffiliation())).findFirst();
+
+		if(!sameaff.isPresent())
+			//I need to verify none of the matching organizations are present in the old affiliation
+			//the raw affiliation string is free text that can be written in different ways
+			//since the relations are generated from publishers files and graph it could happen
+			declaredAffiliations.add(affiliation);
+		else {
+			DeclaredAffiliation da = sameaff.get();
+			//we miss the matching organization. I assume that since the string is the same the matchings will be the same
+			//so I just include the list of matching from affiliation
+			//in case the list is there and it is not empty there is nothing to change because of the assumption
+			if(!Optional.ofNullable(da.getMatchingOrganization()).isPresent() || da.getMatchingOrganization().isEmpty()){
+				da.setMatchingOrganization(affiliation.getMatchingOrganization());
+			}
+		}
 	}
 
 	private static void addRole(List<Role> roles, Role role){
-		
+		if(roles.stream().noneMatch(r -> r.equals(role)))
+			roles.add(role);
 	}
 
 	private static Coauthors getAuthorsPidList(Result r) {

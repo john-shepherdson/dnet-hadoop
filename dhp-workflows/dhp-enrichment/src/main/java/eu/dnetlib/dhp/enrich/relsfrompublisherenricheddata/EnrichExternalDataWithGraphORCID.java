@@ -6,6 +6,8 @@ import static eu.dnetlib.dhp.common.enrichment.Constants.PROPAGATION_DATA_INFO_T
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.sun.org.apache.xpath.internal.operations.String;
+import eu.dnetlib.dhp.common.person.Constants;
 import eu.dnetlib.dhp.schema.oaf.rel.CoAuthorship;
 import org.apache.commons.collections.ArrayStack;
 import org.apache.commons.lang3.StringUtils;
@@ -64,11 +66,30 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 	}
 
 	// orcidPath is the path to the source for orcid. In this case the oaire graph
-	// graphPath is the path to the publishers outcomes to be enriched
+	// graphPath is the path to the results with information from affro to be enriched
 	@Override
 	public void createTemporaryData(SparkSession spark, String graphPath, String orcidPath, String targetPath) {
-		// Done only for publications since it is the input from the publishers which should be enriched
-//creates tuple2 <doi, orcidauthorslist>
+		//the enrichment set is the whole dataset of results computed in the creation of the dataset
+		//the pivot is the result id as the deduped record
+		//the dataset is computed on the original identifiers: for each folder we need to redirect the result to the merging
+		//record.
+		//Selection of the information enriched by affro execution
+		String[] datasources = {"oaire", "oalex", "publishers", "crossref", "datacite", "pubmed"};
+
+		resultsWithAffiliations = spark.em
+
+		//Step2 from the merging record we extract the authors and create an enriched structure AthorInformation containing all
+		//the added information we possibly find in the affro enriched resords in the graph
+
+		//Step 3 for each eauthor information we group by result id and reconcile the information of all the results enriched
+		//for the deduped id
+		//example: or1,...orn are merged in dr. suppose we have author affiliation information for or1 and or3. They enrich
+		//authorinformation extracted for dr producing the enrichment from or1 and the one from or3. It is possible in these two
+		//enrichments the same information is provided, or different information is provided. We need to reconcile and
+		//alert if the differences are too big
+
+		//Step4 after reconciliation, new relations for authors are extracted from the update reconciled unique result per oaire id
+
 		Dataset<Row> orcidDnet = spark
 			.read()
 			.schema(Encoders.bean(Result.class).schema())

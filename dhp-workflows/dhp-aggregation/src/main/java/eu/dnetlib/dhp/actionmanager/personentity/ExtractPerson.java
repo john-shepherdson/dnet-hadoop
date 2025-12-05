@@ -109,7 +109,7 @@ public class ExtractPerson implements Serializable {
 				extractInfoForActionSetFromORCID(spark, inputPath, workingDir);
 				extractInfoForActionSetFromProjects(
 					dbUrl, dbUser, dbPassword, workingDir + "/project", hdfsNameNode, isSparkSessionManaged);
-				extractInfoForActionSetFromPublisher(spark, publisherInputPath, workingDir);
+				//extractInfoForActionSetFromPublisher(spark, publisherInputPath, workingDir);
 				createActionSet(spark, outputPath, workingDir);
 			});
 
@@ -468,9 +468,9 @@ public class ExtractPerson implements Serializable {
 					.readValue(value, Person.class),
 				Encoders.bean(Person.class));
 
-		Dataset<Authorship> authorshipDataset = spark.read().textFile(workingDir + "/authorship")
-				.map((MapFunction<String, Authorship>) values -> OBJECT_MAPPER.readValue(values, Authorship.class),
-						Encoders.bean(Authorship.class));
+//		Dataset<Authorship> authorshipDataset = spark.read().textFile(workingDir + "/authorship")
+//				.map((MapFunction<String, Authorship>) values -> OBJECT_MAPPER.readValue(values, Authorship.class),
+//						Encoders.bean(Authorship.class));
 
 		Dataset<AuthorAffiliation> authorAffiliationDataset = spark.read().textFile(workingDir + "/affiliation")
 				.map((MapFunction<String, AuthorAffiliation>) values -> OBJECT_MAPPER.readValue(values, AuthorAffiliation.class),
@@ -483,11 +483,11 @@ public class ExtractPerson implements Serializable {
 		people
 			.toJavaRDD()
 			.map(p -> new AtomicAction(p.getClass(), p))
-			.union(
-					authorshipDataset
-							.toJavaRDD()
-									.map(r -> new AtomicAction(r.getClass(), r))
-			)
+//			.union(
+//					authorshipDataset
+//							.toJavaRDD()
+//									.map(r -> new AtomicAction(r.getClass(), r))
+//			)
 				.union(authorAffiliationDataset
 						.toJavaRDD()
 						.map(r -> new AtomicAction(r.getClass(), r))
