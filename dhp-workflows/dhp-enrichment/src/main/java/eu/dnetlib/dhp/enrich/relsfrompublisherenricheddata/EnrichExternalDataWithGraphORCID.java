@@ -1,13 +1,18 @@
 
 package eu.dnetlib.dhp.enrich.relsfrompublisherenricheddata;
 
+import static eu.dnetlib.dhp.PropagationConstant.removeOutputDir;
 import static eu.dnetlib.dhp.common.enrichment.Constants.PROPAGATION_DATA_INFO_TYPE;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.sun.org.apache.xpath.internal.operations.String;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.common.person.Constants;
+import eu.dnetlib.dhp.enrich.relsfrompublisherenricheddata.beans.ResultMatchedSchema;
+import eu.dnetlib.dhp.schema.common.EntityType;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.rel.CoAuthorship;
 import org.apache.commons.collections.ArrayStack;
 import org.apache.commons.lang3.StringUtils;
@@ -17,6 +22,7 @@ import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.MapGroupsFunction;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.catalyst.encoders.RowEncoder;
 import org.apache.spark.sql.types.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,6 +41,8 @@ import eu.dnetlib.dhp.utils.DHPUtils;
 import eu.dnetlib.dhp.utils.ORCIDAuthorEnricherResult;
 import eu.dnetlib.dhp.utils.OrcidAuthor;
 import scala.Tuple2;
+import static org.apache.spark.sql.functions.col;
+import static org.apache.spark.sql.functions.size;
 
 public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthors {
 	private static final Logger log = LoggerFactory.getLogger(EnrichExternalDataWithGraphORCID.class);
@@ -73,112 +81,91 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 		//the pivot is the result id as the deduped record
 		//the dataset is computed on the original identifiers: for each folder we need to redirect the result to the merging
 		//record.
-		//Selection of the information enriched by affro execution
-		String[] datasources = {"oaire", "oalex", "publishers", "crossref", "datacite", "pubmed"};
 
-		resultsWithAffiliations = spark.em
+		//1. Extract from the graph the result - Author information for authors with pids.
+		removeOutputDir(spark, targetPath);
+		for(EntityType e : ModelSupport.entityTypes.keySet()) {
+			if(ModelSupport.isResult(e)){
 
-		//Step2 from the merging record we extract the authors and create an enriched structure AthorInformation containing all
-		//the added information we possibly find in the affro enriched resords in the graph
+				Dataset<Row> orcidDnet = spark
+						.read()
+						.schema(Encoders.bean(Result.class).schema())
+						.json(orcidPath + "/" + e.name())
+						.as(Encoders.bean(Result.class))
+						// select only the results with at least the orcid for one author
+						.filter(
+								(FilterFunction<Result>) r -> r.getAuthor() != null &&
+										r
+												.getAuthor()
+												.stream()
+												.anyMatch(
+														a -> a.getPid() != null && a
+																.getPid()
+																.stream()
+																.anyMatch(
+																		p -> p.getQualifier().getClassid().equalsIgnoreCase(ModelConstants.ORCID) ||
+																				p
+																						.getQualifier()
+																						.getClassid()
+																						.equalsIgnoreCase(ModelConstants.ORCID_PENDING))))
+						.map((MapFunction<Result, Tuple2<String, OrcidAuthors>>) r -> {
+							OrcidAuthors authors = getOrcidAuthorsList(r.getAuthor());
+							return new Tuple2<>(r.getId(), authors);
+						}, Encoders.tuple(Encoders.STRING(), Encoders.bean(OrcidAuthors.class)))
+						.selectExpr("_1 as id", "_2.orcidAuthorList as orcid_authors");// in this case the id is the doi
 
-		//Step 3 for each eauthor information we group by result id and reconcile the information of all the results enriched
-		//for the deduped id
-		//example: or1,...orn are merged in dr. suppose we have author affiliation information for or1 and or3. They enrich
-		//authorinformation extracted for dr producing the enrichment from or1 and the one from or3. It is possible in these two
-		//enrichments the same information is provided, or different information is provided. We need to reconcile and
-		//alert if the differences are too big
+				orcidDnet.write().mode(SaveMode.Append).option("compression", "gzip").parquet(targetPath + "/graph_authors");
+			}
+		}
 
-		//Step4 after reconciliation, new relations for authors are extracted from the update reconciled unique result per oaire id
 
-		Dataset<Row> orcidDnet = spark
-			.read()
-			.schema(Encoders.bean(Result.class).schema())
-			.json(orcidPath + "/publication")
-			.as(Encoders.bean(Result.class))
-			// selects only publications with doi since it is the only way to match with publisher data
-			.filter(
-				(FilterFunction<Result>) r -> r.getPid() != null &&
-					r.getPid().stream().anyMatch(p -> p.getQualifier().getClassid().equalsIgnoreCase("doi")))
-			// select only the results with at least the orcid for one author
-			.filter(
-				(FilterFunction<Result>) r -> r.getAuthor() != null &&
-					r
-						.getAuthor()
-						.stream()
-						.anyMatch(
-							a -> a.getPid() != null && a
-								.getPid()
-								.stream()
-								.anyMatch(
-									p -> p.getQualifier().getClassid().equalsIgnoreCase(ModelConstants.ORCID) ||
-										p
-											.getQualifier()
-											.getClassid()
-											.equalsIgnoreCase(ModelConstants.ORCID_PENDING))))
-			.flatMap((FlatMapFunction<Result, Tuple2<String, OrcidAuthors>>) r -> {
-				List<Tuple2<String, OrcidAuthors>> t2 = new ArrayList<>();
-				List<String> dois = r
-					.getPid()
-					.stream()
-					.filter(p -> p.getQualifier().getClassid().equalsIgnoreCase("doi"))
-					.map(p -> p.getValue())
-					.collect(Collectors.toList());
-				OrcidAuthors authors = getOrcidAuthorsList(r.getAuthor());
-				dois.forEach(doi -> t2.add(new Tuple2<>(doi, authors)));
-				return t2.iterator();
-			}, Encoders.tuple(Encoders.STRING(), Encoders.bean(OrcidAuthors.class)))
-			.selectExpr("_1 as id", "_2.orcidAuthorList as orcid_authors");// in this case the id is the doi
+		//2. Selection of the information enriched by affro execution
+		Dataset<ResultMatchedSchema> oaire_entities =
+				spark.createDataFrame(Collections.emptyList(), Constants.RESULT_MATCHED_SCHEMA)
+						.as(Encoders.bean(ResultMatchedSchema.class));
 
-		orcidDnet.write().mode(SaveMode.Overwrite).option("compression", "gzip").parquet(targetPath + "/graph_authors");
-		StructType schema = new StructType()
-			.add("DOI", DataTypes.StringType)
-			.add(
-				"Authors", DataTypes
-					.createArrayType(
-						new StructType()
-							.add("Corresponding", DataTypes.StringType)
-							.add(
-								"Contributor_roles", DataTypes
-									.createArrayType(
-										new StructType()
-											.add("Schema", DataTypes.StringType)
-											.add("Value", DataTypes.StringType)))
-							.add(
-								"Name", new StructType()
-									.add("Full", DataTypes.StringType)
-									.add("First", DataTypes.StringType)
-									.add("Last", DataTypes.StringType))
-							.add(
-								"Matchings", DataTypes
-									.createArrayType(
-										new StructType()
-											.add("PID", DataTypes.StringType)
-											.add("Value", DataTypes.StringType)
-											.add("Confidence", DataTypes.DoubleType)
-											.add("Status", DataTypes.StringType)))
-							.add(
-								"PIDs", DataTypes
-									.createArrayType(
-										new StructType()
-											.add("Schema", DataTypes.StringType)
-											.add("Value", DataTypes.StringType)))));
+		java.lang.String[] datasources = new java.lang.String[] {
+				"oaire", "oalex", "publishers", "crossref", "datacite", "pubmed"
+		};
+		//If there are matchings for organizations then we have at least one author with a raw affiliation string with a match
+		for (String s: datasources){
+			oaire_entities = oaire_entities.union(spark.read().schema(Constants.RESULT_MATCHED_SCHEMA). json(graphPath + s)
+					.filter(col("organizations").isNotNull()
+							.and(size(col("organizations")).gt(0)))
+					.as(Encoders.bean(ResultMatchedSchema.class)));
+		}
 
-		Dataset<Row> df = spark
-			.read()
-			.schema(schema)
-			.json(graphPath) // the path to the publisher files
-			.where("DOI is not null");
+		//3. selection of merges relations to redirect results that have been merged
+		//The pivot is the graph id => I need to have consistent identifiers
+		Dataset<Relation> mergeRelations = spark.read().schema(Encoders.bean(Relation.class).schema())
+				.json(orcidPath + "relation")
+				.as(Encoders.bean(Relation.class))
+				.filter((FilterFunction<Relation>) r -> r.getRelClass().equalsIgnoreCase("merges"));
 
-		Dataset<Row> authors = df
-			.selectExpr("DOI as doi", "explode(Authors) as author")
+		Dataset<ResultMatchedSchema> oaire_entities_redirected = oaire_entities.joinWith(mergeRelations,
+						oaire_entities.col("id").equalTo(mergeRelations.col("target")), "left")
+				.map((MapFunction<Tuple2<ResultMatchedSchema, Relation>, ResultMatchedSchema>) t2 -> {
+					ResultMatchedSchema rms = t2._1();
+					if (t2._2() != null) {
+						rms.setId(t2._2().getSource());
+					}
+					return rms;
+				}, Encoders.bean(ResultMatchedSchema.class));
+
+
+		Dataset<Row> authors = oaire_entities_redirected
+			.selectExpr("id", "explode(authors) as author")
 			.selectExpr(
-				"doi", "author.Name.Full as fullname",
-				"author.Name.First as firstname",
-				"author.Name.Last as lastname",
-				"author.PIDs as pids",
-				"author.Matchings as affiliations")
+				"id",
+					"author.fullname as fullname",
+				"author.firstname as firstname",
+				"author.lastname as lastname",
+				"author.pids as pids",
+				"author.affiliations as affiliations",
+					"author.corresponding as corresponding",
+					"author.contributor_roles as roles")
 			.map(
-				(MapFunction<Row, Tuple2<String, Author>>) a -> new Tuple2<>(a.getAs("doi"), getAuthor(a)),
+				(MapFunction<Row, Tuple2<String, Author>>) a -> new Tuple2<>(a.getAs("is"), getAuthor(a)),
 				Encoders.tuple(Encoders.STRING(), Encoders.bean(Author.class)))
 			.groupByKey((MapFunction<Tuple2<String, Author>, String>) t2 -> t2._1(), Encoders.STRING())
 			.mapGroups(
@@ -190,13 +177,55 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 				}, Encoders.tuple(Encoders.STRING(), Encoders.bean(PublisherAuthors.class)))
 			.selectExpr("_1 as id", "_2.publisherAuthorList as graph_authors");
 
-		orcidDnet
+		spark.read().parquet(targetPath + "/graph_authors")
 			.join(authors, "id")
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.parquet(targetPath + "/publication_unmatched");
 
+	}
+//Step2 from the merging record we extract the authors and create an enriched structure containing all
+	//the added information we possibly find in the affro enriched records in the graph
+
+	//Step 3 for each eauthor information we group by result id and reconcile the information of all the results enriched
+	//for the deduped id
+	//example: or1,...orn are merged in dr. suppose we have author affiliation information for or1 and or3. They enrich
+	//authorinformation extracted for dr producing the enrichment from or1 and the one from or3. It is possible in these two
+	//enrichments the same information is provided, or different information is provided. We need to reconcile and
+	//alert if the differences are too big
+
+	//Step4 after reconciliation, new relations for authors are extracted from the update reconciled unique result per oaire id
+
+	private static Dataset<ResultMatchedSchema> getGraphAuthorWithOrcid(SparkSession spark, String orcidPath, EntityType e) {
+		return spark.read().schema(Encoders.bean(Result.class).schema())
+				.json(orcidPath + e.name())
+				.as(Encoders.bean(Result.class))
+				.filter((FilterFunction<Result>) r -> !r.getDataInfo().getDeletedbyinference() && !r.getDataInfo().getInvisible())
+				.map((MapFunction<Result, ResultMatchedSchema>) r -> {
+					if (r.getAuthor().stream().noneMatch(a -> Optional.ofNullable(a.getPid()).isPresent() && !a.getPid().isEmpty()))
+						return null;
+					ResultMatchedSchema rms = new ResultMatchedSchema();
+					rms.setId(r.getId());
+					rms.setAuthors(
+							r.getAuthor().stream().filter(a -> Optional.ofNullable(a.getPid()).isPresent() && !a.getPid().isEmpty())
+									.map(a -> {
+										eu.dnetlib.dhp.enrich.relsfrompublisherenricheddata.beans.Author author = new eu.dnetlib.dhp.enrich.relsfrompublisherenricheddata.beans.Author();
+										author.setFirstname(a.getName());
+										author.setLastname(a.getSurname());
+										author.setFullname(a.getFullname());
+										author.setPids(a.getPid().stream().map(p -> {
+											eu.dnetlib.dhp.enrich.relsfrompublisherenricheddata.beans.Pid pid = new eu.dnetlib.dhp.enrich.relsfrompublisherenricheddata.beans.Pid();
+											pid.setSchema(p.getQualifier().getClassid());
+											pid.setValue(p.getValue());
+											return pid;
+										}).collect(Collectors.toList()));
+										return author;
+									}).collect(Collectors.toList())
+					);
+					return rms;
+				}, Encoders.bean(ResultMatchedSchema.class))
+				.filter(Objects::nonNull);
 	}
 
 	// graphPath is the path to the publisher file
@@ -442,48 +471,87 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 		return rel;
 	}
 
-	private static @NotNull Author getAuthor(Row a) {
+	private static @NotNull Author getAuthor(Row a) throws JsonProcessingException {
 		Author author = new Author();
 
 		author.setName(a.getAs("firstname"));
 		author.setFullname(a.getAs("fullname"));
 		author.setSurname(a.getAs("lastname"));
 		List<StructuredProperty> pids = new ArrayList<>();
-		List<String> affs = new ArrayList<>();
 
 		List<Row> publisherPids = new ArrayList<>();
 		if (Optional.ofNullable(a.getAs("pids")).isPresent())
 			publisherPids = a.getList(a.fieldIndex("pids"));
 
 		publisherPids.forEach(pid -> pids.add(getPid(pid)));
-
+		SerializationBean sb = new SerializationBean();
 		List<Row> affiliations = a.getList(a.fieldIndex("affiliations"));
-		// "`Matchings`: ARRAY<STRUCT<`PID`:STRING, `Value`:STRING,`Confidence`:DOUBLE, `Status`:STRING>>,
-		affiliations.forEach(aff -> {
-			String pidtype = aff.getAs("PID");
-			String pidvalue = aff.getAs("Value");
-			Double pidconfidence = aff.getAs("Confidence");
+		sb.setAffs(Optional.ofNullable(affiliations)
+				.map(v -> v.stream().map(
+						aff -> {
+							if(aff.getAs("status").equals("active")){
+								SerializationOrg so = new SerializationOrg();
+								if("ror".equalsIgnoreCase(aff.getAs("pid")))
+									so.setRor(aff.getAs("value"));
+								else
+									so.setOpenOrgs(aff.getAs("value"));
+								so.setConfidence(aff.getAs("confidence"));
+								so.setName(aff.getAs("name"));
+								so.setCountry(aff.getAs("country"));
+								return so;
+							}
+							return null;
+						}
+				).filter(Objects::nonNull).collect(Collectors.toList()))
+				.orElse(Collections.emptyList()));
 
-			if (aff.getAs("Status").equals("active"))
-				affs.add(pidtype + "@@" + pidvalue + "@@" + pidconfidence);
 
-		});
+		List<Row> roles = a.getList(a.fieldIndex("roles"));
+		if(Optional.ofNullable(roles).isPresent())
+			sb.setRoles(roles.stream().map(r -> {
+				SerializationRoles sr = null;
+				if(Optional.ofNullable(r.getAs("schema")).isPresent()){
+					sr = new SerializationRoles();
+					sr.setRoleSchema(r.getAs("schema"));
+				}
+
+				if(Optional.ofNullable(r.getAs("value")).isPresent()){
+					if(sr == null)
+						sr = new SerializationRoles();
+					sr.setRoleValue(r.getAs("value"));
+				}
+				if(Optional.ofNullable(r.getAs("name")).isPresent()){
+					if(sr == null)
+						sr = new SerializationRoles();
+					sr.setRoleName(r.getAs("name"));
+				}
+					return sr;
+			}).filter(Objects::nonNull).collect(Collectors.toList()));
+
+		Object val = a.getAs("corresponding");
+		if (val != null) {
+			if (val instanceof Boolean) {
+				sb.setCorresponding((Boolean) val);
+			} else if (val instanceof String) {
+				sb.setCorresponding(Boolean.valueOf((String) val));
+			}
+		}
 
 		author.setPid(pids);
 		// in this case the rawaffiliation string is used as an accumulator to create relations
 		// a little hack not to have to change the schema and /or the implementazion of the analysis method
-		author.setRawAffiliationString(affs);
+		author.setRawAffiliationString(Arrays.asList(new ObjectMapper().writeValueAsString(sb)));
 		return author;
 	}
 
 	private static @Nullable StructuredProperty getPid(Row pid) {
 		return OafMapperUtils
 			.structuredProperty(
-				pid.getAs("Value"),
+				Constants.removePrefixUrl(pid.getAs("value")),
 				OafMapperUtils
 					.qualifier(
-						pid.getAs("Schema"),
-						pid.getAs("Schema"),
+						pid.getAs("schema"),
+						pid.getAs("schema"),
 						ModelConstants.DNET_PID_TYPES,
 						ModelConstants.DNET_PID_TYPES),
 				null);

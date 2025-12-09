@@ -341,19 +341,6 @@ public class SparkBulkTagJob {
 		ProtoMap protoMappingParams,
 		CommunityConfiguration communityConfiguration) {
 
-//		communityConfiguration
-//			.getCommunities()
-//			.keySet()
-//			.forEach(c -> {
-//				try {
-//					log
-//						.info(
-//							"Community Configuration {}",
-//							new ObjectMapper().writeValueAsString(communityConfiguration.getCommunities().get(c)));
-//				} catch (Exception e) {
-//
-//				}
-//			});
 
 		ModelSupport.entityTypes
 			.keySet()
