@@ -2,11 +2,9 @@
 package eu.dnetlib.dhp.oa.provision;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
-import static org.apache.spark.sql.functions.col;
+import static org.apache.spark.sql.functions.*;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import eu.dnetlib.dhp.utils.DHPUtils;
@@ -72,7 +70,15 @@ public class PrepareRelationsJob {
 			.orElse(new HashSet<>());
 		log.info("relationFilter: {}", relationFilter);
 
-		int sourceMaxRelations = Optional
+        // relation class tags that will drive the relation pruning
+        Set<String> relationBiPartitionList = Optional
+                .ofNullable(parser.get("relationBiPartitionList"))
+                .map(String::toLowerCase)
+                .map(s -> Sets.newHashSet(Splitter.on(",").split(s)))
+                .orElse(new HashSet<>());
+        log.info("relationBiPartitionList: {}", relationBiPartitionList);
+
+        int sourceMaxRelations = Optional
 			.ofNullable(parser.get("sourceMaxRelations"))
 			.map(Integer::valueOf)
 			.orElse(MAX_RELS);
@@ -101,7 +107,7 @@ public class PrepareRelationsJob {
 			spark -> {
 				removeOutputDir(spark, outputPath);
 				prepareRelationsRDD(
-					spark, inputType, inputGraph, outputPath, relationFilter, sourceMaxRelations, targetMaxRelations);
+					spark, inputType, inputGraph, outputPath, relationFilter, relationBiPartitionList, sourceMaxRelations, targetMaxRelations);
 			});
 	}
 
@@ -119,29 +125,51 @@ public class PrepareRelationsJob {
 	 * @param targetMaxRelations maximum number of allowed outgoing edges grouping by relation.target
 	 */
 	private static void prepareRelationsRDD(SparkSession spark, InputType inputType, String inputGraph, String outputPath,
-                                            Set<String> relationFilter, int sourceMaxRelations, int targetMaxRelations) {
+                                            Set<String> relationFilter, Set<String> relationBiPartitionList, int sourceMaxRelations, int targetMaxRelations) {
 
-		WindowSpec source_w = Window
+		final WindowSpec source_w = Window
 			.partitionBy("source", "subRelType")
 			.orderBy(col("target").desc_nulls_last());
 
-		WindowSpec target_w = Window
+		final WindowSpec target_w = Window
 			.partitionBy("target", "subRelType")
 			.orderBy(col("source").desc_nulls_last());
 
-        DHPUtils.readGraph(spark, inputType, inputGraph, Relation.class)
+        final String relClassFilterExpr = relationFilter.isEmpty() ? ""
+                : "lower(relClass) NOT IN ("
+                + relationFilter.stream().map(s -> "'" + s + "'").collect(Collectors.joining(",")) + ")";
+
+        final String relClassIN_Expr = relationBiPartitionList.isEmpty() ? ""
+                : "lower(relClass) IN ("
+                + relationBiPartitionList.stream().map(s -> "'" + s + "'").collect(Collectors.joining(",")) + ")";
+
+        final String relClassNOT_IN_Expr = relationBiPartitionList.isEmpty() ? ""
+                : "lower(relClass) NOT IN ("
+                + relationBiPartitionList.stream().map(s -> "'" + s + "'").collect(Collectors.joining(",")) + ")";
+
+        Dataset<Row> bySource = DHPUtils.readGraph(spark, inputType, inputGraph, Relation.class)
+                .where(relClassIN_Expr)
+                .where("source NOT LIKE 'unresolved%' AND  target  NOT LIKE 'unresolved%'")
+                .where("datainfo.deletedbyinference != true")
+                .where(relClassFilterExpr)
+                .withColumn("source_w_pos", functions.row_number().over(source_w))
+                .where("source_w_pos < " + sourceMaxRelations)
+                .drop("source_w_pos");
+
+        Dataset<Row> bySourceTarget = DHPUtils.readGraph(spark, inputType, inputGraph, Relation.class)
+                .where(relClassNOT_IN_Expr)
 			.where("source NOT LIKE 'unresolved%' AND  target  NOT LIKE 'unresolved%'")
-			.where("datainfo.deletedbyinference != true")
-			.where(
-				relationFilter.isEmpty() ? ""
-					: "lower(relClass) NOT IN ("
-						+ relationFilter.stream().map(s -> "'" + s + "'").collect(Collectors.joining(",")) + ")")
-			.withColumn("source_w_pos", functions.row_number().over(source_w))
-			.where("source_w_pos < " + sourceMaxRelations)
-			.drop("source_w_pos")
-			.withColumn("target_w_pos", functions.row_number().over(target_w))
-			.where("target_w_pos < " + targetMaxRelations)
-			.drop("target_w_pos")
+                .where("datainfo.deletedbyinference != true")
+                .where(relClassFilterExpr)
+                .withColumn("source_w_pos", functions.row_number().over(source_w))
+                .where("source_w_pos < " + sourceMaxRelations)
+                .drop("source_w_pos")
+                .withColumn("target_w_pos", functions.row_number().over(target_w))
+                .where("target_w_pos < " + targetMaxRelations)
+                .drop("target_w_pos");
+
+        bySource
+            .union(bySourceTarget)
 			.write()
 			.mode(SaveMode.Overwrite)
 			.parquet(outputPath);
