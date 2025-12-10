@@ -36,6 +36,12 @@
     "paramRequired": false
   },
   {
+    "paramName": "rbl",
+    "paramLongName": "relationBiPartitionList",
+    "paramDescription": "relation class tags that drives the relation pruning",
+    "paramRequired": true
+  },
+  {
     "paramName": "smr",
     "paramLongName": "sourceMaxRelations",
     "paramDescription": "maximum number of relations allowed for a each entity grouping by source",

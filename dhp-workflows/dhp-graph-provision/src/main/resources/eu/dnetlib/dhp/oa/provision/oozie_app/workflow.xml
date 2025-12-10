@@ -35,6 +35,10 @@
             <description>filter applied reading relations (by relClass)</description>
         </property>
         <property>
+            <name>relationBiPartitionList</name>
+            <description>relation class tags that drives the relation pruning</description>
+        </property>
+        <property>
             <name>sourceMaxRelations</name>
             <description>maximum number of relations allowed for a each entity grouping by source</description>
         </property>
@@ -136,6 +140,7 @@
             <arg>--sourceMaxRelations</arg><arg>${sourceMaxRelations}</arg>
             <arg>--targetMaxRelations</arg><arg>${targetMaxRelations}</arg>
             <arg>--relationFilter</arg><arg>${relationFilter}</arg>
+            <arg>--relationBiPartitionList</arg><arg>${relationBiPartitionList}</arg>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
         </spark>
         <ok to="fork_join_related_entities"/>
