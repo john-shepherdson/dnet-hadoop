@@ -40,7 +40,7 @@ case class mappingAuthor(
   affiliation: Option[List[mappingAffiliation]]
 ) {}
 
-case class funderInfo(id: String, uri: String, name: String, synonym: List[String]) {}
+case class funderInfo(id: String, shortName: String, uri: String, name: String, synonym: List[String]) {}
 
 case class mappingFunder(name: String, DOI: Option[String], award: Option[List[String]]) {}
 
@@ -52,9 +52,9 @@ case object Crossref2Oaf {
   val logger: Logger = LoggerFactory.getLogger(Crossref2Oaf.getClass)
   val mapper = new ObjectMapper
 
-  val irishFunder: List[funderInfo] = {
+  val fundersInfo: List[funderInfo] = {
     val s = Source
-      .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/collection/crossref/irish_funder.json"))
+      .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/collection/crossref/funders_info.json"))
       .mkString
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     lazy val json: org.json4s.JValue = parse(s)
@@ -73,11 +73,11 @@ case object Crossref2Oaf {
     "&na; &na;"
   )
 
-  def getIrishId(doi: String): Option[String] = {
+  def getFunderId(doi: String): Option[String] = {
     val id = doi.split("/").last
-    irishFunder
+    fundersInfo
       .find(f => id.equalsIgnoreCase(f.id) || (f.synonym.nonEmpty && f.synonym.exists(s => s.equalsIgnoreCase(id))))
-      .map(f => f.id)
+      .map(f => f.shortName)
   }
 
   def createCrossrefCollectedFrom(): KeyValue = {
@@ -854,8 +854,8 @@ case object Crossref2Oaf {
       funders.foreach(funder => {
         if (funder.DOI.isDefined && funder.DOI.get.nonEmpty) {
 
-          if (getIrishId(funder.DOI.get).isDefined) {
-            val nsPrefix = getIrishId(funder.DOI.get).get.padTo(12, '_')
+          if (getFunderId(funder.DOI.get).isDefined) {
+            val nsPrefix = getFunderId(funder.DOI.get).get.padTo(12, '_')
             val targetId = getProjectId(nsPrefix, "1e5e62235d094afd01cd56e65112fc63")
             queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
             queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
@@ -983,6 +983,12 @@ case object Crossref2Oaf {
             case "10.13039/501100018877" =>
               generateSimpleRelationFromAward(funder, "rif___________", a => a)
               val targetId = getProjectId("rif_________", "1e5e62235d094afd01cd56e65112fc63")
+              queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
+              queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
+              //EDTECH-ID
+            case "10.13039/501100025197" =>
+              generateSimpleRelationFromAward(funder, "edtech______", a => a)
+              val targetId = getProjectId("edtech______", "1e5e62235d094afd01cd56e65112fc63")
               queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
               queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
             case _ => logger.debug("no match for " + funder.DOI.get)

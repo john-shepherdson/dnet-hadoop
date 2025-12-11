@@ -121,7 +121,7 @@ public class GenerateNativeStoreSparkJob {
 		final boolean runValidation = Optional
 				.ofNullable(parser.get("runValidation"))
 				.map(Boolean::valueOf)
-				.orElse(Boolean.TRUE);
+				.orElse(Boolean.FALSE);
 		log.info("runValidation: {}", runValidation);
 
 		final SparkConf conf = new SparkConf();
@@ -155,7 +155,8 @@ public class GenerateNativeStoreSparkJob {
 			res.put(ValidationType.fair_data, new FAIR_Data_GuidelinesProfile());
 			break;
 		default:
-			throw new IllegalStateException("Unexpected value: " + compatibilityLevel);
+            log.info(String.format("Skipping validation for compatibility: %s", compatibilityLevel));
+			return res;
         }
 
 		return res;

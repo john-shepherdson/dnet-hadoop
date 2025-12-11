@@ -6,9 +6,21 @@
     "paramRequired": false
   },
   {
-    "paramName": "irp",
-    "paramLongName": "inputRelationsPath",
-    "paramDescription": "path to input relations prepare",
+    "paramName": "hmu",
+    "paramLongName": "hiveMetastoreUris",
+    "paramDescription": "the hive metastore uris",
+    "paramRequired": true
+  },
+  {
+    "paramName": "it",
+    "paramLongName": "inputType",
+    "paramDescription": "hdfs path or db name where graph is located",
+    "paramRequired": true
+  },
+  {
+    "paramName": "ig",
+    "paramLongName": "inputGraph",
+    "paramDescription": "path or DB where the graph is located",
     "paramRequired": true
   },
   {
@@ -18,16 +30,16 @@
     "paramRequired": true
   },
   {
-    "paramName": "rp",
-    "paramLongName": "relPartitions",
-    "paramDescription": "number or partitions for the relations Dataset",
-    "paramRequired": false
-  },
-  {
     "paramName": "rf",
     "paramLongName": "relationFilter",
     "paramDescription": "filter applied reading relations (by relClass)",
     "paramRequired": false
+  },
+  {
+    "paramName": "rbl",
+    "paramLongName": "relationBiPartitionList",
+    "paramDescription": "relation class tags that drives the relation pruning",
+    "paramRequired": true
   },
   {
     "paramName": "smr",

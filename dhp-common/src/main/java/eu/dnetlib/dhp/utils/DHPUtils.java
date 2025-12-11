@@ -2,14 +2,19 @@
 package eu.dnetlib.dhp.utils;
 
 import java.io.*;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.google.common.base.Splitter;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.schema.oaf.Relation;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.math3.geometry.spherical.oned.ArcsSet;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -17,8 +22,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.SaveMode;
+import org.apache.spark.sql.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,8 +31,6 @@ import com.google.common.collect.Maps;
 import com.jayway.jsonpath.JsonPath;
 
 import eu.dnetlib.dhp.schema.mdstore.MDStoreWithInfo;
-import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
-import eu.dnetlib.dhp.schema.oaf.utils.PidCleaner;
 import net.minidev.json.JSONArray;
 import scala.collection.JavaConverters;
 import scala.collection.Seq;
@@ -128,9 +130,10 @@ public class DHPUtils {
 	public static void writeHdfsFile(final Configuration conf, final String content, final String path)
 		throws IOException {
 
-		log.info("writing file {}, size {}", path, content.length());
-		try (FileSystem fs = FileSystem.get(conf);
-			BufferedOutputStream os = new BufferedOutputStream(fs.create(new Path(path)))) {
+		log.info("writing file {}, size {}", path, content);
+		Path f = new Path(path);
+		try (FileSystem fs = f.getFileSystem(conf);
+			BufferedOutputStream os = new BufferedOutputStream(fs.create(f))) {
 			os.write(content.getBytes(StandardCharsets.UTF_8));
 			os.flush();
 		}
@@ -138,9 +141,8 @@ public class DHPUtils {
 
 	public static String readHdfsFile(Configuration conf, String path) throws IOException {
 		log.info("reading file {}", path);
-
-		try (FileSystem fs = FileSystem.get(conf)) {
-			final Path p = new Path(path);
+		final Path p = new Path(path);
+		try (FileSystem fs = p.getFileSystem(conf)) {
 			if (!fs.exists(p)) {
 				throw new FileNotFoundException(path);
 			}
@@ -162,16 +164,29 @@ public class DHPUtils {
 	}
 
 	public static Configuration getHadoopConfiguration(String nameNode) {
-		// ====== Init HDFS File System Object
-		Configuration conf = new Configuration();
-		// Set FileSystem URI
-		conf.set("fs.defaultFS", nameNode);
-		// Because of Maven
-		conf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
-		conf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName());
+		Configuration hadoopConf = new Configuration();
+		Properties systemProps = System.getProperties();
 
-		System.setProperty("hadoop.home.dir", "/");
-		return conf;
+		for (Map.Entry<Object, Object> entry : systemProps.entrySet()) {
+			String key = entry.getKey().toString();
+			String value = entry.getValue().toString();
+
+			if (key.startsWith("spark.hadoop.")) {
+				String hadoopKey = key.substring("spark.hadoop.".length());
+				hadoopConf.set(hadoopKey, value);
+			}
+		}
+		if (hadoopConf.size() <= 0) {
+			// Set FileSystem URI
+			hadoopConf.set("fs.defaultFS", nameNode);
+			// Because of Maven
+			hadoopConf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
+			hadoopConf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName());
+
+			System.setProperty("hadoop.home.dir", "/");
+		}
+
+		return hadoopConf;
 	}
 
 	public static void populateOOZIEEnv(final Map<String, String> report) throws IOException {
@@ -190,4 +205,93 @@ public class DHPUtils {
 
 		populateOOZIEEnv(report);
 	}
+
+    /**
+     * Reads graph contents from given input based on specified input type and the specified entityType.
+     *
+     * @param spark the spark session
+     * @param input must be either the graph base path on HDFS storing the newline delimited json records, or the DB name
+     * @param entityClazz identifies the graph entity to be read (e.g., "relation", "publication", etc.)
+     * @param encoder the encoder for the graph entity
+     * @return the dataset representing the graph entity
+     */
+    private static <T extends Oaf> Dataset<Row> _readGraph(SparkSession spark, URI input, Class<T> entityClazz, Encoder<T> encoder) {
+
+        log.info("reading graph from {}", input);
+
+        final GraphUriScheme scheme = StringUtils.isBlank(input.getScheme()) ?
+                GraphUriScheme.FILE : GraphUriScheme.valueOf(input.getScheme().toUpperCase());
+
+        switch (scheme) {
+            case HDFS:
+            case S3A:
+            case FILE:
+                final String path = input + "/" + entityClazz.getSimpleName().toLowerCase();
+                return spark
+                        .read()
+                        .schema(encoder.schema())
+                        .json(path);
+            case HIVE:
+                final Iterator<String> pathParts = Splitter.on("/")
+                        .omitEmptyStrings()
+                        .trimResults()
+                        .split(input.getPath())
+                        .iterator();
+                if (!pathParts.hasNext()) {
+                    throw new IllegalArgumentException("Invalid path: " + input.getPath());
+                }
+                final String dbName = pathParts.next();
+                return spark
+                        .read()
+                        .table(dbName + "." + entityClazz.getSimpleName().toLowerCase());
+            default:
+                throw new IllegalArgumentException("Unsupported input URI scheme: " + input.getScheme());
+        }
+    }
+
+    /**
+     * Reads graph contents from given input based on specified input type and the specified entityType.
+     *
+     * @param spark the spark session
+     * @param inputType type of input (HDFS JSON files or DB Parquet tables)
+     * @param input must be either the graph base path on HDFS storing the newline delimited json records, or the DB name
+     * @param entityClazz identifies the graph entity to be read (e.g., "relation", "publication", etc.)
+     * @param encoder the encoder for the graph entity
+     * @return the dataset representing the graph entity
+     */
+    private static <T extends Oaf> Dataset<Row> _readGraph(SparkSession spark, InputType inputType, String input, Class<T> entityClazz, Encoder<T> encoder) {
+        switch (inputType) {
+            case HDFS_JSON:
+                return spark
+                        .read()
+                        .schema(encoder.schema())
+                        .json(input + "/" + entityClazz.getSimpleName().toLowerCase());
+            case DB_PARQUET:
+                return spark
+                        .read()
+                        .table(input + "." + entityClazz.getSimpleName().toLowerCase());
+            default:
+                throw new IllegalArgumentException("Unsupported inputType: " + inputType);
+        }
+    }
+
+    /**
+     * Reads graph contents from given input based on specified input type and the specified entityType.
+     *
+     * @param spark the spark session
+     * @param inputType type of input (HDFS JSON files or DB Parquet tables)
+     * @param input must be either the graph base path on HDFS storing the newline delimited json records, or the DB name
+     * @param entityClazz identifies the graph entity to be read (e.g., "relation", "publication", etc.)
+     * @return the dataset representing the graph entity
+     */
+    public static <T extends Oaf> Dataset<Row> readGraph(SparkSession spark, InputType inputType, String input, Class<T> entityClazz) {
+        final Encoder<T> encoder = Encoders.bean(entityClazz);
+        return _readGraph(spark, inputType, input, entityClazz, encoder);
+    }
+
+    public static <T extends Oaf> Dataset<T> readGraphAs(SparkSession spark, InputType inputType, String input, Class<T> entityClazz) {
+        final Encoder<T> encoder = Encoders.bean(entityClazz);
+        return _readGraph(spark, inputType, input, entityClazz, encoder)
+                .as(encoder);
+    }
 }

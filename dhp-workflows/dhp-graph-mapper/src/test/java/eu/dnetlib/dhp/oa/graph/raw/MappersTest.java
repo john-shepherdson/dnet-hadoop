@@ -983,6 +983,50 @@ class MappersTest {
 		System.out.println(p.getTitle().get(0).getValue());
 	}
 
+    @Test
+    void test_DBLP() throws IOException {
+        final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("odf_dblp.xml")));
+        final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
+
+        System.out.println("***************");
+        System.out.println(new ObjectMapper().writeValueAsString(list));
+        System.out.println("***************");
+
+        assertFalse(list.isEmpty());
+
+        final Publication p = (Publication) list.get(0);
+        assertValidId(p.getId());
+        assertValidId(p.getCollectedfrom().get(0).getKey());
+        System.out.println(p.getTitle().get(0).getValue());
+        assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
+        System.out.println(p.getTitle().get(0).getValue());
+    }
+
+    @Test
+    void test_mEDRA() throws IOException {
+        final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("odf_medra.xml")));
+        final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
+
+        assertFalse(list.isEmpty());
+
+        final Publication p = (Publication) list.get(0);
+        assertValidId(p.getId());
+        assertEquals("50|doi_________::3ecf98b4cee5fa4ef5b4d5f3e9df982b", p.getId());
+
+        assertNotNull(p.getPid());
+        assertFalse(p.getPid().isEmpty());
+        assertEquals(1, p.getPid().size());
+
+        StructuredProperty pid = p.getPid()
+                .stream()
+                .filter(pp -> "doi".equals(pp.getQualifier().getClassid())).findFirst()
+                .orElseThrow(() -> new AssertionError("Expected PID type not found"));
+        assertEquals("10.32098/mltj.02.2015.11", pid.getValue());
+
+        assertValidId(p.getCollectedfrom().get(0).getKey());
+
+    }
+
 	@Test
 	void testJairo() throws IOException {
 		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("oaf_jairo.xml")));

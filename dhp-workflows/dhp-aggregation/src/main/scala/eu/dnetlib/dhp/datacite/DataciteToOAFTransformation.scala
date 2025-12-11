@@ -15,7 +15,6 @@ import org.json4s.jackson.JsonMethods.parse
 
 import java.text.SimpleDateFormat
 import java.time.LocalDate
-import java.time.chrono.ThaiBuddhistDate
 import java.time.format.DateTimeFormatter
 import java.util.{Date, Locale}
 import scala.collection.JavaConverters._
@@ -23,7 +22,7 @@ import scala.io.Source
 
 object DataciteToOAFTransformation {
 
-  val DOI_PREFIX = "50|doi_________::"
+  val DOI_PREFIX = "50|doi_________"
 
   case class HostedByMapType(
     openaire_id: String,
@@ -138,15 +137,15 @@ object DataciteToOAFTransformation {
     d
   }
 
-  def fix_thai_date(input: String, format: String): String = {
-    try {
-      val a_date = LocalDate.parse(input, DateTimeFormatter.ofPattern(format))
-      val d = ThaiBuddhistDate.of(a_date.getYear, a_date.getMonth.getValue, a_date.getDayOfMonth)
-      LocalDate.from(d).toString
-    } catch {
-      case _: Throwable => ""
-    }
-  }
+//  def fix_thai_date(input: String, format: String): String = {
+//    try {
+//      val a_date = LocalDate.parse(input, DateTimeFormatter.ofPattern(format))
+//      val d = ThaiBuddhistDate.of(a_date.getYear, a_date.getMonth.getValue, a_date.getDayOfMonth)
+//      LocalDate.from(d).toString
+//    } catch {
+//      case _: Throwable => ""
+//    }
+//  }
 
   /** *
     * Use the vocabulary dnet:publication_resource to find a synonym to one of these terms and get the instance.type.
@@ -459,47 +458,20 @@ object DataciteToOAFTransformation {
       .map(d => d.get)
 
     if (a_date.isDefined) {
-      if (doi.startsWith("10.14457"))
-        result.setEmbargoenddate(
-          OafMapperUtils.field(fix_thai_date(a_date.get, "[yyyy-MM-dd]"), null)
-        )
-      else
-        result.setEmbargoenddate(OafMapperUtils.field(a_date.get, null))
+      result.setEmbargoenddate(OafMapperUtils.field(a_date.get, null))
     }
     if (i_date.isDefined && i_date.get.isDefined) {
-      if (doi.startsWith("10.14457")) {
-        result.setDateofacceptance(
-          OafMapperUtils.field(fix_thai_date(i_date.get.get, "[yyyy-MM-dd]"), null)
-        )
-        result
-          .getInstance()
-          .get(0)
-          .setDateofacceptance(
-            OafMapperUtils.field(fix_thai_date(i_date.get.get, "[yyyy-MM-dd]"), null)
-          )
-      } else {
+
         result.setDateofacceptance(OafMapperUtils.field(i_date.get.get, null))
         result.getInstance().get(0).setDateofacceptance(OafMapperUtils.field(i_date.get.get, null))
-      }
-    } else if (publication_year != null) {
-      if (doi.startsWith("10.14457")) {
-        result.setDateofacceptance(
-          OafMapperUtils.field(fix_thai_date(s"01-01-$publication_year", "[dd-MM-yyyy]"), null)
-        )
-        result
-          .getInstance()
-          .get(0)
-          .setDateofacceptance(
-            OafMapperUtils.field(fix_thai_date(s"01-01-$publication_year", "[dd-MM-yyyy]"), null)
-          )
 
-      } else {
-        result.setDateofacceptance(OafMapperUtils.field(s"01-01-$publication_year", null))
+    } else if (publication_year != null) {
+      result.setDateofacceptance(OafMapperUtils.field(s"01-01-$publication_year", null))
         result
           .getInstance()
           .get(0)
           .setDateofacceptance(OafMapperUtils.field(s"01-01-$publication_year", null))
-      }
+
     }
 
     result.setRelevantdate(

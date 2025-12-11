@@ -105,7 +105,7 @@
 
     <action name="UnpackCrossrefEntries">
         <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn-cluster</master>
+            <master>yarn</master>
             <mode>cluster</mode>
             <name>SparkUnpackCrossrefEntries</name>
             <class>eu.dnetlib.dhp.collection.crossref.UnpackCrossrefEntries</class>
@@ -120,7 +120,7 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
-            <arg>--master</arg><arg>yarn-cluster</arg>
+            <arg>--master</arg><arg>yarn</arg>
             <arg>--sourcePath</arg><arg>${crossrefDumpPath}/files</arg>
             <arg>--targetPath</arg><arg>${crossrefDumpPath}/crossref_unpack/</arg>
 

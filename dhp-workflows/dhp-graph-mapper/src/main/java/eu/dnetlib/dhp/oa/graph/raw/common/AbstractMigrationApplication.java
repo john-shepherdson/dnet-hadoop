@@ -3,9 +3,7 @@ package eu.dnetlib.dhp.oa.graph.raw.common;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -44,14 +42,14 @@ public class AbstractMigrationApplication implements Closeable {
 		this.writer = null;
 	}
 
-	public AbstractMigrationApplication(final String hdfsPath) throws IOException {
+	public AbstractMigrationApplication(final Path hdfsPath) throws IOException {
 
-		log.info(String.format("Creating SequenceFile Writer, hdfsPath=%s", hdfsPath));
+		log.info(String.format("Creating SequenceFile Writer, hdfsPath=%s", hdfsPath.toString()));
 
 		this.writer = SequenceFile
 			.createWriter(
 				getConf(),
-				SequenceFile.Writer.file(new Path(hdfsPath)),
+				SequenceFile.Writer.file(hdfsPath),
 				SequenceFile.Writer.keyClass(Text.class),
 				SequenceFile.Writer.valueClass(Text.class));
 	}
@@ -73,14 +71,21 @@ public class AbstractMigrationApplication implements Closeable {
 		return DHPUtils.mdstorePaths(mdstoreManagerUrl, format, layout, interpretation, false);
 	}
 
-	private Configuration getConf() {
-		return new Configuration();
-		/*
-		 * conf.set("fs.defaultFS", hdfsNameNode); conf.set("fs.hdfs.impl",
-		 * org.apache.hadoop.hdfs.DistributedFileSystem.class.getName()); conf.set("fs.file.impl",
-		 * org.apache.hadoop.fs.LocalFileSystem.class.getName()); System.setProperty("HADOOP_USER_NAME", hdfsUser);
-		 * System.setProperty("hadoop.home.dir", "/"); FileSystem.get(URI.create(hdfsNameNode), conf);
-		 */
+	protected static Configuration getConf() {
+		Configuration hadoopConf = new Configuration();
+		Properties systemProps = System.getProperties();
+
+		for (Map.Entry<Object, Object> entry : systemProps.entrySet()) {
+			String key = entry.getKey().toString();
+			String value = entry.getValue().toString();
+
+			if (key.startsWith("spark.hadoop.")) {
+				String hadoopKey = key.substring("spark.hadoop.".length());
+				hadoopConf.set(hadoopKey, value);
+			}
+		}
+
+		return hadoopConf;
 	}
 
 	protected void emit(final String s, final String type) {

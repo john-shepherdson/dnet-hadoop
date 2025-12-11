@@ -3,6 +3,8 @@ package eu.dnetlib.dhp.oa.dedup;
 
 import static java.nio.file.Files.createTempDirectory;
 
+import static org.apache.spark.sql.functions.*;
+import static org.apache.spark.sql.functions.col;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.lenient;
 
@@ -14,20 +16,15 @@ import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.*;
+import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.StructType;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -38,6 +35,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
@@ -49,7 +47,8 @@ public class SparkOpenorgsDedupTest implements Serializable {
 
 	private static final String dbUrl = "jdbc:h2:mem:openorgs_test;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false";
 	private static final String dbUser = "sa";
-	private static final String dbTable = "tmp_dedup_events";
+	private static final String dedupEventsTable = "tmp_dedup_events";
+	private static final String parentChildTable = "tmp_parent_child";
 	private static final String dbPwd = "";
 
 	@Mock(serializable = true)
@@ -146,7 +145,8 @@ public class SparkOpenorgsDedupTest implements Serializable {
 			.load(DedupUtility.createSimRelPath(testOutputBasePath, testActionSetId, "organization"))
 			.count();
 
-		assertEquals(91, orgs_simrel);
+		System.out.println("orgs_simrel = " + orgs_simrel);
+		assertEquals(95, orgs_simrel);
 	}
 
 	@Test
@@ -175,7 +175,8 @@ public class SparkOpenorgsDedupTest implements Serializable {
 			.load(DedupUtility.createSimRelPath(testOutputBasePath, testActionSetId, "organization"))
 			.count();
 
-		assertEquals(127, orgs_simrel);
+		System.out.println("orgs_simrel = " + orgs_simrel);
+		assertEquals(131, orgs_simrel);
 	}
 
 	@Test
@@ -210,7 +211,14 @@ public class SparkOpenorgsDedupTest implements Serializable {
 			.read()
 			.load(testOutputBasePath + "/" + testActionSetId + "/organization_mergerel")
 			.count();
-		assertEquals(128, orgs_mergerel);
+		assertEquals(132, orgs_mergerel);
+		long orgs_dedup_ids = spark
+				.read()
+				.load(testOutputBasePath + "/" + testActionSetId + "/organization_mergerel")
+				.select(col("source"))
+				.distinct()
+				.count();
+		assertEquals(72, orgs_dedup_ids);
 
 		// verify that a DiffRel is in the mergerels (to be sure that the job supposed to remove them has something to
 		// do)
@@ -235,6 +243,47 @@ public class SparkOpenorgsDedupTest implements Serializable {
 
 	@Test
 	@Order(4)
+	void refineMergeRelsTest() throws Exception {
+
+		ArgumentApplicationParser parser = new ArgumentApplicationParser(
+			IOUtils
+				.toString(
+					SparkRefineMergeRels.class
+						.getResourceAsStream(
+							"/eu/dnetlib/dhp/oa/dedup/refineMergeRels_parameters.json")));
+
+		parser
+			.parseArgument(
+				new String[] {
+					"-i",
+					testGraphBasePath,
+					"-asi",
+					testActionSetId,
+					"-la",
+					"lookupurl",
+					"-w",
+					testOutputBasePath
+				});
+
+		new SparkRefineMergeRels(parser, spark).run(isLookUpService);
+
+		long orgs_mergerel = spark
+			.read()
+			.load(testOutputBasePath + "/" + testActionSetId + "/organization_mergerel")
+			.count();
+		assertEquals(132, orgs_mergerel);
+		long orgs_dedup_ids = spark
+				.read()
+				.load(testOutputBasePath + "/" + testActionSetId + "/organization_mergerel")
+				.select(col("source"))
+				.distinct()
+				.count();
+		assertEquals(75, orgs_dedup_ids);
+
+	}
+
+	@Test
+	@Order(5)
 	void prepareOrgRelsTest() throws Exception {
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
@@ -257,8 +306,10 @@ public class SparkOpenorgsDedupTest implements Serializable {
 					dbUrl,
 					"-dusr",
 					dbUser,
-					"-t",
-					dbTable,
+					"-tde",
+					dedupEventsTable,
+					"-tpc",
+					parentChildTable,
 					"-dpwd",
 					dbPwd
 				});
@@ -271,53 +322,91 @@ public class SparkOpenorgsDedupTest implements Serializable {
 
 		Connection connection = DriverManager.getConnection(dbUrl, connectionProperties);
 
+		// verify the number of dedup events in the DB
 		ResultSet resultSet = connection
-			.prepareStatement("SELECT COUNT(*) as total_rels FROM " + dbTable)
+			.prepareStatement("SELECT COUNT(*) as total_rels FROM " + dedupEventsTable)
 			.executeQuery();
 		if (resultSet.next()) {
 			int total_rels = resultSet.getInt("total_rels");
-			assertEquals(32, total_rels);
+			assertEquals(34, total_rels);
 		} else
 			fail("No result in the sql DB");
 		resultSet.close();
 
 		// verify the number of organizations with duplicates
 		ResultSet resultSet2 = connection
-			.prepareStatement("SELECT COUNT(DISTINCT(local_id)) as total_orgs FROM " + dbTable)
+			.prepareStatement("SELECT COUNT(DISTINCT(local_id)) as total_orgs FROM " + dedupEventsTable)
 			.executeQuery();
 		if (resultSet2.next()) {
 			int total_orgs = resultSet2.getInt("total_orgs");
-			assertEquals(6, total_orgs);
+			assertEquals(8, total_orgs);
 		} else
 			fail("No result in the sql DB");
 		resultSet2.close();
 
-		// verify that no DiffRel is in the DB
+		// collect the DiffRels from the input graph
 		List<String> diffRels = jsc
 			.textFile(DedupUtility.createEntityPath(testGraphBasePath, "relation"))
 			.map(s -> OBJECT_MAPPER.readValue(s, Relation.class))
-			.filter(r -> r.getRelClass().equals("isDifferentFrom"))
+			.filter(r -> r.getRelClass().equals(ModelConstants.IS_DIFFERENT_FROM))
 			.map(r -> r.getSource() + "@@@" + r.getTarget())
 			.collect();
 
-		List<String> dbRels = new ArrayList<>();
+		// collect the ParentChildRels from the input graph and create families: <id, familyId>
+		Dataset<Row> families = OpenorgsUtility
+			.createFamilies(
+				spark,
+				DedupUtility.createEntityPath(testGraphBasePath, "relation"),
+				ModelConstants.IS_PARENT_OF);
+		List<Row> rows = new ArrayList<>();
 		ResultSet resultSet3 = connection
-			.prepareStatement("SELECT local_id, oa_original_id FROM " + dbTable)
+			.prepareStatement("SELECT local_id, oa_original_id FROM " + dedupEventsTable)
 			.executeQuery();
 		while (resultSet3.next()) {
 			String source = OafMapperUtils.createOpenaireId("organization", resultSet3.getString("local_id"), true);
 			String target = OafMapperUtils
 				.createOpenaireId("organization", resultSet3.getString("oa_original_id"), true);
-			dbRels.add(source + "@@@" + target);
+			rows.add(RowFactory.create(source, target));
 		}
 		resultSet3.close();
+		Dataset<Row> duplicateSuggestions = spark
+			.createDataFrame(
+				rows,
+				new StructType()
+					.add("source", DataTypes.StringType, false)
+					.add("target", DataTypes.StringType, false));
+
+		// verify that the DiffRels are not in the DB
+		List<String> dbRels = duplicateSuggestions.toJavaRDD().map(r -> r.get(0) + "@@@" + r.get(1)).collect();
 		assertTrue(Collections.disjoint(dbRels, diffRels));
+
+		// verify that the suggestions are not in same family
+		long family_conflicts_num = duplicateSuggestions
+			.join(families, duplicateSuggestions.col("target").equalTo(families.col("id")))
+			.groupBy(duplicateSuggestions.col("source"))
+			.agg(
+				count("groupId").alias("total"),
+				countDistinct("groupId").alias("distinct"))
+			.filter(col("total").gt(col("distinct")))
+			.count();
+		assertEquals(0, family_conflicts_num);
+
+		// verify the number of parent child suggestions in the DB
+		ResultSet resultSet4 = connection
+			.prepareStatement("SELECT COUNT(*) as total_rels FROM " + parentChildTable)
+			.executeQuery();
+		if (resultSet4.next()) {
+			int total_rels = resultSet4.getInt("total_rels");
+			assertEquals(4, total_rels);
+		} else
+			fail("No result in the sql DB");
+		resultSet.close();
 
 		connection.close();
 	}
 
 	@Test
-	@Order(5)
+	@Order(6)
 	void prepareNewOrgsTest() throws Exception {
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
@@ -340,8 +429,8 @@ public class SparkOpenorgsDedupTest implements Serializable {
 					dbUrl,
 					"-dusr",
 					dbUser,
-					"-t",
-					dbTable,
+					"-tde",
+					dedupEventsTable,
 					"-dpwd",
 					dbPwd
 				});
@@ -370,7 +459,7 @@ public class SparkOpenorgsDedupTest implements Serializable {
 			.distinct()
 			.foreach(s -> System.out.println("difforgs = " + s));
 		ResultSet resultSet0 = connection
-			.prepareStatement("SELECT oa_original_id FROM " + dbTable + " WHERE local_id = ''")
+			.prepareStatement("SELECT oa_original_id FROM " + dedupEventsTable + " WHERE local_id = ''")
 			.executeQuery();
 		while (resultSet0.next())
 			System.out
@@ -379,11 +468,11 @@ public class SparkOpenorgsDedupTest implements Serializable {
 		resultSet0.close();
 
 		ResultSet resultSet = connection
-			.prepareStatement("SELECT COUNT(*) as total_new_orgs FROM " + dbTable + " WHERE local_id = ''")
+			.prepareStatement("SELECT COUNT(*) as total_new_orgs FROM " + dedupEventsTable + " WHERE local_id = ''")
 			.executeQuery();
 		if (resultSet.next()) {
 			int total_new_orgs = resultSet.getInt("total_new_orgs");
-			assertEquals(orgs_in_diffrel + 1, total_new_orgs);
+			assertEquals(orgs_in_diffrel, total_new_orgs);
 		} else
 			fail("No result in the sql DB");
 		resultSet.close();

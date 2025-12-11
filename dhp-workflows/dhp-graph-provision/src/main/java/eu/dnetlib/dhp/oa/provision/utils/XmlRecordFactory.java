@@ -104,14 +104,11 @@ public class XmlRecordFactory implements Serializable {
 			final EntityType type = EntityType.fromClass(entity.getClass());
 			final List<String> metadata = metadata(type, entity, contexts);
 
-			// rels has to be processed before the contexts because they enrich the contextMap with
-			// the
-			// funding info.
 			final List<RelatedEntityWrapper> links = je.getLinks();
 			final List<String> relations = links
 				.stream()
 				.filter(link -> !isDuplicate(link))
-				.map(link -> mapRelation(contexts, templateFactory, type, link))
+				.map(link -> mapRelation(templateFactory, type, link))
 				.collect(Collectors.toCollection(ArrayList::new));
 
 			final String mainType = ModelSupport.getMainType(type);
@@ -1115,8 +1112,7 @@ public class XmlRecordFactory implements Serializable {
 		return kv != null && StringUtils.isNotBlank(kv.getKey()) && StringUtils.isNotBlank(kv.getValue());
 	}
 
-	private List<String> mapFields(final TemplateFactory templateFactory, final RelatedEntityWrapper link,
-		final Set<String> contexts) {
+	private List<String> mapFields(final TemplateFactory templateFactory, final RelatedEntityWrapper link) {
 		final Relation rel = link.getRelation();
 		final RelatedEntity re = link.getTarget();
 		final String targetType = link.getTarget().getType();
@@ -1271,13 +1267,12 @@ public class XmlRecordFactory implements Serializable {
 				if (re.getContracttype() != null && StringUtils.isNotBlank(re.getContracttype().getClassid())) {
 					metadata.add(XmlSerializationUtils.mapQualifier("contracttype", re.getContracttype()));
 				}
-				if (re.getFundingtree() != null && contexts != null) {
+				if (re.getFundingtree() != null) {
 					metadata
 						.addAll(
 							re
 								.getFundingtree()
 								.stream()
-								.peek(ft -> fillContextMap(ft, contexts))
 								.map(ft -> getRelFundingTree(ft))
 								.collect(Collectors.toList()));
 				}
@@ -1313,7 +1308,7 @@ public class XmlRecordFactory implements Serializable {
 		return metadata;
 	}
 
-	private String mapRelation(final Set<String> contexts,
+	private String mapRelation(
 		final TemplateFactory templateFactory,
 		final EntityType type,
 		final RelatedEntityWrapper link) {
@@ -1325,7 +1320,7 @@ public class XmlRecordFactory implements Serializable {
 			throw new IllegalArgumentException(
 				String.format("missing scheme for: <%s - %s>", type, targetType));
 		}
-		final HashSet<String> fields = Sets.newHashSet(mapFields(templateFactory, link, contexts));
+		final HashSet<String> fields = Sets.newHashSet(mapFields(templateFactory, link));
 		if (rel.getValidated() == null) {
 			rel.setValidated(false);
 		}
@@ -1349,7 +1344,7 @@ public class XmlRecordFactory implements Serializable {
 			.map(link -> {
 				final String targetType = link.getTarget().getType();
 				final String name = ModelSupport.getMainType(EntityType.valueOf(targetType));
-				final HashSet<String> fields = Sets.newHashSet(mapFields(templateFactory, link, null));
+				final HashSet<String> fields = Sets.newHashSet(mapFields(templateFactory, link));
 				return templateFactory
 					.getChild(name, link.getTarget().getId(), Lists.newArrayList(fields));
 			})
@@ -1736,56 +1731,6 @@ public class XmlRecordFactory implements Serializable {
 		final StringWriter buffer = new StringWriter();
 		transformer.transform(new DOMSource(element), new StreamResult(buffer));
 		return buffer.toString();
-	}
-
-	private void fillContextMap(final String xmlTree, final Set<String> contexts) {
-
-		Document fundingPath;
-		try {
-			fundingPath = new SAXReader().read(new StringReader(xmlTree));
-		} catch (final DocumentException e) {
-			throw new RuntimeException(e);
-		}
-		try {
-			final Node funder = fundingPath.selectSingleNode("//funder");
-
-			if (funder != null) {
-
-				final String funderShortName = funder.valueOf("./shortname");
-				contexts.add(funderShortName);
-
-				contextMapper
-					.put(
-						funderShortName,
-						new ContextDef(funderShortName, funder.valueOf("./name"), "context", "funding"));
-				final Node level0 = fundingPath.selectSingleNode("//funding_level_0");
-				if (level0 != null) {
-					final String level0Id = Joiner.on("::").join(funderShortName, level0.valueOf("./name"));
-					contextMapper
-						.put(level0Id, new ContextDef(level0Id, level0.valueOf("./description"), "category", ""));
-					final Node level1 = fundingPath.selectSingleNode("//funding_level_1");
-					if (level1 == null) {
-						contexts.add(level0Id);
-					} else {
-						final String level1Id = Joiner.on("::").join(level0Id, level1.valueOf("./name"));
-						contextMapper
-							.put(level1Id, new ContextDef(level1Id, level1.valueOf("./description"), "concept", ""));
-						final Node level2 = fundingPath.selectSingleNode("//funding_level_2");
-						if (level2 == null) {
-							contexts.add(level1Id);
-						} else {
-							final String level2Id = Joiner.on("::").join(level1Id, level2.valueOf("./name"));
-							contextMapper
-								.put(
-									level2Id, new ContextDef(level2Id, level2.valueOf("./description"), "concept", ""));
-							contexts.add(level2Id);
-						}
-					}
-				}
-			}
-		} catch (final NullPointerException e) {
-			throw new IllegalArgumentException("malformed funding path: " + xmlTree, e);
-		}
 	}
 
 	@SuppressWarnings("unchecked")
