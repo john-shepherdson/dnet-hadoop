@@ -991,6 +991,37 @@ case object Crossref2Oaf {
               val targetId = getProjectId("edtech______", "1e5e62235d094afd01cd56e65112fc63")
               queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
               queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
+              //SWE Funders from SweCris related to the SciLifeLabTender
+            //Vetenskapsrådet
+            case "10.13039/501100004359" =>
+              generateSimpleRelationFromAward(funder, "vr__________", a => a)
+              //VINNOVA
+            case "10.13039/501100001858" =>
+              generateSimpleRelationFromAward(funder, "vinnova_____", a=> a)
+            //Riksbankens Jubileumsfond
+            case "10.13039/501100004472" =>
+              generateSimpleRelationFromAward(funder, "rj__________", a=>a )
+            //Naturvårdsverket
+            case "10.13039/501100004357" =>
+              generateSimpleRelationFromAward(funder, "nvv_________", a => a)
+              //Hjärt-Lungfonden
+            case "10.13039/501100003793"=>
+              generateSimpleRelationFromAward(funder, "nvv_________", a => a)
+              //Karolinska Institutet
+            case "10.13039/501100004047"=>
+              generateSimpleRelationFromAward(funder, "ki__________", a => a)
+            //Stiftelsen för Kunskaps- och Kompetensutveckling
+            case "10.13039/501100003170"=>
+              generateSimpleRelationFromAward(funder, "kks_________", a => a)
+            //Östersjöstiftelsen
+            case "10.13039/100009050"=>
+              generateSimpleRelationFromAward(funder, "fbs_________", a => a)
+            //Statens geotekniska institut
+            case "10.13039/100016779"=>
+              generateSimpleRelationFromAward(funder, "sgi_________", a => a)
+            //Familjen Kamprads Stiftelse
+            case "10.13039/501100009750"=>
+              generateSimpleRelationFromAward(funder, "kff_________", a => a)
             case _ => logger.debug("no match for " + funder.DOI.get)
           }
 
