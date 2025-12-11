@@ -1,53 +1,27 @@
 package eu.dnetlib.dhp.enrich.relsfrompublisherenricheddata;
 
+
 import java.io.Serializable;
+import java.util.List;
 
 public class SerializationOrg implements Serializable {
-    private String ror;
-    private String openOrgs;
-    private Double confidence;
-    private String name;
-    private String country;
+    List<SerializationMatching> matchings;
 
+    private String raw;
 
-    public String getName() {
-        return name;
+    public String getRaw() {
+        return raw;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setRaw(String raw) {
+        this.raw = raw;
     }
 
-    public String getCountry() {
-        return country;
+    public List<SerializationMatching> getMatchings() {
+        return matchings;
     }
 
-    public void setCountry(String country) {
-        this.country = country;
+    public void setMatchings(List<SerializationMatching> matchings) {
+        this.matchings = matchings;
     }
-
-    public String getRor() {
-        return ror;
-    }
-
-    public void setRor(String ror) {
-        this.ror = ror;
-    }
-
-    public String getOpenOrgs() {
-        return openOrgs;
-    }
-
-    public void setOpenOrgs(String openOrgs) {
-        this.openOrgs = openOrgs;
-    }
-
-    public Double getConfidence() {
-        return confidence;
-    }
-
-    public void setConfidence(Double confidence) {
-        this.confidence = confidence;
-    }
-
 }

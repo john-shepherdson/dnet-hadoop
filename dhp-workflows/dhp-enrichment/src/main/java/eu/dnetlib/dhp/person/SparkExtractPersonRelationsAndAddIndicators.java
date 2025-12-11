@@ -5,13 +5,11 @@ import static eu.dnetlib.dhp.PropagationConstant.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.util.*;
-import java.util.logging.Filter;
 import java.util.stream.Collectors;
 
 import eu.dnetlib.dhp.common.person.Constants;
 import eu.dnetlib.dhp.schema.oaf.rel.Authorship;
 import eu.dnetlib.dhp.schema.oaf.rel.CoAuthorship;
-import eu.dnetlib.dhp.schema.oaf.rel.beans.AuthorshipRoles;
 import eu.dnetlib.dhp.schema.oaf.rel.beans.DeclaredAffiliation;
 import eu.dnetlib.dhp.schema.oaf.rel.beans.Role;
 import org.apache.commons.io.IOUtils;
@@ -22,10 +20,6 @@ import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.MapGroupsFunction;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.types.DataType;
-import org.apache.spark.sql.types.DataTypes;
-import org.apache.spark.sql.types.StructType;
-import org.postgresql.shaded.com.ongres.scram.common.bouncycastle.pbkdf2.EncodableDigest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +30,6 @@ import eu.dnetlib.dhp.countrypropagation.SparkCountryPropagationJob;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import scala.Tuple2;
 import static org.apache.spark.sql.functions.*;
@@ -44,7 +37,6 @@ import static org.apache.spark.sql.functions.*;
 public class SparkExtractPersonRelationsAndAddIndicators {
 
 	private static final Logger log = LoggerFactory.getLogger(SparkCountryPropagationJob.class);
-	private static final String PERSON_PREFIX = ModelSupport.getIdPrefix(Person.class) + "|orcid_______";
 
 	public static final DataInfo DATAINFO = OafMapperUtils
 		.dataInfo(
@@ -100,7 +92,7 @@ public class SparkExtractPersonRelationsAndAddIndicators {
 	}
 
 	private static void addIndicators(SparkSession spark, String sourcePath, String workingPath) {
-		// si leggono i result e si selezionano quelli con ordic.
+		// si leggono i result e si selezionano quelli con orcid.
 		// per ogni result si prendono gli orcid value distinti e si emettono i downloads e citation count
 		// si raggruppa per orcid e si sommano i vari contributi
 
@@ -342,32 +334,17 @@ public class SparkExtractPersonRelationsAndAddIndicators {
 						.option("compression", "gzip")
 						.json(workingPath + "/authorship");
 
-					// 3. create co_authorship relations between the pairs of authors with orcid/orcid_pending pids
-					resultWithOrcids
-						.map(
-							(MapFunction<Result, Coauthors>) SparkExtractPersonRelationsAndAddIndicators::getAuthorsPidList,
-							Encoders.bean(Coauthors.class))
-						.flatMap(
-							(FlatMapFunction<Coauthors, CoAuthorship>) c -> new CoAuthorshipIterator(c.getCoauthors()),
-							Encoders.bean(CoAuthorship.class))
-							.groupByKey((MapFunction<CoAuthorship, String>) r -> r.getAuthor1() + "::" + r.getAuthor2(), Encoders.STRING() )
-							.mapGroups((MapGroupsFunction<String, CoAuthorship, CoAuthorship>) (k,it) -> {
-								CoAuthorship ca = it.next();
-								it.forEachRemaining(r -> ca.setCoauthoredProducts(ca.getCoauthoredProducts() + r.getCoauthoredProducts() ));
-								return ca;
-							} , Encoders.bean(CoAuthorship.class))
-						.write()
-						.mode(SaveMode.Append)
-						.option("compression", "gzip")
-						.json(workingPath + "/coauthorship");
 
 				});
 
 		spark
 			.read()
 			.schema(Encoders.bean(Authorship.class).schema())
-			.json(workingPath)
+			.json(workingPath + "/authorship")
 			.as(Encoders.bean(Authorship.class))
+				.union(spark.read().schema(Encoders.bean(Authorship.class).schema())
+						.json(sourcePath + "authorship")
+						.as(Encoders.bean(Authorship.class)))
 				.groupByKey((MapFunction<Authorship, String>) a -> a.getPerson() + "::"  + a.getProduct(), Encoders.STRING())
 				.mapGroups((MapGroupsFunction<String, Authorship, Authorship>) (k,it) -> {
 					Authorship authorship = it.next();
@@ -377,9 +354,9 @@ public class SparkExtractPersonRelationsAndAddIndicators {
 					return  authorship;
 		}, Encoders.bean(Authorship.class))
 			.write()
-			.mode(SaveMode.Append)
+			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
-			.json(sourcePath + "relation");
+			.json(sourcePath + "authorship");
 
 	}
 
@@ -401,6 +378,9 @@ public class SparkExtractPersonRelationsAndAddIndicators {
 		else{
 			if(Optional.ofNullable(toMerge.getDeclaredAffiliations()).isPresent())
 				toMerge.getDeclaredAffiliations().forEach(affiliation -> addAffiliation(acc.getDeclaredAffiliations(), affiliation));
+		}
+		if(acc.getRank() == null){
+			acc.setRank(toMerge.getRank());
 		}
 		return acc;
 	}
@@ -481,26 +461,19 @@ public class SparkExtractPersonRelationsAndAddIndicators {
 					.filter(p -> p.getQualifier().getClassid().equalsIgnoreCase("orcid_pending"))
 					.collect(Collectors.toList());
 			if (!orcids.isEmpty())
-				relationList.add(getAuthorshipRelation(orcids.get(0).getValue(), r.getId(), a.getRank(), a.getRawAffiliationString()));
+				relationList.add(getAuthorshipRelation(orcids.get(0).getValue(), r.getId(), a.getRank()));
 
 		}
 		return relationList.iterator();
 	}
 
-	private static Authorship getAuthorshipRelation(String orcid, String resultId, Integer rank, List<String> rawAffiliations) {
+	private static Authorship getAuthorshipRelation(String orcid, String resultId, Integer rank) {
 		String source = Constants.getPersonId(orcid);
 		Authorship authorship = new Authorship();
 		authorship.setPerson(source);
 		authorship.setProduct(resultId);
 		authorship.setRank(rank);
 		authorship.setDataInfo(DATAINFO);
-		//Maybe we should not add the string without a matching organization
-		//not in the relation anyway
-		authorship.setDeclaredAffiliations(rawAffiliations.stream().map(rawAffiliation -> {
-			DeclaredAffiliation da = new DeclaredAffiliation();
-			da.setRawAffiliation(rawAffiliation);
-			return da;
-		}).collect(Collectors.toList()));
 		return authorship;
 	}
 

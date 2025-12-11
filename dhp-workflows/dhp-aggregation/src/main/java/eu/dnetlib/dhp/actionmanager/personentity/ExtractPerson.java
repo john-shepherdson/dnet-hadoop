@@ -17,8 +17,6 @@ import java.util.stream.Collectors;
 
 import eu.dnetlib.dhp.common.person.Constants;
 import eu.dnetlib.dhp.schema.oaf.rel.AuthorAffiliation;
-import eu.dnetlib.dhp.schema.oaf.rel.Authorship;
-import eu.dnetlib.dhp.schema.oaf.rel.CoAuthorship;
 import eu.dnetlib.dhp.schema.oaf.rel.ProjectParticipation;
 import eu.dnetlib.dhp.schema.oaf.rel.beans.*;
 import org.apache.commons.cli.ParseException;
@@ -44,17 +42,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.collection.orcid.model.Author;
 import eu.dnetlib.dhp.collection.orcid.model.Employment;
-import eu.dnetlib.dhp.collection.orcid.model.Work;
 import eu.dnetlib.dhp.common.DbClient;
 import eu.dnetlib.dhp.common.HdfsSupport;
-import eu.dnetlib.dhp.common.person.CoAuthorshipIterator;
 import eu.dnetlib.dhp.common.person.Coauthors;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.*;
 import scala.Tuple2;
-import scala.collection.mutable.WrappedArray;
 
 import static org.apache.spark.sql.functions.*;
 
@@ -109,142 +104,11 @@ public class ExtractPerson implements Serializable {
 				extractInfoForActionSetFromORCID(spark, inputPath, workingDir);
 				extractInfoForActionSetFromProjects(
 					dbUrl, dbUser, dbPassword, workingDir + "/project", hdfsNameNode, isSparkSessionManaged);
-				//extractInfoForActionSetFromPublisher(spark, publisherInputPath, workingDir);
 				createActionSet(spark, outputPath, workingDir);
 			});
 
 	}
 
-	// PUBLISHER
-	private static void extractInfoForActionSetFromPublisher(SparkSession spark, String inputPath, String workingDir) {
-
-		spark
-				.udf().register(
-						"removeLeadingOrcidUrl", (String pid) -> StringUtils.startsWith(pid, "https") ? StringUtils.substringAfter(pid, "orcid.org/") : pid, DataTypes.StringType);
-
-		// Read the publishers output
-		Dataset<Row> df = spark
-			.read()
-			.schema(RESULT_MATCHED_SCHEMA)
-
-			.json(inputPath)
-			.where("doi is not null");
-
-        //Select the relevant information
-		Dataset<Row> allAuthors = df
-				.withColumn("author", explode(col("authors")))
-				.select(col("doi"),
-						col("author.contributor_roles").as("roles"),
-						col("author.corresponding").as("corresponding"),
-						col("author.affiliations").as("affiliations"),
-						col("author.pids").as("pids"))
-				.withColumn("pid", explode(col("pids")))
-				.drop("pids")
-				.filter(lower(col("pid.schema")).equalTo("orcid"))
-				.withColumn("orcid", expr("removeLeadingOrcidUrl(pid.value)"))
-				.drop("pid");
-
-		writeAuthorshipRelations(workingDir + "/authorship", allAuthors);
-
-
-
-	}
-
-
-	private static void writeAuthorshipRelations(String outputPath, Dataset<Row> allAuthors) {
-
-		allAuthors.map(
-				(MapFunction<Row, Authorship>) row -> {
-					String id = row.getAs("doi");
-					Boolean corresponding = Boolean.valueOf(row.getAs("corresponding"));
-
-					String orcid = Constants.getPersonId(row.getAs("orcid"));
-
-					// --- Gestione Affiliazioni (senza explode) ---
-					WrappedArray<Row> affRows = row.getAs("affiliations");
-					List<DeclaredAffiliation> declaredAffiliations = new ArrayList<>();
-					Set<String> insertedPids = new HashSet<>();
-					if (affRows != null) {
-						for(int i =0; i< affRows.length(); i++){
-							Row aff = affRows.apply(i);
-							String rawAff = aff.getAs("raw_affiliation_string");
-
-							// Matchings non esplosi
-							WrappedArray<Row> matchingRows = aff.getAs("matchings");
-							List<MatchingOrganization> mos = new ArrayList<>();
-
-							if (matchingRows != null) {
-								for (int j = 0 ; j < matchingRows.length(); j++){
-									Row m = matchingRows.apply(j);
-									String status = m.getAs("status");
-									String pidValue = m.getAs("value");
-									if ("active".equalsIgnoreCase(status) && !insertedPids.contains(pidValue)) {
-										insertedPids.add(m.getAs("value"));
-										MatchingOrganization mo = new MatchingOrganization();
-										if("ROR".equalsIgnoreCase(m.getAs("pid"))){
-											mo.setRor(pidValue);
-										}else {
-											mo.setOpenOrgs(m.getAs("value"));
-										}
-										mo.setProvenance("affro");
-										mo.setCountry(m.getAs("country"));
-										mo.setTrust(m.getAs("confidence"));
-										mo.setResolvedOrganizationName(m.getAs("name"));
-
-										mos.add(mo);
-									}
-								}
-							}
-
-							if (!mos.isEmpty()) {
-								DeclaredAffiliation da = new DeclaredAffiliation();
-								da.setRawAffiliation(rawAff);
-								da.setMatchingOrganization(mos);
-								declaredAffiliations.add(da);
-							}
-						}
-					}
-
-					// --- Gestione Roles (senza explode) ---
-					WrappedArray<Row> roleRows = row.getAs("roles");
-					List<Role> roles = new ArrayList<>();
-					if (roleRows != null) {
-						for(int i = 0; i < roleRows.length(); i++){
-							Row role = roleRows.apply(i);
-							Role authorRole = new Role();
-							String schema = role.getAs("schema");
-							if(StringUtils.isNotBlank(schema) && "Credit".equalsIgnoreCase(schema)){
-								AuthorshipRoles r = AuthorshipRoles.fromString(role.getAs("name"));
-								if(r != null){
-									authorRole.setRole(r);
-									authorRole.setValue(role.getAs("value"));
-									authorRole.setSchema(schema);
-								}
-							}
-							authorRole.setText(role.getAs("name"));
-
-							roles.add(authorRole);
-						}
-					}
-
-					// --- Costruzione Authorship ---
-					Authorship authorship = new Authorship();
-					authorship.setProduct(id);
-					authorship.setPerson(orcid);
-					authorship.setCorresponding(corresponding);
-					authorship.setDeclaredAffiliations(declaredAffiliations);
-					authorship.setRoles(roles);
-					authorship.setCollectedfrom(OPENAIRE_COLLECTED_FROM);
-					authorship.setDataInfo(OPENAIRE_DATAINFO);
-					return authorship;
-				},
-				Encoders.bean(Authorship.class)
-		).write()
-				.mode(SaveMode.Overwrite)
-				.option("compression", "gzip")
-				.json(outputPath);
-		;
-	}
 
 	// PROJECT
 	private static void extractInfoForActionSetFromProjects(

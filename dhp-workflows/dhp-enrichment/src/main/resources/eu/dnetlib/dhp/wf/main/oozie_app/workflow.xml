@@ -352,21 +352,6 @@
         <ok to="person_propagation" />
         <error to="Kill" />
     </action>
-    <action name="person_propagation">
-        <sub-workflow>
-            <app-path>${wf:appPath()}/person_propagation
-            </app-path>
-            <propagate-configuration/>
-            <configuration>
-                <property>
-                    <name>sourcePath</name>
-                    <value>${outputPath}</value>
-                </property>
-            </configuration>
-        </sub-workflow>
-        <ok to="publisher_propagation" />
-        <error to="Kill" />
-    </action>
     <action name="publisher_propagation">
         <sub-workflow>
             <app-path>${wf:appPath()}/person_propagation
@@ -380,6 +365,21 @@
                 <property>
                     <name>graphPath</name>
                     <value>${publisherPath}</value>
+                </property>
+            </configuration>
+        </sub-workflow>
+        <ok to="person_propagation" />
+        <error to="Kill" />
+    </action>
+    <action name="person_propagation">
+        <sub-workflow>
+            <app-path>${wf:appPath()}/person_propagation
+            </app-path>
+            <propagate-configuration/>
+            <configuration>
+                <property>
+                    <name>sourcePath</name>
+                    <value>${outputPath}</value>
                 </property>
             </configuration>
         </sub-workflow>
