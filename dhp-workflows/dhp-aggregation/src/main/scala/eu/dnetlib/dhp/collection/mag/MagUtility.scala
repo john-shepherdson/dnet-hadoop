@@ -482,6 +482,17 @@ object MagUtility extends Serializable {
 
   }
 
+  // For ticket #10576:  all publications must have a wildcard type "Research"
+  // so they can be matched by title at every deduplication step regardless of original type.
+  def patchTypology(r:Result): Unit = {
+    r.getInstance().get(0).setInstancetype(qualifier(
+      "0014",
+      "Research",
+      ModelConstants.DNET_PUBLICATION_RESOURCE,
+      ModelConstants.DNET_PUBLICATION_RESOURCE
+    ))
+  }
+
   def convertMAGtoOAF(paper: MAGPaper): String = {
 
     // FILTER all the  MAG paper with no URL
@@ -492,6 +503,10 @@ object MagUtility extends Serializable {
     if (result == null)
       return null
 
+//   if (!result.isInstanceOf[Publication])
+//    return  null
+
+//    patchTypology(result)
     result.setCollectedfrom(List(MAGCollectedFrom).asJava)
     var pidList = List(
       structuredProperty(
@@ -514,87 +529,9 @@ object MagUtility extends Serializable {
 
     result.setTitle(List(originalTitles).asJava)
 
-    if (paper.date.orNull != null) {
-      result.setDateofacceptance(field(paper.date.get, null))
-    } else {
-      if (paper.year.isDefined && paper.year.get > 1700) {
-        result.setDateofacceptance(field(s"${paper.year.get}-01-01", null))
-      }
-    }
-
-    if (paper.onlineDate.orNull != null) {
-      result.setRelevantdate(
-        List(
-          structuredProperty(
-            paper.onlineDate.get,
-            qualifier(
-              "published-online",
-              "published-online",
-              ModelConstants.DNET_DATACITE_DATE,
-              ModelConstants.DNET_DATACITE_DATE
-            ),
-            null
-          )
-        ).asJava
-      )
-    }
-
-    if (paper.publisher.orNull != null) {
-      result.setPublisher(field(paper.publisher.get, null))
-    }
-
-    if (paper.date.isDefined)
-      result.setDateofacceptance(field(paper.date.get, null))
-    if (paper.onlineDate.orNull != null)
-      result.setRelevantdate(
-        List(
-          structuredProperty(
-            paper.onlineDate.get,
-            qualifier(
-              "published-online",
-              "published-online",
-              ModelConstants.DNET_DATACITE_DATE,
-              ModelConstants.DNET_DATACITE_DATE
-            ),
-            null
-          )
-        ).asJava
-      )
-
-    if (paper.publisher.isDefined)
-      result.setPublisher(field(paper.publisher.get, null))
-
-    if (paper.journalId.isDefined && paper.journalName.isDefined) {
-      val j = new Journal
-
-      j.setName(paper.journalName.get)
-      j.setSp(paper.firstPage.orNull)
-      j.setEp(paper.lastPage.orNull)
-      if (paper.publisher.isDefined)
-        result.setPublisher(field(paper.publisher.get, null))
-      j.setIssnPrinted(paper.journalIssn.orNull)
-      j.setVol(paper.volume.orNull)
-      j.setIss(paper.issue.orNull)
-      j.setConferenceplace(paper.conferenceLocation.orNull)
-      result match {
-        case publication: Publication => publication.setJournal(j)
-      }
-    }
 
     if (paper.abstractText.isDefined)
       result.setDescription(List(field(paper.abstractText.get, null)).asJava)
-    if (paper.authors.isDefined && paper.authors.get.nonEmpty) {
-      result.setAuthor(
-        paper.authors.get
-          .filter(a => a.AuthorName.isDefined)
-          .map(a => {
-            val author = new Author
-            author.setFullname(a.AuthorName.get)
-            author
-          })
-          .asJava
-      )
-    }
 
     val instance = result.getInstance().get(0)
 
@@ -612,60 +549,10 @@ object MagUtility extends Serializable {
         )
       )
     }
-    instance.setPid(pidList.asJava)
-    result.setPid(pidList.asJava)
-    instance.setUrl(paper.urls.get.asJava)
-    instance.setHostedby(ModelConstants.UNKNOWN_REPOSITORY)
+    instance.setAlternateIdentifier(pidList.asJava)
+    instance.setUrl(List(s"https://dx.doi.org/${paper.doi.getOrElse("")}").asJava)
     instance.setCollectedfrom(MAGCollectedFrom)
-    instance.setAccessright(
-      accessRight(
-        ModelConstants.UNKNOWN,
-        ModelConstants.NOT_AVAILABLE,
-        ModelConstants.DNET_ACCESS_MODES,
-        ModelConstants.DNET_ACCESS_MODES
-      )
-    )
-
-    if (paper.authors.orNull != null && paper.authors.get.nonEmpty)
-      result.setAuthor(
-        paper.authors.get
-          .filter(a => a.AuthorName.orNull != null)
-          .map { a =>
-            val author = new Author
-            author.setFullname(a.AuthorName.get)
-            var authorPid = List(
-              structuredProperty(
-                a.AuthorId.get.toString,
-                qualifier(
-                  PidType.mag_id.toString,
-                  PidType.mag_id.toString,
-                  ModelConstants.DNET_PID_TYPES,
-                  ModelConstants.DNET_PID_TYPES
-                ),
-                null
-              )
-            )
-            if (a.GridId.orNull != null) {
-              authorPid = authorPid ::: List(
-                structuredProperty(
-                  a.AuthorId.get.toString,
-                  qualifier(
-                    PidType.mag_id.toString,
-                    PidType.mag_id.toString,
-                    ModelConstants.DNET_PID_TYPES,
-                    ModelConstants.DNET_PID_TYPES
-                  ),
-                  null
-                )
-              )
-            }
-            author.setPid(authorPid.asJava)
-            author
-          }
-          .asJava
-      )
     mapper.writeValueAsString(result)
-
   }
 
   def generateOrganization(r: Row): String = {
