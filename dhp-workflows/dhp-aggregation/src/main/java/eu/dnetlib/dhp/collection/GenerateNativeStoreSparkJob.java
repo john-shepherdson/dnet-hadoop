@@ -10,9 +10,8 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 import static eu.dnetlib.dhp.utils.DHPUtils.saveDataset;
 import static eu.dnetlib.dhp.utils.DHPUtils.writeHdfsFile;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.io.StringReader;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -63,6 +62,7 @@ import eu.dnetlib.validator2.validation.guideline.openaire.FAIR_Data_GuidelinesP
 import eu.dnetlib.validator2.validation.guideline.openaire.FAIR_Literature_GuidelinesV4Profile;
 import eu.dnetlib.validator2.validation.guideline.openaire.LiteratureGuidelinesV3Profile;
 import eu.dnetlib.validator2.validation.guideline.openaire.LiteratureGuidelinesV4Profile;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import scala.Tuple2;
 
@@ -304,7 +304,7 @@ public class GenerateNativeStoreSparkJob {
 		try {
 			final SAXReader reader = new SAXReader();
 			reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-			final Document document = reader.read(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)));
+			final Document document = reader.read(new StringReader(input));
 			final Node node = document.selectSingleNode(xpath);
 			final String originalIdentifier = node.getText();
 			if (StringUtils.isBlank(originalIdentifier)) {
@@ -332,8 +332,8 @@ public class GenerateNativeStoreSparkJob {
 			mdr.setValidationResults(new LinkedHashMap<>());
 		}
 
-		try (final ByteArrayInputStream is = new ByteArrayInputStream(mdr.getBody().getBytes(StandardCharsets.UTF_8))) {
-			final org.w3c.dom.Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
+        try (final StringReader reader = new StringReader(mdr.getBody())) {
+            final org.w3c.dom.Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(reader));
 
 			validators.entrySet().forEach(e -> {
 				final ValidationType validationType = e.getKey();
