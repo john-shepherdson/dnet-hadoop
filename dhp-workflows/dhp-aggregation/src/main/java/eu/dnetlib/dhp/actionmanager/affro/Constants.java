@@ -58,6 +58,11 @@ public class Constants implements Serializable {
 
     public final static StructType GRAPH_SCHEMA = new StructType()
             .add("id", StringType) // oaire id created on the fly if result has doi as identifier
+            .add("collectedfrom", DataTypes.createArrayType(
+                    new StructType()
+                            .add("key", StringType)
+                            .add("value", StringType)
+            ))
             .add(
                     "author", DataTypes
                             .createArrayType(
@@ -73,6 +78,7 @@ public class Constants implements Serializable {
                                                             )
                                             ))
                                             .add("rawAffiliationString", DataTypes.createArrayType(StringType))));
+
 
     public final static StructType AUTHOR_SCHEMA = new StructType()
             .add("name", new StructType()

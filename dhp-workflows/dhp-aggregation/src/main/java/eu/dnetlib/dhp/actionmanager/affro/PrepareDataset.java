@@ -157,9 +157,9 @@ public class PrepareDataset implements Serializable {
         for(EntityType entity: ModelSupport.entityTypes.keySet()) {
             if (ModelSupport.isResult(entity)) {
                 oaire_entities = oaire_entities.union(spark.read().schema(GRAPH_SCHEMA).json(oairePath + "/" + entity.name())
-                        .filter(not(array_contains(col("instance.collectedfrom.value"), lit("Crossref"))))
-                        .filter(not(array_contains(col("instance.collectedfrom.value"), lit("Datacite"))))
-                        .filter(not(array_contains(col("instance.collectedfrom.value"), lit("Pubmed"))))
+                        .filter(not(array_contains(col("collectedfrom.value"), lit("Crossref"))))
+                        .filter(not(array_contains(col("collectedfrom.value"), lit("Datacite"))))
+                        .filter(not(array_contains(col("collectedfrom.value"), lit("Pubmed"))))
                 );
 
             }

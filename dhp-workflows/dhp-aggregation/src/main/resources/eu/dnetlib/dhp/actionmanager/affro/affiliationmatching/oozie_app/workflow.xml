@@ -71,10 +71,24 @@
         </configuration>
     </global>
 
-    <start to="deleteoutputpath"/>
+    <start to="resumeFrom"/>
+
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
+
+    <decision name="resumeFrom">
+        <switch>
+            <case to="deleteoutputpath">${wf:conf('resumeFrom') eq 'delete'}</case>
+            <case to="BeginReadDatacite">${wf:conf('resumeFrom') eq 'readDatacite'}</case>
+            <case to="BeginReadPubmed">${wf:conf('resumeFrom') eq 'readPubmed'}</case>
+            <case to="preparedataset">${wf:conf('resumeFrom') eq 'prepareDataset'}</case>
+            <case to="run-affro">${wf:conf('resumeFrom') eq 'runAffro'}</case>
+            <case to="redistributerelations">${wf:conf('resumeFrom') eq 'redistributeRelations'}</case>
+            <case to="atomicactions">${wf:conf('resumeFrom') eq 'createActionset'}</case>
+            <default to="BeginReadCrossref"/>
+        </switch>
+    </decision>
     <action name="deleteoutputpath">
         <fs>
             <delete path="${workingDir}"/>
