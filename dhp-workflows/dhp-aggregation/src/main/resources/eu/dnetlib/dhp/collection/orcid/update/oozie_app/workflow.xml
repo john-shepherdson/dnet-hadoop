@@ -17,6 +17,29 @@
             <name>accessToken</name>
             <description>The access token</description>
         </property>
+        <!-- General oozie workflow properties -->
+        <property>
+            <name>JAVA_HOME</name>
+            <value>/srv/java/openjdk-17</value>
+            <description>Used to configure the Java home location</description>
+        </property>
+        <property>
+            <name>sparkResourceOpts</name>
+            <value>--executor-memory=6G --conf spark.executor.memoryOverhead=3G --executor-cores=6 --driver-memory=6G --driver-cores=4</value>
+            <description>spark resource options</description>
+        </property>
+        <property>
+            <name>sparkClusterOpts</name>
+            <value>--conf spark.network.timeout=600 --conf spark.shuffle.useOldFetchProtocol=true --conf spark.extraListeners= --conf spark.sql.queryExecutionListeners= --conf spark.yarn.historyServer.address=http://iis-cdh5-test-m3.ocean.icm.edu.pl:18088 --conf spark.eventLog.dir=hdfs://nameservice1/user/spark/applicationHistory --conf spark.executorEnv.JAVA_HOME=${JAVA_HOME} --conf spark.yarn.appMasterEnv.JAVA_HOME=${JAVA_HOME}</value>
+            <description>spark cluster-wide options</description>
+        </property>
+        <property>
+            <name>sparkApplicationOpts</name>
+            <value>--conf spark.sql.shuffle.partitions=3000</value>
+            <description>spark resource options</description>
+        </property>
+
+
 
 
     </parameters>
@@ -35,15 +58,10 @@
             <class>eu.dnetlib.dhp.collection.orcid.OrcidGetUpdatesFile</class>
             <jar>dhp-aggregation-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-memory=${sparkExecutorMemory}
-                --executor-cores=${sparkExecutorCores}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.executor.memoryOverhead=2g
-                --conf spark.sql.shuffle.partitions=3000
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
+                --conf spark.sql.shuffle.partitions=10000
             </spark-opts>
             <arg>--master</arg><arg>yarn</arg>
             <arg>--namenode</arg><arg>${nameNode}</arg>
@@ -65,15 +83,10 @@
             <class>eu.dnetlib.dhp.collection.orcid.SparkGenerateORCIDTable</class>
             <jar>dhp-aggregation-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-memory=${sparkExecutorMemory}
-                --executor-cores=${sparkExecutorCores}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.executor.memoryOverhead=2g
-                --conf spark.sql.shuffle.partitions=3000
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
+                --conf spark.sql.shuffle.partitions=10000
             </spark-opts>
             <arg>--sourcePath</arg><arg>${targetPath}</arg>
             <arg>--targetPath</arg><arg>${targetPath}/updateTable</arg>
@@ -92,15 +105,10 @@
             <class>eu.dnetlib.dhp.collection.orcid.SparkApplyUpdate</class>
             <jar>dhp-aggregation-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-memory=${sparkExecutorMemory}
-                --executor-cores=${sparkExecutorCores}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.executor.memoryOverhead=2g
-                --conf spark.sql.shuffle.partitions=3000
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
+                --conf spark.sql.shuffle.partitions=10000
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphPath}</arg>
             <arg>--updatePath</arg><arg>${targetPath}/updateTable</arg>
