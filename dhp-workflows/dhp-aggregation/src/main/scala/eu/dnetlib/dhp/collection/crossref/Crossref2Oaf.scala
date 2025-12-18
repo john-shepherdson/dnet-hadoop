@@ -1022,6 +1022,9 @@ case object Crossref2Oaf {
             //Familjen Kamprads Stiftelse
             case "10.13039/501100009750"=>
               generateSimpleRelationFromAward(funder, "kff_________", a => a)
+            //Research Ireland
+            case "10.13039/501100025294"=>
+              generateSimpleRelationFromAward(funder, "ri__________", a => a)
             case _ => logger.debug("no match for " + funder.DOI.get)
           }
 

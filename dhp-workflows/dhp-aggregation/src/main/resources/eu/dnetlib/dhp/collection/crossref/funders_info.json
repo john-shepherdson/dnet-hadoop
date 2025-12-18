@@ -1075,5 +1075,12 @@
     "uri": "https://doi.org/10.13039/501100003170",
     "name": "Stiftelsen f\u00f6r Kunskaps- och Kompetensutveckling",
     "synonym": []
+  },
+  {
+    "id": "501100025294",
+    "shortName": "ri",
+    "uri": "https://doi.org/10.13039/501100025294",
+    "name": "Research Ireland",
+    "synonym": []
   }
 ]
